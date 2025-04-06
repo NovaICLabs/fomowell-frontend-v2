@@ -1,8 +1,7 @@
+import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
-import type { FunctionComponent } from "../common/types";
-
-export const Home = (): FunctionComponent => {
+const Home = () => {
 	const { t, i18n } = useTranslation();
 
 	const onTranslateButtonClick = async (): Promise<void> => {
@@ -26,3 +25,7 @@ export const Home = (): FunctionComponent => {
 		</div>
 	);
 };
+
+export const Route = createFileRoute("/")({
+	component: Home,
+});
