@@ -1,1 +1,1 @@
-pnpm run commitizen # commitizen
+bun commitizen # commitizen
