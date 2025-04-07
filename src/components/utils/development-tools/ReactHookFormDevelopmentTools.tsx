@@ -8,4 +8,4 @@ export const ReactHookFormDevelopmentTools = isProduction
 			import("@hookform/devtools").then((result) => ({
 				default: result.DevTool,
 			}))
-	  );
+		);
