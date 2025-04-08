@@ -1,6 +1,6 @@
 import React from "react";
 
-import { isProduction } from "../../../common/utils";
+import { isProduction } from "../../../common/env";
 
 export const ReactHookFormDevelopmentTools = isProduction
 	? (): null => null

@@ -61,7 +61,14 @@ const typescriptConfig = {
 		"@typescript-eslint/adjacent-overload-signatures": "error",
 		"@typescript-eslint/array-type": ["error", { default: "generic" }],
 		"@typescript-eslint/consistent-type-exports": "error",
-		"@typescript-eslint/consistent-type-imports": "error",
+		"@typescript-eslint/consistent-type-imports": [
+			"error",
+			{
+				prefer: "type-imports",
+				fixStyle: "inline-type-imports",
+				disallowTypeAnnotations: true,
+			},
+		],
 		"@typescript-eslint/explicit-function-return-type": "off",
 		"@typescript-eslint/explicit-member-accessibility": "error",
 		"@typescript-eslint/explicit-module-boundary-types": "off",
@@ -161,12 +168,9 @@ const reactConfig = {
 		"react/no-unknown-property": "off",
 		"react/prop-types": "off",
 		"react/react-in-jsx-scope": "off",
-		"react-hooks/exhaustive-deps": "error",
 		...patchedReactHooksPlugin.configs.recommended.rules,
-		"react-refresh/only-export-components": [
-			"warn",
-			{ allowConstantExport: true },
-		],
+		"react/no-unstable-nested-components": "off",
+		"react-hooks/exhaustive-deps": "warn",
 	},
 };
 
@@ -233,7 +237,12 @@ const eslintConfig = typescriptEslint.config(
 );
 
 eslintConfig.map((config) => {
-	config.files = ["src/**/*.ts", "src/**/*.tsx"];
+	config.files = ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"];
+	config.ignores = [
+		...(config.ignores || []),
+		"src/canisters/**/*.d.ts",
+		"src/canisters/**/*.did.ts",
+	];
 });
 
 export default eslintConfig;
