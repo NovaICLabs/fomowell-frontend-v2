@@ -1,5 +1,5 @@
 diff --git a/node_modules/ic-siwb-lasereyes-connector/dist/index.js b/node_modules/ic-siwb-lasereyes-connector/dist/index.js
-index bf707a1..3858ba4 100644
+index bf707a1..c900d4e 100644
 --- a/node_modules/ic-siwb-lasereyes-connector/dist/index.js
 +++ b/node_modules/ic-siwb-lasereyes-connector/dist/index.js
 @@ -131280,6 +131280,7 @@ async function callLogin(anonymousActor, data, address, publickeyHex, sessionPub
@@ -23,7 +23,7 @@ index bf707a1..3858ba4 100644
      }
      let loginOkResponse;
      try {
-+      console.log(state.anonymousActor, loginSignature, state.connectedBtcAddress, publickeyHex, sessionPublicKey, signMessageType);
++      // console.log(state.anonymousActor, loginSignature, state.connectedBtcAddress, publickeyHex, new Uint8Array(sessionPublicKey), signMessageType);
        loginOkResponse = await callLogin(
          state.anonymousActor,
          loginSignature,
@@ -35,3 +35,12 @@ index bf707a1..3858ba4 100644
      } catch (e) {
        rejectLoginWithError(e, "Unable to login.");
        return;
+@@ -131714,7 +131717,7 @@ function SiwbIdentityProvider({
+       if (state.provider !== void 0) {
+         signMessageStatus = "pending";
+         let signMessageType;
+-        if (state.selectedProvider === lc2) {
++        if (state.selectedProvider === lc2 || state.selectedProvider === "phantom") {
+           const [addressType, _] = getAddressType(state.connectedBtcAddress);
+           if (addressType === 2 /* P2TR */ || addressType === 1 /* P2WPKH */) {
+             signMessageType = { Bip322Simple: null };
