@@ -292,7 +292,7 @@ const WalletOption: React.FC<WalletOptionProps> = ({
 }) => {
 	return (
 		<button
-			className="bg-gray-850 flex flex-col items-center justify-center rounded-lg border border-gray-700 p-4 transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+			className="bg-gray-750 flex flex-col items-center justify-center rounded-lg border border-gray-700 p-4 transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
 			disabled={disabled}
 			type="button"
 			onClick={onClick}
