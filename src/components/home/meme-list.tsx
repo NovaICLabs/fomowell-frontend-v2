@@ -377,7 +377,7 @@ export default function MemeList() {
 														header.column.getIsPinned() === "right"
 															? `0px`
 															: undefined,
-													zIndex: isPinned ? 100 : undefined,
+													zIndex: isPinned ? 10 : undefined,
 												}}
 											>
 												{flexRender(
