@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 
+import { useRouter } from "@tanstack/react-router";
 import {
 	createColumnHelper,
 	flexRender,
@@ -13,14 +14,16 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { withStopPropagation } from "@/lib/common/react-event";
 import { cn } from "@/lib/utils";
+import { useChainStore } from "@/store/chain";
 
-import SortsIcon from "../icons/common/sorts";
-import Telegram from "../icons/media/telegram";
-import Website from "../icons/media/website";
-import X from "../icons/media/x";
-import Star from "../icons/star";
-import { Button } from "../ui/button";
+import SortsIcon from "../../icons/common/sorts";
+import Telegram from "../../icons/media/telegram";
+import Website from "../../icons/media/website";
+import X from "../../icons/media/x";
+import Star from "../../icons/star";
+import { Button } from "../../ui/button";
 
 type Token = {
 	id: string;
@@ -261,7 +264,7 @@ export default function MemeList() {
 	);
 
 	// Percentage columns to display
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+
 	const percentageKeys = ["1m", "5m", "1h", "24h"];
 
 	const columnHelper = createColumnHelper<Token>();
@@ -279,7 +282,10 @@ export default function MemeList() {
 				),
 				cell: ({ row }) => (
 					<div className="flex items-center gap-2">
-						<Star className="h-4 w-4 cursor-pointer text-white/40" />
+						<Star
+							className="h-4 w-4 cursor-pointer text-white/40"
+							onClick={withStopPropagation(() => {})}
+						/>
 						<TooltipProvider>
 							<Tooltip>
 								<TooltipTrigger asChild>
@@ -306,9 +312,18 @@ export default function MemeList() {
 									{row.original.name}
 								</span>
 								<div className="ml-3 flex cursor-pointer items-center gap-x-2.5">
-									<X className="h-2.5 text-white/40 hover:text-white" />
-									<Telegram className="h-2.5 text-white/40 hover:text-white" />
-									<Website className="h-2.5 text-white/40 hover:text-white" />
+									<X
+										className="h-2.5 text-white/40 hover:text-white"
+										onClick={withStopPropagation(() => {})}
+									/>
+									<Telegram
+										className="h-2.5 text-white/40 hover:text-white"
+										onClick={withStopPropagation(() => {})}
+									/>
+									<Website
+										className="h-2.5 text-white/40 hover:text-white"
+										onClick={withStopPropagation(() => {})}
+									/>
 								</div>
 							</div>
 							<div className="text-xs leading-4 font-light text-white/60">
@@ -455,7 +470,10 @@ export default function MemeList() {
 				),
 				cell: () => (
 					<div className="ml-auto flex items-center justify-end pr-2">
-						<Button className="bg-gray-710 h-9 w-[63px] rounded-full text-xs text-white hover:bg-gray-600">
+						<Button
+							className="hover:bg-gray-710 h-9 w-[63px] rounded-full bg-transparent text-xs text-white"
+							onClick={withStopPropagation(() => {})}
+						>
 							<img alt="flash" src="/svgs/flash.svg" />
 							Buy
 						</Button>
@@ -484,11 +502,13 @@ export default function MemeList() {
 		},
 	});
 
+	const router = useRouter();
+	const { chain } = useChainStore();
 	return (
 		<div className="bg-gray-760 overflow-hidden rounded-2xl">
 			<div className="relative overflow-hidden">
 				<div className="overflow-x-auto" style={{ maxWidth: "100%" }}>
-					<table className="min-w-[1500px]">
+					<table className="w-full">
 						<thead>
 							{table.getHeaderGroups().map((headerGroup) => (
 								<tr key={headerGroup.id} className="border-gray-710">
@@ -533,7 +553,13 @@ export default function MemeList() {
 							{table.getRowModel().rows.map((row) => (
 								<tr
 									key={row.id}
-									className="group hover:bg-gray-710 relative duration-300"
+									className="group hover:bg-gray-750 relative duration-300"
+									onClick={() => {
+										void router.navigate({
+											to: `/${chain}/token/$id`,
+											params: { id: row.original.id },
+										});
+									}}
 								>
 									{row.getVisibleCells().map((cell) => {
 										const isPinned =
@@ -566,7 +592,7 @@ export default function MemeList() {
 													className={cn(
 														"flex h-full items-center p-3",
 														isPinned &&
-															"bg-gray-760 group-hover:bg-gray-710 duration-300"
+															"bg-gray-760 group-hover:bg-gray-750 duration-300"
 													)}
 												>
 													{flexRender(

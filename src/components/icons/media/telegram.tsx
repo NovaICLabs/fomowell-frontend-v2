@@ -1,6 +1,12 @@
 import { cn } from "@/lib/utils";
 
-export default function Telegram({ className }: { className?: string }) {
+export default function Telegram({
+	className,
+	onClick,
+}: {
+	className?: string;
+	onClick?: (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
+}): JSX.Element {
 	return (
 		<svg
 			className={cn(className)}
@@ -9,6 +15,7 @@ export default function Telegram({ className }: { className?: string }) {
 			viewBox="0 0 12 9"
 			width="12"
 			xmlns="http://www.w3.org/2000/svg"
+			onClick={onClick}
 		>
 			<path
 				clipRule="evenodd"

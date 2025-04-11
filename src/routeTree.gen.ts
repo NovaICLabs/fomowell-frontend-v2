@@ -15,6 +15,7 @@ import { Route as HowImport } from './routes/how'
 import { Route as ProfileRouteImport } from './routes/profile/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as ProfileUseridImport } from './routes/profile/$userid'
+import { Route as BitcoinTokenIdImport } from './routes/bitcoin/token/$id'
 
 // Create/Update Routes
 
@@ -40,6 +41,12 @@ const ProfileUseridRoute = ProfileUseridImport.update({
   id: '/$userid',
   path: '/$userid',
   getParentRoute: () => ProfileRouteRoute,
+} as any)
+
+const BitcoinTokenIdRoute = BitcoinTokenIdImport.update({
+  id: '/bitcoin/token/$id',
+  path: '/bitcoin/token/$id',
+  getParentRoute: () => rootRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -74,6 +81,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileUseridImport
       parentRoute: typeof ProfileRouteImport
     }
+    '/bitcoin/token/$id': {
+      id: '/bitcoin/token/$id'
+      path: '/bitcoin/token/$id'
+      fullPath: '/bitcoin/token/$id'
+      preLoaderRoute: typeof BitcoinTokenIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -96,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRouteRouteWithChildren
   '/how': typeof HowRoute
   '/profile/$userid': typeof ProfileUseridRoute
+  '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -103,6 +118,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRouteRouteWithChildren
   '/how': typeof HowRoute
   '/profile/$userid': typeof ProfileUseridRoute
+  '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
 }
 
 export interface FileRoutesById {
@@ -111,14 +127,26 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRouteRouteWithChildren
   '/how': typeof HowRoute
   '/profile/$userid': typeof ProfileUseridRoute
+  '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/profile' | '/how' | '/profile/$userid'
+  fullPaths:
+    | '/'
+    | '/profile'
+    | '/how'
+    | '/profile/$userid'
+    | '/bitcoin/token/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/profile' | '/how' | '/profile/$userid'
-  id: '__root__' | '/' | '/profile' | '/how' | '/profile/$userid'
+  to: '/' | '/profile' | '/how' | '/profile/$userid' | '/bitcoin/token/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/profile'
+    | '/how'
+    | '/profile/$userid'
+    | '/bitcoin/token/$id'
   fileRoutesById: FileRoutesById
 }
 
@@ -126,12 +154,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProfileRouteRoute: typeof ProfileRouteRouteWithChildren
   HowRoute: typeof HowRoute
+  BitcoinTokenIdRoute: typeof BitcoinTokenIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProfileRouteRoute: ProfileRouteRouteWithChildren,
   HowRoute: HowRoute,
+  BitcoinTokenIdRoute: BitcoinTokenIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -146,7 +176,8 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/profile",
-        "/how"
+        "/how",
+        "/bitcoin/token/$id"
       ]
     },
     "/": {
@@ -164,6 +195,9 @@ export const routeTree = rootRoute
     "/profile/$userid": {
       "filePath": "profile/$userid.tsx",
       "parent": "/profile"
+    },
+    "/bitcoin/token/$id": {
+      "filePath": "bitcoin/token/$id.tsx"
     }
   }
 }

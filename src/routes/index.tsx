@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 
-import MemeList from "@/components/home/meme-list";
 import BitcoinLogo from "@/components/icons/logo/bitcoin";
 import Star from "@/components/icons/star";
 import { Input } from "@/components/ui/input";
@@ -15,6 +14,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import MemeList from "@/components/views/home/meme-list";
 import { cn } from "@/lib/utils";
 import { chains, useChainStore } from "@/store/chain";
 

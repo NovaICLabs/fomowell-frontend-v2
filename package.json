@@ -9,10 +9,6 @@
 		"starter",
 		"template"
 	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/RicardoValdovinos/vite-react-boilerplate"
-	},
 	"license": "MIT",
 	"version": "1.0.0",
 	"type": "module",
@@ -35,7 +31,8 @@
 		"commitlint": "commitlint --edit",
 		"commitizen": "exec < /dev/tty && git cz --hook || true",
 		"prepare": "husky",
-		"postinstall": "patch-package"
+		"postinstall": "patch-package && bun copy-files",
+		"copy-files": "cp -R node_modules/charting_library/ public"
 	},
 	"dependencies": {
 		"@dfinity/agent": "^2.4.0",
@@ -79,7 +76,8 @@
 		"tailwind-merge": "^3.2.0",
 		"tw-animate-css": "^1.2.5",
 		"zod": "^3.23.8",
-		"zustand": "^4.5.5"
+		"zustand": "^4.5.5",
+		"charting_library": "git@github.com:tradingview/charting_library.git#semver:28.0.0"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^19.4.1",
