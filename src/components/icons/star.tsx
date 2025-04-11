@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 export default function Star({ className }: { className?: string }) {
 	return (
 		<svg
-			className={cn(className)}
+			className={cn(className, "duration-300 hover:text-yellow-500")}
 			fill="currentColor"
 			height="24"
 			viewBox="0 0 24 24"

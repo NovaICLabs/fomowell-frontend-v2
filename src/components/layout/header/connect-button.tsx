@@ -2,26 +2,27 @@ import { useEffect, useState } from "react";
 
 import { useLaserEyes } from "@omnisat/lasereyes";
 import {
-	LEATHER,
-	MAGIC_EDEN,
 	OKX,
 	PHANTOM,
 	type ProviderType,
 	UNISAT,
-	WIZZ,
-	XVERSE,
 } from "@omnisat/lasereyes-core";
+import copy from "copy-to-clipboard";
 import { useSiwbIdentity } from "ic-siwb-lasereyes-connector";
+import { Check } from "lucide-react";
 
+import { CopyIcon } from "@/components/icons/common/copy";
+import { DisconnectIcon } from "@/components/icons/common/disconnect";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { truncatePrincipal } from "@/lib/ic/principal";
+import { cn } from "@/lib/utils";
 
 const BitcoinWalletConnect: React.FC = () => {
 	const [open, setOpen] = useState(false);
@@ -67,10 +68,6 @@ const BitcoinWalletConnect: React.FC = () => {
 
 	const handleDisconnect = () => {
 		clear();
-	};
-
-	const formatAddress = (addr: string) => {
-		return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 	};
 
 	/**
@@ -138,19 +135,51 @@ const BitcoinWalletConnect: React.FC = () => {
 			setLoading(false);
 		}
 	}, [loginError]);
-
+	const principal = identity?.getPrincipal().toText();
+	const [copied, setCopied] = useState(false);
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogTrigger asChild>
-					{identity ? (
-						<Button
-							className="h-[38px] w-[111px] rounded-full text-xs font-bold"
-							onClick={handleDisconnect}
-						>
-							{formatAddress(identity?.getPrincipal().toText())}
-						</Button>
-					) : (
+				{principal ? (
+					<div className="flex items-center justify-center gap-x-2">
+						<div className="bg-gray-750 inline-flex h-[38px] items-center justify-start rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700">
+							<img
+								alt="avatar"
+								className="h-6 w-6 rounded-full"
+								src={`https://api.dicebear.com/9.x/identicon/svg?seed=${principal}`}
+							/>
+							<span className="ml-2">{truncatePrincipal(principal)}</span>
+							{copied ? (
+								<Check className="ml-1 opacity-40" size={16} />
+							) : (
+								<CopyIcon
+									className="ml-1 h-4 w-4"
+									onClick={() => {
+										setCopied(true);
+										copy(principal);
+										setTimeout(() => {
+											setCopied(false);
+										}, 2000);
+									}}
+								/>
+							)}
+							<div className="ml-2.5 h-6 w-px bg-white/20"></div>
+							<DisconnectIcon
+								className="ml-2.25 h-4 w-4"
+								onClick={handleDisconnect}
+							/>
+						</div>
+						<div className="bg-gray-750 inline-flex h-[38px] items-center justify-start gap-0.5 rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700">
+							<img
+								alt="flash"
+								className="h-4.5 w-4.5 rounded-full"
+								src={"/svgs/coins/bitcoin.svg"}
+							/>
+							<span className="text-xs font-medium">0.01366000</span>
+						</div>
+					</div>
+				) : (
+					<DialogTrigger asChild>
 						<Button
 							className="h-[38px] w-[111px] rounded-full text-xs font-bold"
 							disabled={loading}
@@ -160,17 +189,19 @@ const BitcoinWalletConnect: React.FC = () => {
 						>
 							{loading ? "Connecting..." : "Connect Wallet"}
 						</Button>
-					)}
-				</DialogTrigger>
+					</DialogTrigger>
+				)}
 
-				<DialogContent className="border-gray-800 bg-gray-900 text-white sm:max-w-md">
+				<DialogContent
+					className={cn(
+						"border-gray-755 bg-gray-755 transition-height flex w-[360px] flex-col rounded-3xl px-5 py-6 text-white duration-300",
+						loading && "h-100"
+					)}
+				>
 					<DialogHeader>
-						<DialogTitle className="text-xl font-bold text-white">
-							Connect Bitcoin Wallet
+						<DialogTitle className="text-center text-lg font-semibold text-white">
+							Connect Wallet
 						</DialogTitle>
-						<DialogDescription className="text-gray-400">
-							Choose a wallet to connect to FOMOWELL
-						</DialogDescription>
 					</DialogHeader>
 
 					{connectError && (
@@ -214,61 +245,43 @@ const BitcoinWalletConnect: React.FC = () => {
 							)}
 						</div>
 					)}
-					<div className="grid grid-cols-2 gap-3 py-2">
-						<WalletOption
-							recommended
-							disabled={loading}
-							name="Wizz"
-							onClick={() => handleConnectWallet(WIZZ)}
-						/>
-						<WalletOption
-							recommended
-							disabled={loading}
-							name="Xverse"
-							onClick={() => handleConnectWallet(XVERSE)}
-						/>
-						<WalletOption
-							disabled={loading}
-							name="UniSat"
-							onClick={() => handleConnectWallet(UNISAT)}
-						/>
-						<WalletOption
-							disabled={loading}
-							name="OKX"
-							onClick={() => handleConnectWallet(OKX)}
-						/>
-						<WalletOption
-							disabled={loading}
-							name="Leather"
-							onClick={() => handleConnectWallet(LEATHER)}
-						/>
-						<WalletOption
-							disabled={loading}
-							name="Phantom"
-							onClick={() => handleConnectWallet(PHANTOM)}
-						/>
-						<WalletOption
-							disabled={loading}
-							name="Magic Eden"
-							onClick={() => handleConnectWallet(MAGIC_EDEN)}
-						/>
-					</div>
 
-					<div className="mt-2 flex justify-center">
-						<Button
-							className="rounded-full border-gray-700 text-xs text-gray-300 hover:bg-gray-800 hover:text-white"
-							variant="outline"
-							onClick={() => {
-								setOpen(false);
-							}}
-						>
-							Cancel
-						</Button>
-					</div>
+					{loading ? (
+						<div className="flex h-full flex-1 flex-col items-center justify-start">
+							<img alt="fomowell" className="mt-10" src="/svgs/fomowell.svg" />
+							<img
+								alt="loading"
+								className="ab my-auto h-11 w-11 animate-spin"
+								src="/svgs/loading.svg"
+							/>
+						</div>
+					) : (
+						<div className="flex flex-col gap-6 py-2">
+							<WalletOption
+								disabled={loading}
+								icon={<img alt="Unisat" src="/svgs/wallet/unisat.svg" />}
+								name="UniSat"
+								onClick={() => handleConnectWallet(UNISAT)}
+							/>
+							<WalletOption
+								disabled={loading}
+								icon={<img alt="OKX" src="/svgs/wallet/okx.svg" />}
+								name="OKX"
+								onClick={() => handleConnectWallet(OKX)}
+							/>
+							<WalletOption
+								disabled={loading}
+								icon={<img alt="Phantom" src="/svgs/wallet/phantom.svg" />}
+								name="Phantom"
+								onClick={() => handleConnectWallet(PHANTOM)}
+							/>
 
-					{loading && (
-						<div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/50">
-							<div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+							<WalletOption
+								disabled={loading}
+								icon={<img alt="Plug" src="/svgs/wallet/plug.svg" />}
+								name="Plug"
+								onClick={() => {}}
+							/>
 						</div>
 					)}
 				</DialogContent>
@@ -282,6 +295,7 @@ interface WalletOptionProps {
 	onClick: () => void;
 	recommended?: boolean;
 	disabled?: boolean;
+	icon?: React.ReactNode;
 }
 
 const WalletOption: React.FC<WalletOptionProps> = ({
@@ -289,10 +303,11 @@ const WalletOption: React.FC<WalletOptionProps> = ({
 	onClick,
 	recommended,
 	disabled,
+	icon,
 }) => {
 	return (
 		<button
-			className="bg-gray-750 flex flex-col items-center justify-center rounded-lg border border-gray-700 p-4 transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+			className="bg-gray-750 flex h-[43px] items-center justify-between rounded-full border border-white/10 p-4 px-4 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
 			disabled={disabled}
 			type="button"
 			onClick={onClick}
@@ -303,6 +318,9 @@ const WalletOption: React.FC<WalletOptionProps> = ({
 					Recommended
 				</span>
 			)}
+			<div className="flex h-7 w-7 items-center justify-center rounded-full">
+				{icon}
+			</div>
 		</button>
 	);
 };

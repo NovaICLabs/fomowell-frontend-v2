@@ -37,7 +37,7 @@ const chains: Array<{
 export default function ChainSelector() {
 	const { chain, setChain } = useChainStore();
 	const router = useRouter();
-	const { ...search } = useSearch({ from: "/" });
+	const { ...search } = useSearch({ from: "__root__" });
 	return (
 		<Select
 			value={chain}

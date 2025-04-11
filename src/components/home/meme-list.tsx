@@ -7,20 +7,32 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+
+import SortsIcon from "../icons/common/sorts";
+import Telegram from "../icons/media/telegram";
+import Website from "../icons/media/website";
+import X from "../icons/media/x";
+import Star from "../icons/star";
+import { Button } from "../ui/button";
 
 type Token = {
 	id: string;
 	name: string;
 	symbol: string;
-	time: string;
+	age: string;
 	amount: string;
 	price: string;
+	liquidity: string;
+	marketCap: string;
 	percentages: Record<string, string>;
-	icp: {
-		amount: string;
-		price: string;
-	};
+	volume: string;
 	progress: number;
 };
 
@@ -31,305 +43,429 @@ export default function MemeList() {
 			{
 				id: "1",
 				name: "Krizz",
-				symbol: "BTC/ICP",
-				time: "5m",
+				symbol: "KKK",
+				age: "5m",
 				amount: "0.0016 BTC",
-				price: "$10.32K",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
 				percentages: {
-					"12.5%": "+12.5%",
-					"32.3%": "+32.3%",
-					"12.9%": "+12.9%",
-					"32.5%": "+32.5%",
-					"16.8%": "+16.8%",
-					"8.4%": "+8.4%",
-					"22.1%": "+22.1%",
-					"19.3%": "+19.3%",
-					"7.2%": "+7.2%",
-					"14.5%": "+14.5%",
+					"1m": "+2.5%",
+					"5m": "+12.5%",
+					"1h": "+15.3%",
+					"24h": "+32.7%",
 				},
-				icp: {
-					amount: "0.06 ICP",
-					price: "$0.60",
-				},
+				volume: "100",
 				progress: 80,
 			},
 			{
 				id: "2",
 				name: "Krizz",
-				symbol: "SOL/ICP",
-				time: "10m",
+				symbol: "KK",
+				age: "10m",
 				amount: "0.008 BTC",
-				price: "$10.32K",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
 				percentages: {
-					"12.5%": "-4.5%",
-					"32.3%": "-10.3%",
-					"12.9%": "-1.9%",
-					"32.5%": "-1.5%",
-					"16.8%": "-5.8%",
-					"8.4%": "-3.4%",
-					"22.1%": "-7.1%",
-					"19.3%": "-8.3%",
-					"7.2%": "-2.2%",
-					"14.5%": "-9.5%",
+					"1m": "-1.2%",
+					"5m": "-4.5%",
+					"1h": "-7.1%",
+					"24h": "-10.3%",
 				},
-				icp: {
-					amount: "0.06 ICP",
-					price: "$0.60",
-				},
+				volume: "100",
 				progress: 30,
 			},
 			{
 				id: "3",
 				name: "Krizz",
-				symbol: "ETH/ICP",
-				time: "30m",
+				symbol: "KK",
+				age: "30m",
 				amount: "0.048 BTC",
-				price: "$10.32K",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
 				percentages: {
-					"12.5%": "+3.5%",
-					"32.3%": "+3.6%",
-					"12.9%": "+3.4%",
-					"32.5%": "+3.5%",
-					"16.8%": "+3.8%",
-					"8.4%": "+3.4%",
-					"22.1%": "+3.1%",
-					"19.3%": "+3.3%",
-					"7.2%": "+3.2%",
-					"14.5%": "+3.5%",
+					"1m": "+3.5%",
+					"5m": "+3.6%",
+					"1h": "+3.4%",
+					"24h": "+3.5%",
 				},
-				icp: {
-					amount: "0.06 ICP",
-					price: "$0.60",
-				},
+				volume: "100",
 				progress: 90,
 			},
 			{
 				id: "4",
 				name: "Krizz",
-				symbol: "BNB/ICP",
-				time: "5m",
+				symbol: "KK",
+				age: "5m",
 				amount: "0.048 BTC",
-				price: "$10.32K",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
 				percentages: {
-					"12.5%": "-10.7%",
-					"32.3%": "-32.7%",
-					"12.9%": "-30.9%",
-					"32.5%": "-22.5%",
-					"16.8%": "-32.8%",
-					"8.4%": "-38.4%",
-					"22.1%": "-27.1%",
-					"19.3%": "-19.3%",
-					"7.2%": "-17.2%",
-					"14.5%": "-24.5%",
+					"1m": "-10.7%",
+					"5m": "-32.7%",
+					"1h": "-30.9%",
+					"24h": "-22.5%",
 				},
-				icp: {
-					amount: "0.06 ICP",
-					price: "$0.60",
+				volume: "100",
+				progress: 40,
+			},
+			{
+				id: "1",
+				name: "Krizz",
+				symbol: "KKK",
+				age: "5m",
+				amount: "0.0016 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "+2.5%",
+					"5m": "+12.5%",
+					"1h": "+15.3%",
+					"24h": "+32.7%",
 				},
+				volume: "100",
+				progress: 80,
+			},
+			{
+				id: "2",
+				name: "Krizz",
+				symbol: "KK",
+				age: "10m",
+				amount: "0.008 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "-1.2%",
+					"5m": "-4.5%",
+					"1h": "-7.1%",
+					"24h": "-10.3%",
+				},
+				volume: "100",
+				progress: 30,
+			},
+			{
+				id: "3",
+				name: "Krizz",
+				symbol: "KK",
+				age: "30m",
+				amount: "0.048 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "+3.5%",
+					"5m": "+3.6%",
+					"1h": "+3.4%",
+					"24h": "+3.5%",
+				},
+				volume: "100",
+				progress: 90,
+			},
+			{
+				id: "4",
+				name: "Krizz",
+				symbol: "KK",
+				age: "5m",
+				amount: "0.048 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "-10.7%",
+					"5m": "-32.7%",
+					"1h": "-30.9%",
+					"24h": "-22.5%",
+				},
+				volume: "100",
+				progress: 40,
+			},
+			{
+				id: "1",
+				name: "Krizz",
+				symbol: "KKK",
+				age: "5m",
+				amount: "0.0016 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "+2.5%",
+					"5m": "+12.5%",
+					"1h": "+15.3%",
+					"24h": "+32.7%",
+				},
+				volume: "100",
+				progress: 80,
+			},
+			{
+				id: "2",
+				name: "Krizz",
+				symbol: "KK",
+				age: "10m",
+				amount: "0.008 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "-1.2%",
+					"5m": "-4.5%",
+					"1h": "-7.1%",
+					"24h": "-10.3%",
+				},
+				volume: "100",
+				progress: 30,
+			},
+			{
+				id: "3",
+				name: "Krizz",
+				symbol: "KK",
+				age: "30m",
+				amount: "0.048 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "+3.5%",
+					"5m": "+3.6%",
+					"1h": "+3.4%",
+					"24h": "+3.5%",
+				},
+				volume: "100",
+				progress: 90,
+			},
+			{
+				id: "4",
+				name: "Krizz",
+				symbol: "KK",
+				age: "5m",
+				amount: "0.048 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "-10.7%",
+					"5m": "-32.7%",
+					"1h": "-30.9%",
+					"24h": "-22.5%",
+				},
+				volume: "100",
 				progress: 40,
 			},
 		],
 		[]
 	);
 
+	// Percentage columns to display
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	const percentageKeys = ["1m", "5m", "1h", "24h"];
+
 	const columnHelper = createColumnHelper<Token>();
 
 	// Use useMemo to define columns to avoid re-rendering issues
 	const columns = useMemo(
 		() => [
-			// Left fixed column
+			// Left fixed column - Token
 			columnHelper.group({
 				id: "token",
-				header: "Token",
+				header: () => (
+					<div className="flex cursor-pointer items-center gap-1 pl-5">
+						<span className="">Token</span>
+					</div>
+				),
 				cell: ({ row }) => (
 					<div className="flex items-center gap-2">
-						<div className="h-8 w-8 rounded-full bg-gradient-to-r from-yellow-500 to-red-500"></div>
-						<div>
+						<Star className="h-4 w-4 cursor-pointer text-white/40" />
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<div className="relative h-10 w-10 cursor-pointer overflow-hidden rounded-full">
+										<div className="absolute inset-0 rounded-full border-[2px] border-gray-500"></div>
+										<div
+											className="absolute inset-0 rounded-full"
+											style={{
+												background: `conic-gradient(#F7B406 ${row.original.progress}%, transparent ${row.original.progress}%)`,
+												clipPath: "circle(50% at center)",
+											}}
+										></div>
+										<div className="absolute inset-[2px] rounded-full bg-gradient-to-r from-blue-500 to-black"></div>
+									</div>
+								</TooltipTrigger>
+								<TooltipContent className="bg-white px-1 py-1 text-xs font-semibold text-black">
+									{row.original.progress} %
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+						<div className="flex flex-col gap-1.5">
 							<div className="flex items-center gap-1">
-								<span className="font-medium text-white">
+								<span className="text-sm leading-4 font-medium text-white">
 									{row.original.name}
 								</span>
-								<span className="text-xs text-white/60">
-									{row.original.symbol}
-								</span>
+								<div className="ml-3 flex cursor-pointer items-center gap-x-2.5">
+									<X className="h-2.5 text-white/40 hover:text-white" />
+									<Telegram className="h-2.5 text-white/40 hover:text-white" />
+									<Website className="h-2.5 text-white/40 hover:text-white" />
+								</div>
 							</div>
-							<div className="text-xs text-white/60">{row.original.time}</div>
+							<div className="text-xs leading-4 font-light text-white/60">
+								{row.original.symbol}
+							</div>
 						</div>
 					</div>
 				),
-				size: 150,
+				size: 250,
 				enablePinning: true,
+			}),
+			// Age column
+			columnHelper.accessor("age", {
+				id: "age",
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">Age</span>
+						<SortsIcon />
+					</div>
+				),
+				cell: (info) => (
+					<div className="flex h-full w-full items-center gap-1">
+						<span className="text-sm leading-4 font-medium text-white/60">
+							{info.getValue()}
+						</span>
+					</div>
+				),
+				size: 120,
 			}),
 			// Price column
 			columnHelper.accessor("price", {
-				header: "Price",
-				cell: (info) => info.getValue(),
-				size: 120,
-			}),
-			// Percentage columns - scrollable area
-			columnHelper.accessor((row) => row.percentages["12.5%"], {
-				id: "12.5%",
-				header: "12.5%",
-				cell: (info) => {
-					const value = info.getValue();
-					const isNegative = value?.startsWith("-");
-					return (
-						<span className={isNegative ? "text-red-500" : "text-green-500"}>
-							{value}
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">Price</span>
+						<SortsIcon />
+					</div>
+				),
+				cell: (info) => (
+					<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
+						<span className="text-sm leading-4 font-medium text-white">
+							{info.getValue()} BTC
 						</span>
-					);
-				},
-				size: 120,
-			}),
-			columnHelper.accessor((row) => row.percentages["32.3%"], {
-				id: "32.3%",
-				header: "32.3%",
-				cell: (info) => {
-					const value = info.getValue();
-					const isNegative = value?.startsWith("-");
-					return (
-						<span className={isNegative ? "text-red-500" : "text-green-500"}>
-							{value}
+						<span className="text-xs leading-4 font-light text-white/60">
+							{info.getValue()} sats
 						</span>
-					);
-				},
+					</div>
+				),
 				size: 120,
 			}),
-			columnHelper.accessor((row) => row.percentages["12.9%"], {
-				id: "12.9%",
-				header: "12.9%",
-				cell: (info) => {
-					const value = info.getValue();
-					const isNegative = value?.startsWith("-");
-					return (
-						<span className={isNegative ? "text-red-500" : "text-green-500"}>
-							{value}
+			// Liquidity column
+			columnHelper.accessor("liquidity", {
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">
+							Liquidity
 						</span>
-					);
-				},
-				size: 120,
-			}),
-			columnHelper.accessor((row) => row.percentages["32.5%"], {
-				id: "32.5%",
-				header: "32.5%",
-				cell: (info) => {
-					const value = info.getValue();
-					const isNegative = value?.startsWith("-");
-					return (
-						<span className={isNegative ? "text-red-500" : "text-green-500"}>
-							{value}
+						<SortsIcon />
+					</div>
+				),
+				cell: (info) => (
+					<div className="flex h-full w-full items-center gap-1">
+						<span className="text-sm leading-4 font-medium text-white">
+							{info.getValue()}
 						</span>
-					);
-				},
+					</div>
+				),
 				size: 120,
 			}),
-			columnHelper.accessor((row) => row.percentages["16.8%"], {
-				id: "16.8%",
-				header: "16.8%",
-				cell: (info) => {
-					const value = info.getValue();
-					const isNegative = value?.startsWith("-");
-					return (
-						<span className={isNegative ? "text-red-500" : "text-green-500"}>
-							{value}
+			// Market Cap column
+			columnHelper.accessor("marketCap", {
+				id: "mc",
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">MC</span>
+						<SortsIcon />
+					</div>
+				),
+				cell: (info) => (
+					<div className="flex h-full w-full items-center gap-1">
+						<span className="text-sm leading-4 font-medium text-white">
+							{info.getValue()}
 						</span>
-					);
-				},
+					</div>
+				),
 				size: 120,
 			}),
-			columnHelper.accessor((row) => row.percentages["8.4%"], {
-				id: "8.4%",
-				header: "8.4%",
-				cell: (info) => {
-					const value = info.getValue();
-					const isNegative = value?.startsWith("-");
-					return (
-						<span className={isNegative ? "text-red-500" : "text-green-500"}>
-							{value}
-						</span>
-					);
-				},
-				size: 120,
-			}),
-			columnHelper.accessor((row) => row.percentages["22.1%"], {
-				id: "22.1%",
-				header: "22.1%",
-				cell: (info) => {
-					const value = info.getValue();
-					const isNegative = value?.startsWith("-");
-					return (
-						<span className={isNegative ? "text-red-500" : "text-green-500"}>
-							{value}
-						</span>
-					);
-				},
-				size: 120,
-			}),
-			columnHelper.accessor((row) => row.percentages["19.3%"], {
-				id: "19.3%",
-				header: "19.3%",
-				cell: (info) => {
-					const value = info.getValue();
-					const isNegative = value?.startsWith("-");
-					return (
-						<span className={isNegative ? "text-red-500" : "text-green-500"}>
-							{value}
-						</span>
-					);
-				},
-				size: 120,
-			}),
-			columnHelper.accessor((row) => row.percentages["7.2%"], {
-				id: "7.2%",
-				header: "7.2%",
-				cell: (info) => {
-					const value = info.getValue();
-					const isNegative = value?.startsWith("-");
-					return (
-						<span className={isNegative ? "text-red-500" : "text-green-500"}>
-							{value}
-						</span>
-					);
-				},
-				size: 120,
-			}),
-			columnHelper.accessor((row) => row.percentages["14.5%"], {
-				id: "14.5%",
-				header: "14.5%",
-				cell: (info) => {
-					const value = info.getValue();
-					const isNegative = value?.startsWith("-");
-					return (
-						<span className={isNegative ? "text-red-500" : "text-green-500"}>
-							{value}
-						</span>
-					);
-				},
-				size: 120,
-			}),
+			// Percentage columns
+			...percentageKeys.map((key) =>
+				columnHelper.accessor((row) => row.percentages[key], {
+					id: key,
+					header: () => (
+						<div className="group flex cursor-pointer items-center gap-1">
+							<span className="duration-300 group-hover:text-white">{key}</span>
+							<SortsIcon />
+						</div>
+					),
+					cell: (info) => {
+						const value = info.getValue();
+						const isNegative = value?.startsWith("-");
+						return (
+							<div className="flex h-full w-full items-center">
+								<span
+									className={cn(
+										"text-sm leading-4 font-medium",
+										isNegative ? "text-[#DE3F4D]" : "text-[#1BBB61]"
+									)}
+								>
+									{value}
+								</span>
+							</div>
+						);
+					},
+					size: 120,
+				})
+			),
 			// Volume column
-			columnHelper.accessor((row) => row.icp.amount, {
+			columnHelper.accessor((row) => row.volume, {
 				id: "volume",
-				header: "Volume",
-				cell: (info) => info.getValue(),
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">Volume</span>
+						<SortsIcon />
+					</div>
+				),
+				cell: (info) => (
+					<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
+						<span className="text-sm leading-4 font-medium text-white">
+							{info.getValue()} BTC
+						</span>
+						<span className="text-xs leading-4 font-light text-white/60">
+							${info.getValue()}
+						</span>
+					</div>
+				),
 				size: 120,
 			}),
-			// Right fixed column - fix header alignment issue
+			// Right fixed column - Quick buy
 			columnHelper.group({
 				id: "actions",
-				header: "Quick buy",
+				header: () => (
+					<div className="flex cursor-pointer justify-end pr-2.5">
+						<span className="text-right">Quick buy</span>
+					</div>
+				),
 				cell: () => (
-					<div className="flex justify-center">
-						<button className="rounded-full bg-green-500 px-3 py-1 text-xs text-white hover:bg-green-600">
+					<div className="ml-auto flex items-center justify-end pr-2">
+						<Button className="bg-gray-710 h-9 w-[63px] rounded-full text-xs text-white hover:bg-gray-600">
+							<img alt="flash" src="/svgs/flash.svg" />
 							Buy
-						</button>
+						</Button>
 					</div>
 				),
 				size: 120,
 				enablePinning: true,
 			}),
 		],
-		[columnHelper]
+		[columnHelper, percentageKeys]
 	);
 
 	const table = useReactTable({
@@ -349,14 +485,13 @@ export default function MemeList() {
 	});
 
 	return (
-		<div className="bg-gray-760 rounded-2xl">
+		<div className="bg-gray-760 overflow-hidden rounded-2xl">
 			<div className="relative overflow-hidden">
-				{/* Set container max width to ensure scrollbar appears */}
 				<div className="overflow-x-auto" style={{ maxWidth: "100%" }}>
 					<table className="min-w-[1500px]">
 						<thead>
 							{table.getHeaderGroups().map((headerGroup) => (
-								<tr key={headerGroup.id}>
+								<tr key={headerGroup.id} className="border-gray-710">
 									{headerGroup.headers.map((header) => {
 										const isPinned =
 											header.column.getIsPinned() === "left" ||
@@ -365,7 +500,12 @@ export default function MemeList() {
 										return (
 											<th
 												key={header.id}
-												className="bg-gray-760 border-b border-gray-800 p-3 text-left text-sm font-medium text-white/60"
+												className={cn(
+													"bg-gray-760 border-gray-710 border-b p-3 text-left text-xs leading-4 font-medium text-white/40",
+													isPinned && "sticky",
+													header.column.getIsPinned() === "left" && "left-0",
+													header.column.getIsPinned() === "right" && "right-0"
+												)}
 												style={{
 													width: header.getSize(),
 													position: isPinned ? "sticky" : undefined,
@@ -377,7 +517,6 @@ export default function MemeList() {
 														header.column.getIsPinned() === "right"
 															? `0px`
 															: undefined,
-													zIndex: isPinned ? 10 : undefined,
 												}}
 											>
 												{flexRender(
@@ -392,7 +531,10 @@ export default function MemeList() {
 						</thead>
 						<tbody>
 							{table.getRowModel().rows.map((row) => (
-								<tr key={row.id} className="border-t border-gray-800">
+								<tr
+									key={row.id}
+									className="group hover:bg-gray-710 relative duration-300"
+								>
 									{row.getVisibleCells().map((cell) => {
 										const isPinned =
 											cell.column.getIsPinned() === "left" ||
@@ -402,25 +544,36 @@ export default function MemeList() {
 											<td
 												key={cell.id}
 												className={cn(
-													"p-3 text-sm text-white",
-													isPinned && "bg-gray-760 sticky z-10"
+													"border-gray-710 h-18 border-b p-0 pt-px text-sm text-white",
+													isPinned && "sticky",
+													cell.column.getIsPinned() === "left" && "left-0",
+													cell.column.getIsPinned() === "right" && "right-0"
 												)}
 												style={{
 													width: cell.column.getSize(),
+													position: isPinned ? "sticky" : undefined,
 													left:
 														cell.column.getIsPinned() === "left"
 															? `${cell.column.getStart("left")}px`
 															: undefined,
 													right:
 														cell.column.getIsPinned() === "right"
-															? `${cell.column.getStart("right")}px`
+															? `0px`
 															: undefined,
 												}}
 											>
-												{flexRender(
-													cell.column.columnDef.cell,
-													cell.getContext()
-												)}
+												<div
+													className={cn(
+														"flex h-full items-center p-3",
+														isPinned &&
+															"bg-gray-760 group-hover:bg-gray-710 duration-300"
+													)}
+												>
+													{flexRender(
+														cell.column.columnDef.cell,
+														cell.getContext()
+													)}
+												</div>
 											</td>
 										);
 									})}

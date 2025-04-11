@@ -18,13 +18,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { chains, useChainStore } from "@/store/chain";
 
-const tabs = [
-	"recent trade",
-	"new",
-	"completing",
-	"completed",
-	"favorite",
-] as const;
+const tabs = ["recent", "new", "completing", "completed", "favorite"] as const;
 type TabType = (typeof tabs)[number];
 // Using Zod to define search parameters schema
 const SearchSchema = z.object({
@@ -85,7 +79,7 @@ function Home() {
 				</Select>
 				<Tabs
 					className=""
-					defaultValue="recent trade"
+					defaultValue="recent"
 					onValueChange={(value) => {
 						void router.navigate({
 							to: "/",
@@ -156,7 +150,7 @@ function Home() {
 			</div>
 
 			<div className="mt-[33px]">
-				{(!tab || tab === "recent trade") && <MemeList />}
+				{(!tab || tab === "recent") && <MemeList />}
 				{tab === "new" && <div>New Creation content - Chain: {chain}</div>}
 				{tab === "completing" && <div>Completing content - Chain: {chain}</div>}
 				{tab === "completed" && <div>Completed content - Chain: {chain}</div>}

@@ -10,3 +10,7 @@ export const isPrincipalText = (text: string | undefined): boolean => {
 		return false;
 	}
 };
+
+export const truncatePrincipal = (principal: string): string => {
+	return principal.slice(0, 6) + "..." + principal.slice(-4);
+};
