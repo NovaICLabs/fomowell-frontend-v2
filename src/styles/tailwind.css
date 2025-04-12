@@ -70,6 +70,7 @@
 
 	--color-gray-100: var(--gray-100);
 	--color-gray-200: var(--gray-200);
+	--color-gray-280: var(--gray-280);
 	--color-gray-300: var(--gray-300);
 	--color-gray-400: var(--gray-400);
 	--color-gray-500: var(--gray-500);
@@ -82,6 +83,7 @@
 	--color-gray-760: var(--gray-760);
 	--color-gray-800: var(--gray-800);
 	--color-gray-850: var(--gray-850);
+	--color-gray-860: var(--gray-860);
 	--color-gray-900: var(--gray-900);
 
 	--color-yellow-100: var(--yellow-100);
@@ -186,18 +188,20 @@
 
 	--gray-100: oklch(0.922 0 0);
 	--gray-200: oklch(0.8 0 0);
+	--gray-280: oklch(0.71 0 0); /* #a1a1a1 */
 	--gray-300: oklch(0.7 0 0);
 	--gray-400: oklch(0.6 0 0);
 	--gray-500: oklch(0.51 0.0186 82.76); /* #6B655A */
 	--gray-600: oklch(0.4 0 0);
 	--gray-650: oklch(0.36 0 0); /* #3C3C3C */
 	--gray-700: oklch(0.3 0 0); /* #2E2E2E */
-	--gray-710: oklch(0.27 0 0); /* #262626 */
+	--gray-710: oklch(0.27 0 0); /* #262626 #272727   */
 	--gray-750: oklch(0.24 0 0); /* #1E1E1E */
 	--gray-755: oklch(0.23 0 0); /* #1D1D1D */
 	--gray-760: oklch(0.22 0 0); /* #1A1A1A */
 	--gray-800: oklch(0.21 0 0); /* #191919 */
 	--gray-850: oklch(0.21 0.0061 271.12); /* #17181B */
+	--gray-860: oklch(0.2 0 0); /* #161616 */
 	--gray-900: oklch(0.1 0 0);
 
 	--yellow-100: oklch(0.922 0 0);
@@ -238,5 +242,15 @@
 	button:not([disabled]),
 	[role="button"]:not([disabled]) {
 		cursor: pointer;
+	}
+}
+
+@layer utilities {
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+	.no-scrollbar {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
 	}
 }

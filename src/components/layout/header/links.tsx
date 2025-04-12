@@ -18,7 +18,6 @@ export default function Links() {
 		<div className="flex items-center gap-[30px]">
 			{links.map((link) => {
 				const isActive = location.pathname === link.to;
-
 				return (
 					<Link
 						key={link.to}

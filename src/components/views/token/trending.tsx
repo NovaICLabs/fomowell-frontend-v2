@@ -10,6 +10,7 @@ import {
 import { ChevronLeft } from "lucide-react";
 
 import Sorts from "@/components/icons/common/sorts";
+import { exampleImage } from "@/lib/common/img";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
@@ -39,7 +40,7 @@ export default function Trending() {
 			{
 				id: "1",
 				name: "Kizzy",
-				icon: "/path/to/icon1.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -51,7 +52,7 @@ export default function Trending() {
 			{
 				id: "2",
 				name: "Kizzy",
-				icon: "/path/to/icon2.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -63,7 +64,7 @@ export default function Trending() {
 			{
 				id: "3",
 				name: "Kizzy",
-				icon: "/path/to/icon3.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -75,7 +76,7 @@ export default function Trending() {
 			{
 				id: "4",
 				name: "Kizzy",
-				icon: "/path/to/icon4.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -87,7 +88,7 @@ export default function Trending() {
 			{
 				id: "1",
 				name: "Kizzy",
-				icon: "/path/to/icon1.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -99,7 +100,7 @@ export default function Trending() {
 			{
 				id: "2",
 				name: "Kizzy",
-				icon: "/path/to/icon2.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -111,7 +112,7 @@ export default function Trending() {
 			{
 				id: "3",
 				name: "Kizzy",
-				icon: "/path/to/icon3.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -123,7 +124,7 @@ export default function Trending() {
 			{
 				id: "4",
 				name: "Kizzy",
-				icon: "/path/to/icon4.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -135,7 +136,7 @@ export default function Trending() {
 			{
 				id: "1",
 				name: "Kizzy",
-				icon: "/path/to/icon1.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -147,7 +148,7 @@ export default function Trending() {
 			{
 				id: "2",
 				name: "Kizzy",
-				icon: "/path/to/icon2.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -159,7 +160,7 @@ export default function Trending() {
 			{
 				id: "3",
 				name: "Kizzy",
-				icon: "/path/to/icon3.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -171,7 +172,7 @@ export default function Trending() {
 			{
 				id: "4",
 				name: "Kizzy",
-				icon: "/path/to/icon4.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -183,7 +184,7 @@ export default function Trending() {
 			{
 				id: "1",
 				name: "Kizzy",
-				icon: "/path/to/icon1.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -195,7 +196,7 @@ export default function Trending() {
 			{
 				id: "2",
 				name: "Kizzy",
-				icon: "/path/to/icon2.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -207,7 +208,7 @@ export default function Trending() {
 			{
 				id: "3",
 				name: "Kizzy",
-				icon: "/path/to/icon3.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -219,7 +220,7 @@ export default function Trending() {
 			{
 				id: "4",
 				name: "Kizzy",
-				icon: "/path/to/icon4.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -231,7 +232,7 @@ export default function Trending() {
 			{
 				id: "1",
 				name: "Kizzy",
-				icon: "/path/to/icon1.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -243,7 +244,7 @@ export default function Trending() {
 			{
 				id: "2",
 				name: "Kizzy",
-				icon: "/path/to/icon2.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -255,7 +256,7 @@ export default function Trending() {
 			{
 				id: "3",
 				name: "Kizzy",
-				icon: "/path/to/icon3.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -267,7 +268,7 @@ export default function Trending() {
 			{
 				id: "4",
 				name: "Kizzy",
-				icon: "/path/to/icon4.png",
+				icon: exampleImage,
 				price: "$0.0034",
 				change: "+20%",
 				transactions: {
@@ -371,11 +372,11 @@ export default function Trending() {
 
 	return (
 		<div
-			className="overflow-hidden rounded-2xl"
-			style={{ width: isExpanded ? 230 : 60 }}
+			className="h-full flex-shrink-0 rounded-2xl"
+			style={{ width: isExpanded ? 230 : 0 }}
 		>
 			{isExpanded ? (
-				<div className="p-4">
+				<div className="flex h-full flex-col p-4">
 					<div className="flex items-center justify-between">
 						<h2 className="text-base font-semibold text-white">Trending</h2>
 						<button
@@ -392,7 +393,7 @@ export default function Trending() {
 							<button
 								key={time}
 								className={cn(
-									"bg-[#161616] py-2 text-center text-sm font-medium",
+									"bg-gray-860 py-2 text-center text-sm font-medium",
 									activeTime === time
 										? "bg-gray-700 text-white"
 										: "bg-transparent text-gray-500",
@@ -409,9 +410,9 @@ export default function Trending() {
 					</div>
 
 					{/* Table */}
-					<div className="mt-4">
+					<div className="no-scrollbar mt-4 flex-1 overflow-y-auto">
 						<table className="w-full">
-							<thead>
+							<thead className="sticky top-0 z-10 bg-[#0F0F0F]">
 								{table.getHeaderGroups().map((headerGroup) => (
 									<tr key={headerGroup.id}>
 										{headerGroup.headers.map((header) => (

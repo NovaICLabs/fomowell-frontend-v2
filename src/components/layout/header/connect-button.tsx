@@ -21,6 +21,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 
@@ -146,7 +147,7 @@ const BitcoinWalletConnect: React.FC = () => {
 							<img
 								alt="avatar"
 								className="h-6 w-6 rounded-full"
-								src={`https://api.dicebear.com/9.x/identicon/svg?seed=${principal}`}
+								src={getAvatar(principal)}
 							/>
 							<span className="ml-2">{truncatePrincipal(principal)}</span>
 							{copied ? (
