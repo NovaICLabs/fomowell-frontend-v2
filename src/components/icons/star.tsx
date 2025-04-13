@@ -9,12 +9,15 @@ export default function Star({
 }): JSX.Element {
 	return (
 		<svg
-			className={cn(className, "duration-300 hover:text-yellow-500")}
 			fill="currentColor"
 			height="24"
 			viewBox="0 0 24 24"
 			width="24"
 			xmlns="http://www.w3.org/2000/svg"
+			className={cn(
+				className,
+				"cursor-pointer text-white/40 duration-300 hover:text-yellow-500"
+			)}
 			onClick={onClick}
 		>
 			<path

@@ -1,11 +1,12 @@
 import { useState } from "react";
 
 import Comments from "./comments";
+import Transactions from "./trasactions";
 const tabs = ["Comments", "Transactions"];
 export default function Bottom() {
 	const [activeTab, setActiveTab] = useState(tabs[0]);
 	return (
-		<div className="mt-7.5 flex flex-1 flex-col gap-7.5 overflow-y-auto">
+		<div className="mt-7.5 flex flex-1 flex-col gap-7.5">
 			<div className="flex items-center gap-[30px]">
 				{tabs.map((tab) => {
 					const isActive = activeTab === tab;
@@ -34,6 +35,7 @@ export default function Bottom() {
 				})}
 			</div>
 			{activeTab === "Comments" && <Comments />}
+			{activeTab === "Transactions" && <Transactions />}
 		</div>
 	);
 }

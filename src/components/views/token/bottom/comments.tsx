@@ -61,8 +61,8 @@ export default function Comments() {
 		},
 	});
 	return (
-		<div className="flex flex-1 flex-col overflow-y-auto">
-			<div className="bg-gray-860 sticky top-0 flex flex-col gap-0 overflow-hidden rounded-[12px]">
+		<div className="flex flex-col">
+			<div className="bg-gray-860 flex flex-col gap-0 overflow-hidden rounded-[12px]">
 				<Textarea
 					className="dark:bg-gray-860 h-20 border-0 px-[23px] py-5 text-base text-white placeholder:text-white/40 focus-visible:border-transparent focus-visible:ring-0"
 					placeholder="Write your comments"
@@ -78,7 +78,7 @@ export default function Comments() {
 					</Button>
 				</div>
 			</div>
-			<div className="no-scrollbar mt-3.75 flex flex-1 flex-col gap-3 overflow-y-auto pb-3">
+			<div className="no-scrollbar mt-3.75 flex h-screen flex-col gap-3 overflow-auto pb-3">
 				<Comment />
 				<Comment />
 				<Comment />

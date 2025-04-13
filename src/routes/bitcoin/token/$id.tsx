@@ -12,12 +12,14 @@ export const Route = createFileRoute("/bitcoin/token/$id")({
 
 function RouteComponent() {
 	return (
-		<div className="flex h-full flex-row gap-4">
+		<div className="flex h-full flex-row gap-4 pt-7.5">
 			<Trending />
-			<div className="flex h-full flex-1 flex-col gap-4">
+			<div className="flex flex-1 flex-col gap-4 overflow-auto">
 				<HeadInfo />
-				<TradingView />
-				<Bottom />
+				<div className="no-scrollbar flex flex-1 flex-col gap-4 overflow-auto">
+					<TradingView />
+					<Bottom />
+				</div>
 			</div>
 			<Right />
 		</div>

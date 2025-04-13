@@ -376,7 +376,7 @@ export default function Trending() {
 			style={{ width: isExpanded ? 230 : 0 }}
 		>
 			{isExpanded ? (
-				<div className="flex h-full flex-col p-4">
+				<div className="flex h-full flex-col p-4 pt-0">
 					<div className="flex items-center justify-between">
 						<h2 className="text-base font-semibold text-white">Trending</h2>
 						<button
@@ -412,7 +412,7 @@ export default function Trending() {
 					{/* Table */}
 					<div className="no-scrollbar mt-4 flex-1 overflow-y-auto">
 						<table className="w-full">
-							<thead className="sticky top-0 z-10 bg-[#0F0F0F]">
+							<thead className="bg-background sticky top-0 z-10">
 								{table.getHeaderGroups().map((headerGroup) => (
 									<tr key={headerGroup.id}>
 										{headerGroup.headers.map((header) => (

@@ -8,6 +8,12 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 
+import SortsIcon from "@/components/icons/common/sorts";
+import Telegram from "@/components/icons/media/telegram";
+import Website from "@/components/icons/media/website";
+import X from "@/components/icons/media/x";
+import Star from "@/components/icons/star";
+import { Button } from "@/components/ui/button";
 import {
 	Tooltip,
 	TooltipContent,
@@ -17,13 +23,6 @@ import {
 import { withStopPropagation } from "@/lib/common/react-event";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
-
-import SortsIcon from "../../icons/common/sorts";
-import Telegram from "../../icons/media/telegram";
-import Website from "../../icons/media/website";
-import X from "../../icons/media/x";
-import Star from "../../icons/star";
-import { Button } from "../../ui/button";
 
 type Token = {
 	id: string;
