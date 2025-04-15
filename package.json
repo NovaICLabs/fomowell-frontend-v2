@@ -31,7 +31,8 @@
 		"commitlint": "commitlint --edit",
 		"commitizen": "exec < /dev/tty && git cz --hook || true",
 		"prepare": "husky",
-		"postinstall": "patch-package"
+		"postinstall": "patch-package",
+		"deploy:manual": "bun run build && wrangler pages deploy"
 	},
 	"dependencies": {
 		"@dfinity/agent": "^2.4.1",
@@ -154,7 +155,8 @@
 		"vite": "5.4.2",
 		"vite-plugin-node-polyfills": "^0.23.0",
 		"vite-plugin-static-copy": "^1.0.6",
-		"vitest": "2.0.5"
+		"vitest": "2.0.5",
+		"wrangler": "^4.11.0"
 	},
 	"config": {
 		"commitizen": {
