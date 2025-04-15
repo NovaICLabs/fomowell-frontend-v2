@@ -5,7 +5,6 @@ import { Check } from "lucide-react";
 
 import { CopyIcon } from "@/components/icons/common/copy";
 import { DisconnectIcon } from "@/components/icons/common/disconnect";
-import { useOisyWallet } from "@/components/providers/ic/oisy";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -14,48 +13,43 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { useIcWallet } from "@/hooks/providers/wallet/ic";
 import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
+import { useIcIdentityStore, useIcLastConnectedWalletStore } from "@/store/ic";
 
 import WalletOption from "../wallet-option";
 
-type ProviderType = "oisy" | "plug" | "ii";
+import type { Connector } from "@/lib/ic/connectors";
+
 const IcpWalletConnect: React.FC = () => {
 	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState<boolean>(false);
-	const { connect, disconnect, accounts } = useOisyWallet();
-	const handleConnectWallet = async (provider: ProviderType) => {
+	const { connect, disconnect } = useIcWallet();
+	const { principal, setPrincipal, setConnected } = useIcIdentityStore();
+	const { setLastConnectedWallet } = useIcLastConnectedWalletStore();
+	const handleConnectWallet = async (connector: Connector) => {
 		try {
-			switch (provider) {
-				case "oisy":
-					await connect();
-
-					break;
-				case "plug":
-					break;
-				case "ii":
-					break;
+			const { principal, connected } = await connect(connector);
+			if (principal) {
+				setPrincipal(principal);
+				setConnected(connected);
+				setLastConnectedWallet(connector);
 			}
-			setLoading(false);
 			setOpen(false);
 		} catch (error) {
 			console.error(error);
+		} finally {
+			setLoading(false);
 		}
 	};
 
-	const handleDisconnect = (provider: ProviderType) => {
-		switch (provider) {
-			case "oisy":
-				disconnect();
-				break;
-			case "plug":
-				break;
-		}
+	const handleDisconnect = () => {
+		void disconnect();
 	};
 
 	const [copied, setCopied] = useState(false);
-	const principal = accounts[0]?.owner;
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
@@ -90,7 +84,7 @@ const IcpWalletConnect: React.FC = () => {
 							<DisconnectIcon
 								className="ml-2.25 h-4 w-4"
 								onClick={() => {
-									handleDisconnect("oisy");
+									handleDisconnect();
 								}}
 							/>
 						</div>
@@ -142,16 +136,26 @@ const IcpWalletConnect: React.FC = () => {
 						<div className="flex flex-col gap-6 py-2">
 							<WalletOption
 								disabled={loading}
+								icon={<img alt="II" src="/svgs/wallet/ii.svg" />}
+								name="Internet Identity"
+								onClick={() => {
+									void handleConnectWallet("II");
+								}}
+							/>
+							<WalletOption
+								disabled={loading}
 								icon={<img alt="Plug" src="/svgs/wallet/plug.svg" />}
 								name="Plug"
-								onClick={() => {}}
+								onClick={() => {
+									void handleConnectWallet("PLUG");
+								}}
 							/>
 							<WalletOption
 								disabled={loading}
 								icon={<img alt="Oisy" src="/svgs/wallet/oisy.svg" />}
 								name="Oisy"
 								onClick={() => {
-									void handleConnectWallet("oisy");
+									void handleConnectWallet("OISY");
 								}}
 							/>
 						</div>
