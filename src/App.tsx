@@ -3,6 +3,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 
 import { BitcoinWalletProvider } from "./components/providers/bitcoin-wallet-provider";
+import { OisyWalletProvider } from "./components/providers/ic/oisy";
 import { ThemeProvider } from "./components/providers/theme-provider";
 import { TanStackRouterDevelopmentTools } from "./components/utils/development-tools/TanStackRouterDevelopmentTools";
 import { routeTree } from "./routeTree.gen";
@@ -20,13 +21,15 @@ const App = () => {
 		<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
 			<QueryClientProvider client={queryClient}>
 				<BitcoinWalletProvider>
-					<RouterProvider router={router} />
-					<TanStackRouterDevelopmentTools
-						initialIsOpen={false}
-						position="bottom-right"
-						router={router}
-					/>
-					<ReactQueryDevtools initialIsOpen={false} />
+					<OisyWalletProvider>
+						<RouterProvider router={router} />
+						<TanStackRouterDevelopmentTools
+							initialIsOpen={false}
+							position="bottom-right"
+							router={router}
+						/>
+						<ReactQueryDevtools initialIsOpen={false} />
+					</OisyWalletProvider>
 				</BitcoinWalletProvider>
 			</QueryClientProvider>
 		</ThemeProvider>
