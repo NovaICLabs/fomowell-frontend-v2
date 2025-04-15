@@ -9,7 +9,7 @@ const tabs = ["Trade", "Liquidity"];
 export default function Bottom() {
 	const [activeTab, setActiveTab] = useState(tabs[0]);
 	return (
-		<div className="flex w-[390px] flex-shrink-0 flex-col gap-7.5 overflow-y-auto">
+		<div className="no-scrollbar flex w-[390px] flex-shrink-0 flex-col gap-7.5 overflow-auto">
 			<div className="flex items-center gap-[30px]">
 				{tabs.map((tab) => {
 					const isActive = activeTab === tab;
@@ -40,7 +40,7 @@ export default function Bottom() {
 			{activeTab === "Trade" && <Trade />}
 			{activeTab === "Liquidity" && <Liquidity />}
 
-			<div className="bg-gray-860 grid h-21 grid-cols-4 overflow-hidden rounded-[12px]">
+			<div className="bg-gray-860 grid h-21 flex-shrink-0 grid-cols-4 rounded-[12px]">
 				<div className="border-r-gray-710 hover:bg-gray-710 flex cursor-pointer flex-col items-center justify-center gap-3 border-r">
 					<span className="text-sm leading-4 font-medium text-white/40">
 						1m
