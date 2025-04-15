@@ -258,13 +258,121 @@ export default function MemeList() {
 				volume: "100",
 				progress: 40,
 			},
+			{
+				id: "3",
+				name: "Krizz",
+				symbol: "KK",
+				age: "30m",
+				amount: "0.048 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "+3.5%",
+					"5m": "+3.6%",
+					"1h": "+3.4%",
+					"24h": "+3.5%",
+				},
+				volume: "100",
+				progress: 90,
+			},
+			{
+				id: "4",
+				name: "Krizz",
+				symbol: "KK",
+				age: "5m",
+				amount: "0.048 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "-10.7%",
+					"5m": "-32.7%",
+					"1h": "-30.9%",
+					"24h": "-22.5%",
+				},
+				volume: "100",
+				progress: 40,
+			},
+			{
+				id: "3",
+				name: "Krizz",
+				symbol: "KK",
+				age: "30m",
+				amount: "0.048 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "+3.5%",
+					"5m": "+3.6%",
+					"1h": "+3.4%",
+					"24h": "+3.5%",
+				},
+				volume: "100",
+				progress: 90,
+			},
+			{
+				id: "4",
+				name: "Krizz",
+				symbol: "KK",
+				age: "5m",
+				amount: "0.048 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "-10.7%",
+					"5m": "-32.7%",
+					"1h": "-30.9%",
+					"24h": "-22.5%",
+				},
+				volume: "100",
+				progress: 40,
+			},
+			{
+				id: "3",
+				name: "Krizz",
+				symbol: "KK",
+				age: "30m",
+				amount: "0.048 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "+3.5%",
+					"5m": "+3.6%",
+					"1h": "+3.4%",
+					"24h": "+3.5%",
+				},
+				volume: "100",
+				progress: 90,
+			},
+			{
+				id: "4",
+				name: "Krizz",
+				symbol: "KK",
+				age: "5m",
+				amount: "0.048 BTC",
+				price: "1",
+				liquidity: "$135.5K",
+				marketCap: "$250K",
+				percentages: {
+					"1m": "-10.7%",
+					"5m": "-32.7%",
+					"1h": "-30.9%",
+					"24h": "-22.5%",
+				},
+				volume: "100",
+				progress: 40,
+			},
 		],
 		[]
 	);
 
 	// Percentage columns to display
 
-	const percentageKeys = ["1m", "5m", "1h", "24h"];
+	const percentageKeys = useMemo(() => ["1m", "5m", "1h", "24h"], []);
 
 	const columnHelper = createColumnHelper<Token>();
 
@@ -504,7 +612,7 @@ export default function MemeList() {
 	const router = useRouter();
 	const { chain } = useChainStore();
 	return (
-		<div className="bg-gray-760 no-scrollbar flex-1 overflow-auto rounded-2xl">
+		<div className="bg-gray-760 no-scrollbar h-fit overflow-auto rounded-t-2xl">
 			<table className="w-full min-w-max">
 				<thead className="sticky top-0 z-10">
 					{table.getHeaderGroups().map((headerGroup) => (

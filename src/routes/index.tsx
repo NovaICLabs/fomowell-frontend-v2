@@ -47,7 +47,7 @@ function Home() {
 	}, [chainFromSearch, chain, router, setChain]);
 
 	return (
-		<div className="mt-7 flex flex-1 flex-col overflow-auto">
+		<div className="mt-4.5 flex flex-col overflow-auto">
 			<div className="sticky top-0 z-10 flex gap-4 text-white">
 				<Select
 					value={time}
@@ -148,7 +148,7 @@ function Home() {
 					/>
 				</div>
 			</div>
-			<div className="mt-[33px] flex flex-1 flex-col overflow-auto">
+			<div className="mt-4 flex flex-col overflow-auto">
 				{(!tab || tab === "recent") && <MemeList />}
 				{tab === "new" && <div>New Creation content - Chain: {chain}</div>}
 				{tab === "completing" && <div>Completing content - Chain: {chain}</div>}

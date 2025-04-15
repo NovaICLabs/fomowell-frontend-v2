@@ -103,7 +103,7 @@ export default function Search() {
 			<div className="relative">
 				<CommandInput
 					ref={inputRef}
-					className="rounded-xl bg-gray-800 text-xs placeholder:text-xs placeholder:text-white/30"
+					className="h-full rounded-xl bg-gray-800 text-xs placeholder:text-xs placeholder:text-white/30"
 					placeholder="Search by symbol or address"
 					value={searchTerm}
 					onBlur={handleBlur}

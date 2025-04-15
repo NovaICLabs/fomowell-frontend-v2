@@ -59,7 +59,7 @@ export default function Bottom() {
 					</span>
 					<span className="text-price-positive font-medium">12%</span>
 				</div>
-				<div className="border-r-gray-710 hover:bg-gray-710 flex cursor-pointer flex-col items-center justify-center gap-3 border-r">
+				<div className="hover:bg-gray-710 flex cursor-pointer flex-col items-center justify-center gap-3">
 					<span className="text-sm leading-4 font-medium text-white/40">
 						24h
 					</span>

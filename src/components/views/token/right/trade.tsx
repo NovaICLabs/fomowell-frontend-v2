@@ -5,7 +5,7 @@ import { exampleImage } from "@/lib/common/img";
 const percentages = [25, 50, 75, 100];
 export default function Trade() {
 	return (
-		<div className="h-112.5 bg-gray-800 px-4 py-5">
+		<div className="h-112.5 rounded-[12px] bg-gray-800 px-4 py-5">
 			<div className="bg-gray-710 flex h-[38px] items-center gap-2 rounded-[12px] px-2.5">
 				<img alt="logo" className="h-6 w-6 rounded-full" src={exampleImage} />
 				<span className="text-sm font-medium">Kitty</span>
@@ -64,7 +64,7 @@ export default function Trade() {
 					<span className="text-white">0.00%</span>
 				</div>
 			</div>
-			<Button className="bg-price-positive hover:bg-price-positive/80 mt-5 h-12 w-full rounded-full text-lg font-semibold text-white">
+			<Button className="bg-price-positive hover:bg-price-positive/80 mt-5 h-9.5 w-full rounded-full text-lg font-semibold text-white">
 				Buy
 			</Button>
 			<div className="mt-4 flex items-center space-x-2">

@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/header";
 const RootLayout = () => (
 	<div className="bg-background flex h-screen flex-col px-6">
 		<Header />
-		<div className="flex flex-1 flex-col overflow-auto pb-10">
+		<div className="flex flex-1 flex-col overflow-auto pb-9.5">
 			<Outlet />
 		</div>
 		<Footer />
