@@ -335,6 +335,7 @@ function TokenCreationPage() {
 					<div className="mt-12.5 flex flex-col items-center">
 						<Button
 							className="w-full max-w-md rounded-full py-6 font-medium text-black"
+							disabled={isCreating}
 							type="submit"
 						>
 							{isCreating ? "Creating..." : "Create token"}
