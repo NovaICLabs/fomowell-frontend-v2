@@ -25,9 +25,9 @@ export class PlugConnector implements ConnectorAbstract {
 
 	public type = "PLUG" as const;
 
-	public getPrincipal() {
+	public getPrincipal = () => {
 		return this.principal;
-	}
+	};
 
 	public constructor(config: WalletConnectorConfig) {
 		this.config = {
@@ -38,21 +38,21 @@ export class PlugConnector implements ConnectorAbstract {
 		};
 	}
 
-	public async init() {
+	public init = async () => {
 		return true;
-	}
+	};
 
-	public async createActor<Service>({
+	public createActor = async <Service>({
 		canisterId,
 		interfaceFactory,
-	}: CreateActorArgs): Promise<ActorSubclass<Service> | undefined> {
+	}: CreateActorArgs): Promise<ActorSubclass<Service> | undefined> => {
 		return await (window as any).ic.plug.createActor({
 			canisterId,
 			interfaceFactory,
 		});
-	}
+	};
 
-	public async isConnected() {
+	public isConnected = async () => {
 		const isUnLocked = false; // Replace with proper implementation
 
 		if (typeof isUnLocked === "boolean" && !isUnLocked) {
@@ -64,9 +64,9 @@ export class PlugConnector implements ConnectorAbstract {
 		}
 
 		return false;
-	}
+	};
 
-	public async connect() {
+	public connect = async () => {
 		// Fix tracing message if plug is uninstalled but still connect to
 		if (!(window as any).ic?.plug) {
 			return false;
@@ -86,17 +86,17 @@ export class PlugConnector implements ConnectorAbstract {
 		}
 
 		return true;
-	}
+	};
 
-	public async disconnect() {
+	public disconnect = async () => {
 		try {
 			await (window as any).ic.plug.disconnect();
 		} catch (error) {
 			console.error(error);
 		}
-	}
+	};
 
-	public async expired() {
+	public expired = async () => {
 		return false;
-	}
+	};
 }

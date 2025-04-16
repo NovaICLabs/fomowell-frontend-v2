@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export const connectors = ["PLUG", "II", "OISY"] as const;
 
 export type Connector = (typeof connectors)[number];
@@ -18,19 +14,21 @@ export interface WalletConnectorConfig {
 
 export type ConnectCallback = () => Promise<void>;
 
-export interface ConnectorAbstract {
+export type ActorCreator = <Service>({
+	canisterId,
+	interfaceFactory,
+}: CreateActorArgs) => Promise<ActorSubclass<Service> | undefined>;
+
+export type ConnectorAbstract = {
 	init: () => Promise<boolean>;
 	isConnected: () => Promise<boolean>;
-	createActor: <Service>({
-		canisterId,
-		interfaceFactory,
-	}: CreateActorArgs) => Promise<ActorSubclass<Service> | undefined>;
+	createActor: ActorCreator;
 	connect: () => Promise<boolean>;
 	disconnect: () => Promise<void>;
 	getPrincipal: () => string | undefined;
 	type: Connector;
 	expired: () => Promise<boolean>;
-}
+};
 
 import { InternetIdentityConnector } from "./ii";
 import { OisyConnector } from "./oisy";
@@ -51,7 +49,7 @@ export class WalletConnector {
 			this.connectorType = connectorType;
 			await connector.init();
 			this.connector = connector;
-			(window as any).icConnector = this.connector;
+			window.icConnector = this.connector;
 		}
 	}
 
@@ -60,10 +58,6 @@ export class WalletConnector {
 			host: import.meta.env.VITE_IC_HOST,
 			whitelist: ["fjpld-mqaaa-aaaah-ardua-cai"],
 		};
-		console.debug(
-			"🚀 ~ WalletConnector ~ create ~ config.import.meta.env.VITE_IC_HOST:",
-			config.host
-		);
 
 		switch (connector) {
 			case "II":
@@ -82,8 +76,8 @@ export class WalletConnector {
 
 		const connected = await this.connector.connect();
 
-		(window as any).icConnector = this.connector;
-		const principal = (window as any).icConnector.getPrincipal();
+		window.icConnector = this.connector;
+		const principal = window.icConnector.getPrincipal();
 		return { connected, principal };
 	}
 

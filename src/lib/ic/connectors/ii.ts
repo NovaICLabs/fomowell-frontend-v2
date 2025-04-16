@@ -31,9 +31,9 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 
 	public type = "II" as const;
 
-	public getPrincipal() {
+	public getPrincipal = () => {
 		return this.principal;
-	}
+	};
 
 	public constructor(config: WalletConnectorConfig) {
 		this.config = {
@@ -44,7 +44,7 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 		};
 	}
 
-	public async init() {
+	public init = async () => {
 		this.client = await AuthClient.create({
 			idleOptions: {
 				disableDefaultIdleCallback: true,
@@ -58,16 +58,16 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 		}
 
 		return true;
-	}
+	};
 
-	public async isConnected(): Promise<boolean> {
+	public isConnected = async (): Promise<boolean> => {
 		return !!(await this.client?.isAuthenticated());
-	}
+	};
 
-	public async createActor<Service>({
+	public createActor = async <Service>({
 		canisterId,
 		interfaceFactory,
-	}: CreateActorArgs): Promise<ActorSubclass<Service> | undefined> {
+	}: CreateActorArgs): Promise<ActorSubclass<Service> | undefined> => {
 		const agent = await HttpAgent.create({
 			...this.config,
 			identity: this.identity,
@@ -87,9 +87,9 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 			agent,
 			canisterId,
 		});
-	}
+	};
 
-	public async connect() {
+	public connect = async () => {
 		await new Promise((resolve, reject) => {
 			void this.client?.login({
 				identityProvider: this.config.providerUrl,
@@ -109,17 +109,17 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 		this.identity = identity;
 		this.principal = principal;
 		return true;
-	}
+	};
 
-	public async disconnect() {
+	public disconnect = async () => {
 		await this.client?.logout();
-	}
+	};
 
-	public async expired() {
+	public expired = async () => {
 		const iiExpireTime = window.localStorage.getItem("ii-expire-time");
 		if (!iiExpireTime) return true;
 		return new Date().getTime() >= Number(iiExpireTime);
-	}
+	};
 }
 
 export const InternetIdentity = {

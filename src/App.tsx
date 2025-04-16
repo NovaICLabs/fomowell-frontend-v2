@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { Toaster } from "sonner";
 
 import { ThemeProvider } from "./components/providers/theme-provider";
 import { WalletProvider } from "./components/providers/wallet";
@@ -27,6 +28,11 @@ const App = () => {
 						router={router}
 					/>
 					<ReactQueryDevtools initialIsOpen={false} />
+					<Toaster
+						expand
+						duration={Number(import.meta.env.VITE_TOAST_DURATION)}
+						position="bottom-right"
+					/>
 				</WalletProvider>
 			</QueryClientProvider>
 		</ThemeProvider>

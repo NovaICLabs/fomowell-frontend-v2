@@ -1,15 +1,18 @@
-import { useCallback, useState } from "react";
+import { type ReactNode, useCallback, useState } from "react";
 
 import { ImageIcon, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 
 import { formatBytes } from "@/lib/common/bytes";
 import { withStopPropagation } from "@/lib/common/react-event";
+import { cn } from "@/lib/utils";
 
 interface FileUploaderProps {
 	onChange?: (files: Array<File>) => void;
 	maxSize?: number; // in bytes
 	accept?: Record<string, Array<string>>;
+	imageIcon?: ReactNode;
+	wrapperClassName?: string;
 }
 
 export function FileUploader({
@@ -18,6 +21,8 @@ export function FileUploader({
 	accept = {
 		"image/*": [],
 	},
+	imageIcon,
+	wrapperClassName,
 }: FileUploaderProps) {
 	const [files, setFiles] = useState<Array<File>>([]);
 	const [preview, setPreview] = useState<string | null>(null);
@@ -56,7 +61,10 @@ export function FileUploader({
 		<div>
 			<div
 				{...getRootProps()}
-				className="relative aspect-square w-10 overflow-hidden rounded-lg"
+				className={cn(
+					"relative aspect-square w-10 overflow-hidden rounded-lg",
+					wrapperClassName
+				)}
 			>
 				<input {...getInputProps()} />
 
@@ -81,11 +89,13 @@ export function FileUploader({
 						)}
 					</div>
 				) : (
-					<div className="bg-gray-850 flex h-full w-full cursor-pointer flex-col items-center justify-center text-center">
-						<ImageIcon
-							className="h-full w-full text-gray-400"
-							strokeWidth={1}
-						/>
+					<div className="flex h-full w-full cursor-pointer flex-col items-center justify-center text-center">
+						{imageIcon ?? (
+							<ImageIcon
+								className="h-full w-full text-gray-400"
+								strokeWidth={1}
+							/>
+						)}
 					</div>
 				)}
 			</div>

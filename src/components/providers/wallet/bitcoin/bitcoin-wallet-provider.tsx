@@ -2,7 +2,7 @@ import { LaserEyesProvider, MAINNET } from "@omnisat/lasereyes";
 import { SiwbIdentityProvider } from "ic-siwb-lasereyes-connector";
 
 import { getSIWBCanisterId } from "@/canisters/siwb";
-import { idlFactory as siwbIdlFactory } from "@/canisters/siwb/siwb.did";
+import { idlFactory as siwbIdlFactory } from "@/canisters/siwb/index.did";
 
 export const BitcoinWalletProvider = ({
 	children,

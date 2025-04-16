@@ -30,9 +30,9 @@ export class OisyConnector implements ConnectorAbstract {
 
 	public type = "OISY" as const;
 
-	public getPrincipal() {
+	public getPrincipal = () => {
 		return this.principal;
-	}
+	};
 
 	public constructor(config: WalletConnectorConfig) {
 		this.config = {
@@ -43,18 +43,18 @@ export class OisyConnector implements ConnectorAbstract {
 		};
 	}
 
-	public async init() {
+	public init = async () => {
 		return true;
-	}
+	};
 
-	public async isConnected(): Promise<boolean> {
+	public isConnected = async (): Promise<boolean> => {
 		return !!this.signerAgent && !!this.agent;
-	}
+	};
 
-	public async createActor<Service>({
+	public createActor = async <Service>({
 		canisterId,
 		interfaceFactory,
-	}: CreateActorArgs): Promise<ActorSubclass<Service> | undefined> {
+	}: CreateActorArgs): Promise<ActorSubclass<Service> | undefined> => {
 		if (!this.signerAgent) {
 			throw new Error("No signer agent available. Please connect first.");
 		}
@@ -68,9 +68,9 @@ export class OisyConnector implements ConnectorAbstract {
 			console.error("[Oisy] Actor creation error:", error);
 			throw error;
 		}
-	}
+	};
 
-	public async connect() {
+	public connect = async () => {
 		const agent = HttpAgent.createSync({ host: this.config.providerUrl });
 		this.signerAgent = SignerAgent.createSync({
 			signer: new Signer({
@@ -105,9 +105,9 @@ export class OisyConnector implements ConnectorAbstract {
 		this.agent = agent;
 
 		return true;
-	}
+	};
 
-	public async disconnect() {
+	public disconnect = async () => {
 		if (this.signer) {
 			try {
 				await this.signer.closeChannel();
@@ -118,11 +118,11 @@ export class OisyConnector implements ConnectorAbstract {
 		}
 
 		this.agent = null;
-	}
+	};
 
-	public async expired() {
+	public expired = async () => {
 		return false;
-	}
+	};
 }
 
 export const OisyWallet = {

@@ -13,6 +13,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { useCKBTCBalance } from "@/hooks/ic/tokens/ckbtc";
 import { useIcWallet } from "@/hooks/providers/wallet/ic";
 import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
@@ -25,9 +26,9 @@ import type { Connector } from "@/lib/ic/connectors";
 
 const IcpWalletConnect: React.FC = () => {
 	const [open, setOpen] = useState(false);
-	const [loading, setLoading] = useState<boolean>(false);
-	const { connect, disconnect } = useIcWallet();
-	const { principal, setPrincipal, setConnected } = useIcIdentityStore();
+	const { connect, disconnect, isLoading } = useIcWallet();
+	const { principal, setPrincipal, setConnected, connected } =
+		useIcIdentityStore();
 	const { setLastConnectedWallet } = useIcLastConnectedWalletStore();
 	const handleConnectWallet = async (connector: Connector) => {
 		try {
@@ -40,8 +41,6 @@ const IcpWalletConnect: React.FC = () => {
 			setOpen(false);
 		} catch (error) {
 			console.error(error);
-		} finally {
-			setLoading(false);
 		}
 	};
 
@@ -50,6 +49,7 @@ const IcpWalletConnect: React.FC = () => {
 	};
 
 	const [copied, setCopied] = useState(false);
+	const { data: balance } = useCKBTCBalance();
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
@@ -94,19 +94,21 @@ const IcpWalletConnect: React.FC = () => {
 								className="h-4.5 w-4.5 rounded-full"
 								src={"/svgs/coins/bitcoin.svg"}
 							/>
-							<span className="text-xs font-medium">0.01366000</span>
+							<span className="text-xs font-medium">
+								{connected ? (balance?.formatted ?? "---") : "---"}
+							</span>
 						</div>
 					</div>
 				) : (
 					<DialogTrigger asChild>
 						<Button
 							className="h-[38px] w-[111px] rounded-full text-xs font-bold"
-							disabled={loading}
+							disabled={isLoading}
 							onClick={() => {
 								setOpen(true);
 							}}
 						>
-							{loading ? "Connecting..." : "Connect Wallet"}
+							{isLoading ? "Connecting..." : "Connect Wallet"}
 						</Button>
 					</DialogTrigger>
 				)}
@@ -114,7 +116,7 @@ const IcpWalletConnect: React.FC = () => {
 				<DialogContent
 					className={cn(
 						"border-gray-755 bg-gray-755 transition-height flex w-[360px] flex-col rounded-3xl px-5 py-6 text-white duration-300",
-						loading && "h-100"
+						isLoading && "h-100"
 					)}
 				>
 					<DialogHeader>
@@ -123,7 +125,7 @@ const IcpWalletConnect: React.FC = () => {
 						</DialogTitle>
 					</DialogHeader>
 
-					{loading ? (
+					{isLoading ? (
 						<div className="flex h-full flex-1 flex-col items-center justify-start">
 							<img alt="fomowell" className="mt-10" src="/svgs/fomowell.svg" />
 							<img
@@ -135,7 +137,7 @@ const IcpWalletConnect: React.FC = () => {
 					) : (
 						<div className="flex flex-col gap-6 py-2">
 							<WalletOption
-								disabled={loading}
+								disabled={isLoading}
 								icon={<img alt="II" src="/svgs/wallet/ii.svg" />}
 								name="Internet Identity"
 								onClick={() => {
@@ -143,7 +145,7 @@ const IcpWalletConnect: React.FC = () => {
 								}}
 							/>
 							<WalletOption
-								disabled={loading}
+								disabled={isLoading}
 								icon={<img alt="Plug" src="/svgs/wallet/plug.svg" />}
 								name="Plug"
 								onClick={() => {
@@ -151,7 +153,7 @@ const IcpWalletConnect: React.FC = () => {
 								}}
 							/>
 							<WalletOption
-								disabled={loading}
+								disabled={isLoading}
 								icon={<img alt="Oisy" src="/svgs/wallet/oisy.svg" />}
 								name="Oisy"
 								onClick={() => {

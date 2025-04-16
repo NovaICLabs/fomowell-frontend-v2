@@ -1,6 +1,6 @@
-import type { Principal } from "@dfinity/principal";
 import type { ActorMethod } from "@dfinity/agent";
 import type { IDL } from "@dfinity/candid";
+import type { Principal } from "@dfinity/principal";
 
 export type Address = string;
 export type CanisterPublicKey = PublicKey;
@@ -18,8 +18,7 @@ export interface LoginDetails {
 }
 export type LoginResponse = { Ok: LoginDetails } | { Err: string };
 export type PrepareLoginResponse = { Ok: SiwbMessage } | { Err: string };
-export type Principal = Uint8Array | number[];
-export type PublicKey = Uint8Array | number[];
+export type PublicKey = Uint8Array | Array<number>;
 export type PublickeyHex = string;
 export type RuntimeFeature =
 	| { IncludeUriInSeed: null }
@@ -40,7 +39,7 @@ export interface SettingsInput {
 }
 export type SignMessageType = { Bip322Simple: null } | { ECDSA: null };
 export interface SignedDelegation {
-	signature: Uint8Array | number[];
+	signature: Uint8Array | Array<number>;
 	delegation: Delegation;
 }
 export type SiwbMessage = string;
@@ -62,4 +61,4 @@ export interface _SERVICE {
 	siwb_prepare_login: ActorMethod<[Address], PrepareLoginResponse>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;
-export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];
+export declare const init: (args: { IDL: typeof IDL }) => Array<IDL.Type>;
