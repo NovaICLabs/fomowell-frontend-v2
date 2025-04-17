@@ -20,10 +20,14 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { showToast } from "@/components/utils/toast";
+import { useBuy } from "@/hooks/ic/core";
+import { parseUnits } from "@/lib/common/number";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { fromNow } from "@/lib/common/time";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
+import { useQuickBuyStore } from "@/store/quick-buy";
 
 type Token = {
 	id: bigint;
@@ -44,10 +48,10 @@ export default function MemeList() {
 	const data = useMemo<Array<Token>>(
 		() => [
 			{
-				id: 4n,
-				name: "DUCK FROG",
-				symbol: "DUCK",
-				created: 1744873744554926858n,
+				id: 6n,
+				name: "FROG FROG",
+				symbol: "FROG",
+				created: 1744880732722367464n,
 				amount: "0.0016 ICP",
 				price: "0.1",
 				liquidity: "$135.5K",
@@ -71,6 +75,8 @@ export default function MemeList() {
 
 	const columnHelper = createColumnHelper<Token>();
 
+	const { mutate: buyToken } = useBuy();
+	const { amount: flashAmount } = useQuickBuyStore();
 	// Use useMemo to define columns to avoid re-rendering issues
 	const columns = useMemo(
 		() => [
@@ -115,7 +121,7 @@ export default function MemeList() {
 						<div className="flex flex-col gap-1.5">
 							<div className="flex items-center gap-1">
 								<span className="text-sm leading-4 font-medium text-white">
-									{row.original.name}
+									{row.original.symbol}
 								</span>
 								<div className="ml-3 flex cursor-pointer items-center gap-x-2.5">
 									<X
@@ -133,7 +139,7 @@ export default function MemeList() {
 								</div>
 							</div>
 							<div className="text-xs leading-4 font-light text-white/60">
-								{row.original.symbol}
+								{row.original.name}
 							</div>
 						</div>
 					</div>
@@ -234,7 +240,7 @@ export default function MemeList() {
 								<span
 									className={cn(
 										"text-sm leading-4 font-medium",
-										isNegative ? "text-[#DE3F4D]" : "text-[#1BBB61]"
+										isNegative ? "text-price-negative" : "text-price-positive"
 									)}
 								>
 									{value}
@@ -278,7 +284,14 @@ export default function MemeList() {
 					<div className="ml-auto flex items-center justify-end pr-2">
 						<Button
 							className="hover:bg-gray-710 h-9 w-[63px] rounded-full bg-transparent text-xs text-white"
-							onClick={withStopPropagation(() => {})}
+							onClick={withStopPropagation(() => {
+								showToast("loading", "Buying token(id:6)...");
+								buyToken({
+									amount: BigInt(parseUnits(flashAmount, 8)),
+									id: 6n,
+									minTokenReceived: 0n,
+								});
+							})}
 						>
 							<img alt="flash" src="/svgs/flash.svg" />
 							Buy
@@ -289,7 +302,7 @@ export default function MemeList() {
 				enablePinning: true,
 			}),
 		],
-		[columnHelper, percentageKeys]
+		[buyToken, columnHelper, flashAmount, percentageKeys]
 	);
 
 	const table = useReactTable({

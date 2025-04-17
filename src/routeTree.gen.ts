@@ -16,7 +16,7 @@ import { Route as ProfileRouteImport } from './routes/profile/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as ProfileUseridImport } from './routes/profile/$userid'
 import { Route as IcpCreateImport } from './routes/icp/create'
-import { Route as BitcoinTokenIdImport } from './routes/bitcoin/token/$id'
+import { Route as IcpTokenIdImport } from './routes/icp/token/$id'
 
 // Create/Update Routes
 
@@ -50,9 +50,9 @@ const IcpCreateRoute = IcpCreateImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const BitcoinTokenIdRoute = BitcoinTokenIdImport.update({
-  id: '/bitcoin/token/$id',
-  path: '/bitcoin/token/$id',
+const IcpTokenIdRoute = IcpTokenIdImport.update({
+  id: '/icp/token/$id',
+  path: '/icp/token/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -95,11 +95,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileUseridImport
       parentRoute: typeof ProfileRouteImport
     }
-    '/bitcoin/token/$id': {
-      id: '/bitcoin/token/$id'
-      path: '/bitcoin/token/$id'
-      fullPath: '/bitcoin/token/$id'
-      preLoaderRoute: typeof BitcoinTokenIdImport
+    '/icp/token/$id': {
+      id: '/icp/token/$id'
+      path: '/icp/token/$id'
+      fullPath: '/icp/token/$id'
+      preLoaderRoute: typeof IcpTokenIdImport
       parentRoute: typeof rootRoute
     }
   }
@@ -125,7 +125,7 @@ export interface FileRoutesByFullPath {
   '/how': typeof HowRoute
   '/icp/create': typeof IcpCreateRoute
   '/profile/$userid': typeof ProfileUseridRoute
-  '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
+  '/icp/token/$id': typeof IcpTokenIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -134,7 +134,7 @@ export interface FileRoutesByTo {
   '/how': typeof HowRoute
   '/icp/create': typeof IcpCreateRoute
   '/profile/$userid': typeof ProfileUseridRoute
-  '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
+  '/icp/token/$id': typeof IcpTokenIdRoute
 }
 
 export interface FileRoutesById {
@@ -144,7 +144,7 @@ export interface FileRoutesById {
   '/how': typeof HowRoute
   '/icp/create': typeof IcpCreateRoute
   '/profile/$userid': typeof ProfileUseridRoute
-  '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
+  '/icp/token/$id': typeof IcpTokenIdRoute
 }
 
 export interface FileRouteTypes {
@@ -155,7 +155,7 @@ export interface FileRouteTypes {
     | '/how'
     | '/icp/create'
     | '/profile/$userid'
-    | '/bitcoin/token/$id'
+    | '/icp/token/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -163,7 +163,7 @@ export interface FileRouteTypes {
     | '/how'
     | '/icp/create'
     | '/profile/$userid'
-    | '/bitcoin/token/$id'
+    | '/icp/token/$id'
   id:
     | '__root__'
     | '/'
@@ -171,7 +171,7 @@ export interface FileRouteTypes {
     | '/how'
     | '/icp/create'
     | '/profile/$userid'
-    | '/bitcoin/token/$id'
+    | '/icp/token/$id'
   fileRoutesById: FileRoutesById
 }
 
@@ -180,7 +180,7 @@ export interface RootRouteChildren {
   ProfileRouteRoute: typeof ProfileRouteRouteWithChildren
   HowRoute: typeof HowRoute
   IcpCreateRoute: typeof IcpCreateRoute
-  BitcoinTokenIdRoute: typeof BitcoinTokenIdRoute
+  IcpTokenIdRoute: typeof IcpTokenIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -188,7 +188,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRouteRoute: ProfileRouteRouteWithChildren,
   HowRoute: HowRoute,
   IcpCreateRoute: IcpCreateRoute,
-  BitcoinTokenIdRoute: BitcoinTokenIdRoute,
+  IcpTokenIdRoute: IcpTokenIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -205,7 +205,7 @@ export const routeTree = rootRoute
         "/profile",
         "/how",
         "/icp/create",
-        "/bitcoin/token/$id"
+        "/icp/token/$id"
       ]
     },
     "/": {
@@ -227,8 +227,8 @@ export const routeTree = rootRoute
       "filePath": "profile/$userid.tsx",
       "parent": "/profile"
     },
-    "/bitcoin/token/$id": {
-      "filePath": "bitcoin/token/$id.tsx"
+    "/icp/token/$id": {
+      "filePath": "icp/token/$id.tsx"
     }
   }
 }

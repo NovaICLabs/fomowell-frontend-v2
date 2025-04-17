@@ -39,7 +39,7 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 		this.config = {
 			whitelist: config.whitelist,
 			host: config.host,
-			providerUrl: import.meta.env.VITE_IC_HOST,
+			providerUrl: "https://identity.ic0.app",
 			dev: false,
 		};
 	}

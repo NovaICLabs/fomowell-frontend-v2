@@ -2,9 +2,45 @@ import type { Principal } from "@dfinity/principal";
 import type { ActorMethod } from "@dfinity/agent";
 import type { IDL } from "@dfinity/candid";
 
+export interface Account {
+	owner: Principal;
+	subaccount: [] | [Uint8Array | number[]];
+}
+export interface Approve {
+	fee: [] | [bigint];
+	from: Account;
+	memo: [] | [Uint8Array | number[]];
+	created_at_time: [] | [bigint];
+	amount: bigint;
+	expected_allowance: [] | [bigint];
+	expires_at: [] | [bigint];
+	spender: Account;
+}
+export interface ArchivedRange {
+	callback: [Principal, string];
+	start: bigint;
+	length: bigint;
+}
+export interface Burn {
+	from: Account;
+	memo: [] | [Uint8Array | number[]];
+	created_at_time: [] | [bigint];
+	amount: bigint;
+	spender: [] | [Account];
+}
+export interface Buy {
+	token: Principal;
+	from: Account;
+	reserve0: bigint;
+	reserve1: bigint;
+	amount_out: bigint;
+	amount_in: bigint;
+	meme_token_id: bigint;
+}
 export interface BuyArgs {
 	buy_min_token: bigint;
 	boning_curve_id: bigint;
+	subaccount: [] | [Uint8Array | number[]];
 	ckbtc_amount: bigint;
 }
 export type CanisterLogFeature =
@@ -37,7 +73,7 @@ export interface CreateMemeTokenArg {
 	creator: [] | [Principal];
 	ticker: string;
 	twitter: [] | [string];
-	logo: MetadataValue;
+	logo: string;
 	name: string;
 	description: string;
 	website: [] | [string];
@@ -49,6 +85,24 @@ export interface DailyMetricsData {
 	canisterCycles: NumericEntity;
 	canisterMemorySize: NumericEntity;
 	timeMillis: bigint;
+}
+export interface Deposit {
+	to: Account;
+	height: bigint;
+	token: Principal;
+	memo: [] | [Uint8Array | number[]];
+	amount: bigint;
+	spender: Account;
+}
+export interface DepositArgs {
+	token: StableToken;
+	memo: [] | [Uint8Array | number[]];
+	subaccount: [] | [Uint8Array | number[]];
+	amount: bigint;
+}
+export interface GetBlocksRequest {
+	start: bigint;
+	length: bigint;
 }
 export interface GetInformationRequest {
 	status: [] | [StatusRequest];
@@ -82,6 +136,12 @@ export interface GetMetricsParameters {
 	granularity: MetricsGranularity;
 	dateFromMillis: bigint;
 }
+export interface GetTransactionsResponse {
+	first_index: bigint;
+	log_length: bigint;
+	transactions: Array<Transaction>;
+	archived_transactions: Array<ArchivedRange>;
+}
 export interface HourlyMetricsData {
 	updateCalls: BigUint64Array | bigint[];
 	canisterHeapMemorySize: BigUint64Array | bigint[];
@@ -90,13 +150,14 @@ export interface HourlyMetricsData {
 	timeMillis: bigint;
 }
 export interface InitArg {
-	fee_receiver: Principal;
-	ckbtc_canister: StableToken;
+	icp_launch_thread_hold: bigint;
+	fee_receiver: Account;
 	create_token_fee: [] | [bigint];
-	ckbtc_launch_thread_hold: bigint;
 	maintenance: boolean;
 	fee_percentage: [] | [number];
+	icp_canister: StableToken;
 }
+export type LedgerType = { MemeToken: bigint } | { ICRCToken: Principal };
 export interface LogMessageData {
 	timeNanos: bigint;
 	message: string;
@@ -107,27 +168,34 @@ export interface MemeToken {
 	ticker: string;
 	available_token: bigint;
 	twitter: [] | [string];
-	logo: MetadataValue;
+	logo: string;
 	name: string;
 	completed: boolean;
 	description: string;
 	created_at: bigint;
 	website: [] | [string];
-	market_cap_ckbtc: bigint;
 	ledger_canister: [] | [string];
+	market_cap_icp: bigint;
 	telegram: [] | [string];
 }
-export type MetadataValue =
-	| { Int: bigint }
-	| { Nat: bigint }
-	| { Blob: Uint8Array | number[] }
-	| { Text: string };
 export type MetricsGranularity = { hourly: null } | { daily: null };
 export interface MetricsRequest {
 	parameters: GetMetricsParameters;
 }
 export interface MetricsResponse {
 	metrics: [] | [CanisterMetrics];
+}
+export interface Mint {
+	metadata: Array<[string, Value]>;
+	from: Account;
+	meme_token_id: bigint;
+	amount: bigint;
+}
+export interface Mint_1 {
+	to: Account;
+	memo: [] | [Uint8Array | number[]];
+	created_at_time: [] | [bigint];
+	amount: bigint;
 }
 export interface NumericEntity {
 	avg: bigint;
@@ -141,6 +209,7 @@ export type Result_1 = { Ok: MemeToken } | { Err: string };
 export interface SellArgs {
 	token_amount: bigint;
 	boning_curve_id: bigint;
+	subaccount: [] | [Uint8Array | number[]];
 	btc_min_amount: bigint;
 }
 export interface StableToken {
@@ -160,18 +229,84 @@ export interface StatusResponse {
 	cycles: [] | [bigint];
 	heap_memory_size: [] | [bigint];
 }
+export interface Swap {
+	from: Account;
+	reserve0: bigint;
+	reserve1: bigint;
+	amount0: bigint;
+	amount1: bigint;
+	token0: Principal;
+	token1: Principal;
+}
+export interface Transaction {
+	buy: [] | [Buy];
+	withdraw: [] | [Deposit];
+	kind: string;
+	mint: [] | [Mint];
+	sell: [] | [Buy];
+	swap: [] | [Swap];
+	deposit: [] | [Deposit];
+	timestamp: bigint;
+	transfer: [] | [Transfer];
+}
+export interface TransactionRange {
+	transactions: Array<Transaction_1>;
+}
+export interface Transaction_1 {
+	burn: [] | [Burn];
+	kind: string;
+	mint: [] | [Mint_1];
+	approve: [] | [Approve];
+	timestamp: bigint;
+	transfer: [] | [Transfer_1];
+}
+export interface Transfer {
+	to: Account;
+	from: Account;
+	memo: [] | [Uint8Array | number[]];
+	ledger: LedgerType;
+	amount: bigint;
+}
+export interface Transfer_1 {
+	to: Account;
+	fee: [] | [bigint];
+	from: Account;
+	memo: [] | [Uint8Array | number[]];
+	created_at_time: [] | [bigint];
+	amount: bigint;
+	spender: [] | [Account];
+}
+export type Value =
+	| { Int: bigint }
+	| { Map: Array<[string, Value]> }
+	| { Nat: bigint }
+	| { Nat64: bigint }
+	| { Blob: Uint8Array | number[] }
+	| { Text: string }
+	| { Array: Array<Value> };
+export interface WithdrawArgs {
+	to: Account;
+	token: StableToken;
+	memo: [] | [Uint8Array | number[]];
+	subaccount: [] | [Uint8Array | number[]];
+	amount: bigint;
+}
 export interface _SERVICE {
 	__get_candid_interface_tmp_hack: ActorMethod<[], string>;
 	buy: ActorMethod<[BuyArgs], Result>;
 	calculate_buy: ActorMethod<[bigint, bigint], Result>;
 	calculate_sell: ActorMethod<[bigint, bigint], Result>;
 	create_token: ActorMethod<[CreateMemeTokenArg], Result_1>;
+	deposit: ActorMethod<[DepositArgs], Result>;
 	getCanistergeekInformation: ActorMethod<
 		[GetInformationRequest],
 		GetInformationResponse
 	>;
+	get_transactions: ActorMethod<[GetBlocksRequest], GetTransactionsResponse>;
+	icrc1_balance_of: ActorMethod<[Principal, Account], bigint>;
 	query_meme_token: ActorMethod<[bigint], [] | [MemeToken]>;
 	sell: ActorMethod<[SellArgs], Result>;
+	withdraw: ActorMethod<[WithdrawArgs], Result>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];

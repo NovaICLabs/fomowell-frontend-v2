@@ -30,6 +30,8 @@ export type ConnectorAbstract = {
 	expired: () => Promise<boolean>;
 };
 
+import { getChainICCoreCanisterId } from "@/canisters/core";
+
 import { InternetIdentityConnector } from "./ii";
 import { OisyConnector } from "./oisy";
 import { PlugConnector } from "./plug";
@@ -56,7 +58,7 @@ export class WalletConnector {
 	public static create(connector: Connector) {
 		const config = {
 			host: import.meta.env.VITE_IC_HOST,
-			whitelist: [],
+			whitelist: [getChainICCoreCanisterId().toText()],
 		};
 
 		switch (connector) {

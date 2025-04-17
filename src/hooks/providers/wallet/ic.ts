@@ -114,7 +114,6 @@ export function useIcWallet() {
 export const useConnectedIdentity = () => {
 	const { principal, connected } = useIcIdentityStore();
 	const actorCreator = window.icConnector?.createActor;
-	console.debug("🚀 ~ useConnectedIdentity ~ actorCreator:", actorCreator);
 	if (!connected) {
 		return { principal: undefined, connected, actorCreator: undefined };
 	}

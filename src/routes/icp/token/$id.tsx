@@ -6,7 +6,7 @@ import Right from "@/components/views/token/right";
 import TradingView from "@/components/views/token/tradingview";
 import Trending from "@/components/views/token/trending";
 
-export const Route = createFileRoute("/bitcoin/token/$id")({
+export const Route = createFileRoute("/icp/token/$id")({
 	component: RouteComponent,
 });
 

@@ -1,18 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { getCKBTCCanisterId } from "@/canisters/icrc3";
-import { getCKBTCBalance } from "@/canisters/tokens/ckbtc";
+import { getICPCanisterId } from "@/canisters/icrc3";
+import { getICPBalance } from "@/canisters/tokens/icp";
 import { useIcIdentityStore } from "@/store/ic";
 
-export const useCKBTCBalance = (principal?: string) => {
+export const useICPBalance = (principal?: string) => {
 	const { principal: self } = useIcIdentityStore();
 	const p = principal ?? self;
 	return useQuery({
-		queryKey: ["balance", getCKBTCCanisterId().toText(), p],
+		queryKey: ["balance", getICPCanisterId().toText(), p],
 		queryFn: async () => {
 			if (!p) throw new Error("Principal is not set");
-			return getCKBTCBalance(p);
+			return getICPBalance(p);
 		},
 		enabled: !!p,
+		refetchInterval: 3000,
 	});
 };

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 
-import BitcoinLogo from "@/components/icons/logo/bitcoin";
+import IcpLogo from "@/components/icons/logo/icp";
 import Star from "@/components/icons/star";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,6 +17,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MemeList from "@/components/views/home/meme-list";
 import { cn } from "@/lib/utils";
 import { chains, useChainStore } from "@/store/chain";
+import { useQuickBuyStore } from "@/store/quick-buy";
 
 const tabs = ["recent", "new", "completing", "completed", "favorite"] as const;
 type TabType = (typeof tabs)[number];
@@ -35,8 +36,7 @@ type TimeOption = (typeof timeOptions)[number];
 function Home() {
 	const { tab, chain: chainFromSearch, ...search } = Route.useSearch();
 	const [time, setTime] = useState<TimeOption>("5 mins");
-	const [flashAmount, setFlashAmount] = useState<string>("0.00002");
-	const [slippage, setSlippage] = useState<string>("0.2");
+
 	const router = useRouter();
 	const { chain, setChain } = useChainStore();
 
@@ -45,7 +45,12 @@ function Home() {
 			setChain(chainFromSearch);
 		}
 	}, [chainFromSearch, chain, router, setChain]);
-
+	const {
+		amount: flashAmount,
+		setAmount: setFlashAmount,
+		slippage,
+		setSlippage,
+	} = useQuickBuyStore();
 	return (
 		<div className="mt-4.5 flex flex-col overflow-auto">
 			<div className="sticky top-0 z-10 flex gap-4 text-white">
@@ -116,13 +121,28 @@ function Home() {
 				<div className="bg-gray-710 ml-auto flex h-[38px] items-center rounded-full px-4 text-white">
 					<img alt="flash" src="/svgs/flash.svg" />
 					<span className="ml-1.5 text-sm font-medium text-white">Buy</span>
-					<div className="ml-2 flex h-8 w-[92px] items-center rounded-full bg-gray-800 px-2">
-						<BitcoinLogo className="h-4 w-4 flex-shrink-0" />
+					<div className="ml-2 flex h-8 items-center rounded-full bg-gray-800 px-2">
+						<IcpLogo className="h-4 w-4 flex-shrink-0" />
 						<Input
-							className="h-8 rounded-full border-none px-1 text-sm font-medium text-white focus-visible:ring-0 dark:bg-gray-800"
+							className="h-8 w-24 rounded-full border-none px-1 text-sm font-medium text-white focus-visible:ring-0 dark:bg-gray-800"
+							placeholder="0"
 							value={flashAmount}
+							onBlur={() => {
+								if (flashAmount.endsWith(".")) {
+									setFlashAmount(flashAmount.slice(0, -1));
+								}
+							}}
 							onChange={(event) => {
-								setFlashAmount(event.target.value);
+								const value = event.target.value.trim();
+								const regex = new RegExp(`^(0|[1-9]\\d*)(\\.\\d{0,${8}})?$`);
+								if (
+									value === "" ||
+									value === "0" ||
+									value === "." ||
+									regex.test(value)
+								) {
+									setFlashAmount(value);
+								}
 							}}
 						></Input>
 					</div>
@@ -133,8 +153,22 @@ function Home() {
 						<Input
 							className="h-8 w-full rounded-full border-none px-1 text-sm font-medium text-white focus-visible:ring-0 dark:bg-gray-800"
 							value={slippage}
+							onBlur={() => {
+								if (slippage.endsWith(".")) {
+									setSlippage(slippage.slice(0, -1));
+								}
+							}}
 							onChange={(event) => {
-								setSlippage(event.target.value);
+								const value = event.target.value.trim();
+								const regex = new RegExp(`^(0|[1-9]\\d*)(\\.\\d{0,${8}})?$`);
+								if (
+									value === "" ||
+									value === "0" ||
+									value === "." ||
+									regex.test(value)
+								) {
+									setSlippage(value);
+								}
 							}}
 						/>
 						<span className="absolute right-2 text-sm font-medium text-white/60">
