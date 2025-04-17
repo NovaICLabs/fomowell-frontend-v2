@@ -11,14 +11,6 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		canister_id: IDL.Principal,
 		symbol: IDL.Text,
 	});
-	const InitArg = IDL.Record({
-		icp_launch_thread_hold: IDL.Nat,
-		fee_receiver: Account,
-		create_token_fee: IDL.Opt(IDL.Nat64),
-		maintenance: IDL.Bool,
-		fee_percentage: IDL.Opt(IDL.Float32),
-		icp_canister: StableToken,
-	});
 	const BuyArgs = IDL.Record({
 		buy_min_token: IDL.Nat,
 		boning_curve_id: IDL.Nat64,
