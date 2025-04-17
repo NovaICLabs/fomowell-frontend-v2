@@ -1,3 +1,5 @@
+import BigNumber from "bignumber.js";
+
 import { getAnonymousActorCreator } from "@/hooks/providers/wallet/ic";
 import { formatUnits } from "@/lib/common/number";
 import { validatePrincipalText } from "@/lib/ic/principal";
@@ -27,6 +29,6 @@ export const getIcrcTokenBalance = async ({
 	return {
 		raw: r,
 		decimals,
-		formatted: formatUnits(r, decimals),
+		formatted: BigNumber(formatUnits(r, decimals)).toFixed(decimals),
 	};
 };

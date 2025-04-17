@@ -27,7 +27,6 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		Text: IDL.Text,
 	});
 	const CreateMemeTokenArg = IDL.Record({
-		rune_ticker: IDL.Text,
 		creator: IDL.Opt(IDL.Principal),
 		ticker: IDL.Text,
 		twitter: IDL.Opt(IDL.Text),
@@ -39,7 +38,6 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 	});
 	const MemeToken = IDL.Record({
 		id: IDL.Nat64,
-		rune_ticker: IDL.Text,
 		creator: IDL.Text,
 		ticker: IDL.Text,
 		available_token: IDL.Nat,

@@ -21,14 +21,15 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { withStopPropagation } from "@/lib/common/react-event";
+import { fromNow } from "@/lib/common/time";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
 
 type Token = {
-	id: string;
+	id: bigint;
 	name: string;
 	symbol: string;
-	age: string;
+	created: bigint;
 	amount: string;
 	price: string;
 	liquidity: string;
@@ -43,12 +44,12 @@ export default function MemeList() {
 	const data = useMemo<Array<Token>>(
 		() => [
 			{
-				id: "1",
-				name: "Krizz",
-				symbol: "KKK",
-				age: "5m",
-				amount: "0.0016 BTC",
-				price: "1",
+				id: 4n,
+				name: "DUCK FROG",
+				symbol: "DUCK",
+				created: 1744873744554926858n,
+				amount: "0.0016 ICP",
+				price: "0.1",
 				liquidity: "$135.5K",
 				marketCap: "$250K",
 				percentages: {
@@ -59,312 +60,6 @@ export default function MemeList() {
 				},
 				volume: "100",
 				progress: 80,
-			},
-			{
-				id: "2",
-				name: "Krizz",
-				symbol: "KK",
-				age: "10m",
-				amount: "0.008 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "-1.2%",
-					"5m": "-4.5%",
-					"1h": "-7.1%",
-					"24h": "-10.3%",
-				},
-				volume: "100",
-				progress: 30,
-			},
-			{
-				id: "3",
-				name: "Krizz",
-				symbol: "KK",
-				age: "30m",
-				amount: "0.048 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+3.5%",
-					"5m": "+3.6%",
-					"1h": "+3.4%",
-					"24h": "+3.5%",
-				},
-				volume: "100",
-				progress: 90,
-			},
-			{
-				id: "4",
-				name: "Krizz",
-				symbol: "KK",
-				age: "5m",
-				amount: "0.048 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "-10.7%",
-					"5m": "-32.7%",
-					"1h": "-30.9%",
-					"24h": "-22.5%",
-				},
-				volume: "100",
-				progress: 40,
-			},
-			{
-				id: "1",
-				name: "Krizz",
-				symbol: "KKK",
-				age: "5m",
-				amount: "0.0016 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+2.5%",
-					"5m": "+12.5%",
-					"1h": "+15.3%",
-					"24h": "+32.7%",
-				},
-				volume: "100",
-				progress: 80,
-			},
-			{
-				id: "2",
-				name: "Krizz",
-				symbol: "KK",
-				age: "10m",
-				amount: "0.008 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "-1.2%",
-					"5m": "-4.5%",
-					"1h": "-7.1%",
-					"24h": "-10.3%",
-				},
-				volume: "100",
-				progress: 30,
-			},
-			{
-				id: "3",
-				name: "Krizz",
-				symbol: "KK",
-				age: "30m",
-				amount: "0.048 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+3.5%",
-					"5m": "+3.6%",
-					"1h": "+3.4%",
-					"24h": "+3.5%",
-				},
-				volume: "100",
-				progress: 90,
-			},
-			{
-				id: "4",
-				name: "Krizz",
-				symbol: "KK",
-				age: "5m",
-				amount: "0.048 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "-10.7%",
-					"5m": "-32.7%",
-					"1h": "-30.9%",
-					"24h": "-22.5%",
-				},
-				volume: "100",
-				progress: 40,
-			},
-			{
-				id: "1",
-				name: "Krizz",
-				symbol: "KKK",
-				age: "5m",
-				amount: "0.0016 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+2.5%",
-					"5m": "+12.5%",
-					"1h": "+15.3%",
-					"24h": "+32.7%",
-				},
-				volume: "100",
-				progress: 80,
-			},
-			{
-				id: "2",
-				name: "Krizz",
-				symbol: "KK",
-				age: "10m",
-				amount: "0.008 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "-1.2%",
-					"5m": "-4.5%",
-					"1h": "-7.1%",
-					"24h": "-10.3%",
-				},
-				volume: "100",
-				progress: 30,
-			},
-			{
-				id: "3",
-				name: "Krizz",
-				symbol: "KK",
-				age: "30m",
-				amount: "0.048 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+3.5%",
-					"5m": "+3.6%",
-					"1h": "+3.4%",
-					"24h": "+3.5%",
-				},
-				volume: "100",
-				progress: 90,
-			},
-			{
-				id: "4",
-				name: "Krizz",
-				symbol: "KK",
-				age: "5m",
-				amount: "0.048 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "-10.7%",
-					"5m": "-32.7%",
-					"1h": "-30.9%",
-					"24h": "-22.5%",
-				},
-				volume: "100",
-				progress: 40,
-			},
-			{
-				id: "3",
-				name: "Krizz",
-				symbol: "KK",
-				age: "30m",
-				amount: "0.048 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+3.5%",
-					"5m": "+3.6%",
-					"1h": "+3.4%",
-					"24h": "+3.5%",
-				},
-				volume: "100",
-				progress: 90,
-			},
-			{
-				id: "4",
-				name: "Krizz",
-				symbol: "KK",
-				age: "5m",
-				amount: "0.048 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "-10.7%",
-					"5m": "-32.7%",
-					"1h": "-30.9%",
-					"24h": "-22.5%",
-				},
-				volume: "100",
-				progress: 40,
-			},
-			{
-				id: "3",
-				name: "Krizz",
-				symbol: "KK",
-				age: "30m",
-				amount: "0.048 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+3.5%",
-					"5m": "+3.6%",
-					"1h": "+3.4%",
-					"24h": "+3.5%",
-				},
-				volume: "100",
-				progress: 90,
-			},
-			{
-				id: "4",
-				name: "Krizz",
-				symbol: "KK",
-				age: "5m",
-				amount: "0.048 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "-10.7%",
-					"5m": "-32.7%",
-					"1h": "-30.9%",
-					"24h": "-22.5%",
-				},
-				volume: "100",
-				progress: 40,
-			},
-			{
-				id: "3",
-				name: "Krizz",
-				symbol: "KK",
-				age: "30m",
-				amount: "0.048 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+3.5%",
-					"5m": "+3.6%",
-					"1h": "+3.4%",
-					"24h": "+3.5%",
-				},
-				volume: "100",
-				progress: 90,
-			},
-			{
-				id: "4",
-				name: "Krizz",
-				symbol: "KK",
-				age: "5m",
-				amount: "0.048 BTC",
-				price: "1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "-10.7%",
-					"5m": "-32.7%",
-					"1h": "-30.9%",
-					"24h": "-22.5%",
-				},
-				volume: "100",
-				progress: 40,
 			},
 		],
 		[]
@@ -405,7 +100,11 @@ export default function MemeList() {
 												clipPath: "circle(50% at center)",
 											}}
 										></div>
-										<div className="absolute inset-[2px] rounded-full bg-gradient-to-r from-blue-500 to-black"></div>
+										<img
+											alt="duck"
+											className="absolute rounded-full p-[2px]"
+											src="https://ipfs.io/ipfs/QmQ4H6Y23dSEjn9LKB85M7KpVFiDu6KfDNZAcrqiCwFQQH?img-width=800&img-dpr=2&img-onerror=redirect"
+										/>
 									</div>
 								</TooltipTrigger>
 								<TooltipContent className="bg-white px-1 py-1 text-xs font-semibold text-black">
@@ -443,7 +142,7 @@ export default function MemeList() {
 				enablePinning: true,
 			}),
 			// Age column
-			columnHelper.accessor("age", {
+			columnHelper.accessor("created", {
 				id: "age",
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
@@ -454,7 +153,7 @@ export default function MemeList() {
 				cell: (info) => (
 					<div className="flex h-full w-full items-center gap-1">
 						<span className="text-sm leading-4 font-medium text-white/60">
-							{info.getValue()}
+							{fromNow(info.getValue())}
 						</span>
 					</div>
 				),
@@ -471,10 +170,10 @@ export default function MemeList() {
 				cell: (info) => (
 					<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
 						<span className="text-sm leading-4 font-medium text-white">
-							{info.getValue()} BTC
+							${0.5}
 						</span>
 						<span className="text-xs leading-4 font-light text-white/60">
-							{info.getValue()} sats
+							{info.getValue()} ICP
 						</span>
 					</div>
 				),
@@ -558,7 +257,7 @@ export default function MemeList() {
 				cell: (info) => (
 					<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
 						<span className="text-sm leading-4 font-medium text-white">
-							{info.getValue()} BTC
+							{info.getValue()} ICP
 						</span>
 						<span className="text-xs leading-4 font-light text-white/60">
 							${info.getValue()}
@@ -612,7 +311,7 @@ export default function MemeList() {
 	const router = useRouter();
 	const { chain } = useChainStore();
 	return (
-		<div className="bg-gray-760 no-scrollbar h-fit overflow-auto rounded-t-2xl">
+		<div className="bg-gray-760 no-scrollbar h-screen overflow-auto rounded-t-2xl">
 			<table className="w-full min-w-max">
 				<thead className="sticky top-0 z-10">
 					{table.getHeaderGroups().map((headerGroup) => (
@@ -662,7 +361,7 @@ export default function MemeList() {
 							onClick={() => {
 								void router.navigate({
 									to: `/${chain}/token/$id`,
-									params: { id: row.original.id },
+									params: { id: row.original.id.toString() },
 								});
 							}}
 						>
@@ -695,7 +394,7 @@ export default function MemeList() {
 									>
 										<div
 											className={cn(
-												"flex h-full items-center p-3",
+												"flex h-full cursor-pointer items-center p-3",
 												isPinned &&
 													"bg-gray-760 group-hover:bg-gray-750 duration-300"
 											)}

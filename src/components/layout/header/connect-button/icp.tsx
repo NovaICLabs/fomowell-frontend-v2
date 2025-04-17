@@ -5,6 +5,7 @@ import { Check } from "lucide-react";
 
 import { CopyIcon } from "@/components/icons/common/copy";
 import { DisconnectIcon } from "@/components/icons/common/disconnect";
+import IcpLogo from "@/components/icons/logo/icp";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -88,13 +89,9 @@ const IcpWalletConnect: React.FC = () => {
 								}}
 							/>
 						</div>
-						<div className="bg-gray-750 inline-flex h-[38px] items-center justify-start gap-0.5 rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700">
-							<img
-								alt="flash"
-								className="h-4.5 w-4.5 rounded-full"
-								src={"/svgs/coins/bitcoin.svg"}
-							/>
-							<span className="text-xs font-medium">
+						<div className="bg-gray-750 inline-flex h-[38px] min-w-[100px] items-center justify-start gap-0.5 rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700">
+							<IcpLogo className="h-4 w-4" />
+							<span className="flex-1 text-center text-xs font-medium">
 								{connected ? (balance?.formatted ?? "---") : "---"}
 							</span>
 						</div>

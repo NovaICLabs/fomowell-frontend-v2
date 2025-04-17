@@ -32,7 +32,7 @@ const ACCEPTED_IMAGE_TYPES = [
 	"image/gif",
 	"image/svg+xml",
 ];
-const MAX_FILE_SIZE = 200 * 1024; // 200KB
+const MAX_FILE_SIZE = 1000 * 1024; // 1MB
 
 // Create form validation schema with Zod
 const formSchema = z.object({
@@ -55,7 +55,7 @@ const formSchema = z.object({
 		.any()
 		.refine((file: File) => file !== undefined, { message: "Logo is required" })
 		.refine((file: File) => file?.size <= MAX_FILE_SIZE, {
-			message: `Max file size is 200KB`,
+			message: `Max file size is 1MB`,
 		})
 		.refine((file: File) => ACCEPTED_IMAGE_TYPES.includes(file?.type), {
 			message:
@@ -166,7 +166,7 @@ function TokenCreationPage() {
 														JPEG / PNG / WEBP / GIF / SVG
 													</p>
 													<p className="text-center text-xs text-gray-500">
-														(max size 200KB)
+														(max size 1MB)
 													</p>
 												</FormDescription>
 												<FormMessage />

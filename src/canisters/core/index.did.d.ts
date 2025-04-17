@@ -34,7 +34,6 @@ export type CanisterMetricsData =
 	| { hourly: Array<HourlyMetricsData> }
 	| { daily: Array<DailyMetricsData> };
 export interface CreateMemeTokenArg {
-	rune_ticker: string;
 	creator: [] | [Principal];
 	ticker: string;
 	twitter: [] | [string];
@@ -104,7 +103,6 @@ export interface LogMessageData {
 }
 export interface MemeToken {
 	id: bigint;
-	rune_ticker: string;
 	creator: string;
 	ticker: string;
 	available_token: bigint;

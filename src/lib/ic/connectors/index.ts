@@ -56,7 +56,7 @@ export class WalletConnector {
 	public static create(connector: Connector) {
 		const config = {
 			host: import.meta.env.VITE_IC_HOST,
-			whitelist: ["fjpld-mqaaa-aaaah-ardua-cai"],
+			whitelist: [],
 		};
 
 		switch (connector) {

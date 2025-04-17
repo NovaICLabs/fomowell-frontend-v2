@@ -32,7 +32,6 @@ export type CreateMemeTokenArgs = {
 	website?: string;
 	telegram?: string;
 	twitter?: string;
-	rune_ticker?: string;
 	creator?: string;
 };
 
@@ -66,10 +65,10 @@ export const createMemeToken = async (
 		website: wrapOption(website),
 		telegram: wrapOption(telegram),
 		twitter: wrapOption(twitter),
-		rune_ticker: "12213",
 		creator: wrapOption(creator ? validatePrincipalText(creator) : undefined),
 		logo: logoMetadata,
 	});
+	console.debug("🚀 ~ result:", result);
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
 	});
