@@ -1,19 +1,4 @@
 export const idlFactory = ({ IDL }: { IDL: any }) => {
-	const StableToken = IDL.Record({
-		fee: IDL.Nat,
-		decimals: IDL.Nat8,
-		name: IDL.Text,
-		canister_id: IDL.Principal,
-		symbol: IDL.Text,
-	});
-	const InitArg = IDL.Record({
-		fee_receiver: IDL.Principal,
-		ckbtc_canister: StableToken,
-		create_token_fee: IDL.Opt(IDL.Nat64),
-		ckbtc_launch_thread_hold: IDL.Nat,
-		maintenance: IDL.Bool,
-		fee_percentage: IDL.Opt(IDL.Float32),
-	});
 	const BuyArgs = IDL.Record({
 		buy_min_token: IDL.Nat,
 		boning_curve_id: IDL.Nat64,
