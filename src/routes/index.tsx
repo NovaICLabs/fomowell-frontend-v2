@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MemeList from "@/components/views/home/meme-list";
+import { validateInputNumber } from "@/lib/common/validate";
 import { cn } from "@/lib/utils";
 import { chains, useChainStore } from "@/store/chain";
 import { useQuickBuyStore } from "@/store/quick-buy";
@@ -134,15 +135,10 @@ function Home() {
 							}}
 							onChange={(event) => {
 								const value = event.target.value.trim();
-								const regex = new RegExp(`^(0|[1-9]\\d*)(\\.\\d{0,${8}})?$`);
-								if (
-									value === "" ||
-									value === "0" ||
-									value === "." ||
-									regex.test(value)
-								) {
-									setFlashAmount(value);
-								}
+								validateInputNumber({
+									value,
+									callback: setFlashAmount,
+								});
 							}}
 						></Input>
 					</div>
@@ -160,15 +156,10 @@ function Home() {
 							}}
 							onChange={(event) => {
 								const value = event.target.value.trim();
-								const regex = new RegExp(`^(0|[1-9]\\d*)(\\.\\d{0,${8}})?$`);
-								if (
-									value === "" ||
-									value === "0" ||
-									value === "." ||
-									regex.test(value)
-								) {
-									setSlippage(value);
-								}
+								validateInputNumber({
+									value,
+									callback: setSlippage,
+								});
 							}}
 						/>
 						<span className="absolute right-2 text-sm font-medium text-white/60">

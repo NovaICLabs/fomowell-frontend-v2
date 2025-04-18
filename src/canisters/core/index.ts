@@ -1,22 +1,171 @@
+import { getAnonymousActorCreator } from "@/hooks/providers/wallet/ic";
 import { string2array } from "@/lib/common/data/arrays";
+import { formatNumberSmart, formatUnits } from "@/lib/common/number";
 import {
 	validateCanisterIdText,
 	validatePrincipalText,
 } from "@/lib/ic/principal";
-import { wrapOption } from "@/lib/ic/rust/option";
+import {
+	unwrapOption,
+	unwrapOptionMap,
+	wrapOption,
+} from "@/lib/ic/rust/option";
 import { unwrapRustResult } from "@/lib/ic/rust/result";
 
 import { idlFactory } from "./index.did";
 import { approve, getICPCanisterId } from "../icrc3";
 
-import type { _SERVICE, StableToken } from "./index.did.d";
+import type { _SERVICE, LedgerType, StableToken } from "./index.did.d";
 import type { ActorCreator } from "@/lib/ic/connectors";
+
 export const getChainICCoreCanisterId = () => {
 	return validateCanisterIdText(
 		import.meta.env["VITE_CHAIN_IC_CORE_CANISTER_ID"]
 	);
 };
 
+// ================================ read ================================
+export const getMemeToken = async (canisterId: string, id: bigint) => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+	const actor = await createActor<_SERVICE>({
+		idlFactory,
+		canisterId,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const result = await actor.query_meme_token(id);
+	const memeToken = unwrapOptionMap(result, (r) => ({
+		name: r.name,
+		ticker: r.ticker,
+		description: r.description,
+		website: unwrapOption(r.website),
+		telegram: unwrapOption(r.telegram),
+		twitter: unwrapOption(r.twitter),
+		logo: r.logo,
+		creator: r.creator,
+		completed: r.completed,
+		available_token: r.available_token,
+		ledger_canister: unwrapOption(r.ledger_canister),
+		market_cap_icp: r.market_cap_icp,
+		created_at: r.created_at,
+		decimals: 8,
+	}));
+	if (!memeToken) {
+		throw new Error("Meme token not found");
+	}
+	return memeToken;
+};
+// getCoreTokenBalance
+export const getCoreTokenBalance = async (
+	canisterId: string,
+	args: {
+		owner: string;
+		token: LedgerType;
+	}
+) => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+	const actor = await createActor<_SERVICE>({
+		idlFactory,
+		canisterId,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { owner, token } = args;
+	const result = await actor.icrc1_balance_of(token, {
+		owner: validatePrincipalText(owner),
+		subaccount: [],
+	});
+	const decimals = 8;
+	const formatted = formatNumberSmart(formatUnits(result, decimals));
+	return {
+		raw: result,
+		formatted,
+		decimals,
+	};
+};
+
+// calculateBuy
+export const calculateBuy = async (
+	canisterId: string,
+	args: {
+		amount: bigint;
+		id: bigint;
+	}
+) => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+	const actor = await createActor<_SERVICE>({
+		idlFactory,
+		canisterId,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { amount, id } = args;
+	const result = await actor.calculate_buy(id, amount);
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};
+
+// calculateSell
+export const calculateSell = async (
+	canisterId: string,
+	args: {
+		amount: bigint;
+		id: bigint;
+	}
+) => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+	const actor = await createActor<_SERVICE>({
+		idlFactory,
+		canisterId,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { amount, id } = args;
+	const result = await actor.calculate_sell(id, amount);
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};
+
+// get current price
+export const getCurrentPrice = async (canisterId: string, tokenId: bigint) => {
+	console.debug("🚀 ~ getCurrentPrice ~ tokenId:", tokenId);
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+	const actor = await createActor<_SERVICE>({
+		idlFactory,
+		canisterId,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const result = await actor.query_meme_token_price(tokenId);
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};
+
+// ================================ write ================================
+// createMemeToken
 export type CreateMemeTokenArgs = {
 	name: string;
 	logo: File;
@@ -61,12 +210,13 @@ export const createMemeToken = async (
 		creator: wrapOption(creator ? validatePrincipalText(creator) : undefined),
 		logo: "https://ipfs.io/ipfs/QmQ4H6Y23dSEjn9LKB85M7KpVFiDu6KfDNZAcrqiCwFQQH?img-width=800&img-dpr=2&img-onerror=redirect",
 	});
+	console.debug("🚀 ~ result:", result);
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
 	});
 };
 
-// ================================ deposit ================================
+// deposit
 export type DepositArgs = {
 	token: StableToken;
 	amount: bigint;
@@ -104,12 +254,13 @@ export const deposit = async (
 		throw new Error(error);
 	});
 };
+
+// buy
 export type BuyArgs = {
 	minTokenReceived: bigint;
 	id: bigint;
 	amount: bigint;
 };
-
 export const buy = async (
 	createActor: ActorCreator,
 	canisterId: string,
@@ -126,12 +277,42 @@ export const buy = async (
 	const { minTokenReceived, id, amount } = args;
 
 	const result = await actor.buy({
-		buy_min_token: minTokenReceived,
+		amount_out_min: minTokenReceived,
 		boning_curve_id: id,
 		subaccount: [],
-		ckbtc_amount: amount,
+		amount_in: amount,
 	});
-	console.debug("🚀 ~ result:", result);
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};
+
+// sell
+export type SellArgs = {
+	amount: bigint;
+	id: bigint;
+	minTokenReceived: bigint;
+};
+
+export const sell = async (
+	createActor: ActorCreator,
+	canisterId: string,
+	args: SellArgs
+) => {
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		interfaceFactory: idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { amount, id, minTokenReceived } = args;
+	const result = await actor.sell({
+		amount_in: amount,
+		boning_curve_id: id,
+		subaccount: [],
+		amount_out_min: minTokenReceived,
+	});
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
 	});

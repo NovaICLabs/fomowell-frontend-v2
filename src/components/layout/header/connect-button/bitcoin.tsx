@@ -19,7 +19,6 @@ import {
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
 import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
@@ -184,17 +183,15 @@ const BitcoinWalletConnect: React.FC = () => {
 						</div>
 					</div>
 				) : (
-					<DialogTrigger asChild>
-						<Button
-							className="h-[38px] w-[111px] rounded-full text-xs font-bold"
-							disabled={loading}
-							onClick={() => {
-								setOpen(true);
-							}}
-						>
-							{loading ? "Connecting..." : "Connect Wallet"}
-						</Button>
-					</DialogTrigger>
+					<Button
+						className="h-[38px] w-[111px] rounded-full text-xs font-bold"
+						disabled={loading}
+						onClick={() => {
+							setOpen(true);
+						}}
+					>
+						{loading ? "Connecting..." : "Connect Wallet"}
+					</Button>
 				)}
 
 				<DialogContent

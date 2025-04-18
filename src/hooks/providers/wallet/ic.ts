@@ -121,10 +121,11 @@ export const useConnectedIdentity = () => {
 };
 
 export const getAnonymousActorCreator = (fetchRootKey: boolean = false) => {
-	return async <T>(
-		idlFactory: IDL.InterfaceFactory,
-		canisterId: string | Principal
-	) => {
+	return async <T>(args: {
+		idlFactory: IDL.InterfaceFactory;
+		canisterId: string | Principal;
+	}) => {
+		const { idlFactory, canisterId } = args;
 		const agent = HttpAgent.createSync({
 			host: import.meta.env.VITE_IC_HOST,
 			retryTimes: 1,

@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/tooltip";
 import { showToast } from "@/components/utils/toast";
 import { useBuy } from "@/hooks/ic/core";
-import { parseUnits } from "@/lib/common/number";
+import { formatNumberSmart, parseUnits } from "@/lib/common/number";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { fromNow } from "@/lib/common/time";
 import { cn } from "@/lib/utils";
@@ -48,9 +48,9 @@ export default function MemeList() {
 	const data = useMemo<Array<Token>>(
 		() => [
 			{
-				id: 6n,
-				name: "FROG FROG",
-				symbol: "FROG",
+				id: 3n,
+				name: "DCF",
+				symbol: "DCF",
 				created: 1744880732722367464n,
 				amount: "0.0016 ICP",
 				price: "0.1",
@@ -75,8 +75,13 @@ export default function MemeList() {
 
 	const columnHelper = createColumnHelper<Token>();
 
-	const { mutate: buyToken } = useBuy();
+	const { mutateAsync: buyToken } = useBuy();
 	const { amount: flashAmount } = useQuickBuyStore();
+
+	const flashAmountBigInt = useMemo(
+		() => BigInt(parseUnits(flashAmount, 8)),
+		[flashAmount]
+	);
 	// Use useMemo to define columns to avoid re-rendering issues
 	const columns = useMemo(
 		() => [
@@ -286,10 +291,15 @@ export default function MemeList() {
 							className="hover:bg-gray-710 h-9 w-[63px] rounded-full bg-transparent text-xs text-white"
 							onClick={withStopPropagation(() => {
 								showToast("loading", "Buying token(id:6)...");
-								buyToken({
-									amount: BigInt(parseUnits(flashAmount, 8)),
-									id: 6n,
+								void buyToken({
+									amount: flashAmountBigInt,
+									id: 7n,
 									minTokenReceived: 0n,
+								}).then(() => {
+									showToast(
+										"success",
+										`${formatNumberSmart(flashAmount)} tokens(id:${7}) received!`
+									);
 								});
 							})}
 						>

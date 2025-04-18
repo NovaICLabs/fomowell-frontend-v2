@@ -5,7 +5,7 @@ import { isProduction } from "../../../common/env";
 export const TanStackRouterDevelopmentTools = isProduction
 	? (): null => null
 	: React.lazy(() =>
-			import("@tanstack/router-devtools").then((result) => ({
+			import("@tanstack/react-router-devtools").then((result) => ({
 				default: result.TanStackRouterDevtools,
 			}))
 		);

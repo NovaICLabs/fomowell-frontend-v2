@@ -3,6 +3,7 @@ import { type KeyboardEvent, useCallback, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Command as CommandPrimitive } from "cmdk";
 import { Check, Loader2 } from "lucide-react";
+import { useDebounce } from "use-debounce";
 
 import {
 	CommandGroup,
@@ -10,7 +11,6 @@ import {
 	CommandItem,
 	CommandList,
 } from "@/components/ui/command";
-import { useDebounce } from "@/hooks/common/use-debounce";
 import { cn } from "@/lib/utils";
 
 interface SearchResult {
@@ -32,7 +32,7 @@ export default function Search() {
 	const [isOpen, setIsOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selected, setSelected] = useState<SearchResult | null>(null);
-	const debouncedSearchTerm = useDebounce(searchTerm, 500); // 500ms debounce
+	const [debouncedSearchTerm] = useDebounce(searchTerm, 500); // 500ms debounce
 
 	// Search request
 	const { data: searchResults, isLoading } = useQuery({

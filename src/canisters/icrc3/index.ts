@@ -22,7 +22,10 @@ export const getIcrcTokenBalance = async ({
 	principal: string;
 }) => {
 	const creator = getAnonymousActorCreator();
-	const actor = await creator<_SERVICE>(icrc3IdlFactory, canisterId);
+	const actor = await creator<_SERVICE>({
+		idlFactory: icrc3IdlFactory,
+		canisterId,
+	});
 	const r = await actor.icrc1_balance_of({
 		owner: validatePrincipalText(principal),
 		subaccount: [],

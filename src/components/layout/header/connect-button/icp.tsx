@@ -16,7 +16,6 @@ import {
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
 import {
 	Popover,
@@ -180,17 +179,15 @@ const IcpWalletConnect: React.FC = () => {
 						</div>
 					</div>
 				) : (
-					<DialogTrigger asChild>
-						<Button
-							className="h-[38px] w-[111px] rounded-full text-xs font-bold"
-							disabled={isLoading}
-							onClick={() => {
-								setOpen(true);
-							}}
-						>
-							{isLoading ? "Connecting..." : "Connect Wallet"}
-						</Button>
-					</DialogTrigger>
+					<Button
+						className="h-[38px] w-[111px] rounded-full text-xs font-bold"
+						disabled={isLoading}
+						onClick={() => {
+							setOpen(true);
+						}}
+					>
+						{isLoading ? "Connecting..." : "Connect Wallet"}
+					</Button>
 				)}
 
 				<DialogContent

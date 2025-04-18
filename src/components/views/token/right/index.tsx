@@ -1,13 +1,21 @@
 import { useState } from "react";
 
+import { useParams } from "@tanstack/react-router";
+
+import IcpLogo from "@/components/icons/logo/icp";
 import { Progress } from "@/components/ui/progress";
+import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
+import { formatNumberSmart, formatUnits } from "@/lib/common/number";
+import { fromNow } from "@/lib/common/time";
 
 import Liquidity from "./liquidity";
 import Trade from "./trade";
-
 const tabs = ["Trade", "Liquidity"];
 export default function Bottom() {
 	const [activeTab, setActiveTab] = useState(tabs[0]);
+	const { id } = useParams({ from: "/icp/token/$id" });
+	const { data: currentTokenPrice } = useCurrentPrice({ id: Number(id) });
+	const { data: memeTokenInfo } = useMemeTokenInfo(Number(id));
 	return (
 		<div className="no-scrollbar flex w-[390px] flex-shrink-0 flex-col gap-7.5 overflow-auto">
 			<div className="flex items-center gap-[30px]">
@@ -77,7 +85,9 @@ export default function Bottom() {
 				<div className="flex items-center justify-between">
 					<span className="text-sm text-white/40">Price</span>
 					<span className="text-sm text-white">
-						20000 sats <span className="text-gray-280">($20)</span>
+						<span className="text-gray-280">
+							{currentTokenPrice?.formattedPerPayToken} ICP
+						</span>
 					</span>
 				</div>
 				<div className="flex items-center justify-between">
@@ -86,12 +96,18 @@ export default function Bottom() {
 						<span className="text-white">$50K</span>
 						<div className="text-gray-280 flex items-center">
 							(
-							<img
-								alt="bitcoin"
-								className="inline"
-								src="/svgs/coins/bitcoin.svg"
-							/>
-							<span className="text-gray-280">20</span>)
+							<IcpLogo className="inline" />
+							<span className="text-gray-280">
+								{memeTokenInfo?.market_cap_icp
+									? formatNumberSmart(
+											formatUnits(
+												memeTokenInfo.market_cap_icp,
+												memeTokenInfo.decimals
+											)
+										)
+									: "N/A"}
+							</span>
+							)
 						</div>
 					</div>
 				</div>
@@ -101,11 +117,7 @@ export default function Bottom() {
 						<span className="text-white">$120.9K</span>
 						<div className="text-gray-280 flex items-center">
 							(
-							<img
-								alt="bitcoin"
-								className="inline"
-								src="/svgs/coins/bitcoin.svg"
-							/>
+							<IcpLogo className="inline" />
 							<span className="text-gray-280">20</span>)
 						</div>
 					</div>
@@ -113,7 +125,12 @@ export default function Bottom() {
 				<div className="flex items-center justify-between">
 					<span className="text-sm text-white/40">Created at</span>
 					<div className="flex items-center gap-1 text-sm text-white">
-						<span className="text-white">24h ago</span>
+						<span className="text-white">
+							{memeTokenInfo?.created_at
+								? fromNow(memeTokenInfo.created_at)
+								: "N/A"}{" "}
+							ago
+						</span>
 					</div>
 				</div>
 				<div className="flex items-center justify-between">

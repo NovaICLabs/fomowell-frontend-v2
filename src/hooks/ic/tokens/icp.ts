@@ -14,6 +14,6 @@ export const useICPBalance = (principal?: string) => {
 			return getICPBalance(p);
 		},
 		enabled: !!p,
-		refetchInterval: 3000,
+		refetchInterval: 15_000,
 	});
 };

@@ -15,7 +15,7 @@ export function parseUnits(
 ): string {
 	const valueAsBN = new BigNumber(value);
 	const multiplier = new BigNumber(10).pow(decimals);
-	return valueAsBN.times(multiplier).toFixed(0);
+	return valueAsBN.times(multiplier).toFixed();
 }
 
 export const formatNumberSmart = (
@@ -75,4 +75,16 @@ export const formatNumberSmart = (
 	}
 
 	return bn.toFormat(2).replace(/(\.\d*?[1-9])0+$|\.0*$/, "$1");
+};
+
+export const getTokenUsdValueTotal = (
+	token: { amount: bigint; decimals?: number },
+	price: number
+) => {
+	return formatNumberSmart(
+		new BigNumber(token.amount)
+			.div(new BigNumber(10).pow(token.decimals ?? 8))
+			.times(price),
+		true
+	);
 };

@@ -33,7 +33,6 @@ export function FileUploader({
 				if (!file) return;
 				setFiles([file]);
 				onChange?.([file]);
-				// 创建预览URL
 				const reader = new FileReader();
 				reader.onload = (event) => {
 					setPreview(event.target?.result as string);

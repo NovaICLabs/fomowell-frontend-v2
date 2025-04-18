@@ -11,11 +11,19 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		canister_id: IDL.Principal,
 		symbol: IDL.Text,
 	});
+	const InitArg = IDL.Record({
+		icp_launch_thread_hold: IDL.Nat,
+		fee_receiver: Account,
+		create_token_fee: IDL.Opt(IDL.Nat64),
+		maintenance: IDL.Bool,
+		fee_percentage: IDL.Opt(IDL.Float32),
+		icp_canister: StableToken,
+	});
 	const BuyArgs = IDL.Record({
-		buy_min_token: IDL.Nat,
+		amount_out_min: IDL.Nat,
 		boning_curve_id: IDL.Nat64,
 		subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
-		ckbtc_amount: IDL.Nat,
+		amount_in: IDL.Nat,
 	});
 	const Result = IDL.Variant({ Ok: IDL.Nat, Err: IDL.Text });
 	const CreateMemeTokenArg = IDL.Record({
@@ -42,6 +50,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		website: IDL.Opt(IDL.Text),
 		ledger_canister: IDL.Opt(IDL.Text),
 		market_cap_icp: IDL.Nat,
+		price: IDL.Float64,
 		telegram: IDL.Opt(IDL.Text),
 	});
 	const Result_1 = IDL.Variant({ Ok: MemeToken, Err: IDL.Text });
@@ -159,10 +168,10 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 	const Buy = IDL.Record({
 		token: IDL.Principal,
 		from: Account,
-		reserve0: IDL.Nat,
-		reserve1: IDL.Nat,
 		amount_out: IDL.Nat,
+		reserve_out: IDL.Nat,
 		amount_in: IDL.Nat,
+		reserve_in: IDL.Nat,
 		meme_token_id: IDL.Nat64,
 	});
 	const Deposit = IDL.Record({
@@ -185,10 +194,12 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		})
 	);
 	const Mint = IDL.Record({
+		meme_token0: IDL.Nat64,
 		metadata: IDL.Vec(IDL.Tuple(IDL.Text, Value)),
 		from: Account,
-		meme_token_id: IDL.Nat64,
-		amount: IDL.Nat,
+		reserve0: IDL.Nat,
+		reserve1: IDL.Nat,
+		token1: IDL.Principal,
 	});
 	const Swap = IDL.Record({
 		from: Account,
@@ -219,6 +230,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		swap: IDL.Opt(Swap),
 		deposit: IDL.Opt(Deposit),
 		timestamp: IDL.Nat64,
+		index: IDL.Nat,
 		transfer: IDL.Opt(Transfer),
 	});
 	const Burn = IDL.Record({
@@ -275,12 +287,6 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		transactions: IDL.Vec(Transaction),
 		archived_transactions: IDL.Vec(ArchivedRange),
 	});
-	const SellArgs = IDL.Record({
-		token_amount: IDL.Nat,
-		boning_curve_id: IDL.Nat64,
-		subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
-		btc_min_amount: IDL.Nat,
-	});
 	const WithdrawArgs = IDL.Record({
 		to: Account,
 		token: StableToken,
@@ -305,9 +311,10 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			[GetTransactionsResponse],
 			["query"]
 		),
-		icrc1_balance_of: IDL.Func([IDL.Principal, Account], [IDL.Nat], ["query"]),
+		icrc1_balance_of: IDL.Func([LedgerType, Account], [IDL.Nat], ["query"]),
 		query_meme_token: IDL.Func([IDL.Nat64], [IDL.Opt(MemeToken)], ["query"]),
-		sell: IDL.Func([SellArgs], [Result], []),
+		query_meme_token_price: IDL.Func([IDL.Nat64], [Result], ["query"]),
+		sell: IDL.Func([BuyArgs], [Result], []),
 		withdraw: IDL.Func([WithdrawArgs], [Result], []),
 	});
 };

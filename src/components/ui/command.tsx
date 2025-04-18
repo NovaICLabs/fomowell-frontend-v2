@@ -1,4 +1,4 @@
-import type * as React from "react";
+import * as React from "react";
 
 import { Command as CommandPrimitive } from "cmdk";
 
@@ -51,10 +51,10 @@ function CommandDialog({
 	);
 }
 
-function CommandInput({
-	className,
-	...props
-}: React.ComponentProps<typeof CommandPrimitive.Input>) {
+const CommandInput = React.forwardRef<
+	React.ElementRef<typeof CommandPrimitive.Input>,
+	React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
+>(({ className, ...props }, ref) => {
 	return (
 		<div
 			className="flex h-9 items-center gap-2 rounded-xl bg-gray-800 px-3"
@@ -68,10 +68,11 @@ function CommandInput({
 					className
 				)}
 				{...props}
+				ref={ref}
 			/>
 		</div>
 	);
-}
+});
 
 function CommandList({
 	className,

@@ -31,17 +31,17 @@ export interface Burn {
 export interface Buy {
 	token: Principal;
 	from: Account;
-	reserve0: bigint;
-	reserve1: bigint;
 	amount_out: bigint;
+	reserve_out: bigint;
 	amount_in: bigint;
+	reserve_in: bigint;
 	meme_token_id: bigint;
 }
 export interface BuyArgs {
-	buy_min_token: bigint;
+	amount_out_min: bigint;
 	boning_curve_id: bigint;
 	subaccount: [] | [Uint8Array | number[]];
-	ckbtc_amount: bigint;
+	amount_in: bigint;
 }
 export type CanisterLogFeature =
 	| { filterMessageByContains: null }
@@ -176,6 +176,7 @@ export interface MemeToken {
 	website: [] | [string];
 	ledger_canister: [] | [string];
 	market_cap_icp: bigint;
+	price: number;
 	telegram: [] | [string];
 }
 export type MetricsGranularity = { hourly: null } | { daily: null };
@@ -186,10 +187,12 @@ export interface MetricsResponse {
 	metrics: [] | [CanisterMetrics];
 }
 export interface Mint {
+	meme_token0: bigint;
 	metadata: Array<[string, Value]>;
 	from: Account;
-	meme_token_id: bigint;
-	amount: bigint;
+	reserve0: bigint;
+	reserve1: bigint;
+	token1: Principal;
 }
 export interface Mint_1 {
 	to: Account;
@@ -206,12 +209,6 @@ export interface NumericEntity {
 }
 export type Result = { Ok: bigint } | { Err: string };
 export type Result_1 = { Ok: MemeToken } | { Err: string };
-export interface SellArgs {
-	token_amount: bigint;
-	boning_curve_id: bigint;
-	subaccount: [] | [Uint8Array | number[]];
-	btc_min_amount: bigint;
-}
 export interface StableToken {
 	fee: bigint;
 	decimals: number;
@@ -247,6 +244,7 @@ export interface Transaction {
 	swap: [] | [Swap];
 	deposit: [] | [Deposit];
 	timestamp: bigint;
+	index: bigint;
 	transfer: [] | [Transfer];
 }
 export interface TransactionRange {
@@ -303,9 +301,10 @@ export interface _SERVICE {
 		GetInformationResponse
 	>;
 	get_transactions: ActorMethod<[GetBlocksRequest], GetTransactionsResponse>;
-	icrc1_balance_of: ActorMethod<[Principal, Account], bigint>;
+	icrc1_balance_of: ActorMethod<[LedgerType, Account], bigint>;
 	query_meme_token: ActorMethod<[bigint], [] | [MemeToken]>;
-	sell: ActorMethod<[SellArgs], Result>;
+	query_meme_token_price: ActorMethod<[bigint], Result>;
+	sell: ActorMethod<[BuyArgs], Result>;
 	withdraw: ActorMethod<[WithdrawArgs], Result>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;
