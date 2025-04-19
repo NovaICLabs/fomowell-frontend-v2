@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useRouter } from "@tanstack/react-router";
 import copy from "copy-to-clipboard";
 import { Check } from "lucide-react";
 
@@ -22,34 +23,18 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { useDeposit } from "@/hooks/ic/core";
-import { useICPBalance } from "@/hooks/ic/tokens/icp";
+import { useCoreTokenBalance } from "@/hooks/ic/core";
 import { useIcWallet } from "@/hooks/providers/wallet/ic";
 import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
+import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore, useIcLastConnectedWalletStore } from "@/store/ic";
 
 import WalletOption from "../wallet-option";
 
 import type { Connector } from "@/lib/ic/connectors";
-const popoverLinks = [
-	{
-		label: "Profile",
-		href: "/profile",
-		icon: <ProfileIcon />,
-	},
-	{
-		label: "Deposit",
-		href: "/deposit-withdraw",
-		icon: <DepositWithdrawIcon />,
-	},
-	{
-		label: "Linked Wallet",
-		href: "/linked-wallet",
-		icon: <LinkedWalletIcon />,
-	},
-];
+
 const IcpWalletConnect: React.FC = () => {
 	const [open, setOpen] = useState(false);
 	const { connect, disconnect, isLoading } = useIcWallet();
@@ -75,11 +60,40 @@ const IcpWalletConnect: React.FC = () => {
 	};
 
 	const [copied, setCopied] = useState(false);
-	const { data: balance, refetch } = useICPBalance();
 
 	const [openPopover, setOpenPopover] = useState(false);
-	const { mutateAsync: deposit } = useDeposit();
-
+	const { setDepositWithdrawOpen } = useDialogStore();
+	const router = useRouter();
+	const popoverLinks = [
+		{
+			label: "Profile",
+			action: async () => {
+				await router.navigate({ to: "/profile" });
+			},
+			icon: <ProfileIcon />,
+		},
+		{
+			label: "Deposit",
+			action: () => {
+				setDepositWithdrawOpen({
+					open: true,
+					type: "deposit",
+				});
+			},
+			icon: <DepositWithdrawIcon />,
+		},
+		{
+			label: "Linked Wallet",
+			action: async () => {
+				await router.navigate({ to: "/linked-wallet" });
+			},
+			icon: <LinkedWalletIcon />,
+		},
+	];
+	const { data: coreTokenBalance } = useCoreTokenBalance({
+		owner: principal,
+		token: { ICRCToken: getICPCanisterId() },
+	});
 	return (
 		<>
 			<Dialog open={open} onOpenChange={setOpen}>
@@ -143,6 +157,7 @@ const IcpWalletConnect: React.FC = () => {
 										<div
 											key={link.label}
 											className="group flex h-10.5 cursor-pointer items-center rounded-[14px] px-2.5 hover:bg-gray-700"
+											onClick={link.action}
 										>
 											<div className="flex h-4 items-center gap-x-2">
 												{link.icon}
@@ -158,23 +173,16 @@ const IcpWalletConnect: React.FC = () => {
 
 						<div
 							className="bg-gray-750 inline-flex h-[38px] min-w-[100px] cursor-pointer items-center justify-start gap-0.5 gap-x-2 rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700"
-							onClick={async () => {
-								await deposit({
-									token: {
-										fee: 10000n,
-										decimals: 8,
-										name: "ICP",
-										canister_id: getICPCanisterId(),
-										symbol: "ICP",
-									},
-									amount: 100000000n,
+							onClick={() => {
+								setDepositWithdrawOpen({
+									open: true,
+									type: "deposit",
 								});
-								await refetch();
 							}}
 						>
 							<IcpLogo className="h-4 w-4" />
 							<span className="text-center text-xs font-medium">
-								{connected ? (balance?.formatted ?? "---") : "---"}
+								{connected ? (coreTokenBalance?.formatted ?? "---") : "---"}
 							</span>
 						</div>
 					</div>

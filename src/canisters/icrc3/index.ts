@@ -14,6 +14,7 @@ export const getICPCanisterId = () => {
 	return validatePrincipalText(import.meta.env["VITE_ICP_CANISTER_ID"]);
 };
 
+
 export const getIcrcTokenBalance = async ({
 	canisterId,
 	principal,

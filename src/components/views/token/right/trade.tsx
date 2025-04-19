@@ -60,18 +60,27 @@ export default function Trade() {
 	const [debouncedBuyAmount] = useDebounce(buyAmount, 500);
 
 	const [sellAmount, setSellAmount] = useState<string>("");
+	console.debug("🚀 ~ Trade ~ sellAmount:", sellAmount);
 	const [debouncedSellAmount] = useDebounce(sellAmount, 500);
+	console.debug(
+		"🚀 ~ Trade ~ debouncedSellAmount:",
+		Number(debouncedSellAmount)
+	);
 	const debouncedBuyAmountBigInt = useMemo(() => {
+		if (debouncedBuyAmount === "") {
+			return undefined;
+		}
 		return isNaN(Number(debouncedBuyAmount))
 			? undefined
-			: BigInt(parseUnits(Number(debouncedBuyAmount), memeTokenInfo?.decimals));
+			: BigInt(parseUnits(debouncedBuyAmount, memeTokenInfo?.decimals));
 	}, [debouncedBuyAmount, memeTokenInfo?.decimals]);
 	const debouncedSellAmountBigInt = useMemo(() => {
+		if (debouncedSellAmount === "") {
+			return undefined;
+		}
 		return isNaN(Number(debouncedSellAmount))
 			? undefined
-			: BigInt(
-					parseUnits(Number(debouncedSellAmount), memeTokenInfo?.decimals)
-				);
+			: BigInt(parseUnits(debouncedSellAmount, memeTokenInfo?.decimals));
 	}, [debouncedSellAmount, memeTokenInfo?.decimals]);
 	const { data: calculatedBuyReceived, isFetching: isCalculatingBuy } =
 		useCalculateBuy({
@@ -127,6 +136,7 @@ export default function Trade() {
 				debouncedBuyAmountBigInt <= coreTokenBalance.raw
 			);
 		}
+
 		return (
 			debouncedSellAmountBigInt !== undefined &&
 			memeTokenBalance?.raw !== undefined &&
@@ -139,6 +149,14 @@ export default function Trade() {
 		debouncedSellAmountBigInt,
 		memeTokenBalance,
 	]);
+	console.debug(
+		"🚀 ~ balanceEnough ~ debouncedSellAmountBigInt:",
+		debouncedSellAmountBigInt
+	);
+	console.debug(
+		"🚀 ~ balanceEnough ~ memeTokenBalance:",
+		memeTokenBalance?.raw
+	);
 
 	const { mutateAsync: buy, isPending: isBuying } = useBuy();
 	const { mutateAsync: sell, isPending: isSelling } = useSell();
@@ -173,7 +191,8 @@ export default function Trade() {
 		if (
 			isCalculatingBuy ||
 			isCalculatingSell ||
-			minTokenReceived === undefined
+			minTokenReceived === undefined ||
+			slippage === ""
 		) {
 			return;
 		}
@@ -183,7 +202,7 @@ export default function Trade() {
 					const result = await buy({
 						amount: debouncedBuyAmountBigInt,
 						id: BigInt(id),
-						minTokenReceived,
+						slippage: Number(slippage),
 					});
 					showToast(
 						"success",
@@ -200,7 +219,7 @@ export default function Trade() {
 					const result = await sell({
 						amount: debouncedSellAmountBigInt,
 						id: BigInt(id),
-						minTokenReceived,
+						slippage: Number(slippage),
 					});
 					showToast(
 						"success",
@@ -214,6 +233,7 @@ export default function Trade() {
 		isCalculatingBuy,
 		isCalculatingSell,
 		minTokenReceived,
+		slippage,
 		activeTab,
 		debouncedBuyAmountBigInt,
 		debouncedSellAmountBigInt,
@@ -241,18 +261,27 @@ export default function Trade() {
 					break;
 				case "Sell":
 					if (memeTokenBalance) {
-						setSellAmount(
-							formatUnits(
-								BigNumber(memeTokenBalance.raw)
-									.multipliedBy(percentage / 100)
-									.toFixed(0)
-							).toString()
-						);
+						if (percentage === 100) {
+							setSellAmount(
+								formatUnits(
+									memeTokenBalance.raw,
+									memeTokenInfo?.decimals
+								).toString()
+							);
+						} else {
+							setSellAmount(
+								formatUnits(
+									BigNumber(memeTokenBalance.raw)
+										.multipliedBy(percentage / 100)
+										.toFixed(0)
+								).toString()
+							);
+						}
 					}
 					break;
 			}
 		},
-		[activeTab, coreTokenBalance, memeTokenBalance]
+		[activeTab, coreTokenBalance, memeTokenBalance, memeTokenInfo?.decimals]
 	);
 	return (
 		<div className="h-112.5 rounded-[12px] bg-gray-800 px-4 py-5">

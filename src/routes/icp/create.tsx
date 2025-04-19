@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -24,16 +24,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { showToast } from "@/components/utils/toast";
 import { FileUploader } from "@/components/views/token/bottom/file-uploader";
 import { useCreateMemeToken } from "@/hooks/ic/core";
-// Define allowed file types for logo
-const ACCEPTED_IMAGE_TYPES = [
-	"image/jpeg",
-	"image/png",
-	"image/webp",
-	"image/gif",
-	"image/svg+xml",
-];
-const MAX_FILE_SIZE = 1000 * 1024; // 1MB
-
 // Create form validation schema with Zod
 const formSchema = z.object({
 	name: z
@@ -51,17 +41,7 @@ const formSchema = z.object({
 		.min(1, { message: "Description is required" })
 		.max(100, { message: "Description must not exceed 100 characters" }),
 
-	logo: z
-		.any()
-		.refine((file: File) => file !== undefined, { message: "Logo is required" })
-		.refine((file: File) => file?.size <= MAX_FILE_SIZE, {
-			message: `Max file size is 1MB`,
-		})
-		.refine((file: File) => ACCEPTED_IMAGE_TYPES.includes(file?.type), {
-			message:
-				"Only .jpg, .jpeg, .png, .webp, .svg and .gif formats are supported",
-		}),
-
+	logo: z.string().url(),
 	devBuy: z
 		.string()
 		.optional()
@@ -116,16 +96,17 @@ function TokenCreationPage() {
 
 	const { mutateAsync: createMemeToken, isPending: isCreating } =
 		useCreateMemeToken();
-
+	const router = useRouter();
 	// Form submission handler
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
-			await createMemeToken({
+			const token = await createMemeToken({
 				name: values.name,
 				ticker: values.symbol,
 				description: values.description,
-				logo: values.logo as File,
+				logo: values.logo,
 			});
+			void router.navigate({ to: `/icp/token/${token.id}` });
 			showToast("success", "Token created successfully");
 		} catch (error) {
 			console.error(error);
@@ -154,9 +135,9 @@ function TokenCreationPage() {
 														imageIcon={
 															<Upload className="h-8 w-8 text-gray-400" />
 														}
-														onChange={(files) => {
-															if (files.length > 0) {
-																onChange(files[0]);
+														onChange={(url) => {
+															if (url) {
+																onChange(url);
 															}
 														}}
 													/>
@@ -340,7 +321,7 @@ function TokenCreationPage() {
 						>
 							{isCreating ? "Creating..." : "Create token"}
 						</Button>
-						<p className="mt-3 text-sm text-gray-400">Service Fees: 0.5 ICP</p>
+						{/* <p className="mt-3 text-sm text-gray-400">Service Fees: 0.5 ICP</p> */}
 					</div>
 				</form>
 			</Form>

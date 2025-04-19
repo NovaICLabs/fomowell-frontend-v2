@@ -17,6 +17,8 @@ import {
 	getMemeToken,
 	sell,
 	type SellArgs,
+	withdraw,
+	type WithdrawArgs,
 } from "@/canisters/core";
 import { showToast } from "@/components/utils/toast";
 import { formatNumberSmart, formatUnits } from "@/lib/common/number";
@@ -30,6 +32,7 @@ export const useMemeTokenInfo = (id: number) => {
 		queryKey: ["ic-core", "meme-token", id],
 		queryFn: () =>
 			getMemeToken(getChainICCoreCanisterId().toText(), BigInt(id)),
+		refetchInterval: 1000 * 10,
 	});
 };
 
@@ -167,6 +170,18 @@ export const useDeposit = () => {
 				throw new Error("No actor creator found");
 			}
 			return deposit(actorCreator, getChainICCoreCanisterId().toText(), args);
+		},
+	});
+};
+
+export const useWithdraw = () => {
+	const { actorCreator } = useConnectedIdentity();
+	return useMutation({
+		mutationFn: async (args: WithdrawArgs) => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			return withdraw(actorCreator, getChainICCoreCanisterId().toText(), args);
 		},
 	});
 };

@@ -14,6 +14,7 @@ import { unwrapRustResult } from "@/lib/ic/rust/result";
 
 import { idlFactory } from "./index.did";
 import { approve, getICPCanisterId } from "../icrc3";
+import { getICPCanisterToken } from "../icrc3/specials";
 
 import type { _SERVICE, LedgerType, StableToken } from "./index.did.d";
 import type { ActorCreator } from "@/lib/ic/connectors";
@@ -50,8 +51,9 @@ export const getMemeToken = async (canisterId: string, id: bigint) => {
 		completed: r.completed,
 		available_token: r.available_token,
 		ledger_canister: unwrapOption(r.ledger_canister),
-		market_cap_icp: r.market_cap_icp,
+		market_cap_token: r.market_cap_token,
 		created_at: r.created_at,
+		bc: r.bc,
 		decimals: 8,
 	}));
 	if (!memeToken) {
@@ -146,7 +148,6 @@ export const calculateSell = async (
 
 // get current price
 export const getCurrentPrice = async (canisterId: string, tokenId: bigint) => {
-	console.debug("🚀 ~ getCurrentPrice ~ tokenId:", tokenId);
 	const createActor = getAnonymousActorCreator();
 	if (!createActor) {
 		throw new Error("Failed to create actor");
@@ -168,7 +169,7 @@ export const getCurrentPrice = async (canisterId: string, tokenId: bigint) => {
 // createMemeToken
 export type CreateMemeTokenArgs = {
 	name: string;
-	logo: File;
+	logo: string;
 	ticker: string;
 	description: string;
 	website?: string;
@@ -199,8 +200,8 @@ export const createMemeToken = async (
 		twitter,
 		creator,
 	} = args;
-	console.debug("🚀 ~ logo:", logo);
 	const result = await actor.create_token({
+		token: getICPCanisterToken(),
 		name,
 		ticker,
 		description,
@@ -208,7 +209,7 @@ export const createMemeToken = async (
 		telegram: wrapOption(telegram),
 		twitter: wrapOption(twitter),
 		creator: wrapOption(creator ? validatePrincipalText(creator) : undefined),
-		logo: "https://ipfs.io/ipfs/QmQ4H6Y23dSEjn9LKB85M7KpVFiDu6KfDNZAcrqiCwFQQH?img-width=800&img-dpr=2&img-onerror=redirect",
+		logo,
 	});
 	console.debug("🚀 ~ result:", result);
 	return unwrapRustResult(result, (error) => {
@@ -231,7 +232,7 @@ export const deposit = async (
 		creator: createActor,
 		canisterId: getICPCanisterId().toText(),
 		args: {
-			amount: args.amount + 20000n,
+			amount: args.amount + getICPCanisterToken().fee,
 			spender: canisterId,
 		},
 	});
@@ -254,10 +255,44 @@ export const deposit = async (
 		throw new Error(error);
 	});
 };
+// withdraw
+export type WithdrawArgs = {
+	token: StableToken;
+	amount: bigint;
+	to: string;
+};
+
+export const withdraw = async (
+	createActor: ActorCreator,
+	canisterId: string,
+	args: WithdrawArgs
+) => {
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		interfaceFactory: idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { token, amount, to } = args;
+	const result = await actor.withdraw({
+		token,
+		amount,
+		subaccount: [],
+		to: {
+			owner: validatePrincipalText(to),
+			subaccount: [],
+		},
+		memo: wrapOption(string2array((Math.random() * 100).toString())),
+	});
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};
 
 // buy
 export type BuyArgs = {
-	minTokenReceived: bigint;
+	slippage: number;
 	id: bigint;
 	amount: bigint;
 };
@@ -274,13 +309,13 @@ export const buy = async (
 		throw new Error("Failed to create actor");
 	}
 
-	const { minTokenReceived, id, amount } = args;
+	const { slippage, id, amount } = args;
 
 	const result = await actor.buy({
-		amount_out_min: minTokenReceived,
-		boning_curve_id: id,
+		slippage,
 		subaccount: [],
 		amount_in: amount,
+		meme_token_id: id,
 	});
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
@@ -291,7 +326,7 @@ export const buy = async (
 export type SellArgs = {
 	amount: bigint;
 	id: bigint;
-	minTokenReceived: bigint;
+	slippage: number;
 };
 
 export const sell = async (
@@ -306,12 +341,12 @@ export const sell = async (
 	if (!actor) {
 		throw new Error("Failed to create actor");
 	}
-	const { amount, id, minTokenReceived } = args;
+	const { amount, id, slippage } = args;
 	const result = await actor.sell({
 		amount_in: amount,
-		boning_curve_id: id,
 		subaccount: [],
-		amount_out_min: minTokenReceived,
+		slippage,
+		meme_token_id: id,
 	});
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);

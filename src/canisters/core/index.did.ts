@@ -4,6 +4,24 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		owner: IDL.Principal,
 		subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
 	});
+	const TokenAmount = IDL.Record({
+		token: IDL.Principal,
+		amount: IDL.Nat,
+	});
+	const InitArg = IDL.Record({
+		fee_receiver: Account,
+		token_launch_tread_hold: IDL.Vec(TokenAmount),
+		create_token_fee: IDL.Vec(TokenAmount),
+		maintenance: IDL.Bool,
+		fee_percentage: IDL.Opt(IDL.Float32),
+	});
+	const BuyArgs = IDL.Record({
+		subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
+		amount_in: IDL.Nat,
+		meme_token_id: IDL.Nat64,
+		slippage: IDL.Float64,
+	});
+	const Result = IDL.Variant({ Ok: IDL.Nat, Err: IDL.Text });
 	const StableToken = IDL.Record({
 		fee: IDL.Nat,
 		decimals: IDL.Nat8,
@@ -11,23 +29,9 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		canister_id: IDL.Principal,
 		symbol: IDL.Text,
 	});
-	const InitArg = IDL.Record({
-		icp_launch_thread_hold: IDL.Nat,
-		fee_receiver: Account,
-		create_token_fee: IDL.Opt(IDL.Nat64),
-		maintenance: IDL.Bool,
-		fee_percentage: IDL.Opt(IDL.Float32),
-		icp_canister: StableToken,
-	});
-	const BuyArgs = IDL.Record({
-		amount_out_min: IDL.Nat,
-		boning_curve_id: IDL.Nat64,
-		subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
-		amount_in: IDL.Nat,
-	});
-	const Result = IDL.Variant({ Ok: IDL.Nat, Err: IDL.Text });
 	const CreateMemeTokenArg = IDL.Record({
 		creator: IDL.Opt(IDL.Principal),
+		token: StableToken,
 		ticker: IDL.Text,
 		twitter: IDL.Opt(IDL.Text),
 		logo: IDL.Text,
@@ -36,7 +40,15 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		website: IDL.Opt(IDL.Text),
 		telegram: IDL.Opt(IDL.Text),
 	});
+	const BondingCurve = IDL.Record({
+		token: StableToken,
+		token_reserve: IDL.Nat,
+		meme_token_reserve: IDL.Nat,
+		k_last: IDL.Nat,
+		total_supply: IDL.Nat,
+	});
 	const MemeToken = IDL.Record({
+		bc: BondingCurve,
 		id: IDL.Nat64,
 		creator: IDL.Text,
 		ticker: IDL.Text,
@@ -44,12 +56,12 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		twitter: IDL.Opt(IDL.Text),
 		logo: IDL.Text,
 		name: IDL.Text,
+		market_cap_token: IDL.Nat,
 		completed: IDL.Bool,
 		description: IDL.Text,
 		created_at: IDL.Nat64,
 		website: IDL.Opt(IDL.Text),
 		ledger_canister: IDL.Opt(IDL.Text),
-		market_cap_icp: IDL.Nat,
 		price: IDL.Float64,
 		telegram: IDL.Opt(IDL.Text),
 	});
@@ -323,20 +335,16 @@ export const init = ({ IDL }: { IDL: any }) => {
 		owner: IDL.Principal,
 		subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
 	});
-	const StableToken = IDL.Record({
-		fee: IDL.Nat,
-		decimals: IDL.Nat8,
-		name: IDL.Text,
-		canister_id: IDL.Principal,
-		symbol: IDL.Text,
+	const TokenAmount = IDL.Record({
+		token: IDL.Principal,
+		amount: IDL.Nat,
 	});
 	const InitArg = IDL.Record({
-		icp_launch_thread_hold: IDL.Nat,
 		fee_receiver: Account,
-		create_token_fee: IDL.Opt(IDL.Nat64),
+		token_launch_tread_hold: IDL.Vec(TokenAmount),
+		create_token_fee: IDL.Vec(TokenAmount),
 		maintenance: IDL.Bool,
 		fee_percentage: IDL.Opt(IDL.Float32),
-		icp_canister: StableToken,
 	});
 	return [InitArg];
 };

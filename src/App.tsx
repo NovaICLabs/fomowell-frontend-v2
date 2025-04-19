@@ -3,11 +3,11 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 
+import DepositWithdrawDialog from "./components/layout/dialog/deposit-withdraw";
 import { ThemeProvider } from "./components/providers/theme-provider";
 import { WalletProvider } from "./components/providers/wallet";
 import { TanStackRouterDevelopmentTools } from "./components/utils/development-tools/TanStackRouterDevelopmentTools";
 import { routeTree } from "./routeTree.gen";
-
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
 	interface Register {
@@ -33,6 +33,7 @@ const App = () => {
 						duration={Number(import.meta.env.VITE_TOAST_DURATION)}
 						position="bottom-right"
 					/>
+					<DepositWithdrawDialog />
 				</WalletProvider>
 			</QueryClientProvider>
 		</ThemeProvider>

@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as LinkedWalletImport } from './routes/linked-wallet'
 import { Route as HowImport } from './routes/how'
 import { Route as ProfileRouteImport } from './routes/profile/route'
 import { Route as IndexImport } from './routes/index'
@@ -19,6 +20,12 @@ import { Route as IcpCreateImport } from './routes/icp/create'
 import { Route as IcpTokenIdImport } from './routes/icp/token/$id'
 
 // Create/Update Routes
+
+const LinkedWalletRoute = LinkedWalletImport.update({
+  id: '/linked-wallet',
+  path: '/linked-wallet',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const HowRoute = HowImport.update({
   id: '/how',
@@ -81,6 +88,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HowImport
       parentRoute: typeof rootRoute
     }
+    '/linked-wallet': {
+      id: '/linked-wallet'
+      path: '/linked-wallet'
+      fullPath: '/linked-wallet'
+      preLoaderRoute: typeof LinkedWalletImport
+      parentRoute: typeof rootRoute
+    }
     '/icp/create': {
       id: '/icp/create'
       path: '/icp/create'
@@ -123,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRouteRouteWithChildren
   '/how': typeof HowRoute
+  '/linked-wallet': typeof LinkedWalletRoute
   '/icp/create': typeof IcpCreateRoute
   '/profile/$userid': typeof ProfileUseridRoute
   '/icp/token/$id': typeof IcpTokenIdRoute
@@ -132,6 +147,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRouteRouteWithChildren
   '/how': typeof HowRoute
+  '/linked-wallet': typeof LinkedWalletRoute
   '/icp/create': typeof IcpCreateRoute
   '/profile/$userid': typeof ProfileUseridRoute
   '/icp/token/$id': typeof IcpTokenIdRoute
@@ -142,6 +158,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRouteRouteWithChildren
   '/how': typeof HowRoute
+  '/linked-wallet': typeof LinkedWalletRoute
   '/icp/create': typeof IcpCreateRoute
   '/profile/$userid': typeof ProfileUseridRoute
   '/icp/token/$id': typeof IcpTokenIdRoute
@@ -153,6 +170,7 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/how'
+    | '/linked-wallet'
     | '/icp/create'
     | '/profile/$userid'
     | '/icp/token/$id'
@@ -161,6 +179,7 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/how'
+    | '/linked-wallet'
     | '/icp/create'
     | '/profile/$userid'
     | '/icp/token/$id'
@@ -169,6 +188,7 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/how'
+    | '/linked-wallet'
     | '/icp/create'
     | '/profile/$userid'
     | '/icp/token/$id'
@@ -179,6 +199,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProfileRouteRoute: typeof ProfileRouteRouteWithChildren
   HowRoute: typeof HowRoute
+  LinkedWalletRoute: typeof LinkedWalletRoute
   IcpCreateRoute: typeof IcpCreateRoute
   IcpTokenIdRoute: typeof IcpTokenIdRoute
 }
@@ -187,6 +208,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProfileRouteRoute: ProfileRouteRouteWithChildren,
   HowRoute: HowRoute,
+  LinkedWalletRoute: LinkedWalletRoute,
   IcpCreateRoute: IcpCreateRoute,
   IcpTokenIdRoute: IcpTokenIdRoute,
 }
@@ -204,6 +226,7 @@ export const routeTree = rootRoute
         "/",
         "/profile",
         "/how",
+        "/linked-wallet",
         "/icp/create",
         "/icp/token/$id"
       ]
@@ -219,6 +242,9 @@ export const routeTree = rootRoute
     },
     "/how": {
       "filePath": "how.tsx"
+    },
+    "/linked-wallet": {
+      "filePath": "linked-wallet.tsx"
     },
     "/icp/create": {
       "filePath": "icp/create.tsx"

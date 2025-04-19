@@ -1,14 +1,15 @@
 import { type ReactNode, useCallback, useState } from "react";
 
 import { ImageIcon, X } from "lucide-react";
-import { useDropzone } from "react-dropzone";
+import { type FileRejection, useDropzone } from "react-dropzone";
 
+import { uploadImage } from "@/apis/image";
 import { formatBytes } from "@/lib/common/bytes";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { cn } from "@/lib/utils";
 
 interface FileUploaderProps {
-	onChange?: (files: Array<File>) => void;
+	onChange?: (url: string | null) => void;
 	maxSize?: number; // in bytes
 	accept?: Record<string, Array<string>>;
 	imageIcon?: ReactNode;
@@ -17,7 +18,7 @@ interface FileUploaderProps {
 
 export function FileUploader({
 	onChange,
-	maxSize = 1 * 1024 * 1024, // 5MB
+	maxSize = 2 * 1024 * 1024, // 1MB
 	accept = {
 		"image/*": [],
 	},
@@ -26,18 +27,24 @@ export function FileUploader({
 }: FileUploaderProps) {
 	const [files, setFiles] = useState<Array<File>>([]);
 	const [preview, setPreview] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
 	const onDrop = useCallback(
-		(acceptedFiles: Array<File>) => {
+		(acceptedFiles: Array<File>, rejectedFiles: Array<FileRejection>) => {
 			if (acceptedFiles.length > 0) {
 				const file = acceptedFiles[0];
 				if (!file) return;
 				setFiles([file]);
-				onChange?.([file]);
+				void uploadImage(file).then((url) => {
+					onChange?.(url);
+				});
 				const reader = new FileReader();
 				reader.onload = (event) => {
 					setPreview(event.target?.result as string);
 				};
 				reader.readAsDataURL(file);
+			}
+			if (rejectedFiles.length > 0) {
+				setError(rejectedFiles[0]?.errors?.[0]?.message ?? null);
 			}
 		},
 		[onChange]
@@ -46,7 +53,7 @@ export function FileUploader({
 	const removeFile = () => {
 		setFiles([]);
 		setPreview(null);
-		onChange?.([]);
+		onChange?.(null);
 	};
 
 	const { getRootProps, getInputProps } = useDropzone({
@@ -57,7 +64,7 @@ export function FileUploader({
 	});
 
 	return (
-		<div>
+		<div className="flex flex-col items-center justify-center">
 			<div
 				{...getRootProps()}
 				className={cn(
@@ -65,7 +72,12 @@ export function FileUploader({
 					wrapperClassName
 				)}
 			>
-				<input {...getInputProps()} />
+				<input
+					{...getInputProps()}
+					onClick={withStopPropagation(() => {
+						setError(null);
+					})}
+				/>
 
 				{preview ? (
 					<div className="relative h-full w-full">
@@ -88,16 +100,19 @@ export function FileUploader({
 						)}
 					</div>
 				) : (
-					<div className="flex h-full w-full cursor-pointer flex-col items-center justify-center text-center">
-						{imageIcon ?? (
-							<ImageIcon
-								className="h-full w-full text-gray-400"
-								strokeWidth={1}
-							/>
-						)}
-					</div>
+					<>
+						<div className="flex h-full w-full cursor-pointer flex-col items-center justify-center text-center">
+							{imageIcon ?? (
+								<ImageIcon
+									className="h-full w-full text-gray-400"
+									strokeWidth={1}
+								/>
+							)}
+						</div>
+					</>
 				)}
 			</div>
+			{error && <p className="mt-2 text-xs text-red-500">{error}</p>}
 			{/* <p className="mt-2 text-xs text-gray-500">(JPG, PNG, GIF &lt; 1MB)</p> */}
 		</div>
 	);

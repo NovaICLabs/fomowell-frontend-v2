@@ -21,6 +21,13 @@ export interface ArchivedRange {
 	start: bigint;
 	length: bigint;
 }
+export interface BondingCurve {
+	token: StableToken;
+	token_reserve: bigint;
+	meme_token_reserve: bigint;
+	k_last: bigint;
+	total_supply: bigint;
+}
 export interface Burn {
 	from: Account;
 	memo: [] | [Uint8Array | number[]];
@@ -38,10 +45,10 @@ export interface Buy {
 	meme_token_id: bigint;
 }
 export interface BuyArgs {
-	amount_out_min: bigint;
-	boning_curve_id: bigint;
 	subaccount: [] | [Uint8Array | number[]];
 	amount_in: bigint;
+	meme_token_id: bigint;
+	slippage: number;
 }
 export type CanisterLogFeature =
 	| { filterMessageByContains: null }
@@ -71,6 +78,7 @@ export type CanisterMetricsData =
 	| { daily: Array<DailyMetricsData> };
 export interface CreateMemeTokenArg {
 	creator: [] | [Principal];
+	token: StableToken;
 	ticker: string;
 	twitter: [] | [string];
 	logo: string;
@@ -150,12 +158,11 @@ export interface HourlyMetricsData {
 	timeMillis: bigint;
 }
 export interface InitArg {
-	icp_launch_thread_hold: bigint;
 	fee_receiver: Account;
-	create_token_fee: [] | [bigint];
+	token_launch_tread_hold: Array<TokenAmount>;
+	create_token_fee: Array<TokenAmount>;
 	maintenance: boolean;
 	fee_percentage: [] | [number];
-	icp_canister: StableToken;
 }
 export type LedgerType = { MemeToken: bigint } | { ICRCToken: Principal };
 export interface LogMessageData {
@@ -163,6 +170,7 @@ export interface LogMessageData {
 	message: string;
 }
 export interface MemeToken {
+	bc: BondingCurve;
 	id: bigint;
 	creator: string;
 	ticker: string;
@@ -170,12 +178,12 @@ export interface MemeToken {
 	twitter: [] | [string];
 	logo: string;
 	name: string;
+	market_cap_token: bigint;
 	completed: boolean;
 	description: string;
 	created_at: bigint;
 	website: [] | [string];
 	ledger_canister: [] | [string];
-	market_cap_icp: bigint;
 	price: number;
 	telegram: [] | [string];
 }
@@ -234,6 +242,10 @@ export interface Swap {
 	amount1: bigint;
 	token0: Principal;
 	token1: Principal;
+}
+export interface TokenAmount {
+	token: Principal;
+	amount: bigint;
 }
 export interface Transaction {
 	buy: [] | [Buy];

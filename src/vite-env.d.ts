@@ -7,6 +7,7 @@ interface ImportMetaEnv {
 	readonly VITE_CHAIN_IC_CORE_CANISTER_ID: string;
 	readonly VITE_TOAST_DURATION: string;
 	readonly VITE_COINGECKO_API_BASE_URL: string;
+	readonly VITE_IMG_UPLOADER_URL: string;
 }
 
 interface ImportMeta {
