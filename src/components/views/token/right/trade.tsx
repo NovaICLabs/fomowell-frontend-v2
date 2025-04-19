@@ -5,6 +5,7 @@ import BigNumber from "bignumber.js";
 import { useDebounce } from "use-debounce";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
+import SlippageSetting from "@/components/icons/common/slippage-setting";
 import IcpLogo from "@/components/icons/logo/icp";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -29,6 +30,7 @@ import {
 } from "@/lib/common/number";
 import { validateInputNumber } from "@/lib/common/validate";
 import { cn } from "@/lib/utils";
+import { useDialogStore } from "@/store/dialog";
 const percentages = [25, 50, 75, 100];
 const tabs = ["Buy", "Sell"] as const;
 type Tab = (typeof tabs)[number];
@@ -283,6 +285,7 @@ export default function Trade() {
 		},
 		[activeTab, coreTokenBalance, memeTokenBalance, memeTokenInfo?.decimals]
 	);
+	const { setSlippageOpen } = useDialogStore();
 	return (
 		<div className="h-112.5 rounded-[12px] bg-gray-800 px-4 py-5">
 			<div className="bg-gray-710 flex h-[38px] items-center gap-2 rounded-[12px] px-2.5">
@@ -424,10 +427,14 @@ export default function Trade() {
 							});
 						}}
 					/>
-					<img
-						alt="settings"
-						className="h-4 w-4 cursor-pointer"
-						src={"/svgs/slippage-setting.svg"}
+					<SlippageSetting
+						className="ml-2"
+						onClick={() => {
+							setSlippageOpen({
+								open: true,
+								type: "single",
+							});
+						}}
 					/>
 				</div>
 				<div className="text-sm">

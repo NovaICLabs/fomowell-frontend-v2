@@ -8,6 +8,14 @@ export const useDialogStore = create<{
 		open: boolean;
 		type: "deposit" | "withdraw";
 	}) => void;
+	slippageOpen: {
+		open: boolean;
+		type: "global" | "single";
+	};
+	setSlippageOpen: (slippageOpen: {
+		open: boolean;
+		type: "global" | "single";
+	}) => void;
 }>((set) => ({
 	depositWithdrawOpen: {
 		open: false,
@@ -15,5 +23,12 @@ export const useDialogStore = create<{
 	},
 	setDepositWithdrawOpen: (depositWithdrawOpen) => {
 		set({ depositWithdrawOpen });
+	},
+	slippageOpen: {
+		open: false,
+		type: "global",
+	},
+	setSlippageOpen: (slippageOpen) => {
+		set({ slippageOpen });
 	},
 }));

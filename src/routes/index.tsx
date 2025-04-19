@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 
+import SlippageSetting from "@/components/icons/common/slippage-setting";
 import IcpLogo from "@/components/icons/logo/icp";
 import Star from "@/components/icons/star";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ import MemeList from "@/components/views/home/meme-list";
 import { validateInputNumber } from "@/lib/common/validate";
 import { cn } from "@/lib/utils";
 import { chains, useChainStore } from "@/store/chain";
+import { useDialogStore } from "@/store/dialog";
 import { useQuickBuyStore } from "@/store/quick-buy";
 
 const tabs = ["recent", "new", "completing", "completed", "favorite"] as const;
@@ -52,6 +54,7 @@ function Home() {
 		slippage,
 		setSlippage,
 	} = useQuickBuyStore();
+	const { setSlippageOpen } = useDialogStore();
 	return (
 		<div className="mt-4.5 flex flex-col overflow-auto">
 			<div className="sticky top-0 z-10 flex gap-4 text-white">
@@ -166,10 +169,14 @@ function Home() {
 							%
 						</span>
 					</div>
-					<img
-						alt="slippage-setting"
+					<SlippageSetting
 						className="ml-1.5 h-4 w-4 cursor-pointer"
-						src="/svgs/slippage-setting.svg"
+						onClick={() => {
+							setSlippageOpen({
+								open: true,
+								type: "global",
+							});
+						}}
 					/>
 				</div>
 			</div>
