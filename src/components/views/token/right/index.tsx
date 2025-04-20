@@ -13,6 +13,7 @@ import {
 	parseUnits,
 } from "@/lib/common/number";
 import { fromNow } from "@/lib/common/time";
+import { cn } from "@/lib/utils";
 
 import Liquidity from "./liquidity";
 import Trade from "./trade";
@@ -62,7 +63,7 @@ export default function Bottom() {
 		}
 		return value;
 	}, [memeTokenInfo, totalSupply]);
-	console.debug("🚀 ~ bcProgress ~ bcProgress:", bcProgress?.toNumber());
+
 	return (
 		<div className="no-scrollbar flex w-[390px] flex-shrink-0 flex-col gap-7.5 overflow-auto">
 			<div className="flex items-center gap-[30px]">
@@ -71,10 +72,15 @@ export default function Bottom() {
 					return (
 						<div
 							key={tab}
-							className={`relative cursor-pointer text-base font-semibold ${
-								isActive ? "text-white" : "text-white/60 hover:text-white"
-							}`}
+							className={cn(
+								`relative cursor-pointer text-base font-semibold`,
+								isActive ? "text-white" : "text-white/60 hover:text-white",
+								tab === "Liquidity" && "cursor-not-allowed"
+							)}
 							onClick={() => {
+								if (tab === "Liquidity") {
+									return;
+								}
 								setActiveTab(tab);
 							}}
 						>

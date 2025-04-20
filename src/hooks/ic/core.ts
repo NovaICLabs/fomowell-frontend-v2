@@ -156,6 +156,9 @@ export const useCreateMemeToken = () => {
 					logo: args.logo,
 					ticker: args.ticker,
 					description: args.description,
+					website: args.website,
+					telegram: args.telegram,
+					twitter: args.twitter,
 				}
 			);
 		},

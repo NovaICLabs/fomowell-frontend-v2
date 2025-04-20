@@ -172,7 +172,7 @@ const IcpWalletConnect: React.FC = () => {
 						</Popover>
 
 						<div
-							className="bg-gray-750 inline-flex h-[38px] min-w-[100px] cursor-pointer items-center justify-start gap-0.5 gap-x-2 rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700"
+							className="bg-gray-750 inline-flex h-[38px] min-w-[80px] cursor-pointer items-center justify-start gap-0.5 gap-x-1 rounded-full px-3 text-xs leading-4 font-medium text-white hover:bg-gray-700"
 							onClick={() => {
 								setDepositWithdrawOpen({
 									open: true,

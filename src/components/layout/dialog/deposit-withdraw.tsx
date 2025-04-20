@@ -271,13 +271,6 @@ const Withdraw = () => {
 			});
 			refetch();
 			showToast("success", `${formatNumberSmart(amount)} ICP withdrawn!`);
-			await withdraw({
-				amount: BigInt(parseUnits(amount)),
-				to: selectedToPrincipal,
-				token: getICPCanisterToken(),
-			});
-			refetch();
-			showToast("success", `${formatNumberSmart(amount)} ICP withdrawn!`);
 		} catch (error) {
 			console.debug("🚀 ~ handleWithdraw ~ error:", error);
 		}

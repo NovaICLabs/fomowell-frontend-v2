@@ -87,15 +87,15 @@ export function FileUploader({
 							src={preview}
 						/>
 						<button
-							className="absolute top-2 right-2 rounded-full bg-gray-800/70 p-1.5 text-white/80 hover:bg-gray-700 hover:text-white"
+							className="absolute top-3 right-3 rounded-full bg-gray-800/70 p-1.5 text-white/80 hover:bg-gray-700 hover:text-white"
 							type="button"
 							onClick={withStopPropagation(removeFile)}
 						>
 							<X size={16} />
 						</button>
 						{files.length > 0 && (
-							<div className="absolute right-0 bottom-0 left-0 bg-black/50 px-2 py-1 text-xs text-white">
-								{files[0]?.name} ({formatBytes(files[0]?.size ?? 0)})
+							<div className="absolute right-0 bottom-0 left-0 bg-black/50 px-2 py-1 text-center text-xs text-white">
+								({formatBytes(files[0]?.size ?? 0)})
 							</div>
 						)}
 					</div>

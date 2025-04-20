@@ -1,7 +1,7 @@
-import { useParams } from "@tanstack/react-router";
-import { Link } from "lucide-react";
+import { Link, useParams } from "@tanstack/react-router";
 
 import Telegram from "@/components/icons/media/telegram";
+import Website from "@/components/icons/media/website";
 import X from "@/components/icons/media/x";
 import Star from "@/components/icons/star";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -43,7 +43,7 @@ export default function HeadInfo() {
 										{memeToken?.ticker}
 									</span>{" "}
 									<span className="text-xs font-normal text-white/40">
-										{memeToken?.description}
+										{memeToken?.name}
 									</span>
 								</>
 							)}
@@ -59,13 +59,18 @@ export default function HeadInfo() {
 							</div>
 							<div className="ml-2.5 flex items-center gap-2 text-sm text-gray-400">
 								{memeToken?.twitter && (
-									<Link href={memeToken?.twitter} target="_blank">
+									<Link target="_blank" to={memeToken?.twitter}>
 										<X className="h-3 w-3 cursor-pointer text-gray-400 hover:text-white" />
 									</Link>
 								)}
 								{memeToken?.telegram && (
-									<Link href={memeToken?.telegram} target="_blank">
+									<Link target="_blank" to={memeToken?.telegram}>
 										<Telegram className="h-3 w-3 cursor-pointer text-gray-400 hover:text-white" />
+									</Link>
+								)}
+								{memeToken?.website && (
+									<Link target="_blank" to={memeToken?.website}>
+										<Website className="h-3 w-3 cursor-pointer text-gray-400 hover:text-white" />
 									</Link>
 								)}
 							</div>

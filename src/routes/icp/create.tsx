@@ -55,21 +55,42 @@ const formSchema = z.object({
 	twitter: z
 		.string()
 		.optional()
-		.refine((value) => !value || /^@?[a-zA-Z0-9_]{1,15}$/.test(value), {
-			message: "Invalid Twitter username",
-		}),
+		.refine(
+			(value) =>
+				!value || // Allow empty optional field
+				/^@?[a-zA-Z0-9_]{1,15}$/.test(value) || // Matches @username or username
+				/^(https?:\/\/(www\.)?(twitter|x)\.com\/[a-zA-Z0-9_]{1,15}\/?)$/.test(
+					value
+				), // Matches twitter.com/username or x.com/username
+			{
+				message:
+					"Invalid Twitter handle (e.g., @handle) or profile URL (e.g., https://x.com/handle)",
+			}
+		),
 
-	telegram: z.string().optional(),
+	telegram: z
+		.string()
+		.optional()
+		.refine(
+			(value) =>
+				!value || // Allow empty optional field
+				/^@?[a-zA-Z0-9_]{5,32}$/.test(value) || // Matches @username or username (5-32 chars)
+				/^(https?:\/\/(www\.)?t\.me\/[a-zA-Z0-9_]{5,32}\/?)$/.test(value), // Matches https://t.me/username
+			{
+				message:
+					"Invalid Telegram handle (e.g., @handle, 5-32 chars) or link (e.g., https://t.me/handle)",
+			}
+		),
 
 	website: z
 		.string()
 		.optional()
 		.refine(
 			(value) =>
-				!value ||
+				!value || // Allow empty optional field
 				/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(
 					value
-				),
+				), // General URL regex
 			{ message: "Invalid website URL" }
 		),
 });
@@ -77,6 +98,17 @@ const formSchema = z.object({
 export const Route = createFileRoute("/icp/create")({
 	component: TokenCreationPage,
 });
+
+// Helper function to clean and get handle
+const getHandle = (value: string): string => {
+	return value.startsWith("@") ? value.substring(1) : value;
+};
+
+// Helper function to check if a value is likely just a handle
+const isHandle = (value: string): boolean => {
+	// Simple check: if it doesn't start with http, assume it's a handle
+	return !value.toLowerCase().startsWith("http");
+};
 
 function TokenCreationPage() {
 	// Initialize form with React Hook Form
@@ -100,17 +132,66 @@ function TokenCreationPage() {
 	// Form submission handler
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
-			const token = await createMemeToken({
+			// Prepare Twitter URL
+			let twitterUrl: string | undefined = undefined;
+			if (values.twitter) {
+				if (isHandle(values.twitter)) {
+					const handle = getHandle(values.twitter);
+					twitterUrl = `https://x.com/${handle}`; // Use x.com as the current standard
+				} else {
+					twitterUrl = values.twitter; // Assume it's already a valid URL if not a handle
+				}
+			}
+
+			// Prepare Telegram URL
+			let telegramUrl: string | undefined = undefined;
+			if (values.telegram) {
+				if (isHandle(values.telegram)) {
+					const handle = getHandle(values.telegram);
+					telegramUrl = `https://t.me/${handle}`;
+				} else {
+					telegramUrl = values.telegram; // Assume it's already a valid URL
+				}
+			}
+			let websiteUrl: string | undefined = undefined;
+			if (values.website) {
+				// Check if protocol (http:// or https://) is missing using case-insensitive regex
+				if (!/^(https?:\/\/)/i.test(values.website)) {
+					websiteUrl = `https://${values.website}`; // Prepend https://
+				} else {
+					websiteUrl = values.website; // Assume it's already a full URL
+				}
+			}
+			const createArgs = {
 				name: values.name,
 				ticker: values.symbol,
 				description: values.description,
 				logo: values.logo,
+				dev_allocate_percent: values.devBuy
+					? parseFloat(values.devBuy) * 100
+					: undefined,
+				twitter: twitterUrl,
+				telegram: telegramUrl,
+				website: websiteUrl,
+			};
+
+			Object.keys(createArgs).forEach((key) => {
+				if (createArgs[key as keyof typeof createArgs] === undefined) {
+					delete createArgs[key as keyof typeof createArgs];
+				}
 			});
+
+			console.log("Creating token with args:", createArgs); // Log arguments before sending
+
+			const token = await createMemeToken(createArgs);
+
 			void router.navigate({ to: `/icp/token/${token.id}` });
 			showToast("success", "Token created successfully");
 		} catch (error) {
-			console.error(error);
-			toast.error("Failed to create token");
+			console.error("Failed to create token:", error);
+			const errorMessage =
+				error instanceof Error ? error.message : "An unknown error occurred";
+			toast.error(`Failed to create token: ${errorMessage}`);
 		}
 	}
 

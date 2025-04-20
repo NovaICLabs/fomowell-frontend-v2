@@ -59,11 +59,11 @@ export default function Trade() {
 			token: { MemeToken: BigInt(Number(id)) },
 		});
 	const [buyAmount, setBuyAmount] = useState<string>("");
-	const [debouncedBuyAmount] = useDebounce(buyAmount, 100);
+	const [debouncedBuyAmount] = useDebounce(buyAmount, 500);
 
 	const [sellAmount, setSellAmount] = useState<string>("");
 
-	const [debouncedSellAmount] = useDebounce(sellAmount, 100);
+	const [debouncedSellAmount] = useDebounce(sellAmount, 500);
 
 	const debouncedBuyAmountBigInt = useMemo(() => {
 		if (debouncedBuyAmount === "") {
@@ -588,7 +588,7 @@ export default function Trade() {
 					/>
 				)}
 			</Button>
-			<div className="mt-4 flex items-center space-x-2">
+			<div className="mt-4 hidden items-center space-x-2">
 				<Checkbox id="post-x" />
 				<label
 					className="cursor-pointer text-xs leading-none font-medium text-white/50 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
