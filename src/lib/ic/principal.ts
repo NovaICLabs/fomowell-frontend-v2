@@ -1,5 +1,16 @@
 import { Principal } from "@dfinity/principal";
 
+export const isPrincipalText = (text: string | undefined): boolean => {
+	if (!text) return false;
+	try {
+		Principal.fromText(text);
+		return true;
+	} catch (error) {
+		console.error(error);
+		return false;
+	}
+};
+
 export const validatePrincipalText = (text: string | undefined): Principal => {
 	if (!text) throw new Error("Principal text is undefined");
 	try {

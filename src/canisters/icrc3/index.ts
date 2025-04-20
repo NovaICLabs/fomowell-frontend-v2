@@ -13,8 +13,7 @@ import type { Principal } from "@dfinity/principal";
 export const getICPCanisterId = () => {
 	return validatePrincipalText(import.meta.env["VITE_ICP_CANISTER_ID"]);
 };
-
-
+// ================================ read ================================
 export const getIcrcTokenBalance = async ({
 	canisterId,
 	principal,
@@ -39,6 +38,8 @@ export const getIcrcTokenBalance = async ({
 	};
 };
 
+// ================================ write ================================
+// approve
 export type ApproveArgs = {
 	amount: bigint;
 	spender: string;
@@ -72,6 +73,42 @@ export const approve = async ({
 		created_at_time: [],
 		expected_allowance: [],
 		expires_at: [],
+	});
+	return unwrapRustResult(result, (error) => {
+		throw new Error(Object.keys(error)[0]);
+	});
+};
+// transfer
+export type TransferArgs = {
+	amount: bigint;
+	to: string;
+	fee: bigint;
+	canisterId: string;
+};
+export const transfer = async ({
+	creator,
+	args,
+}: {
+	creator: ActorCreator;
+	args: TransferArgs;
+}) => {
+	const actor = await creator<_SERVICE>({
+		canisterId: args.canisterId,
+		interfaceFactory: idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const result = await actor.icrc1_transfer({
+		from_subaccount: [],
+		created_at_time: [],
+		memo: wrapOption(string2array(Math.random().toString())),
+		amount: args.amount,
+		to: {
+			owner: validatePrincipalText(args.to),
+			subaccount: [],
+		},
+		fee: wrapOption(args.fee),
 	});
 	return unwrapRustResult(result, (error) => {
 		throw new Error(Object.keys(error)[0]);

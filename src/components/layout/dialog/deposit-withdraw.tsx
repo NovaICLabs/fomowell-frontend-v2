@@ -77,7 +77,6 @@ const Deposit = () => {
 	const handleDeposit = useCallback(async () => {
 		await deposit({
 			amount: BigInt(parseUnits(amount)),
-
 			token: getICPCanisterToken(),
 		});
 		refetch();

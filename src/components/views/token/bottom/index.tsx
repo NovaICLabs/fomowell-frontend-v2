@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import Comments from "./comments";
-import Transactions from "./trasactions";
+import Transactions from "./transactions";
 const tabs = ["Comments", "Transactions"];
 export default function Bottom() {
 	const [activeTab, setActiveTab] = useState(tabs[0]);
