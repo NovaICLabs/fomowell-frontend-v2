@@ -28,7 +28,7 @@ import {
 	getTokenUsdValueTotal,
 	parseUnits,
 } from "@/lib/common/number";
-import { validateInputNumber } from "@/lib/common/validate";
+import { slippageRange, validateInputNumber } from "@/lib/common/validate";
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
 const percentages = [25, 50, 75, 100];
@@ -59,15 +59,12 @@ export default function Trade() {
 			token: { MemeToken: BigInt(Number(id)) },
 		});
 	const [buyAmount, setBuyAmount] = useState<string>("");
-	const [debouncedBuyAmount] = useDebounce(buyAmount, 500);
+	const [debouncedBuyAmount] = useDebounce(buyAmount, 100);
 
 	const [sellAmount, setSellAmount] = useState<string>("");
-	console.debug("🚀 ~ Trade ~ sellAmount:", sellAmount);
-	const [debouncedSellAmount] = useDebounce(sellAmount, 500);
-	console.debug(
-		"🚀 ~ Trade ~ debouncedSellAmount:",
-		Number(debouncedSellAmount)
-	);
+
+	const [debouncedSellAmount] = useDebounce(sellAmount, 100);
+
 	const debouncedBuyAmountBigInt = useMemo(() => {
 		if (debouncedBuyAmount === "") {
 			return undefined;
@@ -99,7 +96,7 @@ export default function Trade() {
 		});
 
 	// slippage
-	const [slippage, setSlippage] = useState<string>("1.5");
+	const [slippage, setSlippage] = useState<string>("1");
 	const minTokenReceived = useMemo(() => {
 		switch (activeTab) {
 			case "Buy":
@@ -133,32 +130,27 @@ export default function Trade() {
 	const balanceEnough = useMemo(() => {
 		if (activeTab === "Buy") {
 			return (
-				debouncedBuyAmountBigInt !== undefined &&
+				buyAmount !== "" &&
 				coreTokenBalance?.raw !== undefined &&
-				debouncedBuyAmountBigInt <= coreTokenBalance.raw
+				BigNumber(buyAmount).lte(BigNumber(formatUnits(coreTokenBalance.raw)))
 			);
 		}
 
 		return (
-			debouncedSellAmountBigInt !== undefined &&
+			sellAmount !== "" &&
 			memeTokenBalance?.raw !== undefined &&
-			debouncedSellAmountBigInt <= memeTokenBalance.raw
+			BigNumber(sellAmount).lte(
+				BigNumber(formatUnits(memeTokenBalance.raw, memeTokenInfo?.decimals))
+			)
 		);
 	}, [
 		activeTab,
-		coreTokenBalance,
-		debouncedBuyAmountBigInt,
-		debouncedSellAmountBigInt,
-		memeTokenBalance,
+		buyAmount,
+		coreTokenBalance?.raw,
+		memeTokenBalance?.raw,
+		memeTokenInfo?.decimals,
+		sellAmount,
 	]);
-	console.debug(
-		"🚀 ~ balanceEnough ~ debouncedSellAmountBigInt:",
-		debouncedSellAmountBigInt
-	);
-	console.debug(
-		"🚀 ~ balanceEnough ~ memeTokenBalance:",
-		memeTokenBalance?.raw
-	);
 
 	const { mutateAsync: buy, isPending: isBuying } = useBuy();
 	const { mutateAsync: sell, isPending: isSelling } = useSell();
@@ -212,6 +204,7 @@ export default function Trade() {
 					);
 					refetchBalance();
 					void refetchCurrentTokenPrice();
+					setBuyAmount("");
 				} else {
 					throw new Error("Invalid amount");
 				}
@@ -229,6 +222,7 @@ export default function Trade() {
 					);
 					refetchBalance();
 					void refetchCurrentTokenPrice();
+					setSellAmount("");
 				}
 		}
 	}, [
@@ -286,6 +280,99 @@ export default function Trade() {
 		[activeTab, coreTokenBalance, memeTokenBalance, memeTokenInfo?.decimals]
 	);
 	const { setSlippageOpen } = useDialogStore();
+	const [autoSlippage, setAutoSlippage] = useState<boolean>(false);
+
+	const priceImpactPercent = useMemo(() => {
+		if (!currentTokenPrice?.raw || !memeTokenInfo?.decimals) {
+			return undefined;
+		}
+
+		const currentTokenPriceInICP = BigNumber(1).div(
+			BigNumber(currentTokenPrice.raw)
+		);
+
+		// Avoid division by zero or invalid calculations if price is non-positive
+		if (currentTokenPriceInICP.isLessThanOrEqualTo(0)) {
+			return "0.00"; // Or handle as undefined/error
+		}
+
+		let expectedOutputBigIntNoImpact: BigNumber | undefined;
+		let actualOutputUnits: BigNumber | undefined;
+
+		try {
+			if (activeTab === "Buy") {
+				if (!calculatedBuyReceived?.raw || !debouncedBuyAmountBigInt) {
+					return undefined; // Need calculation result and input amount
+				}
+				const inputAmountICPUnits = BigNumber(debouncedBuyAmountBigInt);
+				// Prevent division by zero if input amount is zero
+				if (inputAmountICPUnits.isLessThanOrEqualTo(0)) return "0.00";
+
+				expectedOutputBigIntNoImpact = inputAmountICPUnits.div(
+					currentTokenPriceInICP
+				);
+				actualOutputUnits = BigNumber(calculatedBuyReceived.raw);
+			} else {
+				// Sell
+				if (!calculatedSellReceived?.raw || !debouncedSellAmountBigInt) {
+					return undefined; // Need calculation result and input amount
+				}
+				const inputAmountMeme_Units = BigNumber(debouncedSellAmountBigInt);
+				// Prevent division by zero if input amount is zero
+				if (inputAmountMeme_Units.isLessThanOrEqualTo(0)) return "0.00";
+
+				expectedOutputBigIntNoImpact = inputAmountMeme_Units.times(
+					currentTokenPriceInICP
+				);
+				actualOutputUnits = BigNumber(calculatedSellReceived.raw);
+			}
+
+			// Ensure we have valid numbers and avoid division by zero for impact calculation
+			if (
+				!expectedOutputBigIntNoImpact ||
+				!actualOutputUnits ||
+				expectedOutputBigIntNoImpact.isLessThanOrEqualTo(0) // Use <= 0 to be safe
+			) {
+				return "0.00"; // If expected output is zero or less, impact is effectively 0 or N/A
+			}
+
+			// Impact = ((Expected - Actual) / Expected) * 100
+			const impact = expectedOutputBigIntNoImpact
+				.minus(actualOutputUnits)
+				.div(expectedOutputBigIntNoImpact)
+				.times(100);
+
+			const nonNegativeImpact = BigNumber.max(0, impact);
+
+			// Format to 2 decimal places
+			return formatNumberSmart(nonNegativeImpact.toFixed(2));
+		} catch (error) {
+			console.error("Error calculating price impact:", error);
+			return undefined; // Return undefined on calculation error
+		}
+	}, [
+		activeTab,
+		currentTokenPrice,
+		calculatedBuyReceived,
+		calculatedSellReceived,
+		debouncedBuyAmountBigInt,
+		debouncedSellAmountBigInt,
+		memeTokenInfo?.decimals,
+	]);
+	const priceImpactPercentColor = useMemo(() => {
+		if (priceImpactPercent !== undefined) {
+			if (Number(priceImpactPercent) > 0) {
+				if (Number(priceImpactPercent) > 10) {
+					if (Number(priceImpactPercent) > 50) {
+						return "text-price-negative";
+					} else {
+						return "text-yellow-500";
+					}
+				}
+			}
+		}
+		return "text-white/60";
+	}, [priceImpactPercent]);
 	return (
 		<div className="h-112.5 rounded-[12px] bg-gray-800 px-4 py-5">
 			<div className="bg-gray-710 flex h-[38px] items-center gap-2 rounded-[12px] px-2.5">
@@ -360,9 +447,15 @@ export default function Trade() {
 				</span>
 			</div>
 			<Input
-				className="dark:bg-background mt-1 h-13.5 rounded-2xl border-white/10 text-lg font-semibold placeholder:text-lg placeholder:leading-[14px] placeholder:font-bold placeholder:text-white/40 focus-visible:ring-0"
 				placeholder="0.00"
 				value={activeTab === "Buy" ? buyAmount : sellAmount}
+				aria-invalid={
+					!balanceEnough &&
+					(activeTab === "Buy" ? buyAmount !== "" : sellAmount !== "")
+				}
+				className={cn(
+					"dark:bg-background mt-1 h-13.5 rounded-2xl border border-transparent text-lg font-semibold placeholder:text-lg placeholder:leading-[14px] placeholder:font-bold placeholder:text-white/40 focus-visible:border-transparent focus-visible:ring-0"
+				)}
 				onBlur={() => {
 					if (activeTab === "Buy") {
 						setBuyAmount(
@@ -415,32 +508,68 @@ export default function Trade() {
 					<span className="text-sm leading-[18px] font-normal text-white/40">
 						Slippage
 					</span>
-					<Input
-						className="dark:bg-background ml-2 h-8 w-15 rounded-2xl border-white/10 text-sm font-semibold placeholder:text-sm placeholder:font-semibold placeholder:text-white/40 focus-visible:ring-0"
-						placeholder="1.5%"
-						value={slippage}
-						onChange={(event) => {
-							const value = event.target.value.trim();
-							validateInputNumber({
-								value,
-								callback: setSlippage,
-							});
-						}}
-					/>
+					<div
+						className={cn(
+							"bg-background relative ml-2 flex h-8 w-[63px] items-center overflow-hidden rounded-full border border-transparent pr-3 pl-2",
+							Number(slippage) < slippageRange[0] ||
+								(Number(slippage) > slippageRange[1] && "border-price-negative")
+						)}
+					>
+						<Input
+							value={slippage}
+							className={cn(
+								"dark:bg-background h-full w-full rounded-full border-none px-1 text-sm font-medium text-white focus-visible:ring-0"
+							)}
+							onBlur={() => {
+								if (slippage.endsWith(".")) {
+									setSlippage(slippage.slice(0, -1));
+								}
+								if (
+									slippage === "" ||
+									Number(slippage) < slippageRange[0] ||
+									Number(slippage) > slippageRange[1]
+								) {
+									setSlippage("1");
+								}
+							}}
+							onChange={(event) => {
+								const value = event.target.value.trim();
+								validateInputNumber({
+									value,
+									decimals: 2,
+									callback: setSlippage,
+								});
+							}}
+						/>
+						<span className="absolute right-2 text-sm font-medium text-white/60">
+							%
+						</span>
+					</div>
 					<SlippageSetting
 						className="ml-2"
 						onClick={() => {
 							setSlippageOpen({
 								open: true,
 								type: "single",
+								callback: (args) => {
+									setSlippage(args.slippage);
+									setAutoSlippage(args.autoSlippage);
+								},
+								autoSlippage,
+								customSlippage: slippage,
 							});
 						}}
 					/>
 				</div>
 				<div className="text-sm">
-					<span className="text-white">0.00%</span>
+					<span className={cn(priceImpactPercentColor)}>
+						{priceImpactPercent !== undefined
+							? `-${priceImpactPercent}%`
+							: "--%"}
+					</span>
 				</div>
 			</div>
+
 			<Button
 				disabled={buttonDisabled}
 				className={cn(

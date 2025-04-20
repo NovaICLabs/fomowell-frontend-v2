@@ -1,4 +1,16 @@
 import { create } from "zustand";
+type SlippageOpen =
+	| {
+			open: boolean;
+			type: "global";
+	  }
+	| {
+			open: boolean;
+			type: "single";
+			callback?: (args: { slippage: string; autoSlippage: boolean }) => void;
+			autoSlippage: boolean;
+			customSlippage: string;
+	  };
 export const useDialogStore = create<{
 	depositWithdrawOpen: {
 		open: boolean;
@@ -8,14 +20,8 @@ export const useDialogStore = create<{
 		open: boolean;
 		type: "deposit" | "withdraw";
 	}) => void;
-	slippageOpen: {
-		open: boolean;
-		type: "global" | "single";
-	};
-	setSlippageOpen: (slippageOpen: {
-		open: boolean;
-		type: "global" | "single";
-	}) => void;
+	slippageOpen: SlippageOpen;
+	setSlippageOpen: (slippageOpen: SlippageOpen) => void;
 }>((set) => ({
 	depositWithdrawOpen: {
 		open: false,

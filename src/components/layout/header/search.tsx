@@ -99,7 +99,10 @@ export default function Search() {
 		searchResults?.filter((item) => item.type === "result") || [];
 
 	return (
-		<CommandPrimitive className="relative w-[240px]" onKeyDown={handleKeyDown}>
+		<CommandPrimitive
+			className="relative hidden w-[240px]"
+			onKeyDown={handleKeyDown}
+		>
 			<div className="relative">
 				<CommandInput
 					ref={inputRef}

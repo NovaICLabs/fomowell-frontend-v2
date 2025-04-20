@@ -212,12 +212,8 @@ const Deposit = () => {
 	);
 };
 const Withdraw = () => {
-	const { data: icpBalance, refetch: refetchICPBalance } = useICPBalance();
+	const { refetch: refetchICPBalance } = useICPBalance();
 	const [amount, setAmount] = useState<string>("");
-
-	const fees = useMemo(() => {
-		return 2n * getICPCanisterToken().fee;
-	}, []);
 
 	const { principal } = useConnectedIdentity();
 	const { data: coreTokenBalance, refetch: refetchCoreTokenBalance } =
@@ -230,9 +226,10 @@ const Withdraw = () => {
 	}, [coreTokenBalance]);
 	const isEnough = useMemo(() => {
 		if (amount === "") return false;
-
-		return icpBalance && icpBalance.raw - fees >= BigInt(parseUnits(amount));
-	}, [icpBalance, fees, amount]);
+		return (
+			coreTokenBalance && coreTokenBalance.raw >= BigInt(parseUnits(amount))
+		);
+	}, [coreTokenBalance, amount]);
 
 	const { mutateAsync: withdraw, isPending: isWithdrawing } = useWithdraw();
 

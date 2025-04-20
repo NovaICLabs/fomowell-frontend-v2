@@ -11,3 +11,5 @@ export const validateInputNumber = (args: {
 		callback?.(value);
 	}
 };
+
+export const slippageRange = [0, 50] as const;

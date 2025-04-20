@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MemeList from "@/components/views/home/meme-list";
-import { validateInputNumber } from "@/lib/common/validate";
+import { slippageRange, validateInputNumber } from "@/lib/common/validate";
 import { cn } from "@/lib/utils";
 import { chains, useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
@@ -148,19 +148,35 @@ function Home() {
 					<span className="ml-4 text-sm font-medium text-white/60 capitalize">
 						Slippage
 					</span>
-					<div className="relative ml-2 flex h-8 w-[60px] items-center rounded-full bg-gray-800 px-2">
+					<div
+						className={cn(
+							"relative ml-2 flex h-8 w-[63px] items-center overflow-hidden rounded-full border border-transparent bg-gray-800 pr-3 pl-2",
+							Number(slippage) < slippageRange[0] ||
+								(Number(slippage) > slippageRange[1] && "border-price-negative")
+						)}
+					>
 						<Input
-							className="h-8 w-full rounded-full border-none px-1 text-sm font-medium text-white focus-visible:ring-0 dark:bg-gray-800"
 							value={slippage}
+							className={cn(
+								"h-full w-full rounded-full border-none px-1 text-sm font-medium text-white focus-visible:ring-0 dark:bg-gray-800"
+							)}
 							onBlur={() => {
 								if (slippage.endsWith(".")) {
 									setSlippage(slippage.slice(0, -1));
+								}
+								if (
+									slippage === "" ||
+									Number(slippage) < slippageRange[0] ||
+									Number(slippage) > slippageRange[1]
+								) {
+									setSlippage("1");
 								}
 							}}
 							onChange={(event) => {
 								const value = event.target.value.trim();
 								validateInputNumber({
 									value,
+									decimals: 2,
 									callback: setSlippage,
 								});
 							}}

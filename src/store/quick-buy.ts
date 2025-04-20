@@ -5,6 +5,8 @@ export const useQuickBuyStore = create(
 	persist<{
 		amount: string;
 		setAmount: (amount: string) => void;
+		autoSlippage: boolean;
+		setAutoSlippage: (autoSlippage: boolean) => void;
 		slippage: string;
 		setSlippage: (slippage: string) => void;
 	}>(
@@ -12,6 +14,10 @@ export const useQuickBuyStore = create(
 			amount: "0.001",
 			setAmount: (amount) => {
 				set({ amount });
+			},
+			autoSlippage: false,
+			setAutoSlippage: (autoSlippage) => {
+				set({ autoSlippage });
 			},
 			slippage: "0.2",
 			setSlippage: (slippage) => {
