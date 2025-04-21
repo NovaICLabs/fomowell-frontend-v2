@@ -68,7 +68,7 @@ const IcpWalletConnect: React.FC = () => {
 		{
 			label: "Profile",
 			action: async () => {
-				await router.navigate({ to: `/profile/${principal}` });
+				await router.navigate({ to: `/icp/profile/${principal}` });
 			},
 			icon: <ProfileIcon />,
 		},
