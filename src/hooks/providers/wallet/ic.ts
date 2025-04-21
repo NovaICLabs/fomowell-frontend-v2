@@ -29,7 +29,7 @@ const useDisconnect = () => {
 	return disconnect;
 };
 
-const useInitialConnect = () => {
+export const useInitialConnect = () => {
 	const [initializing, setInitializing] = useState(false);
 	const disconnect = useDisconnect();
 	const { setConnected, setPrincipal } = useIcIdentityStore();
@@ -41,6 +41,7 @@ const useInitialConnect = () => {
 			if (expired) {
 				await disconnect();
 				setInitializing(false);
+
 				return;
 			}
 			const { connected, principal } = await connectManager.isConnected();
@@ -98,16 +99,14 @@ export function useIcWallet() {
 
 	const disconnect = useDisconnect();
 
-	const isInitializing = useInitialConnect();
-
 	return useMemo(
 		() => ({
 			open,
 			connect,
 			disconnect,
-			isLoading: connecting || isInitializing,
+			isLoading: connecting,
 		}),
-		[connect, disconnect, connecting, isInitializing]
+		[connect, disconnect, connecting]
 	);
 }
 

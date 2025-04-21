@@ -47,7 +47,11 @@ export default function IcpConnectDialog() {
 
 				{isLoading ? (
 					<div className="flex h-full flex-1 flex-col items-center justify-start">
-						<img alt="fomowell" className="mt-10" src="/svgs/fomowell.svg" />
+						<img
+							alt="fomowell"
+							className="mt-10 w-40"
+							src="/svgs/fomowell.png"
+						/>
 						<img
 							alt="loading"
 							className="ab my-auto h-11 w-11 animate-spin"

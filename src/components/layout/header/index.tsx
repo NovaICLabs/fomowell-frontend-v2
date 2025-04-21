@@ -15,8 +15,8 @@ export const Header = () => {
 		<div className="relative z-50 flex h-18 items-center justify-between">
 			<img
 				alt="Logo"
-				className="cursor-pointer"
-				src="/svgs/fomowell.svg"
+				className="w-40 cursor-pointer"
+				src="/svgs/fomowell.png"
 				onClick={() => router.navigate({ to: "/" })}
 			/>
 			<div className="mr-auto ml-[30px] flex items-center gap-[30px]">
