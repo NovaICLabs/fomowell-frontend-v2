@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
 
+import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 import { Progress } from "@/components/ui/progress";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
@@ -42,6 +43,7 @@ export default function Bottom() {
 	const marketCap = useMemo(() => {
 		return currentTokenPrice?.raw && totalSupply && icpPrice
 			? BigNumber(1)
+					.times(10 ** getICPCanisterToken().decimals)
 					.times(totalSupply)
 					.times(icpPrice)
 					.div(BigNumber(currentTokenPrice.raw))
