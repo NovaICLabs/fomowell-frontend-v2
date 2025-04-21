@@ -9,7 +9,7 @@ export const useChainStore = create(
 		setChain: (chain: ChainType) => void;
 	}>(
 		(set) => ({
-			chain: chains[0],
+			chain: chains[2],
 			setChain: (chain) => {
 				set({ chain });
 			},

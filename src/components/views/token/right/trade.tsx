@@ -5,8 +5,8 @@ import BigNumber from "bignumber.js";
 import { useDebounce } from "use-debounce";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
+import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 import SlippageSetting from "@/components/icons/common/slippage-setting";
-import IcpLogo from "@/components/icons/logo/icp";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -287,9 +287,9 @@ export default function Trade() {
 			return undefined;
 		}
 
-		const currentTokenPriceInICP = BigNumber(1).div(
-			BigNumber(currentTokenPrice.raw)
-		);
+		const currentTokenPriceInICP = BigNumber(1)
+			.multipliedBy(10 ** getICPCanisterToken().decimals)
+			.div(BigNumber(currentTokenPrice.raw));
 
 		// Avoid division by zero or invalid calculations if price is non-positive
 		if (currentTokenPriceInICP.isLessThanOrEqualTo(0)) {
@@ -376,7 +376,7 @@ export default function Trade() {
 	return (
 		<div className="h-112.5 rounded-[12px] bg-gray-800 px-4 py-5">
 			<div className="bg-gray-710 flex h-[38px] items-center gap-2 rounded-[12px] px-2.5">
-				<IcpLogo className="h-6 w-6 rounded-full" />
+				<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 				<span className="text-sm font-medium">ICP</span>
 				<div className="ml-auto flex items-center gap-1">
 					<span className="font-medium">{coreTokenBalance?.formatted}</span>

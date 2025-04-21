@@ -4,7 +4,6 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 
 import SlippageSetting from "@/components/icons/common/slippage-setting";
-import IcpLogo from "@/components/icons/logo/icp";
 import Star from "@/components/icons/star";
 import { Input } from "@/components/ui/input";
 import {
@@ -126,7 +125,7 @@ function Home() {
 					<img alt="flash" src="/svgs/flash.svg" />
 					<span className="ml-1.5 text-sm font-medium text-white">Buy</span>
 					<div className="ml-2 flex h-8 items-center rounded-full bg-gray-800 px-2">
-						<IcpLogo className="h-4 w-4 flex-shrink-0" />
+						<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 						<Input
 							className="h-8 w-24 rounded-full border-none px-1 text-sm font-medium text-white focus-visible:ring-0 dark:bg-gray-800"
 							placeholder="0"

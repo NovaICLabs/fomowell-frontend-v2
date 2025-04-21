@@ -3,8 +3,6 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 
-import DepositWithdrawDialog from "./components/layout/dialog/deposit-withdraw";
-import SlippageDialog from "./components/layout/dialog/slippage";
 import { ThemeProvider } from "./components/providers/theme-provider";
 import { WalletProvider } from "./components/providers/wallet";
 import { TanStackRouterDevelopmentTools } from "./components/utils/development-tools/TanStackRouterDevelopmentTools";
@@ -34,8 +32,6 @@ const App = () => {
 						duration={Number(import.meta.env.VITE_TOAST_DURATION)}
 						position="bottom-right"
 					/>
-					<DepositWithdrawDialog />
-					<SlippageDialog />
 				</WalletProvider>
 			</QueryClientProvider>
 		</ThemeProvider>

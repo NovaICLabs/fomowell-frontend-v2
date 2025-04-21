@@ -7,7 +7,6 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 
-import IcpLogo from "@/components/icons/logo/icp";
 import TransferDialog from "@/components/layout/dialog/transfer";
 import { Button } from "@/components/ui/button";
 import { useICPPrice } from "@/hooks/apis/coingecko";
@@ -86,7 +85,7 @@ export default function Assets({ pid }: { pid: string }) {
 					),
 					cell: (info) => (
 						<div className="flex h-full w-full items-center gap-1">
-							<IcpLogo className="h-6 w-6" />
+							<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 							<div className="flex flex-col">
 								<span className="text-sm font-medium text-white">
 									{info.getValue().symbol}

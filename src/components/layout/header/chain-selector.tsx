@@ -1,8 +1,5 @@
 import { useRouter, useSearch } from "@tanstack/react-router";
 
-import BaseLogo from "@/components/icons/logo/base";
-import BitcoinLogo from "@/components/icons/logo/bitcoin";
-import ICPLogo from "@/components/icons/logo/icp";
 import {
 	Select,
 	SelectContent,
@@ -13,22 +10,34 @@ import {
 } from "@/components/ui/select";
 import { type ChainType, useChainStore } from "@/store/chain";
 const chains: Array<{
-	logo: React.ComponentType<{ className?: string }>;
+	logo: React.ReactNode;
 	name: string;
 	value: ChainType;
 }> = [
 	{
-		logo: BitcoinLogo,
+		logo: (
+			<div className="flex h-6 w-6 items-center justify-center">
+				<img alt={"bitcoin-logo"} src={`/svgs/chains/bitcoin.svg`} />
+			</div>
+		),
 		name: "Bitcoin",
 		value: "bitcoin",
 	},
 	{
-		logo: ICPLogo,
+		logo: (
+			<div className="flex h-6 w-6 items-center justify-center">
+				<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
+			</div>
+		),
 		name: "ICP",
 		value: "icp",
 	},
 	{
-		logo: BaseLogo,
+		logo: (
+			<div className="flex h-6 w-6 items-center justify-center">
+				<img alt={"base-logo"} src={`/svgs/chains/base.svg`} />
+			</div>
+		),
 		name: "Base",
 		value: "base",
 	},
@@ -57,7 +66,7 @@ export default function ChainSelector() {
 							className="flex h-[42px] cursor-pointer items-center gap-x-1.5 rounded-[14px] text-sm font-semibold hover:bg-gray-700 data-[state=checked]:bg-gray-700"
 							value={chain.value}
 						>
-							<chain.logo />
+							{chain.logo}
 							{chain.name}
 						</SelectItem>
 					))}

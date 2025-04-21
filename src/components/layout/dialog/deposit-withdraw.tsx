@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from "react";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
 import { getICPCanisterToken } from "@/canisters/icrc3/specials";
-import IcpLogo from "@/components/icons/logo/icp";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -120,7 +119,7 @@ const Deposit = () => {
 									value={token}
 								>
 									<div className="flex items-center gap-x-1.5">
-										<IcpLogo />
+										<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 										{token}
 									</div>
 								</SelectItem>
@@ -186,7 +185,7 @@ const Deposit = () => {
 							{truncatePrincipal(principal ?? "")}
 						</span>
 						<div className="ml-auto flex h-full items-center gap-x-1">
-							<IcpLogo className="h-4 w-4" />
+							<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 							{coreTokenBalance?.formatted}
 							{/* <span className="text-sm font-medium text-white">ICP</span> */}
 						</div>
@@ -288,7 +287,7 @@ const Withdraw = () => {
 						{truncatePrincipal(principal ?? "")}
 					</span>
 					<div className="ml-auto flex h-full items-center gap-x-1">
-						<IcpLogo className="h-4 w-4" />
+						<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 						{coreTokenBalance?.formatted}
 						{/* <span className="text-sm font-medium text-white">ICP</span> */}
 					</div>
@@ -309,7 +308,7 @@ const Withdraw = () => {
 									value={token}
 								>
 									<div className="flex items-center gap-x-1.5">
-										<IcpLogo />
+										<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 										{token}
 									</div>
 								</SelectItem>

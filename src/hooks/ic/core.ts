@@ -20,6 +20,7 @@ import {
 	withdraw,
 	type WithdrawArgs,
 } from "@/canisters/core";
+import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 import { showToast } from "@/components/utils/toast";
 import { formatNumberSmart, formatUnits } from "@/lib/common/number";
 
@@ -133,7 +134,9 @@ export const useCurrentPrice = (args: { id: number }) => {
 			return {
 				raw: result,
 				formattedPerPayToken: formatNumberSmart(
-					BigNumber(1).div(BigNumber(result))
+					BigNumber(1)
+						.multipliedBy(10 ** getICPCanisterToken().decimals)
+						.div(BigNumber(result))
 				),
 			};
 		},

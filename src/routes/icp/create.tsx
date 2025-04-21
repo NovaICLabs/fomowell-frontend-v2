@@ -24,6 +24,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { showToast } from "@/components/utils/toast";
 import { FileUploader } from "@/components/views/token/bottom/file-uploader";
 import { useCreateMemeToken } from "@/hooks/ic/core";
+import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
+import { useDialogStore } from "@/store/dialog";
 // Create form validation schema with Zod
 const formSchema = z.object({
 	name: z
@@ -194,7 +196,8 @@ function TokenCreationPage() {
 			toast.error(`Failed to create token: ${errorMessage}`);
 		}
 	}
-
+	const { connected } = useConnectedIdentity();
+	const { setIcpConnectOpen } = useDialogStore();
 	return (
 		<div className="container m-auto pb-10">
 			<Form {...form}>
@@ -395,14 +398,25 @@ function TokenCreationPage() {
 
 					{/* Submit Button and Fee Information */}
 					<div className="mt-12.5 flex flex-col items-center">
-						<Button
-							className="w-full max-w-md rounded-full py-6 font-medium text-black"
-							disabled={isCreating}
-							type="submit"
-						>
-							{isCreating ? "Creating..." : "Create token"}
-						</Button>
-						{/* <p className="mt-3 text-sm text-gray-400">Service Fees: 0.5 ICP</p> */}
+						{connected ? (
+							<Button
+								className="w-full max-w-md rounded-full py-6 font-medium text-black"
+								disabled={isCreating}
+								type="submit"
+							>
+								{isCreating ? "Creating..." : "Create token"}
+							</Button>
+						) : (
+							<Button
+								className="w-full max-w-md rounded-full py-6 font-medium text-black"
+								type="button"
+								onClick={() => {
+									setIcpConnectOpen(true);
+								}}
+							>
+								Connect Wallet
+							</Button>
+						)}
 					</div>
 				</form>
 			</Form>

@@ -3,7 +3,6 @@ import { useMemo, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
 
-import IcpLogo from "@/components/icons/logo/icp";
 import { Progress } from "@/components/ui/progress";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
@@ -164,7 +163,7 @@ export default function Bottom() {
 						</span>
 						<div className="text-gray-280 flex items-center">
 							(
-							<IcpLogo className="inline" />
+							<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 							<span className="text-gray-280">
 								{liquidityICP ? formatNumberSmart(liquidityICP) : "N/A"}
 							</span>
