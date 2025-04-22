@@ -7,11 +7,7 @@ import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 import { Progress } from "@/components/ui/progress";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
-import {
-	formatNumberSmart,
-	formatUnits,
-	parseUnits,
-} from "@/lib/common/number";
+import { formatNumberSmart, formatUnits } from "@/lib/common/number";
 import { fromNow } from "@/lib/common/time";
 import { cn } from "@/lib/utils";
 
@@ -25,10 +21,11 @@ export default function Bottom() {
 	const { data: memeTokenInfo } = useMemeTokenInfo(Number(id));
 
 	const liquidityICP = useMemo(() => {
-		return memeTokenInfo?.bc.token_reserve
-			? formatUnits(memeTokenInfo.bc.token_reserve)
+		return memeTokenInfo?.liquidity
+			? formatUnits(memeTokenInfo.liquidity)
 			: undefined;
 	}, [memeTokenInfo]);
+
 	const { data: icpPrice } = useICPPrice();
 	const liquidityUSD = useMemo(() => {
 		return liquidityICP && icpPrice
@@ -50,20 +47,6 @@ export default function Bottom() {
 					.toString()
 			: undefined;
 	}, [currentTokenPrice, totalSupply, icpPrice]);
-
-	const bcProgress = useMemo(() => {
-		const bcTotalSupply = 800_000_000;
-		if (!memeTokenInfo?.bc.meme_token_reserve) {
-			return undefined;
-		}
-		const value = BigNumber(parseUnits(totalSupply))
-			.minus(BigNumber(memeTokenInfo.bc.meme_token_reserve))
-			.div(BigNumber(parseUnits(bcTotalSupply)));
-		if (value.gte(1)) {
-			return BigNumber(1);
-		}
-		return value;
-	}, [memeTokenInfo, totalSupply]);
 
 	return (
 		<div className="no-scrollbar flex w-[390px] flex-shrink-0 flex-col gap-7.5 overflow-auto">
@@ -102,7 +85,7 @@ export default function Bottom() {
 			{activeTab === "Trade" && <Trade />}
 			{activeTab === "Liquidity" && <Liquidity />}
 
-			<div className="bg-gray-860 grid h-21 flex-shrink-0 grid-cols-4 rounded-[12px]">
+			<div className="bg-gray-860 grid h-21 flex-shrink-0 grid-cols-4 overflow-hidden rounded-[12px]">
 				<div className="border-r-gray-710 hover:bg-gray-710 flex cursor-pointer flex-col items-center justify-center gap-3 border-r">
 					<span className="text-sm leading-4 font-medium text-white/40">
 						1m
@@ -132,13 +115,10 @@ export default function Bottom() {
 				<div className="flex w-full items-center justify-between">
 					<span className="text-gray-280 text-sm">bonding curve progress:</span>
 					<span className="text-yellow-500">
-						({formatNumberSmart(bcProgress?.times(100)?.toString() ?? "0")}%)
+						({formatNumberSmart(memeTokenInfo?.progress ?? "0")}%)
 					</span>
 				</div>
-				<Progress
-					className="mt-4"
-					value={bcProgress?.times(100).toNumber() ?? 0}
-				/>
+				<Progress className="mt-4" value={memeTokenInfo?.progress ?? 0} />
 			</div>
 			<div className="bg-gray-860 flex flex-col gap-5.5 rounded-[12px] px-4.5 py-5">
 				<div className="flex items-center justify-between">
@@ -153,7 +133,7 @@ export default function Bottom() {
 					<span className="text-sm text-white/40">Market Cap:</span>
 					<div className="flex items-center gap-1 text-sm text-white">
 						<span className="text-white">
-							{marketCap ? `$${formatNumberSmart(marketCap)}` : "N/A"}
+							{marketCap ? `$${formatNumberSmart(marketCap)}` : "0"}
 						</span>
 					</div>
 				</div>
@@ -161,13 +141,13 @@ export default function Bottom() {
 					<span className="text-sm text-white/40">Liquidity</span>
 					<div className="flex items-center gap-1 text-sm text-white">
 						<span className="text-white">
-							{liquidityUSD ? `$${formatNumberSmart(liquidityUSD)}` : "N/A"}
+							{liquidityUSD ? `$${formatNumberSmart(liquidityUSD)}` : "$0"}
 						</span>
 						<div className="text-gray-280 flex items-center">
 							(
 							<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 							<span className="text-gray-280">
-								{liquidityICP ? formatNumberSmart(liquidityICP) : "N/A"}
+								{liquidityICP ? formatNumberSmart(liquidityICP) : "0"}
 							</span>
 							)
 						</div>

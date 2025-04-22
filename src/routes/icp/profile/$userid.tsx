@@ -48,7 +48,7 @@ function UserId() {
 							className="h-16 w-16 rounded-full"
 							src={getAvatar(userid)}
 						/>
-						<div className="flex flex-col">
+						<div className="flex flex-col gap-1">
 							<div className="flex items-center gap-1">
 								<span className="text-lg font-semibold">
 									{
@@ -64,8 +64,8 @@ function UserId() {
 								{principalCopied ? (
 									<Check
 										className="ml-1 opacity-40"
-										size={14}
-										strokeWidth={"2"}
+										size={16}
+										strokeWidth={4}
 									/>
 								) : (
 									<CopyIcon

@@ -21,6 +21,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { showToast } from "@/components/utils/toast";
+import { useTokenList } from "@/hooks/apis/indexer";
 import { useBuy } from "@/hooks/ic/core";
 import { formatNumberSmart, parseUnits } from "@/lib/common/number";
 import { withStopPropagation } from "@/lib/common/react-event";
@@ -29,159 +30,16 @@ import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
 import { useQuickBuyStore } from "@/store/quick-buy";
 
-type Token = {
-	id: bigint;
-	name: string;
-	symbol: string;
-	created: bigint;
-	amount: string;
-	price: string;
-	liquidity: string;
-	marketCap: string;
-	percentages: Record<string, string>;
-	volume: string;
-	progress: number;
-};
+import type { tokenInfo } from "@/apis/indexer";
 
 export default function MemeList() {
-	// Use useMemo to avoid infinite loops caused by data recreation
-	const data = useMemo<Array<Token>>(
-		() => [
-			{
-				id: 1n,
-				name: "FROG FUCK",
-				symbol: "FROG",
-				created: 1744880732722367464n,
-				amount: "0.0016 ICP",
-				price: "0.1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+2.5%",
-					"5m": "+12.5%",
-					"1h": "+15.3%",
-					"24h": "+32.7%",
-				},
-				volume: "100",
-				progress: 80,
-			},
-			{
-				id: 2n,
-				name: "FROG FUCK",
-				symbol: "FROG",
-				created: 1744880732722367464n,
-				amount: "0.0016 ICP",
-				price: "0.1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+2.5%",
-					"5m": "+12.5%",
-					"1h": "+15.3%",
-					"24h": "+32.7%",
-				},
-				volume: "100",
-				progress: 80,
-			},
-			{
-				id: 3n,
-				name: "FROG FUCK",
-				symbol: "FROG",
-				created: 1744880732722367464n,
-				amount: "0.0016 ICP",
-				price: "0.1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+2.5%",
-					"5m": "+12.5%",
-					"1h": "+15.3%",
-					"24h": "+32.7%",
-				},
-				volume: "100",
-				progress: 80,
-			},
-			{
-				id: 4n,
-				name: "FROG FUCK",
-				symbol: "FROG",
-				created: 1744880732722367464n,
-				amount: "0.0016 ICP",
-				price: "0.1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+2.5%",
-					"5m": "+12.5%",
-					"1h": "+15.3%",
-					"24h": "+32.7%",
-				},
-				volume: "100",
-				progress: 80,
-			},
-			{
-				id: 5n,
-				name: "FROG FUCK",
-				symbol: "FROG",
-				created: 1744880732722367464n,
-				amount: "0.0016 ICP",
-				price: "0.1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+2.5%",
-					"5m": "+12.5%",
-					"1h": "+15.3%",
-					"24h": "+32.7%",
-				},
-				volume: "100",
-				progress: 80,
-			},
-			{
-				id: 6n,
-				name: "FROG FUCK",
-				symbol: "FROG",
-				created: 1744880732722367464n,
-				amount: "0.0016 ICP",
-				price: "0.1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+2.5%",
-					"5m": "+12.5%",
-					"1h": "+15.3%",
-					"24h": "+32.7%",
-				},
-				volume: "100",
-				progress: 80,
-			},
-			{
-				id: 7n,
-				name: "FROG FUCK",
-				symbol: "FROG",
-				created: 1744880732722367464n,
-				amount: "0.0016 ICP",
-				price: "0.1",
-				liquidity: "$135.5K",
-				marketCap: "$250K",
-				percentages: {
-					"1m": "+2.5%",
-					"5m": "+12.5%",
-					"1h": "+15.3%",
-					"24h": "+32.7%",
-				},
-				volume: "100",
-				progress: 80,
-			},
-		],
-		[]
-	);
+	const { data: tokenList } = useTokenList();
 
 	// Percentage columns to display
 
 	const percentageKeys = useMemo(() => ["1m", "5m", "1h", "24h"], []);
 
-	const columnHelper = createColumnHelper<Token>();
+	const columnHelper = createColumnHelper<tokenInfo>();
 
 	const { mutateAsync: buyToken } = useBuy();
 	const { amount: flashAmount } = useQuickBuyStore();
@@ -212,31 +70,31 @@ export default function MemeList() {
 						<TooltipProvider>
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<div className="relative h-10 w-10 cursor-pointer overflow-hidden rounded-full">
+									<div className="relative flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full">
 										<div className="absolute inset-0 rounded-full border-[2px] border-gray-500"></div>
 										<div
 											className="absolute inset-0 rounded-full"
 											style={{
-												background: `conic-gradient(#F7B406 ${row.original.progress}%, transparent ${row.original.progress}%)`,
+												background: `conic-gradient(#F7B406 ${row.original.market}%, transparent ${row.original.market}%)`,
 												clipPath: "circle(50% at center)",
 											}}
 										></div>
 										<img
 											alt="duck"
 											className="absolute rounded-full p-[2px]"
-											src="https://ipfs.io/ipfs/QmQ4H6Y23dSEjn9LKB85M7KpVFiDu6KfDNZAcrqiCwFQQH?img-width=800&img-dpr=2&img-onerror=redirect"
+											src={row.original.logo}
 										/>
 									</div>
 								</TooltipTrigger>
 								<TooltipContent className="bg-white px-1 py-1 text-xs font-semibold text-black">
-									{row.original.progress} %
+									{row.original.market}
 								</TooltipContent>
 							</Tooltip>
 						</TooltipProvider>
 						<div className="flex flex-col gap-1.5">
 							<div className="flex items-center gap-1">
 								<span className="text-sm leading-4 font-medium text-white">
-									{row.original.symbol}
+									{row.original.ticker}
 								</span>
 								<div className="ml-3 flex cursor-pointer items-center gap-x-2.5">
 									<X
@@ -263,7 +121,7 @@ export default function MemeList() {
 				enablePinning: true,
 			}),
 			// Age column
-			columnHelper.accessor("created", {
+			columnHelper.accessor("timestamp", {
 				id: "age",
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
@@ -274,14 +132,14 @@ export default function MemeList() {
 				cell: (info) => (
 					<div className="flex h-full w-full items-center gap-1">
 						<span className="text-sm leading-4 font-medium text-white/60">
-							{fromNow(info.getValue())}
+							{fromNow(BigInt(info.getValue()?.split("n")[0] ?? "0"))}
 						</span>
 					</div>
 				),
 				size: 120,
 			}),
 			// Price column
-			columnHelper.accessor("price", {
+			columnHelper.accessor("fee", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">Price</span>
@@ -301,7 +159,7 @@ export default function MemeList() {
 				size: 120,
 			}),
 			// Liquidity column
-			columnHelper.accessor("liquidity", {
+			columnHelper.accessor("holders", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">
@@ -320,7 +178,7 @@ export default function MemeList() {
 				size: 120,
 			}),
 			// Market Cap column
-			columnHelper.accessor("marketCap", {
+			columnHelper.accessor("maxTotalSupply", {
 				id: "mc",
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
@@ -338,36 +196,36 @@ export default function MemeList() {
 				size: 120,
 			}),
 			// Percentage columns
-			...percentageKeys.map((key) =>
-				columnHelper.accessor((row) => row.percentages[key], {
-					id: key,
-					header: () => (
-						<div className="group flex cursor-pointer items-center gap-1">
-							<span className="duration-300 group-hover:text-white">{key}</span>
-							<SortsIcon />
-						</div>
-					),
-					cell: (info) => {
-						const value = info.getValue();
-						const isNegative = value?.startsWith("-");
-						return (
-							<div className="flex h-full w-full items-center">
-								<span
-									className={cn(
-										"text-sm leading-4 font-medium",
-										isNegative ? "text-price-negative" : "text-price-positive"
-									)}
-								>
-									{value}
-								</span>
-							</div>
-						);
-					},
-					size: 120,
-				})
-			),
+			// ...percentageKeys.map((key) =>
+			// 	columnHelper.accessor((row) => row.percentages[key], {
+			// 		id: key,
+			// 		header: () => (
+			// 			<div className="group flex cursor-pointer items-center gap-1">
+			// 				<span className="duration-300 group-hover:text-white">{key}</span>
+			// 				<SortsIcon />
+			// 			</div>
+			// 		),
+			// 		cell: (info) => {
+			// 			const value = info.getValue();
+			// 			const isNegative = value?.startsWith("-");
+			// 			return (
+			// 				<div className="flex h-full w-full items-center">
+			// 					<span
+			// 						className={cn(
+			// 							"text-sm leading-4 font-medium",
+			// 							isNegative ? "text-price-negative" : "text-price-positive"
+			// 						)}
+			// 					>
+			// 						{value}
+			// 					</span>
+			// 				</div>
+			// 			);
+			// 		},
+			// 		size: 120,
+			// 	})
+			// ),
 			// Volume column
-			columnHelper.accessor((row) => row.volume, {
+			columnHelper.accessor((row) => row.tx_index, {
 				id: "volume",
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
@@ -426,7 +284,7 @@ export default function MemeList() {
 	);
 
 	const table = useReactTable({
-		data,
+		data: tokenList?.items ?? [],
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		defaultColumn: {
@@ -494,7 +352,7 @@ export default function MemeList() {
 							onClick={() => {
 								void router.navigate({
 									to: `/${chain}/token/$id`,
-									params: { id: row.original.id.toString() },
+									params: { id: row.original.memeTokenId.toString() },
 								});
 							}}
 						>

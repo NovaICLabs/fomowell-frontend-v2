@@ -147,6 +147,7 @@ export const useCurrentPrice = (args: { id: number }) => {
 export const useCreateMemeToken = () => {
 	const { actorCreator } = useConnectedIdentity();
 	return useMutation({
+		mutationKey: ["ic-core", "create-meme-token"],
 		mutationFn: async (args: CreateMemeTokenArgs) => {
 			if (!actorCreator) {
 				throw new Error("No actor creator found");
@@ -162,6 +163,7 @@ export const useCreateMemeToken = () => {
 					website: args.website,
 					telegram: args.telegram,
 					twitter: args.twitter,
+					devBuy: args.devBuy,
 				}
 			);
 		},
@@ -171,6 +173,7 @@ export const useCreateMemeToken = () => {
 export const useDeposit = () => {
 	const { actorCreator } = useConnectedIdentity();
 	return useMutation({
+		mutationKey: ["ic-core", "deposit"],
 		mutationFn: async (args: DepositArgs) => {
 			if (!actorCreator) {
 				throw new Error("No actor creator found");
@@ -183,6 +186,7 @@ export const useDeposit = () => {
 export const useWithdraw = () => {
 	const { actorCreator } = useConnectedIdentity();
 	return useMutation({
+		mutationKey: ["ic-core", "withdraw"],
 		mutationFn: async (args: WithdrawArgs) => {
 			if (!actorCreator) {
 				throw new Error("No actor creator found");
@@ -195,6 +199,7 @@ export const useWithdraw = () => {
 export const useBuy = () => {
 	const { actorCreator } = useConnectedIdentity();
 	return useMutation({
+		mutationKey: ["ic-core", "buy"],
 		mutationFn: async (args: BuyArgs) => {
 			if (!actorCreator) {
 				throw new Error("No actor creator found");
@@ -210,6 +215,7 @@ export const useBuy = () => {
 export const useSell = () => {
 	const { actorCreator } = useConnectedIdentity();
 	return useMutation({
+		mutationKey: ["ic-core", "sell"],
 		mutationFn: async (args: SellArgs) => {
 			if (!actorCreator) {
 				throw new Error("No actor creator found");

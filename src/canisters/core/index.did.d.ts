@@ -85,6 +85,7 @@ export interface CreateMemeTokenArg {
 	name: string;
 	description: string;
 	website: [] | [string];
+	dev_buy: [] | [bigint];
 	telegram: [] | [string];
 }
 export interface DailyMetricsData {
@@ -150,6 +151,10 @@ export interface GetTransactionsResponse {
 	transactions: Array<Transaction>;
 	archived_transactions: Array<ArchivedRange>;
 }
+export interface Holder {
+	balance: bigint;
+	account: Account;
+}
 export interface HourlyMetricsData {
 	updateCalls: BigUint64Array | bigint[];
 	canisterHeapMemorySize: BigUint64Array | bigint[];
@@ -186,6 +191,11 @@ export interface MemeToken {
 	ledger_canister: [] | [string];
 	price: number;
 	telegram: [] | [string];
+	process: number;
+}
+export interface MemeTokenBalance {
+	token: MemeToken;
+	balance: bigint;
 }
 export type MetricsGranularity = { hourly: null } | { daily: null };
 export interface MetricsRequest {
@@ -316,7 +326,13 @@ export interface _SERVICE {
 	icrc1_balance_of: ActorMethod<[LedgerType, Account], bigint>;
 	query_meme_token: ActorMethod<[bigint], [] | [MemeToken]>;
 	query_meme_token_price: ActorMethod<[bigint], Result>;
+	query_token_holders: ActorMethod<
+		[bigint, bigint, bigint],
+		[Array<Holder>, bigint]
+	>;
+	query_user_tokens: ActorMethod<[[] | [Account]], Array<MemeTokenBalance>>;
 	sell: ActorMethod<[BuyArgs], Result>;
+	update_creation_fee: ActorMethod<[TokenAmount], undefined>;
 	withdraw: ActorMethod<[WithdrawArgs], Result>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;

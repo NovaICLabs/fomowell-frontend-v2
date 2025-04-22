@@ -73,9 +73,7 @@ export default function Comments() {
 				/>
 				<div className="bg-gray-860 border-gray-710 flex w-full items-end justify-between border-t p-5">
 					<FileUploader />
-					<Button className="h-[42px] rounded-full font-semibold">
-						Submit
-					</Button>
+					<Button className="h-9 rounded-full font-semibold">Submit</Button>
 				</div>
 			</div>
 			<div className="no-scrollbar mt-3.75 flex h-screen flex-col gap-3 overflow-auto pb-3">

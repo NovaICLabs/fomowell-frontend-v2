@@ -8,6 +8,7 @@ interface ImportMetaEnv {
 	readonly VITE_TOAST_DURATION: string;
 	readonly VITE_COINGECKO_API_BASE_URL: string;
 	readonly VITE_IMG_UPLOADER_URL: string;
+	readonly VITE_INDEXER_BASE_URL: string;
 }
 
 interface ImportMeta {

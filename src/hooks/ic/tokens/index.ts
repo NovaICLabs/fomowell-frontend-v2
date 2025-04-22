@@ -6,6 +6,7 @@ import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
 export const useIcrcTransfer = () => {
 	const { actorCreator } = useConnectedIdentity();
 	return useMutation({
+		mutationKey: ["ic-tokens", "transfer"],
 		mutationFn: async (args: TransferArgs) => {
 			if (!actorCreator) {
 				throw new Error("No actor creator found");

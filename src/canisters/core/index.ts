@@ -47,13 +47,14 @@ export const getMemeToken = async (canisterId: string, id: bigint) => {
 		telegram: unwrapOption(r.telegram),
 		twitter: unwrapOption(r.twitter),
 		logo: r.logo,
+		progress: r.process,
 		creator: r.creator,
 		completed: r.completed,
 		available_token: r.available_token,
 		ledger_canister: unwrapOption(r.ledger_canister),
-		market_cap_token: r.market_cap_token,
+		liquidity: r.market_cap_token,
 		created_at: r.created_at,
-		bc: r.bc,
+		bc: r.bc, // no use
 		decimals: 8,
 	}));
 	if (!memeToken) {
@@ -176,6 +177,7 @@ export type CreateMemeTokenArgs = {
 	telegram?: string;
 	twitter?: string;
 	creator?: string;
+	devBuy?: bigint;
 };
 
 export const createMemeToken = async (
@@ -199,6 +201,7 @@ export const createMemeToken = async (
 		telegram,
 		twitter,
 		creator,
+		devBuy,
 	} = args;
 	const result = await actor.create_token({
 		token: getICPCanisterToken(),
@@ -210,8 +213,8 @@ export const createMemeToken = async (
 		twitter: wrapOption(twitter),
 		creator: wrapOption(creator ? validatePrincipalText(creator) : undefined),
 		logo,
+		dev_buy: wrapOption(devBuy),
 	});
-	console.debug("🚀 ~ result:", result);
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
 	});

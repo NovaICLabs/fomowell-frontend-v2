@@ -4,6 +4,17 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		owner: IDL.Principal,
 		subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
 	});
+	const TokenAmount = IDL.Record({
+		token: IDL.Principal,
+		amount: IDL.Nat,
+	});
+	const InitArg = IDL.Record({
+		fee_receiver: Account,
+		token_launch_tread_hold: IDL.Vec(TokenAmount),
+		create_token_fee: IDL.Vec(TokenAmount),
+		maintenance: IDL.Bool,
+		fee_percentage: IDL.Opt(IDL.Float32),
+	});
 	const BuyArgs = IDL.Record({
 		subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
 		amount_in: IDL.Nat,
@@ -27,6 +38,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		name: IDL.Text,
 		description: IDL.Text,
 		website: IDL.Opt(IDL.Text),
+		dev_buy: IDL.Opt(IDL.Nat),
 		telegram: IDL.Opt(IDL.Text),
 	});
 	const BondingCurve = IDL.Record({
@@ -53,6 +65,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		ledger_canister: IDL.Opt(IDL.Text),
 		price: IDL.Float64,
 		telegram: IDL.Opt(IDL.Text),
+		process: IDL.Float64,
 	});
 	const Result_1 = IDL.Variant({ Ok: MemeToken, Err: IDL.Text });
 	const DepositArgs = IDL.Record({
@@ -288,6 +301,11 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		transactions: IDL.Vec(Transaction),
 		archived_transactions: IDL.Vec(ArchivedRange),
 	});
+	const Holder = IDL.Record({ balance: IDL.Nat, account: Account });
+	const MemeTokenBalance = IDL.Record({
+		token: MemeToken,
+		balance: IDL.Nat,
+	});
 	const WithdrawArgs = IDL.Record({
 		to: Account,
 		token: StableToken,
@@ -315,7 +333,18 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		icrc1_balance_of: IDL.Func([LedgerType, Account], [IDL.Nat], ["query"]),
 		query_meme_token: IDL.Func([IDL.Nat64], [IDL.Opt(MemeToken)], ["query"]),
 		query_meme_token_price: IDL.Func([IDL.Nat64], [Result], ["query"]),
+		query_token_holders: IDL.Func(
+			[IDL.Nat64, IDL.Nat64, IDL.Nat64],
+			[IDL.Vec(Holder), IDL.Nat64],
+			["query"]
+		),
+		query_user_tokens: IDL.Func(
+			[IDL.Opt(Account)],
+			[IDL.Vec(MemeTokenBalance)],
+			["query"]
+		),
 		sell: IDL.Func([BuyArgs], [Result], []),
+		update_creation_fee: IDL.Func([TokenAmount], [], []),
 		withdraw: IDL.Func([WithdrawArgs], [Result], []),
 	});
 };

@@ -92,7 +92,7 @@ const IcpWalletConnect: React.FC = () => {
 									<Check
 										className="ml-1 opacity-40"
 										size={16}
-										strokeWidth={"2"}
+										strokeWidth={4}
 									/>
 								) : (
 									<CopyIcon

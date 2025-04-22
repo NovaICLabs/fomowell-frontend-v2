@@ -6,6 +6,7 @@ import { useDebounce } from "use-debounce";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
 import { getICPCanisterToken } from "@/canisters/icrc3/specials";
+import DepositPlus from "@/components/icons/common/deposit-plus";
 import SlippageSetting from "@/components/icons/common/slippage-setting";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -22,6 +23,7 @@ import {
 	useSell,
 } from "@/hooks/ic/core";
 import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
+import { getAvatar } from "@/lib/common/avatar";
 import {
 	formatNumberSmart,
 	formatUnits,
@@ -29,11 +31,16 @@ import {
 	parseUnits,
 } from "@/lib/common/number";
 import { slippageRange, validateInputNumber } from "@/lib/common/validate";
+import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
 const percentages = [25, 50, 75, 100];
 const tabs = ["Buy", "Sell"] as const;
 type Tab = (typeof tabs)[number];
+
+const buyRange = [0.0001, Infinity] as const;
+const sellRange = [0.1, Infinity] as const;
+
 export default function Trade() {
 	const { id } = useParams({ from: "/icp/token/$id" });
 	const { principal } = useConnectedIdentity();
@@ -152,6 +159,24 @@ export default function Trade() {
 		sellAmount,
 	]);
 
+	// buy range
+	const amountValid = useMemo(() => {
+		switch (activeTab) {
+			case "Buy":
+				return (
+					BigNumber(buyAmount).isEqualTo(BigNumber(0)) ||
+					(BigNumber(buyAmount).gte(BigNumber(buyRange[0])) &&
+						BigNumber(buyAmount).lte(BigNumber(buyRange[1])))
+				);
+			case "Sell":
+				return (
+					BigNumber(sellAmount).isEqualTo(BigNumber(0)) ||
+					(BigNumber(sellAmount).gte(BigNumber(sellRange[0])) &&
+						BigNumber(sellAmount).lte(BigNumber(sellRange[1])))
+				);
+		}
+	}, [activeTab, buyAmount, sellAmount]);
+
 	const { mutateAsync: buy, isPending: isBuying } = useBuy();
 	const { mutateAsync: sell, isPending: isSelling } = useSell();
 	const buttonDisabled = useMemo(() => {
@@ -163,7 +188,8 @@ export default function Trade() {
 			isCalculatingBuy ||
 			isCalculatingSell ||
 			isBuying ||
-			isSelling
+			isSelling ||
+			!amountValid
 		);
 	}, [
 		activeTab,
@@ -175,6 +201,7 @@ export default function Trade() {
 		isBuying,
 		isSelling,
 		minTokenReceived,
+		amountValid,
 	]);
 	const refetchBalance = useCallback(() => {
 		void refetchCoreTokenBalance();
@@ -373,25 +400,36 @@ export default function Trade() {
 		}
 		return "text-white/60";
 	}, [priceImpactPercent]);
+
+	// deposit
+	const { setDepositWithdrawOpen } = useDialogStore();
 	return (
-		<div className="h-112.5 rounded-[12px] bg-gray-800 px-4 py-5">
+		<div className="rounded-[12px] bg-gray-800 px-4 py-5">
 			<div className="bg-gray-710 flex h-[38px] items-center gap-2 rounded-[12px] px-2.5">
-				<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
-				<span className="text-sm font-medium">ICP</span>
+				<img
+					alt={"avatar"}
+					className="h-6 w-6 rounded-full"
+					src={getAvatar(principal ?? "")}
+				/>
+				<span className="text-sm font-medium">
+					{truncatePrincipal(principal ?? "")}
+				</span>
 				<div className="ml-auto flex items-center gap-1">
+					<img
+						alt={"icp-logo"}
+						className="h-6 w-6"
+						src={`/svgs/chains/icp.svg`}
+					/>
 					<span className="font-medium">{coreTokenBalance?.formatted}</span>
-					<span className="text-xs text-white/60">
-						($
-						{coreTokenBalance && icpPrice
-							? getTokenUsdValueTotal(
-									{
-										amount: coreTokenBalance.raw,
-									},
-									icpPrice
-								)
-							: "--"}
-						)
-					</span>
+					<DepositPlus
+						className="h-4 w-4 cursor-pointer"
+						onClick={() => {
+							setDepositWithdrawOpen({
+								open: true,
+								type: "deposit",
+							});
+						}}
+					/>
 				</div>
 			</div>
 			<div className="mt-4 flex justify-between gap-2">
@@ -399,7 +437,7 @@ export default function Trade() {
 					<button
 						key={tab}
 						className={cn(
-							"bg-gray-710 hover:bg-gray-710/80 h-[38px] w-[152px] rounded-[19px] px-2.5 py-1.5 text-sm font-medium",
+							"bg-gray-710 hover:bg-gray-710/80 h-8 w-[158px] rounded-[19px] px-2.5 py-1.5 text-sm font-medium",
 							activeTab === tab &&
 								(tab === "Buy"
 									? "bg-price-positive hover:bg-price-positive/80"
@@ -413,48 +451,50 @@ export default function Trade() {
 					</button>
 				))}
 			</div>
-			<div className="mt-4 text-end text-sm font-medium">
+			<div className="mt-4 flex items-center justify-between px-2 text-end text-sm font-medium">
 				<span className="font-normal text-white/60">Balance:</span>{" "}
-				<span className="font-medium">
-					{activeTab === "Buy"
-						? coreTokenBalance?.formatted
-						: memeTokenBalance?.formatted}
-				</span>
-				<span className="text-xs text-white/60">
-					{" "}
-					($
-					{activeTab === "Buy"
-						? coreTokenBalance &&
-							icpPrice &&
-							getTokenUsdValueTotal(
-								{
-									amount: coreTokenBalance.raw,
-								},
-								icpPrice
-							)
-						: currentTokenPrice &&
-							memeTokenBalance &&
-							icpPrice &&
-							getTokenUsdValueTotal(
-								{
-									amount: memeTokenBalance?.raw,
-								},
-								BigNumber(currentTokenPrice.formattedPerPayToken)
-									.multipliedBy(icpPrice)
-									.toNumber()
-							)}
-					)
-				</span>
+				<div className="flex items-center">
+					<span className="font-medium">
+						{activeTab === "Buy"
+							? coreTokenBalance?.formatted
+							: memeTokenBalance?.formatted}
+					</span>
+					<span className="text-xs text-white/60">
+						{" "}
+						($
+						{activeTab === "Buy"
+							? coreTokenBalance &&
+								icpPrice &&
+								getTokenUsdValueTotal(
+									{
+										amount: coreTokenBalance.raw,
+									},
+									icpPrice
+								)
+							: currentTokenPrice &&
+								memeTokenBalance &&
+								icpPrice &&
+								getTokenUsdValueTotal(
+									{
+										amount: memeTokenBalance?.raw,
+									},
+									BigNumber(currentTokenPrice.formattedPerPayToken)
+										.multipliedBy(icpPrice)
+										.toNumber()
+								)}
+						)
+					</span>
+				</div>
 			</div>
 			<Input
 				placeholder="0.00"
 				value={activeTab === "Buy" ? buyAmount : sellAmount}
 				aria-invalid={
-					!balanceEnough &&
+					(!balanceEnough || !amountValid) &&
 					(activeTab === "Buy" ? buyAmount !== "" : sellAmount !== "")
 				}
 				className={cn(
-					"dark:bg-background mt-1 h-13.5 rounded-2xl border border-transparent text-lg font-semibold placeholder:text-lg placeholder:leading-[14px] placeholder:font-bold placeholder:text-white/40 focus-visible:border-transparent focus-visible:ring-0"
+					"dark:bg-background mt-2 h-13.5 rounded-2xl border border-transparent text-lg font-semibold placeholder:text-lg placeholder:leading-[14px] placeholder:font-bold placeholder:text-white/40 focus-visible:border-transparent focus-visible:ring-0"
 				)}
 				onBlur={() => {
 					if (activeTab === "Buy") {
@@ -475,11 +515,11 @@ export default function Trade() {
 					});
 				}}
 			/>
-			<div className="mt-4 flex gap-2">
+			<div className="mt-4 grid grid-cols-4 gap-2">
 				{percentages.map((percentage) => (
 					<Button
 						key={percentage}
-						className="bg-gray-710 hover:bg-gray-710/70 h-9 w-[82px] flex-shrink-0 rounded-2xl text-sm font-medium text-white"
+						className="bg-gray-710 hover:bg-gray-710/70 h-9 w-full flex-shrink-0 rounded-2xl text-sm font-medium text-white"
 						onClick={() => {
 							setPercentage(percentage);
 						}}

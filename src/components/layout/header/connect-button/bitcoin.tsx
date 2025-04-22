@@ -150,11 +150,7 @@ const BitcoinWalletConnect: React.FC = () => {
 							/>
 							<span className="ml-2">{truncatePrincipal(principal)}</span>
 							{copied ? (
-								<Check
-									className="ml-1 opacity-40"
-									size={16}
-									strokeWidth={"2"}
-								/>
+								<Check className="ml-1 opacity-40" size={16} strokeWidth={4} />
 							) : (
 								<CopyIcon
 									className="ml-1 h-4 w-4"

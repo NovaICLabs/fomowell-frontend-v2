@@ -103,7 +103,7 @@ const Deposit = () => {
 				<span className="text-md font-medium text-white">
 					From linked wallet
 				</span>
-				<span className="mt-4 mb-2 text-sm text-white/60">Token</span>
+				<span className="mt-4 mb-2 pl-1.5 text-sm text-white/60">Token</span>
 				<Select
 					value={"ICP"}
 					onValueChange={(value: Token) => {
@@ -115,7 +115,7 @@ const Deposit = () => {
 							{tokens.map((token) => (
 								<SelectItem
 									key={token}
-									className="hover:bg-gray-750 data-[state=checked]:bg-gray-750 flex h-[38px] cursor-pointer items-center gap-x-1.5 rounded-xl text-sm font-semibold"
+									className="hover:bg-gray-750 data-[state=checked]:bg-gray-750 flex h-10.5 cursor-pointer items-center gap-x-1.5 rounded-xl text-sm font-semibold"
 									value={token}
 								>
 									<div className="flex items-center gap-x-1.5">
@@ -126,7 +126,7 @@ const Deposit = () => {
 							))}
 						</SelectGroup>
 					</SelectContent>
-					<SelectTrigger className="h-[38px] w-full rounded-xl border border-white/10 px-4 text-sm font-semibold focus-visible:ring-0 dark:bg-gray-800 dark:hover:bg-gray-800/80">
+					<SelectTrigger className="!h-10.5 w-full rounded-xl border border-white/10 px-4 text-sm font-semibold focus-visible:ring-0 dark:bg-gray-800 dark:hover:bg-gray-800/80">
 						<div className="flex items-center gap-x-1.5">
 							<SelectValue className="text-white/60" placeholder="" />
 						</div>
@@ -134,11 +134,14 @@ const Deposit = () => {
 				</Select>
 
 				<div className="mt-6.25 flex w-full flex-col items-start justify-between">
-					<div className="flex w-full justify-between">
-						<span className="text-sm text-white/60">Balance</span>
-						<span className="text-sm font-medium text-white">
-							{icpBalance?.formatted} ICP
-						</span>
+					<div className="flex w-full justify-between px-1.5">
+						<span className="text-sm text-white/60">Amount</span>
+						<div className="flex items-center gap-x-1">
+							<span className="text-sm text-white/60">Balance: </span>
+							<span className="text-sm font-medium text-white">
+								{icpBalance?.formatted} ICP
+							</span>
+						</div>
 					</div>
 					<div className="relative mt-2 flex h-10.5 w-full items-center justify-center">
 						<Input
@@ -168,13 +171,13 @@ const Deposit = () => {
 							<span className="text-sm font-medium text-white">ICP</span>
 						</div>
 					</div>
-					<span className="mt-2 ml-auto text-sm text-white/40">
-						Network fee: 0.0002 ICP
-					</span>
+					<div className="mt-2 flex w-full items-center justify-between px-1.5">
+						<span className="text-sm text-white/60">Network fee</span>
+						<span className="text-sm font-medium text-white">0.0002 ICP</span>
+					</div>
 				</div>
-
+				<img alt="to" className="mx-auto mt-7.5" src="/svgs/common/to.svg" />
 				<div className="mt-auto flex w-full flex-col items-start justify-between">
-					<span className="text-md font-medium text-white">To:</span>
 					<div className="bg-gray-710 mt-2 flex h-[38px] w-full items-center justify-start rounded-[12px] px-4">
 						<img
 							alt=""
@@ -275,8 +278,30 @@ const Withdraw = () => {
 	}, [withdraw, amount, selectedToPrincipal, refetch]);
 	return (
 		<div className="flex w-full flex-1 flex-col">
-			<div className="mt-4 flex w-full flex-1 flex-col items-start justify-between">
-				<span className="text-md font-medium text-white">From:</span>
+			<Tabs
+				className="mx-auto"
+				defaultValue="Linked Wallet"
+				value={selectedToType}
+				onValueChange={(value: string) => {
+					setSelectedToType(value as InnerTab);
+				}}
+			>
+				<TabsList className="border-gray-650 h-[38px] rounded-full border bg-transparent">
+					{innerTabs.map((tabName) => (
+						<TabsTrigger
+							key={tabName}
+							value={tabName}
+							className={cn(
+								"rounded-full px-4 py-2 text-white/60 capitalize dark:data-[state=active]:bg-white dark:data-[state=active]:text-black"
+							)}
+						>
+							{tabName}
+						</TabsTrigger>
+					))}
+				</TabsList>
+			</Tabs>
+			<div className="mt-4 flex w-full flex-1 flex-col items-start justify-between gap-0">
+				<span className="text-md font-medium text-white">From</span>
 				<div className="bg-gray-710 mt-2 flex h-[38px] w-full items-center justify-start rounded-[12px] px-4">
 					<img
 						alt=""
@@ -292,7 +317,7 @@ const Withdraw = () => {
 						{/* <span className="text-sm font-medium text-white">ICP</span> */}
 					</div>
 				</div>
-				<span className="mt-4 mb-2 text-sm text-white/60">Token</span>
+				<span className="mt-4 mb-2 pl-1.5 text-sm text-white/60">Token</span>
 				<Select
 					value={"ICP"}
 					onValueChange={(value: Token) => {
@@ -304,7 +329,7 @@ const Withdraw = () => {
 							{tokens.map((token) => (
 								<SelectItem
 									key={token}
-									className="hover:bg-gray-750 data-[state=checked]:bg-gray-750 flex h-[38px] cursor-pointer items-center gap-x-1.5 rounded-xl text-sm font-semibold"
+									className="hover:bg-gray-750 data-[state=checked]:bg-gray-750 flex h-10.5 cursor-pointer items-center gap-x-1.5 rounded-xl text-sm font-semibold"
 									value={token}
 								>
 									<div className="flex items-center gap-x-1.5">
@@ -315,7 +340,7 @@ const Withdraw = () => {
 							))}
 						</SelectGroup>
 					</SelectContent>
-					<SelectTrigger className="h-[38px] w-full rounded-xl border border-white/10 px-4 text-sm font-semibold focus-visible:ring-0 dark:bg-gray-800 dark:hover:bg-gray-800/80">
+					<SelectTrigger className="!h-10.5 w-full rounded-xl border border-white/10 px-4 text-sm font-semibold focus-visible:ring-0 dark:bg-gray-800 dark:hover:bg-gray-800/80">
 						<div className="flex items-center gap-x-1.5">
 							<SelectValue className="text-white/60" placeholder="" />
 						</div>
@@ -323,7 +348,7 @@ const Withdraw = () => {
 				</Select>
 
 				<div className="mt-6.25 flex w-full flex-col items-start justify-between">
-					<div className="flex w-full justify-between">
+					<div className="flex w-full justify-between px-1.5">
 						<span className="text-sm text-white/60">Amount</span>
 						<span className="text-sm font-medium text-white">
 							Balance: {coreTokenBalance?.formatted} ICP
@@ -357,68 +382,52 @@ const Withdraw = () => {
 							<span className="text-sm font-medium text-white">ICP</span>
 						</div>
 					</div>
-					<span className="mt-2 ml-auto text-sm text-white/40">
-						Network fee: 0.0001 ICP
-					</span>
+					<div className="mt-2 flex w-full items-center justify-between px-1.5">
+						<span className="text-sm text-white/60">Network fee</span>
+						<span className="text-sm font-medium text-white">0.0002 ICP</span>
+					</div>
 				</div>
 
-				<div className="mt-auto flex w-full flex-col items-start justify-between">
-					<span className="text-md mb-2 font-medium text-white">To:</span>
-					<div className="mb-2 flex w-full flex-col items-start justify-between">
-						<Select
-							value={selectedToType}
-							onValueChange={(value: InnerTab) => {
-								setSelectedToType(value);
-							}}
-						>
-							<SelectContent className="rounded-xl border-none bg-gray-800 px-[2px] py-[2px]">
-								<SelectGroup className="bg-gray-800">
-									{innerTabs.map((tab) => (
-										<SelectItem
-											key={tab}
-											className="hover:bg-gray-750 data-[state=checked]:bg-gray-750 flex h-[38px] cursor-pointer items-center gap-x-1.5 rounded-xl text-sm font-semibold"
-											value={tab}
-										>
-											{tab}
-										</SelectItem>
-									))}
-								</SelectGroup>
-							</SelectContent>
-							<SelectTrigger className="h-[38px] w-full rounded-xl border border-white/10 px-4 text-sm font-semibold focus-visible:ring-0 dark:bg-gray-800 dark:hover:bg-gray-800/80">
-								<div className="flex items-center gap-x-1.5">
-									<SelectValue className="text-white/60" placeholder="" />
-								</div>
-							</SelectTrigger>
-						</Select>
-						<Input
-							placeholder="Enter your principal id"
-							value={inputPrincipal}
-							className={cn(
-								"dark:bg-background mt-2 flex w-full flex-col items-start justify-between rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold focus-visible:ring-0 dark:hover:bg-gray-800/80",
-								selectedToType === "Linked Wallet" && "invisible"
-							)}
-							onChange={(event) => {
-								setInputPrincipal(event.target.value);
-								try {
-									validatePrincipalText(event.target.value);
-									setIsInputPrincipalValid(true);
-								} catch (error) {
-									console.debug("🚀 ~ Withdraw ~ error:", error);
-									setIsInputPrincipalValid(false);
-								}
-							}}
-						/>
-						{!isInputPrincipalValid && inputPrincipal !== "" && (
-							<span
-								className={cn(
-									"text-price-negative mt-2 ml-auto text-sm",
-									selectedToType === "Linked Wallet" && "invisible"
-								)}
-							>
-								Invalid principal id
+				<div className="flex w-full flex-1 flex-col items-start justify-between">
+					{selectedToType === "Linked Wallet" ? (
+						<>
+							<img
+								alt="to"
+								className="mx-auto mt-5"
+								src="/svgs/common/to.svg"
+							/>
+							<span className="mx-auto mt-5 text-sm text-white/40">
+								Linked Wallet
 							</span>
-						)}
-					</div>
+						</>
+					) : (
+						<div className="mt-6 flex w-full flex-col items-start justify-between">
+							<span className="pl-1.5 text-sm text-white/40">Principal ID</span>
+							<Input
+								placeholder="Enter your principal id"
+								value={inputPrincipal}
+								className={cn(
+									"dark:bg-background mt-2 h-10.5 rounded-[10px] border-white/10 text-lg font-semibold placeholder:text-sm placeholder:leading-[14px] placeholder:font-normal placeholder:text-white/20 focus-visible:ring-0"
+								)}
+								onChange={(event) => {
+									setInputPrincipal(event.target.value);
+									try {
+										validatePrincipalText(event.target.value);
+										setIsInputPrincipalValid(true);
+									} catch (error) {
+										console.debug("🚀 ~ Withdraw ~ error:", error);
+										setIsInputPrincipalValid(false);
+									}
+								}}
+							/>
+							{!isInputPrincipalValid && inputPrincipal !== "" && (
+								<span className={cn("text-price-negative text-sm")}>
+									Invalid principal id
+								</span>
+							)}
+						</div>
+					)}
+
 					<Button
 						className="mt-10 h-[42px] w-full rounded-full text-base font-bold text-black"
 						disabled={buttonDisabled}

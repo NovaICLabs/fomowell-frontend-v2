@@ -17,7 +17,7 @@ export default function HeadInfo() {
 		useCurrentPrice({ id: Number(id) });
 	return (
 		<div className="text-white">
-			<div className="flex items-center justify-between">
+			<div className="flex items-center justify-between pr-4">
 				<div className="flex items-center">
 					<Star className="h-5 w-5" />
 					<div className="relative ml-2 h-10 w-10 overflow-hidden rounded-full">

@@ -256,3 +256,22 @@
 		scrollbar-width: none;
 	}
 }
+
+/* Override browser autofill styles */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+	-webkit-text-fill-color: white; /* Ensure text color matches theme */
+	transition: background-color 5000s ease-in-out 0s; /* Delay background color change */
+}
+
+/* Light mode autofill background */
+input:-webkit-autofill {
+	box-shadow: 0 0 0px 1000px hsl(var(--input)) inset !important;
+}
+
+/* Dark mode autofill background */
+.dark input:-webkit-autofill {
+	box-shadow: 0 0 0px 1000px hsl(var(--background)) inset !important;
+}
