@@ -7,6 +7,7 @@ import {
 	getCoreRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
+import BigNumber from "bignumber.js";
 
 import SortsIcon from "@/components/icons/common/sorts";
 import Telegram from "@/components/icons/media/telegram";
@@ -21,9 +22,14 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { showToast } from "@/components/utils/toast";
-import { useTokenList } from "@/hooks/apis/indexer";
+import { useICPPrice } from "@/hooks/apis/coingecko";
+import { useInfiniteTokenList } from "@/hooks/apis/indexer";
 import { useBuy } from "@/hooks/ic/core";
-import { formatNumberSmart, parseUnits } from "@/lib/common/number";
+import {
+	formatNumberSmart,
+	getTokenUsdValueTotal,
+	parseUnits,
+} from "@/lib/common/number";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { fromNow } from "@/lib/common/time";
 import { cn } from "@/lib/utils";
@@ -33,11 +39,8 @@ import { useQuickBuyStore } from "@/store/quick-buy";
 import type { tokenInfo } from "@/apis/indexer";
 
 export default function MemeList() {
-	const { data: tokenList } = useTokenList();
-
-	// Percentage columns to display
-
-	const percentageKeys = useMemo(() => ["1m", "5m", "1h", "24h"], []);
+	const { data } = useInfiniteTokenList();
+	const router = useRouter();
 
 	const columnHelper = createColumnHelper<tokenInfo>();
 
@@ -50,6 +53,7 @@ export default function MemeList() {
 		}
 		return BigInt(parseUnits(flashAmount, 8));
 	}, [flashAmount]);
+	const { data: icpPrice } = useICPPrice();
 	// Use useMemo to define columns to avoid re-rendering issues
 	const columns = useMemo(
 		() => [
@@ -61,62 +65,80 @@ export default function MemeList() {
 						<span className="">Token</span>
 					</div>
 				),
-				cell: ({ row }) => (
-					<div className="flex items-center gap-2">
-						<Star
-							className="h-4 w-4 cursor-pointer text-white/40"
-							onClick={withStopPropagation(() => {})}
-						/>
-						<TooltipProvider>
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<div className="relative flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full">
-										<div className="absolute inset-0 rounded-full border-[2px] border-gray-500"></div>
-										<div
-											className="absolute inset-0 rounded-full"
-											style={{
-												background: `conic-gradient(#F7B406 ${row.original.market}%, transparent ${row.original.market}%)`,
-												clipPath: "circle(50% at center)",
-											}}
-										></div>
-										<img
-											alt="duck"
-											className="absolute rounded-full p-[2px]"
-											src={row.original.logo}
-										/>
+				cell: ({ row }) => {
+					const process = row.original.process * 100;
+					return (
+						<div className="flex items-center gap-2">
+							<Star
+								className="h-4 w-4 cursor-pointer text-white/40"
+								onClick={withStopPropagation(() => {})}
+							/>
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<div className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full">
+											<div className="absolute inset-0 rounded-full border-[2px] border-gray-500"></div>
+											<div
+												className="absolute inset-0 rounded-full"
+												style={{
+													background: `conic-gradient(#F7B406 ${process}%, transparent ${process}%)`,
+													clipPath: "circle(50% at center)",
+												}}
+											></div>
+											<div
+												className="absolute h-[36px] w-[36px] rounded-full p-[2px]"
+												style={{
+													backgroundImage: `url(${row.original.logo})`,
+													backgroundSize: "cover",
+													backgroundPosition: "center",
+												}}
+											/>
+										</div>
+									</TooltipTrigger>
+									<TooltipContent className="bg-white px-1 py-1 text-xs font-semibold text-black">
+										{process.toFixed(2)}%
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+							<div className="flex flex-col gap-1.5">
+								<div className="flex items-center gap-1">
+									<span className="text-sm leading-4 font-medium text-white">
+										{row.original.ticker}
+									</span>
+									<div className="ml-3 flex cursor-pointer items-center gap-x-2.5">
+										{row.original.twitter && (
+											<X
+												className="h-2.5 text-white/40 hover:text-white"
+												onClick={withStopPropagation(() => {
+													window.open(row.original.twitter, "_blank");
+												})}
+											/>
+										)}
+										{row.original.telegram && (
+											<Telegram
+												className="h-2.5 text-white/40 hover:text-white"
+												onClick={withStopPropagation(() => {
+													window.open(row.original.telegram, "_blank");
+												})}
+											/>
+										)}
+										{row.original.website && (
+											<Website
+												className="h-2.5 text-white/40 hover:text-white"
+												onClick={withStopPropagation(() => {
+													window.open(row.original.website, "_blank");
+												})}
+											/>
+										)}
 									</div>
-								</TooltipTrigger>
-								<TooltipContent className="bg-white px-1 py-1 text-xs font-semibold text-black">
-									{row.original.market}
-								</TooltipContent>
-							</Tooltip>
-						</TooltipProvider>
-						<div className="flex flex-col gap-1.5">
-							<div className="flex items-center gap-1">
-								<span className="text-sm leading-4 font-medium text-white">
-									{row.original.ticker}
-								</span>
-								<div className="ml-3 flex cursor-pointer items-center gap-x-2.5">
-									<X
-										className="h-2.5 text-white/40 hover:text-white"
-										onClick={withStopPropagation(() => {})}
-									/>
-									<Telegram
-										className="h-2.5 text-white/40 hover:text-white"
-										onClick={withStopPropagation(() => {})}
-									/>
-									<Website
-										className="h-2.5 text-white/40 hover:text-white"
-										onClick={withStopPropagation(() => {})}
-									/>
+								</div>
+								<div className="text-xs leading-4 font-light text-white/60">
+									{row.original.name}
 								</div>
 							</div>
-							<div className="text-xs leading-4 font-light text-white/60">
-								{row.original.name}
-							</div>
 						</div>
-					</div>
-				),
+					);
+				},
 				size: 250,
 				enablePinning: true,
 			}),
@@ -139,27 +161,32 @@ export default function MemeList() {
 				size: 120,
 			}),
 			// Price column
-			columnHelper.accessor("fee", {
+			columnHelper.accessor("price", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">Price</span>
 						<SortsIcon />
 					</div>
 				),
-				cell: (info) => (
-					<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
-						<span className="text-sm leading-4 font-medium text-white">
-							${0.5}
-						</span>
-						<span className="text-xs leading-4 font-light text-white/60">
-							{info.getValue()} ICP
-						</span>
-					</div>
-				),
-				size: 120,
+				cell: (info) => {
+					const raw = info.getValue();
+					const priceInIcp = BigNumber(1).div(BigNumber(raw));
+					const priceInUsd = priceInIcp.times(icpPrice ?? 0);
+					return (
+						<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
+							<span className="text-sm leading-4 font-medium text-white">
+								${formatNumberSmart(priceInUsd)}
+							</span>
+							<span className="text-xs leading-4 font-light text-white/60">
+								{formatNumberSmart(priceInIcp)} ICP
+							</span>
+						</div>
+					);
+				},
+				size: 140,
 			}),
 			// Liquidity column
-			columnHelper.accessor("holders", {
+			columnHelper.accessor("market_cap_token", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">
@@ -171,14 +198,20 @@ export default function MemeList() {
 				cell: (info) => (
 					<div className="flex h-full w-full items-center gap-1">
 						<span className="text-sm leading-4 font-medium text-white">
-							{info.getValue()}
+							$
+							{getTokenUsdValueTotal(
+								{
+									amount: BigInt(info.getValue()),
+								},
+								icpPrice ?? 0
+							)}
 						</span>
 					</div>
 				),
 				size: 120,
 			}),
 			// Market Cap column
-			columnHelper.accessor("maxTotalSupply", {
+			columnHelper.accessor((row) => row.price, {
 				id: "mc",
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
@@ -186,44 +219,134 @@ export default function MemeList() {
 						<SortsIcon />
 					</div>
 				),
-				cell: (info) => (
-					<div className="flex h-full w-full items-center gap-1">
-						<span className="text-sm leading-4 font-medium text-white">
-							{info.getValue()}
-						</span>
-					</div>
-				),
+				cell: (info) => {
+					const priceInUsd = BigNumber(1)
+						.div(BigNumber(info.row.original.price))
+						.times(icpPrice ?? 0);
+					const mc = BigNumber(1_000_000_000).times(priceInUsd);
+					return (
+						<div className="flex h-full w-full items-center gap-1">
+							<span className="text-sm leading-4 font-medium text-white">
+								${formatNumberSmart(mc)}
+							</span>
+						</div>
+					);
+				},
 				size: 120,
 			}),
-			// Percentage columns
-			// ...percentageKeys.map((key) =>
-			// 	columnHelper.accessor((row) => row.percentages[key], {
-			// 		id: key,
-			// 		header: () => (
-			// 			<div className="group flex cursor-pointer items-center gap-1">
-			// 				<span className="duration-300 group-hover:text-white">{key}</span>
-			// 				<SortsIcon />
-			// 			</div>
-			// 		),
-			// 		cell: (info) => {
-			// 			const value = info.getValue();
-			// 			const isNegative = value?.startsWith("-");
-			// 			return (
-			// 				<div className="flex h-full w-full items-center">
-			// 					<span
-			// 						className={cn(
-			// 							"text-sm leading-4 font-medium",
-			// 							isNegative ? "text-price-negative" : "text-price-positive"
-			// 						)}
-			// 					>
-			// 						{value}
-			// 					</span>
-			// 				</div>
-			// 			);
-			// 		},
-			// 		size: 120,
-			// 	})
-			// ),
+			columnHelper.accessor((row) => row.priceChangeRate5M, {
+				id: "priceChangeRate5M",
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">5m</span>
+						<SortsIcon />
+					</div>
+				),
+				cell: (info) => {
+					const value = info.getValue();
+					const isNull = value === null;
+					const isNegative = !isNull && value < 0;
+					return (
+						<div className="flex h-full w-full items-center">
+							<span
+								className={cn(
+									"text-sm leading-4 font-medium",
+									isNegative ? "text-price-negative" : "text-price-positive",
+									isNull && "text-white/40"
+								)}
+							>
+								{!isNull ? `${value}%` : "--"}
+							</span>
+						</div>
+					);
+				},
+				size: 120,
+			}),
+			columnHelper.accessor((row) => row.priceChangeRate1H, {
+				id: "priceChangeRate1H",
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">1h</span>
+						<SortsIcon />
+					</div>
+				),
+				cell: (info) => {
+					const value = info.getValue();
+					const isNull = value === null;
+					const isNegative = !isNull && value < 0;
+					return (
+						<div className="flex h-full w-full items-center">
+							<span
+								className={cn(
+									"text-sm leading-4 font-medium",
+									isNegative ? "text-price-negative" : "text-price-positive",
+									isNull && "text-white/40"
+								)}
+							>
+								{!isNull ? `${value}%` : "--"}
+							</span>
+						</div>
+					);
+				},
+				size: 120,
+			}),
+
+			columnHelper.accessor((row) => row.priceChangeRate8H, {
+				id: "priceChangeRate8H",
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">8h</span>
+						<SortsIcon />
+					</div>
+				),
+				cell: (info) => {
+					const value = info.getValue();
+					const isNull = value === null;
+					const isNegative = !isNull && value < 0;
+					return (
+						<div className="flex h-full w-full items-center">
+							<span
+								className={cn(
+									"text-sm leading-4 font-medium",
+									isNegative ? "text-price-negative" : "text-price-positive",
+									isNull && "text-white/40"
+								)}
+							>
+								{!isNull ? `${value}%` : "--"}
+							</span>
+						</div>
+					);
+				},
+				size: 120,
+			}),
+			columnHelper.accessor((row) => row.priceChangeRate24H, {
+				id: "priceChangeRate24H",
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">24h</span>
+						<SortsIcon />
+					</div>
+				),
+				cell: (info) => {
+					const value = info.getValue();
+					const isNull = value === null;
+					const isNegative = !isNull && value < 0;
+					return (
+						<div className="flex h-full w-full items-center">
+							<span
+								className={cn(
+									"text-sm leading-4 font-medium",
+									isNegative ? "text-price-negative" : "text-price-positive",
+									isNull && "text-white/40"
+								)}
+							>
+								{!isNull ? `${value}%` : "--"}
+							</span>
+						</div>
+					);
+				},
+				size: 120,
+			}),
 			// Volume column
 			columnHelper.accessor((row) => row.tx_index, {
 				id: "volume",
@@ -280,11 +403,14 @@ export default function MemeList() {
 				enablePinning: true,
 			}),
 		],
-		[buyToken, columnHelper, flashAmount, percentageKeys]
+		[buyToken, columnHelper, flashAmount, flashAmountBigInt, icpPrice]
 	);
-
+	const items = useMemo(
+		() => data?.pages.flatMap((page) => page.items) ?? [],
+		[data]
+	);
 	const table = useReactTable({
-		data: tokenList?.items ?? [],
+		data: items,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		defaultColumn: {
@@ -298,8 +424,6 @@ export default function MemeList() {
 			},
 		},
 	});
-
-	const router = useRouter();
 	const { chain } = useChainStore();
 	return (
 		<div className="bg-gray-760 no-scrollbar h-screen overflow-auto rounded-t-2xl">

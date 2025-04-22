@@ -7,13 +7,24 @@ const getIndexerBaseUrl = () => {
 	}
 	return indexerBaseUrl;
 };
-interface PaginatedData<T> {
+interface PaginatedDataBase {
 	total: number;
 	page: number;
 	pageSize: number;
 	totalPages: number;
-	items: Array<T>;
 }
+
+interface PaginatedDataWithItems<T> extends PaginatedDataBase {
+	items: Array<T>;
+	data?: never;
+}
+
+interface PaginatedDataWithData<T> extends PaginatedDataBase {
+	data: Array<T>;
+	items?: never;
+}
+
+// type PaginatedData<T> = PaginatedDataWithItems<T> | PaginatedDataWithData<T>;
 // =============================== Token List ===============================
 
 export type tokenInfo = {
@@ -26,7 +37,7 @@ export type tokenInfo = {
 	creator: string;
 	timestamp: string;
 	market: "ICP";
-	tokenAddress: string;
+	tokenAddress: string; // Meme token address
 	decimals: number;
 	holders: string;
 	fee: string;
@@ -35,16 +46,94 @@ export type tokenInfo = {
 	maxTotalSupply: string;
 	createdAt: unknown;
 	updatedAt: unknown;
+	telegram?: string;
+	website?: string;
+	twitter?: string;
+	process: number;
+	completed: boolean;
+	price: number;
+	priceChangeRate5M: number | null;
+	priceChangeRate1H: number | null;
+	priceChangeRate6H: number | null;
+	priceChangeRate8H: number | null;
+	priceChangeRate24H: number | null;
+	token_reserve: string;
+	meme_token_reserve: string;
+	market_cap_token: string;
+	token1Address: string;
+	token1Name: string;
 };
 
-export const getTokenList = async () => {
+export const getTokenList = async (parameters: {
+	page?: number;
+	pageSize?: number;
+	market?: string;
+}) => {
+	const { page = 1, pageSize = 10, market = "ICP" } = parameters;
+	const queryParameters = new URLSearchParams({
+		page: page.toString(),
+		pageSize: pageSize.toString(),
+		market,
+	});
 	const response = await request<{
-		data: PaginatedData<tokenInfo>;
+		data: PaginatedDataWithItems<tokenInfo>;
 		statusCode: number;
 		message: string;
-	}>(`${getIndexerBaseUrl()}/api/v1/token_info/list`);
+	}>(
+		`${getIndexerBaseUrl()}/api/v1/token_info/list?${queryParameters.toString()}`
+	);
 	if (response.statusCode !== 200) {
 		throw new Error(response.message);
+	}
+	return response.data;
+};
+
+// =============================== transaction history ===============================
+
+export type Transaction = {
+	id: string;
+	tradeType: "buy" | "sell";
+	token0: string;
+	token1: string;
+	token0Amount: string;
+	token1Amount: string;
+	token0Reserve: string;
+	token1Reserve: string;
+	token0Price: string;
+	token1Price: string;
+	token0Volume: string;
+	token1Volume: string;
+	tradeTs: string;
+	tx_index: number;
+	createdAt: unknown;
+	updatedAt: unknown;
+};
+
+export const getTokenTransactionList = async (parameters: {
+	token0: string;
+	token1: string;
+	page?: number;
+	pageSize?: number;
+}) => {
+	const { token0, token1, page = 1, pageSize = 10 } = parameters;
+	const queryParameters = new URLSearchParams({
+		page: page.toString(),
+		pageSize: pageSize.toString(),
+		token0: token0.toString(),
+		token1: token1,
+	});
+	const response = await request<{
+		data: PaginatedDataWithData<Transaction>;
+		statusCode: number;
+		message: string;
+	}>(
+		`${getIndexerBaseUrl()}/api/v1/token_trade/list?${queryParameters.toString()}`
+	);
+
+	if (response.statusCode !== 200) {
+		throw new Error(
+			`Failed to fetch token trade list: ${response.message} (Status: ${response.statusCode})`
+		);
 	}
 	return response.data;
 };

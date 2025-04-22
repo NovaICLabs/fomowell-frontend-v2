@@ -115,10 +115,13 @@ export default function Bottom() {
 				<div className="flex w-full items-center justify-between">
 					<span className="text-gray-280 text-sm">bonding curve progress:</span>
 					<span className="text-yellow-500">
-						({formatNumberSmart(memeTokenInfo?.progress ?? "0")}%)
+						({formatNumberSmart((memeTokenInfo?.progress ?? 0) * 100)}%)
 					</span>
 				</div>
-				<Progress className="mt-4" value={memeTokenInfo?.progress ?? 0} />
+				<Progress
+					className="mt-4"
+					value={(memeTokenInfo?.progress ?? 0) * 100}
+				/>
 			</div>
 			<div className="bg-gray-860 flex flex-col gap-5.5 rounded-[12px] px-4.5 py-5">
 				<div className="flex items-center justify-between">

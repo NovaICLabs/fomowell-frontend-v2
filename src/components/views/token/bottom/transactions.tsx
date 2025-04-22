@@ -1,419 +1,40 @@
 import { useMemo } from "react";
 
+import { useParams } from "@tanstack/react-router";
 import {
 	createColumnHelper,
 	flexRender,
 	getCoreRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
+import { BigNumber } from "bignumber.js";
 
+import { getICPCanisterToken } from "@/canisters/icrc3/specials";
+import { useICPPrice } from "@/hooks/apis/coingecko";
+import { useInfiniteTokenTransactionsHistory } from "@/hooks/apis/indexer";
 import { getAvatar } from "@/lib/common/avatar";
-import { exampleImage } from "@/lib/common/img";
+import {
+	formatNumberSmart,
+	formatUnits,
+	getTokenUsdValueTotal,
+} from "@/lib/common/number";
+import { fromNow } from "@/lib/common/time";
+import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
-type Transaction = {
-	id: string;
-	maker: string;
-	type: "Buy" | "Sell";
-	price: string;
-	amount: string;
-	total: string;
-	fee: string;
-	time: string;
-};
+
+import type { Transaction } from "@/apis/indexer";
 
 export default function Transactions() {
-	const data = useMemo<Array<Transaction>>(
-		() => [
-			{
-				id: "1",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$26.71",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "6m ago",
-			},
-			{
-				id: "2",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$6.83",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "5m ago",
-			},
-			{
-				id: "3",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$95.74",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "4",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$98.50",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "5",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$7.43",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "6",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$68.83",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "7",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$67.96",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "5m ago",
-			},
-			{
-				id: "8",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$77.41",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "6m ago",
-			},
-			{
-				id: "3",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$95.74",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "4",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$98.50",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "5",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$7.43",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "6",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$68.83",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "7",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$67.96",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "5m ago",
-			},
-			{
-				id: "8",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$77.41",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "6m ago",
-			},
-			{
-				id: "3",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$95.74",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "4",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$98.50",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "5",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$7.43",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "6",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$68.83",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "7",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$67.96",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "5m ago",
-			},
-			{
-				id: "8",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$77.41",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "6m ago",
-			},
-			{
-				id: "3",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$95.74",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "4",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$98.50",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "5",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$7.43",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "6",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$68.83",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "7",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$67.96",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "5m ago",
-			},
-			{
-				id: "8",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$77.41",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "6m ago",
-			},
-			{
-				id: "3",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$95.74",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "4",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$98.50",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "5",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$7.43",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "6",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$68.83",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "7",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$67.96",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "5m ago",
-			},
-			{
-				id: "8",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$77.41",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "6m ago",
-			},
-			{
-				id: "3",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$95.74",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "4",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$98.50",
-				amount: "9.4K",
-				total: "$240,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "5",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$7.43",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "6",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$68.83",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "4m ago",
-			},
-			{
-				id: "7",
-				maker: "Star7p...6op",
-				type: "Sell",
-				price: "$67.96",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "5m ago",
-			},
-			{
-				id: "8",
-				maker: "Star7p...6op",
-				type: "Buy",
-				price: "$77.41",
-				amount: "9.4K",
-				total: "$250,059.00",
-				fee: "0.00001 BTC",
-				time: "6m ago",
-			},
-		],
-		[]
-	);
-
+	const { id } = useParams({ from: "/icp/token/$id" });
+	const { data } = useInfiniteTokenTransactionsHistory({
+		token0: id,
+	});
 	const columnHelper = createColumnHelper<Transaction>();
-
+	const { data: icpPrice } = useICPPrice();
 	const columns = useMemo(
 		() => [
 			// Maker column
-			columnHelper.accessor("maker", {
+			columnHelper.accessor("token1", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">Maker</span>
@@ -425,10 +46,10 @@ export default function Transactions() {
 							<img
 								alt=""
 								className="h-4 w-4 rounded-full"
-								src={getAvatar(exampleImage)}
+								src={getAvatar(info.getValue())}
 							/>
 							<span className="text-center text-sm font-medium text-white/60">
-								{info.getValue()}
+								{truncatePrincipal(info.getValue())}
 							</span>
 						</div>
 					</div>
@@ -436,7 +57,7 @@ export default function Transactions() {
 				size: 150,
 			}),
 			// Type column
-			columnHelper.accessor("type", {
+			columnHelper.accessor("tradeType", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">Type</span>
@@ -444,12 +65,12 @@ export default function Transactions() {
 				),
 				cell: (info) => {
 					const value = info.getValue();
-					const isSell = value === "Sell";
+					const isSell = value === "sell";
 					return (
 						<div className="flex h-full w-full items-center">
 							<span
 								className={cn(
-									"text-sm leading-4",
+									"text-sm leading-4 capitalize",
 									isSell ? "text-price-negative" : "text-price-positive"
 								)}
 							>
@@ -461,7 +82,7 @@ export default function Transactions() {
 				size: 70,
 			}),
 			// Amount column
-			columnHelper.accessor("amount", {
+			columnHelper.accessor("token0Amount", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">Amount</span>
@@ -470,14 +91,14 @@ export default function Transactions() {
 				cell: (info) => (
 					<div className="flex h-full w-full items-center">
 						<span className="text-sm leading-4 text-white/60">
-							{info.getValue()}
+							{formatNumberSmart(formatUnits(info.getValue()), true)}
 						</span>
 					</div>
 				),
 				size: 100,
 			}),
 			// Total USD column
-			columnHelper.accessor("total", {
+			columnHelper.accessor("token1Amount", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">
@@ -490,18 +111,23 @@ export default function Transactions() {
 						<span
 							className={cn(
 								"text-sm leading-4",
-								info.row.original.type === "Sell"
+								info.row.original.tradeType === "sell"
 									? "text-price-negative"
 									: "text-price-positive"
 							)}
 						>
-							{info.getValue()}
+							{getTokenUsdValueTotal(
+								{
+									amount: BigInt(info.getValue()),
+								},
+								icpPrice ?? 0
+							)}
 						</span>
 					</div>
 				),
 				size: 120,
 			}), // Price column
-			columnHelper.accessor("price", {
+			columnHelper.accessor("token1Price", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">Price</span>
@@ -510,25 +136,28 @@ export default function Transactions() {
 				cell: (info) => (
 					<div className="flex h-full w-full items-center">
 						<span className="text-sm leading-4 text-white/60">
-							{100} Sats (
 							<span
 								className={cn(
 									"text-sm leading-4",
-									info.row.original.type === "Sell"
+									info.row.original.tradeType === "sell"
 										? "text-price-negative"
 										: "text-price-positive"
 								)}
 							>
-								{info.getValue()}
+								{formatNumberSmart(
+									BigNumber(1)
+										.times(10 ** getICPCanisterToken().decimals)
+										.div(BigNumber(info.getValue()))
+										.toString()
+								)}
 							</span>
-							)
 						</span>
 					</div>
 				),
 				size: 150,
 			}),
 			// Fee column
-			columnHelper.accessor("fee", {
+			columnHelper.accessor("token1Volume", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">Fee</span>
@@ -544,30 +173,29 @@ export default function Transactions() {
 				size: 120,
 			}),
 			// Time column
-			columnHelper.accessor("time", {
+			columnHelper.accessor("tradeTs", {
 				header: () => <div className="w-full text-end">Time</div>,
 				cell: (info) => (
 					<div className="flex h-full w-full items-center">
 						<div className="w-full text-end text-sm leading-4 text-white/60">
-							{info.getValue()}
+							{fromNow(BigInt(info.getValue()))}
 						</div>
 					</div>
 				),
 				size: 120,
 			}),
 		],
-		[columnHelper]
+		[columnHelper, icpPrice]
 	);
 
 	const table = useReactTable({
-		data,
+		data: data?.pages.flatMap((page) => page.data) ?? [],
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		defaultColumn: {
 			size: 120,
 		},
 	});
-
 	return (
 		<div className="no-scrollbar h-screen overflow-auto">
 			<table className="w-full" style={{ minWidth: "max-content" }}>
