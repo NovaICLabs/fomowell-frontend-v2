@@ -84,8 +84,12 @@ export default function Assets({ pid }: { pid: string }) {
 						</div>
 					),
 					cell: (info) => (
-						<div className="flex h-full w-full items-center gap-1">
-							<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
+						<div className="flex h-full w-full items-center gap-2.5">
+							<img
+								alt={"icp-logo"}
+								className="h-[38px] w-[38px]"
+								src={`/svgs/chains/icp.svg`}
+							/>
 							<div className="flex flex-col">
 								<span className="text-sm font-medium text-white">
 									{info.getValue().symbol}
@@ -173,7 +177,7 @@ export default function Assets({ pid }: { pid: string }) {
 			// Action column (Transfer)
 			columnHelper.display({
 				id: "action",
-				header: () => <div className="w-full text-end">Action</div>, // Empty header or text like 'Action'
+				header: () => <div className="w-full text-end"></div>, // Empty header or text like 'Action'
 				cell: () => (
 					<div className={cn("ml-auto", !isSelf && "hidden")}>
 						<TransferButton

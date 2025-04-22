@@ -25,9 +25,9 @@ export class PlugConnector implements ConnectorAbstract {
 
 	public type = "PLUG" as const;
 
-	public getPrincipal = () => {
+	public getPrincipal() {
 		return this.principal;
-	};
+	}
 
 	public constructor(config: WalletConnectorConfig) {
 		this.config = {
@@ -38,35 +38,50 @@ export class PlugConnector implements ConnectorAbstract {
 		};
 	}
 
-	public init = async () => {
+	public async init() {
 		return true;
-	};
+	}
 
-	public createActor = async <Service>({
+	public async createActor<Service>({
 		canisterId,
 		interfaceFactory,
-	}: CreateActorArgs): Promise<ActorSubclass<Service> | undefined> => {
+	}: CreateActorArgs): Promise<ActorSubclass<Service> | undefined> {
 		return await (window as any).ic.plug.createActor({
 			canisterId,
 			interfaceFactory,
 		});
-	};
+	}
 
-	public isConnected = async () => {
-		const isUnLocked = false; // Replace with proper implementation
-
+	public async isConnected() {
+		const plug = (window as any).ic.plug;
+		const isUnLocked = plug.isWalletLocked; // Replace with proper implementation
 		if (typeof isUnLocked === "boolean" && !isUnLocked) {
-			return false;
+			this.principal = plug.principalId;
+			return true;
 		}
-
 		if ((window as any).ic && (window as any).ic.plug) {
-			return await (window as any).ic.plug.isConnected();
+			let returned = false;
+			const connected = await Promise.race<boolean>([
+				(window as any).ic.plug.isConnected().then((connected: boolean) => {
+					if (returned && connected) location.reload();
+					return connected ? true : false;
+				}),
+				new Promise((resolve) => {
+					setTimeout(() => {
+						returned = true;
+						resolve(false);
+					}, 2000);
+				}),
+			]);
+			if (connected) {
+				this.principal = plug.principalId;
+				return true;
+			}
 		}
-
 		return false;
-	};
+	}
 
-	public connect = async () => {
+	public async connect() {
 		// Fix tracing message if plug is uninstalled but still connect to
 		if (!(window as any).ic?.plug) {
 			return false;
@@ -90,17 +105,17 @@ export class PlugConnector implements ConnectorAbstract {
 		}
 
 		return true;
-	};
+	}
 
-	public disconnect = async () => {
+	public async disconnect() {
 		try {
 			await (window as any).ic.plug.disconnect();
 		} catch (error) {
 			console.error(error);
 		}
-	};
+	}
 
-	public expired = async () => {
+	public async expired() {
 		return false;
-	};
+	}
 }

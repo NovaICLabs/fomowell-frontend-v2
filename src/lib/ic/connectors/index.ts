@@ -79,14 +79,15 @@ export class WalletConnector {
 		const connected = await this.connector.connect();
 
 		window.icConnector = this.connector;
-		const principal = window.icConnector.getPrincipal();
+		const principal = this.connector.getPrincipal();
 		return { connected, principal };
 	}
 
 	public async isConnected() {
-		const connected = await this.connector?.isConnected();
-		const principal = this.connector?.getPrincipal();
-		return { connected, principal };
+			const connected = await this.connector?.isConnected();
+
+			const principal = this.connector?.getPrincipal();
+			return { connected, principal };
 	}
 
 	public async createActor<Service>(

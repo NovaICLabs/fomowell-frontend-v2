@@ -4,8 +4,8 @@
     "": {
       "name": "vite-react-boilerplate",
       "dependencies": {
-        "@dfinity/agent": "^2.4.1",
-        "@dfinity/auth-client": "^2.4.1",
+        "@dfinity/agent": "^2.1.2",
+        "@dfinity/auth-client": "^1.3.0",
         "@dfinity/oisy-wallet-signer": "^0.1.8",
         "@dfinity/principal": "^2.4.0",
         "@hookform/resolvers": "^5.0.1",
@@ -263,7 +263,7 @@
 
     "@dfinity/agent": ["@dfinity/agent@2.4.1", "", { "dependencies": { "@noble/curves": "^1.4.0", "@noble/hashes": "^1.3.1", "base64-arraybuffer": "^0.2.0", "borc": "^2.1.1", "buffer": "^6.0.3", "simple-cbor": "^0.4.1" }, "peerDependencies": { "@dfinity/candid": "^2.4.1", "@dfinity/principal": "^2.4.1" } }, "sha512-IczFFOUDGfMTdQ83yiCvGtvHr1IIB80lWBP0ZYRLogs6NVt8t6HYcMlu1sgT+9VivhT7iwX4pktPFxxOkO3COw=="],
 
-    "@dfinity/auth-client": ["@dfinity/auth-client@2.4.1", "", { "dependencies": { "idb": "^7.0.2" }, "peerDependencies": { "@dfinity/agent": "^2.4.1", "@dfinity/identity": "^2.4.1", "@dfinity/principal": "^2.4.1" } }, "sha512-osKgBWwMsMyQUNYhFxPqj14R2RhgdYVD0PoTGDig2sl1Hy4mQzPalCWbkW9R50vsZGmoMi/uiopvnXy036EyqA=="],
+    "@dfinity/auth-client": ["@dfinity/auth-client@1.4.0", "", { "dependencies": { "idb": "^7.0.2" }, "peerDependencies": { "@dfinity/agent": "^1.4.0", "@dfinity/identity": "^1.4.0", "@dfinity/principal": "^1.4.0" } }, "sha512-9ImeOAw61SQvHJ+w4RHIuKKUL2xAQDLoce+JhmH3DbJuVvNbZIM5xMW8gHTZVlXaMw3Vhip+a1DPJIGy95r9pA=="],
 
     "@dfinity/candid": ["@dfinity/candid@2.4.0", "", { "peerDependencies": { "@dfinity/principal": "^2.4.0" } }, "sha512-ZVuBIFlWOZOvEZaLtBKE2666rab32XSdHo1BtzdDy36NMvQbRXkZRbIEd7xoZXRud2wK7pk5cNsZULnXghAORg=="],
 
