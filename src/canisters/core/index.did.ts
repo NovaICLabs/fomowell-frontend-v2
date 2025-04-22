@@ -8,13 +8,6 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		token: IDL.Principal,
 		amount: IDL.Nat,
 	});
-	const InitArg = IDL.Record({
-		fee_receiver: Account,
-		token_launch_tread_hold: IDL.Vec(TokenAmount),
-		create_token_fee: IDL.Vec(TokenAmount),
-		maintenance: IDL.Bool,
-		fee_percentage: IDL.Opt(IDL.Float32),
-	});
 	const BuyArgs = IDL.Record({
 		subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
 		amount_in: IDL.Nat,
