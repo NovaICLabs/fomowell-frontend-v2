@@ -44,6 +44,7 @@ export const formatNumberSmart = (
 				.replace(/\.?0+$/, "")}K`;
 		}
 	}
+
 	if (bn.abs().isLessThan(1)) {
 		const absString = bn.abs().toFixed();
 
@@ -73,7 +74,6 @@ export const formatNumberSmart = (
 			return formattedDecimal.replace(/(\.\d*?[1-9])0+$|\.0*$/, "$1");
 		}
 	}
-
 	return bn.toFormat(2).replace(/(\.\d*?[1-9])0+$|\.0*$/, "$1");
 };
 

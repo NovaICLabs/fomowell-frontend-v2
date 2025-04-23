@@ -167,6 +167,39 @@ export const getCurrentPrice = async (canisterId: string, tokenId: bigint) => {
 	});
 };
 
+export const DEFAULT_HOLDERS_PAGE_SIZE = 10;
+// get holders
+export const getHolders = async (
+	canisterId: string,
+	tokenId: bigint,
+	args: {
+		page: number;
+		pageSize?: number;
+	}
+) => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+	const actor = await createActor<_SERVICE>({
+		idlFactory,
+		canisterId,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { page, pageSize } = args;
+	const result = await actor.query_token_holders(
+		tokenId,
+		BigInt(page),
+		BigInt(pageSize ?? DEFAULT_HOLDERS_PAGE_SIZE)
+	);
+	return {
+		data: result[0],
+		total: result[1],
+	};
+};
+
 export type CreatedToken = {
 	id: string;
 	name: string;

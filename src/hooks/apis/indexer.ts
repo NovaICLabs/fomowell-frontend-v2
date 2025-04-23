@@ -32,7 +32,7 @@ export const useInfiniteTokenTransactionsHistory = (parameters: {
 	token0: string;
 }) => {
 	return useInfiniteQuery({
-		queryKey: ["ic-core", "tokenTransactionList"],
+		queryKey: ["ic-core", "tokenTransactionList", parameters.token0],
 		queryFn: ({ pageParam: pageParameter = 1 }) =>
 			getTokenTransactionList({
 				...parameters,

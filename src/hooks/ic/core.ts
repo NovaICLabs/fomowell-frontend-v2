@@ -9,11 +9,13 @@ import {
 	calculateSell,
 	createMemeToken,
 	type CreateMemeTokenArgs,
+	DEFAULT_HOLDERS_PAGE_SIZE,
 	deposit,
 	type DepositArgs,
 	getChainICCoreCanisterId,
 	getCoreTokenBalance,
 	getCurrentPrice,
+	getHolders,
 	getMemeToken,
 	sell,
 	type SellArgs,
@@ -142,7 +144,28 @@ export const useCurrentPrice = (args: { id: number }) => {
 		},
 	});
 };
-
+export const useTokenHolders = (args: {
+	id: number;
+	page: number;
+	pageSize?: number;
+}) => {
+	const pageSize = args.pageSize ?? DEFAULT_HOLDERS_PAGE_SIZE;
+	return useQuery({
+		queryKey: [
+			"ic-core",
+			"holders",
+			args.id.toString(),
+			args.page.toString(),
+			pageSize.toString(),
+		],
+		queryFn: () =>
+			getHolders(getChainICCoreCanisterId().toText(), BigInt(args.id), {
+				page: args.page,
+				pageSize,
+			}),
+		enabled: !!args.id && !!args.page,
+	});
+};
 export const useMultipleCurrentPrice = (args: { ids: Array<string> | [] }) => {
 	return useQuery({
 		queryKey: ["ic-core", "current-price", args.ids.toString()],

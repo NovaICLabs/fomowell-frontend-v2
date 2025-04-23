@@ -1,5 +1,6 @@
 import { Link, useParams } from "@tanstack/react-router";
 
+import FormattedSmallNumber from "@/components/common/short-zero";
 import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
 import X from "@/components/icons/media/x";
@@ -81,9 +82,13 @@ export default function HeadInfo() {
 					{isLoadingCurrentPrice ? (
 						<Skeleton className="h-6 w-16" />
 					) : (
-						<span className="text-price-positive font-semibold">
-							{currentPrice?.formattedPerPayToken} ICP
-						</span>
+						<div className="text-price-positive flex items-center gap-1 font-semibold">
+							<FormattedSmallNumber
+								className=""
+								number={currentPrice?.formattedPerPayToken ?? "0"}
+							></FormattedSmallNumber>{" "}
+							ICP
+						</div>
 					)}
 					<span className="flex items-center gap-1 text-sm">
 						<span className="text-white/40">24h</span>

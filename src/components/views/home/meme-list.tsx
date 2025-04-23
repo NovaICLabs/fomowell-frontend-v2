@@ -12,6 +12,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import BigNumber from "bignumber.js";
 import { motion } from "framer-motion";
 
+import FormattedSmallNumber from "@/components/common/short-zero";
 import SortsIcon from "@/components/icons/common/sorts";
 import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
@@ -295,13 +296,19 @@ export default function MemeList() {
 						raw === null ? BigNumber(0) : BigNumber(1).div(BigNumber(raw));
 					const priceInUsd = priceInIcp.times(icpPrice ?? 0);
 					return (
-						<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
-							<span className="text-sm leading-4 font-medium text-white">
-								${raw === null ? "--" : formatNumberSmart(priceInUsd)}
-							</span>
-							<span className="text-xs leading-4 font-light text-white/60">
-								{raw === null ? "--" : formatNumberSmart(priceInIcp)} ICP
-							</span>
+						<div className="flex h-full w-full flex-col items-start justify-center">
+							<div className="flex items-center text-sm font-medium text-white">
+								<span>$</span>
+								{raw === null ? (
+									"--"
+								) : (
+									<FormattedSmallNumber number={priceInUsd} />
+								)}
+							</div>
+							<div className="flex items-center gap-x-0.5 text-xs font-light text-white/60">
+								<FormattedSmallNumber number={priceInIcp} />
+								<span>ICP</span>
+							</div>
 						</div>
 					);
 				},
@@ -655,6 +662,7 @@ export default function MemeList() {
 			direction,
 			flashAmount,
 			flashAmountBigInt,
+			handleSort,
 			icpPrice,
 			router,
 			search,
@@ -774,7 +782,6 @@ export default function MemeList() {
 								const isPinned =
 									header.column.getIsPinned() === "left" ||
 									header.column.getIsPinned() === "right";
-
 								return (
 									<th
 										key={header.id}

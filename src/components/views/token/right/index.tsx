@@ -11,6 +11,7 @@ import { formatNumberSmart, formatUnits } from "@/lib/common/number";
 import { fromNow } from "@/lib/common/time";
 import { cn } from "@/lib/utils";
 
+import Holders from "./holders";
 import Liquidity from "./liquidity";
 import Trade from "./trade";
 const tabs = ["Trade", "Liquidity"];
@@ -175,13 +176,8 @@ export default function Bottom() {
 						</span>
 					</div>
 				</div>
-				<div className="flex items-center justify-between">
-					<span className="text-sm text-white/40">Holders</span>
-					<div className="flex items-center gap-1 text-sm text-white">
-						<span className="text-white">12k</span>
-					</div>
-				</div>
 			</div>
+			<Holders />
 		</div>
 	);
 }
