@@ -64,28 +64,39 @@ export type tokenInfo = {
 	token1Name: string;
 	recentTradeTs: string | null;
 };
+export const tokenListSortOptions = [
+	"popularity_5m",
+	"popularity_1h",
+	"popularity_6h",
+	"popularity_24h",
+	"recent",
+	"new",
+	"completing",
+	"completed",
+] as const;
 
-export const getTokenList = async (parameters: {
+export type TokenListSortOption = (typeof tokenListSortOptions)[number];
+
+export type TokenListParameters = {
 	page?: number;
 	pageSize?: number;
 	name?: string;
 	ticker?: string;
 	market?: string;
-	sort?:
-		| "popularity_5m"
-		| "popularity_1h"
-		| "popularity_6h"
-		| "popularity_24h"
-		| "recent"
-		| "new"
-		| "completing"
-		| "completed";
-}) => {
-	const { page = 1, pageSize = 10, market = "ICP" } = parameters;
+	sort?: TokenListSortOption;
+};
+export const getTokenList = async (parameters: TokenListParameters) => {
+	const {
+		page = 1,
+		pageSize = 10,
+		market = "ICP",
+		sort = "recent",
+	} = parameters;
 	const queryParameters = new URLSearchParams({
 		page: page.toString(),
 		pageSize: pageSize.toString(),
 		market,
+		sort,
 	});
 	const response = await request<{
 		data: PaginatedDataWithData<tokenInfo>;

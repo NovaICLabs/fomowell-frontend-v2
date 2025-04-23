@@ -1,16 +1,16 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-import { getTokenList, getTokenTransactionList } from "@/apis/indexer";
+import {
+	getTokenList,
+	getTokenTransactionList,
+	type TokenListParameters,
+} from "@/apis/indexer";
 import { getICPCanisterId } from "@/canisters/icrc3";
 
-export const useInfiniteTokenList = () => {
+export const useInfiniteTokenList = (parameters: TokenListParameters) => {
 	return useInfiniteQuery({
-		queryKey: ["ic-core", "tokenList"],
-		queryFn: ({ pageParam: pageParameter = 1 }) =>
-			getTokenList({
-				page: pageParameter,
-				pageSize: 16,
-			}),
+		queryKey: ["ic-core", "tokenList", parameters.sort],
+		queryFn: () => getTokenList(parameters),
 		getNextPageParam: (lastPage, pages) => {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},

@@ -109,6 +109,25 @@
 
 	--color-price-positive: var(--price-positive);
 	--color-price-negative: var(--price-negative);
+
+	--animate-flash: yellow-flash 1.5s ease-out forwards;
+	@keyframes yellow-flash {
+		0%,
+		20%,
+		40%,
+		100% {
+			background-color: transparent;
+		}
+		10%,
+		30% {
+			/* Brighter, more opaque flash */
+			background-color: color-mix(
+				in srgb,
+				var(--color-yellow-500) 70%,
+				transparent
+			);
+		}
+	}
 }
 
 /*

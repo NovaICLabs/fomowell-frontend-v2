@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useRouter } from "@tanstack/react-router";
 import {
@@ -16,6 +16,7 @@ import Website from "@/components/icons/media/website";
 import X from "@/components/icons/media/x";
 import Star from "@/components/icons/star";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
 	Tooltip,
 	TooltipContent,
@@ -38,17 +39,31 @@ import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
 import { useQuickBuyStore } from "@/store/quick-buy";
 
-import type { tokenInfo } from "@/apis/indexer";
+import type { tokenInfo, TokenListSortOption } from "@/apis/indexer";
 
-export default function MemeList() {
-	const { data, hasNextPage, fetchNextPage, isFetching } =
-		useInfiniteTokenList();
+const TableItemsSkeleton = () => {
+	return (
+		<div className="flex h-18 w-full items-center justify-center">
+			<Skeleton className="h-18 w-full" />
+		</div>
+	);
+};
+
+export default function MemeList({ sort }: { sort: TokenListSortOption }) {
+	const { data, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } =
+		useInfiniteTokenList({ sort, pageSize: 16 });
 	const router = useRouter();
 
 	const columnHelper = createColumnHelper<tokenInfo>();
 
 	const { mutateAsync: buyToken } = useBuy();
 	const { amount: flashAmount } = useQuickBuyStore();
+
+	const [flashingRows, setFlashingRows] = useState<Set<string>>(new Set());
+	const previousRecentTradeTsRef = useRef<Map<string, string | null>>(
+		new Map()
+	);
+	const isInitialized = useRef(false);
 
 	const flashAmountBigInt = useMemo(() => {
 		if (flashAmount === "") {
@@ -57,6 +72,62 @@ export default function MemeList() {
 		return BigInt(parseUnits(flashAmount, 8));
 	}, [flashAmount]);
 	const { data: icpPrice } = useICPPrice();
+
+	const items = useMemo(
+		() => data?.pages.flatMap((page) => page.data) ?? [],
+		[data]
+	);
+
+	// Effect to detect changes in recentTradeTs and trigger flashing
+	useEffect(() => {
+		const currentRecentTradeTs = new Map<string, string | null>();
+		const newlyFlashed = new Set<string>();
+
+		items.forEach((item) => {
+			const id = item.memeTokenId.toString();
+			const previousTs = previousRecentTradeTsRef.current.get(id);
+			const currentTs = item.recentTradeTs; // Assuming this field exists
+			currentRecentTradeTs.set(id, currentTs); // Keep track of current Ts for next render
+
+			// Only flash if initialized, item existed before, has a current Ts, and Ts changed
+			if (
+				isInitialized.current && // Don't flash on first load
+				previousTs !== undefined && // Item existed in the previous state
+				currentTs !== null && // Item has a valid trade timestamp now
+				previousTs !== currentTs // The timestamp actually changed
+			) {
+				newlyFlashed.add(id);
+			}
+		});
+		console.debug("🚀 ~ useEffect ~ newlyFlashed:", newlyFlashed);
+		if (newlyFlashed.size > 0) {
+			setFlashingRows((previous) => {
+				const updated = new Set(previous);
+				newlyFlashed.forEach((id) => updated.add(id));
+				return updated;
+			});
+
+			// Set timers to remove the flash effect after animation duration
+			newlyFlashed.forEach((id) => {
+				setTimeout(() => {
+					setFlashingRows((previous) => {
+						const updated = new Set(previous);
+						updated.delete(id);
+						return updated;
+					});
+				}, 800); // Match animation duration (0.8s)
+			});
+		}
+
+		// Update the ref with the current timestamps for the next comparison
+		previousRecentTradeTsRef.current = currentRecentTradeTs;
+
+		// Mark as initialized after the first run
+		if (!isInitialized.current) {
+			isInitialized.current = true;
+		}
+	}, [items]); // Rerun this effect when items data changes
+
 	// Use useMemo to define columns to avoid re-rendering issues
 	const columns = useMemo(
 		() => [
@@ -403,20 +474,24 @@ export default function MemeList() {
 						<span className="text-right">Quick buy</span>
 					</div>
 				),
-				cell: () => (
+				cell: (info) => (
 					<div className="ml-auto flex items-center justify-end pr-2">
 						<Button
 							className="hover:bg-gray-710 h-9 w-[63px] rounded-full bg-transparent text-xs text-white"
 							onClick={withStopPropagation(() => {
-								showToast("loading", "Buying token(id:6)...");
+								const tokenId = info.row.original.memeTokenId.toString();
+								showToast(
+									"loading",
+									`Buying token($${info.row.original.ticker.toLocaleUpperCase()})...`
+								);
 								void buyToken({
 									amount: flashAmountBigInt,
-									id: 4n,
+									id: BigInt(tokenId),
 									slippage: 100,
 								}).then(() => {
 									showToast(
 										"success",
-										`${formatNumberSmart(flashAmount)} tokens(id:${7}) received!`
+										`${formatNumberSmart(flashAmount)} $${info.row.original.ticker.toLocaleUpperCase()} received!`
 									);
 								});
 							})}
@@ -431,10 +506,6 @@ export default function MemeList() {
 			}),
 		],
 		[buyToken, columnHelper, flashAmount, flashAmountBigInt, icpPrice]
-	);
-	const items = useMemo(
-		() => data?.pages.flatMap((page) => page.data) ?? [],
-		[data]
 	);
 
 	const table = useReactTable({
@@ -463,111 +534,137 @@ export default function MemeList() {
 	}, [inView, hasNextPage, fetchNextPage]);
 	return (
 		<div className="bg-gray-760 no-scrollbar h-screen overflow-auto rounded-t-2xl">
-			<table className="w-full min-w-max">
-				<thead className="sticky top-0 z-10">
-					{table.getHeaderGroups().map((headerGroup) => (
-						<tr key={headerGroup.id} className="border-gray-710">
-							{headerGroup.headers.map((header) => {
-								const isPinned =
-									header.column.getIsPinned() === "left" ||
-									header.column.getIsPinned() === "right";
-
-								return (
-									<th
-										key={header.id}
-										className={cn(
-											"bg-gray-760 border-gray-710 border-b p-3 text-left text-xs leading-4 font-medium text-white/40",
-											isPinned && "sticky",
-											header.column.getIsPinned() === "left" && "left-0",
-											header.column.getIsPinned() === "right" && "right-0"
-										)}
-										style={{
-											width: header.getSize(),
-											position: isPinned ? "sticky" : undefined,
-											left:
-												header.column.getIsPinned() === "left"
-													? `${header.getStart("left")}px`
-													: undefined,
-											right:
-												header.column.getIsPinned() === "right"
-													? `0px`
-													: undefined,
-										}}
-									>
-										{flexRender(
-											header.column.columnDef.header,
-											header.getContext()
-										)}
-									</th>
-								);
-							})}
-						</tr>
+			{isLoading ? (
+				<div className="flex w-full flex-col items-center justify-center gap-2 pt-10">
+					{Array.from({ length: 12 }).map((_, index) => (
+						<Skeleton key={index} className="h-18 w-full" />
 					))}
-				</thead>
-				<tbody>
-					{table.getRowModel().rows.map((row) => (
-						<tr
-							key={row.id}
-							className="group hover:bg-gray-750 relative duration-300"
-							onClick={() => {
-								void router.navigate({
-									to: `/${chain}/token/$id`,
-									params: { id: row.original.memeTokenId.toString() },
-								});
-							}}
-						>
-							{row.getVisibleCells().map((cell) => {
-								const isPinned =
-									cell.column.getIsPinned() === "left" ||
-									cell.column.getIsPinned() === "right";
+				</div>
+			) : (
+				<table className="w-full min-w-max">
+					<thead className="sticky top-0 z-10">
+						{table.getHeaderGroups().map((headerGroup) => (
+							<tr key={headerGroup.id} className="border-gray-710">
+								{headerGroup.headers.map((header) => {
+									const isPinned =
+										header.column.getIsPinned() === "left" ||
+										header.column.getIsPinned() === "right";
 
-								return (
-									<td
-										key={cell.id}
-										className={cn(
-											"border-gray-710 h-18 border-b p-0 pt-px text-sm text-white",
-											isPinned && "sticky",
-											cell.column.getIsPinned() === "left" && "left-0",
-											cell.column.getIsPinned() === "right" && "right-0"
-										)}
-										style={{
-											width: cell.column.getSize(),
-											position: isPinned ? "sticky" : undefined,
-											left:
-												cell.column.getIsPinned() === "left"
-													? `${cell.column.getStart("left")}px`
-													: undefined,
-											right:
-												cell.column.getIsPinned() === "right"
-													? `0px`
-													: undefined,
-										}}
-									>
-										<div
+									return (
+										<th
+											key={header.id}
 											className={cn(
-												"flex h-full cursor-pointer items-center p-3",
-												isPinned &&
-													"bg-gray-760 group-hover:bg-gray-750 duration-300"
+												"bg-gray-760 border-gray-710 border-b p-3 text-left text-xs leading-4 font-medium text-white/40",
+												isPinned && "sticky",
+												header.column.getIsPinned() === "left" && "left-0",
+												header.column.getIsPinned() === "right" && "right-0"
 											)}
+											style={{
+												width: header.getSize(),
+												position: isPinned ? "sticky" : undefined,
+												left:
+													header.column.getIsPinned() === "left"
+														? `${header.getStart("left")}px`
+														: undefined,
+												right:
+													header.column.getIsPinned() === "right"
+														? `0px`
+														: undefined,
+											}}
 										>
 											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext()
+												header.column.columnDef.header,
+												header.getContext()
 											)}
-										</div>
-									</td>
-								);
-							})}
-						</tr>
-					))}
-				</tbody>
-			</table>
+										</th>
+									);
+								})}
+							</tr>
+						))}
+					</thead>
+					<tbody>
+						{table.getRowModel().rows.map((row) => {
+							const rowId = row.original.memeTokenId.toString();
+							const isFlashing = flashingRows.has(rowId);
+							return (
+								<tr
+									key={row.id}
+									className={cn(
+										"group hover:bg-gray-750 relative duration-300",
+										isFlashing && "animate-flash"
+									)}
+									onClick={() => {
+										void router.navigate({
+											to: `/${chain}/token/$id`,
+											params: { id: row.original.memeTokenId.toString() },
+										});
+									}}
+								>
+									{row.getVisibleCells().map((cell) => {
+										const isPinned =
+											cell.column.getIsPinned() === "left" ||
+											cell.column.getIsPinned() === "right";
+
+										return (
+											<td
+												key={cell.id}
+												className={cn(
+													"border-gray-710 h-18 border-b p-0 pt-px text-sm text-white",
+													isPinned && "sticky",
+													cell.column.getIsPinned() === "left" && "left-0",
+													cell.column.getIsPinned() === "right" && "right-0",
+													// Ensure flash background applies correctly to pinned cells if needed
+													isPinned && isFlashing && "bg-inherit" // Inherit flashing background if pinned
+												)}
+												style={{
+													width: cell.column.getSize(),
+													position: isPinned ? "sticky" : undefined,
+													left:
+														cell.column.getIsPinned() === "left"
+															? `${cell.column.getStart("left")}px`
+															: undefined,
+													right:
+														cell.column.getIsPinned() === "right"
+															? `0px`
+															: undefined,
+												}}
+											>
+												<div
+													className={cn(
+														"flex h-full cursor-pointer items-center p-3",
+														isPinned &&
+															"bg-gray-760 group-hover:bg-gray-750 duration-300",
+														// Ensure flash background applies correctly to pinned cells if needed
+														isPinned && isFlashing && "bg-inherit" // Inherit flashing background if pinned
+													)}
+												>
+													{flexRender(
+														cell.column.columnDef.cell,
+														cell.getContext()
+													)}
+												</div>
+											</td>
+										);
+									})}
+								</tr>
+							);
+						})}
+					</tbody>
+				</table>
+			)}
+
 			<div
 				ref={loadMoreRef}
-				className="flex h-15 w-full items-center justify-center"
+				className="sticky right-0 left-0 flex h-20 w-full items-start justify-center"
 			>
-				{!isFetching && !hasNextPage && (
-					<span className="text-sm text-white/40">No more tokens</span>
+				{isFetchingNextPage ? (
+					<TableItemsSkeleton />
+				) : (
+					!hasNextPage && (
+						<div className="flex h-full w-full items-center justify-center">
+							<span className="text-sm text-white/40">No more tokens</span>
+						</div>
+					)
 				)}
 			</div>
 		</div>

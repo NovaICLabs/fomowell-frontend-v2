@@ -21,6 +21,8 @@ import { chains, useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
 import { useQuickBuyStore } from "@/store/quick-buy";
 
+import type { TokenListSortOption } from "@/apis/indexer";
+
 const tabs = ["recent", "new", "completing", "completed", "favorite"] as const;
 type TabType = (typeof tabs)[number];
 // Using Zod to define search parameters schema
@@ -32,12 +34,21 @@ const SearchSchema = z.object({
 // Derived type
 // type SearchParameters = z.infer<typeof SearchSchema>;
 
-const timeOptions = ["5 mins", "1 hrs", "6 hrs", "1 day"] as const;
-type TimeOption = (typeof timeOptions)[number];
+const trendingTimeOptions: Array<{
+	label: string;
+	value: TokenListSortOption;
+}> = [
+	{ label: "5 mins", value: "popularity_5m" },
+	{ label: "1 hrs", value: "popularity_1h" },
+	{ label: "6 hrs", value: "popularity_6h" },
+	{ label: "1 day", value: "popularity_24h" },
+] as const;
+type TrendingTimeOption = (typeof trendingTimeOptions)[number]["label"];
 
 function Home() {
 	const { tab, chain: chainFromSearch, ...search } = Route.useSearch();
-	const [time, setTime] = useState<TimeOption>("5 mins");
+	const [trendingTime, setTrendingTime] =
+		useState<TrendingTimeOption>("5 mins");
 
 	const router = useRouter();
 	const { chain, setChain } = useChainStore();
@@ -54,13 +65,23 @@ function Home() {
 		setSlippage,
 	} = useQuickBuyStore();
 	const { setSlippageOpen } = useDialogStore();
+
+	const [sort, setSort] = useState<TokenListSortOption>("recent");
+
 	return (
 		<div className="mt-4.5 flex flex-col overflow-auto">
 			<div className="sticky top-0 z-10 flex gap-4 text-white">
 				<Select
-					value={time}
-					onValueChange={(value: TimeOption) => {
-						setTime(value);
+					value={trendingTime}
+					onValueChange={(value: TrendingTimeOption) => {
+						setTrendingTime(value);
+						const option = trendingTimeOptions.find(
+							(option) => option.label === value
+						);
+						if (!option) {
+							return;
+						}
+						setSort(option.value);
 					}}
 				>
 					<SelectTrigger className="dark:bg-gray-710 dark:hover:bg-gray-710/80 *:data-[slot=select-value]:bg-gray-760 h-[38px] min-w-[162px] rounded-full border-none px-4 text-sm font-semibold focus-visible:ring-0 *:data-[slot=select-value]:h-6 *:data-[slot=select-value]:rounded-full *:data-[slot=select-value]:px-2 *:data-[slot=select-value]:text-xs *:data-[slot=select-value]:font-medium *:data-[slot=select-value]:text-white/60">
@@ -74,21 +95,22 @@ function Home() {
 						/>
 					</SelectTrigger>
 					<SelectContent className="bg-gray-750 rounded-2xl border-none py-[5px]">
-						{timeOptions.map((tabName) => (
+						{trendingTimeOptions.map((option) => (
 							<SelectItem
-								key={tabName}
+								key={option.label}
 								className="flex h-[42px] cursor-pointer items-center gap-x-1.5 rounded-[14px] text-sm font-semibold hover:bg-gray-700 data-[state=checked]:bg-gray-700"
-								value={tabName}
+								value={option.label}
 							>
-								{tabName}
+								{option.label}
 							</SelectItem>
 						))}
 					</SelectContent>
 				</Select>
 				<Tabs
 					className=""
-					defaultValue="recent"
+					defaultValue={tab ?? "recent"}
 					onValueChange={(value) => {
+						setSort(value as TokenListSortOption);
 						void router.navigate({
 							to: "/",
 							search: { ...search, tab: value as TabType },
@@ -96,15 +118,15 @@ function Home() {
 					}}
 				>
 					<TabsList className="border-gray-650 h-[38px] rounded-full border bg-transparent">
-						{tabs.slice(0, 4).map((tabName) => (
+						{tabs.slice(0, 4).map((tab) => (
 							<TabsTrigger
-								key={tabName}
-								value={tabName}
+								key={tab}
+								value={tab}
 								className={cn(
 									"rounded-full px-4 py-2 text-white/60 capitalize dark:data-[state=active]:bg-white dark:data-[state=active]:text-black"
 								)}
 							>
-								{tabName}
+								{tab}
 							</TabsTrigger>
 						))}
 					</TabsList>
@@ -196,11 +218,7 @@ function Home() {
 				</div>
 			</div>
 			<div className="mt-4 flex flex-col overflow-auto">
-				{(!tab || tab === "recent") && <MemeList />}
-				{tab === "new" && <div>New Creation content - Chain: {chain}</div>}
-				{tab === "completing" && <div>Completing content - Chain: {chain}</div>}
-				{tab === "completed" && <div>Completed content - Chain: {chain}</div>}
-				{tab === "favorite" && <div>Favorite content - Chain: {chain}</div>}
+				<MemeList sort={sort} />
 			</div>
 		</div>
 	);
