@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useRouter } from "@tanstack/react-router";
 import {
@@ -520,7 +520,7 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 	});
 
 	const { chain } = useChainStore();
-	const parentRef = React.useRef<HTMLDivElement>(null);
+	const parentRef = useRef<HTMLDivElement>(null);
 
 	const tableRows = table.getRowModel().rows;
 
@@ -530,9 +530,8 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 		estimateSize: () => 72,
 		overscan: 5,
 	});
-
-	React.useEffect(() => {
-		const virtualItems = rowVirtualizer.getVirtualItems();
+	const virtualItems = rowVirtualizer.getVirtualItems();
+	useEffect(() => {
 		if (!virtualItems || virtualItems.length === 0) return;
 
 		const [lastItem] = [...virtualItems].reverse();
@@ -553,11 +552,11 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 		fetchNextPage,
 		tableRows.length,
 		isFetchingNextPage,
-		rowVirtualizer.getVirtualItems(),
+		virtualItems,
 	]);
 
 	const transparentBg = "rgba(0, 0, 0, 0)";
-	const yellowBg = "rgba(247, 180, 6, 0.7)";
+	const yellowBg = "rgba(247, 180, 6)";
 
 	const rowVariants = {
 		initial: { backgroundColor: transparentBg },
@@ -705,31 +704,31 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 										<td
 											key={cell.id}
 											className={cn(
-													"border-gray-710 h-18 border-b p-0 pt-px text-sm text-white",
+												"border-gray-710 h-18 border-b p-0 pt-px text-sm text-white",
 												isPinned && "sticky",
 												cell.column.getIsPinned() === "left" && "left-0",
 												cell.column.getIsPinned() === "right" && "right-0",
-													isPinned && isFlashing && "bg-inherit"
+												isPinned && isFlashing && "bg-inherit"
 											)}
 											style={{
 												width: cell.column.getSize(),
-													position: isPinned ? "sticky" : undefined,
+												position: isPinned ? "sticky" : undefined,
 												left:
 													cell.column.getIsPinned() === "left"
 														? `${cell.column.getStart("left")}px`
 														: undefined,
 												right:
 													cell.column.getIsPinned() === "right"
-															? `0px`
+														? `0px`
 														: undefined,
 											}}
 										>
 											<div
 												className={cn(
 													"flex h-full cursor-pointer items-center p-3",
-														isPinned &&
-															"bg-gray-760 group-hover:bg-gray-750 duration-300",
-														isPinned && isFlashing && "bg-inherit"
+													isPinned &&
+														"bg-gray-760 group-hover:bg-gray-750 duration-300",
+													isPinned && isFlashing && "bg-inherit"
 												)}
 											>
 												{flexRender(
