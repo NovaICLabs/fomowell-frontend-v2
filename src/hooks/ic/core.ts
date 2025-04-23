@@ -143,6 +143,31 @@ export const useCurrentPrice = (args: { id: number }) => {
 	});
 };
 
+export const useMultipleCurrentPrice = (args: { ids: Array<string> | [] }) => {
+	return useQuery({
+		queryKey: ["ic-core", "current-price", args.ids.toString()],
+		queryFn: async () => {
+			if (args.ids.length === 0) {
+				throw new Error("No ids provided");
+			}
+			const result = await Promise.all(
+				args.ids.map((id) =>
+					getCurrentPrice(getChainICCoreCanisterId().toText(), BigInt(id))
+				)
+			);
+			return result.map((r, index) => ({
+				id: args.ids[index],
+				raw: r,
+				formattedPerPayToken: formatNumberSmart(
+					BigNumber(1)
+						.multipliedBy(10 ** getICPCanisterToken().decimals)
+						.div(BigNumber(r))
+				),
+			}));
+		},
+	});
+};
+
 // ================================ write ================================
 export const useCreateMemeToken = () => {
 	const { actorCreator } = useConnectedIdentity();

@@ -27,3 +27,12 @@ export const fromNow = (timestampNanos: bigint) => {
 	const date = dayjs(Number(milliseconds));
 	return date.fromNow();
 };
+
+export const formatDate = (
+	timestampNanos: bigint,
+	formatString = "YYYY-MM-DD HH:mm:ss"
+) => {
+	const milliseconds = timestampNanos / 1000000n;
+	const date = dayjs(Number(milliseconds));
+	return date.format(formatString);
+};
