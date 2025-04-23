@@ -8,7 +8,7 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import BigNumber from "bignumber.js";
-import { useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 
 import SortsIcon from "@/components/icons/common/sorts";
 import Telegram from "@/components/icons/media/telegram";
@@ -78,7 +78,6 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 		[data]
 	);
 
-	// Effect to detect changes in recentTradeTs and trigger flashing
 	useEffect(() => {
 		const currentRecentTradeTs = new Map<string, string | null>();
 		const newlyFlashed = new Set<string>();
@@ -86,20 +85,19 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 		items.forEach((item) => {
 			const id = item.memeTokenId.toString();
 			const previousTs = previousRecentTradeTsRef.current.get(id);
-			const currentTs = item.recentTradeTs; // Assuming this field exists
-			currentRecentTradeTs.set(id, currentTs); // Keep track of current Ts for next render
+			const currentTs = item.recentTradeTs;
+			currentRecentTradeTs.set(id, currentTs);
 
-			// Only flash if initialized, item existed before, has a current Ts, and Ts changed
 			if (
-				isInitialized.current && // Don't flash on first load
-				previousTs !== undefined && // Item existed in the previous state
-				currentTs !== null && // Item has a valid trade timestamp now
-				previousTs !== currentTs // The timestamp actually changed
+				isInitialized.current &&
+				previousTs !== undefined &&
+				currentTs !== null &&
+				previousTs !== currentTs
 			) {
 				newlyFlashed.add(id);
 			}
 		});
-		console.debug("🚀 ~ useEffect ~ newlyFlashed:", newlyFlashed);
+
 		if (newlyFlashed.size > 0) {
 			setFlashingRows((previous) => {
 				const updated = new Set(previous);
@@ -107,7 +105,6 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 				return updated;
 			});
 
-			// Set timers to remove the flash effect after animation duration
 			newlyFlashed.forEach((id) => {
 				setTimeout(() => {
 					setFlashingRows((previous) => {
@@ -115,23 +112,18 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 						updated.delete(id);
 						return updated;
 					});
-				}, 800); // Match animation duration (0.8s)
+				}, 800);
 			});
 		}
 
-		// Update the ref with the current timestamps for the next comparison
 		previousRecentTradeTsRef.current = currentRecentTradeTs;
 
-		// Mark as initialized after the first run
 		if (!isInitialized.current) {
 			isInitialized.current = true;
 		}
-	}, [items]); // Rerun this effect when items data changes
-
-	// Use useMemo to define columns to avoid re-rendering issues
+	}, [items]);
 	const columns = useMemo(
 		() => [
-			// Left fixed column - Token
 			columnHelper.group({
 				id: "token",
 				header: () => (
@@ -222,7 +214,6 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 				size: 250,
 				enablePinning: true,
 			}),
-			// Age column
 			columnHelper.accessor("timestamp", {
 				id: "age",
 				header: () => (
@@ -240,7 +231,6 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 				),
 				size: 120,
 			}),
-			// Price column
 			columnHelper.accessor("price", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
@@ -266,7 +256,6 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 				},
 				size: 140,
 			}),
-			// Liquidity column
 			columnHelper.accessor("market_cap_token", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
@@ -295,7 +284,6 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 				},
 				size: 120,
 			}),
-			// Market Cap column
 			columnHelper.accessor((row) => row.price, {
 				id: "mc",
 				header: () => (
@@ -436,7 +424,6 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 				},
 				size: 120,
 			}),
-			// Volume column
 			columnHelper.accessor("volume24H", {
 				id: "volume",
 				header: () => (
@@ -466,7 +453,6 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 				},
 				size: 120,
 			}),
-			// Right fixed column - Quick buy
 			columnHelper.group({
 				id: "actions",
 				header: () => (
@@ -516,7 +502,6 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			size: 120,
 		},
 		state: {
-			// Pin first and last columns
 			columnPinning: {
 				left: ["token"],
 				right: ["actions"],
@@ -532,6 +517,32 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			void fetchNextPage();
 		}
 	}, [inView, hasNextPage, fetchNextPage]);
+
+	const transparentBg = "rgba(0, 0, 0, 0)";
+	const yellowBg = "rgb(247, 180, 6)";
+
+	const rowVariants = {
+		initial: { backgroundColor: transparentBg },
+		flash: {
+			backgroundColor: [
+				yellowBg,
+				yellowBg,
+				transparentBg,
+				transparentBg,
+				yellowBg,
+				yellowBg,
+				transparentBg,
+				transparentBg,
+			],
+			transition: {
+				duration: 0.8,
+				ease: "linear",
+				times: [0, 0.15, 0.151, 0.3, 0.301, 0.45, 0.451, 1],
+			},
+		},
+		normal: { backgroundColor: transparentBg },
+	};
+
 	return (
 		<div className="bg-gray-760 no-scrollbar h-screen overflow-auto rounded-t-2xl">
 			{isLoading ? (
@@ -587,12 +598,12 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 							const rowId = row.original.memeTokenId.toString();
 							const isFlashing = flashingRows.has(rowId);
 							return (
-								<tr
+								<motion.tr
 									key={row.id}
-									className={cn(
-										"group hover:bg-gray-750 relative duration-300",
-										isFlashing && "animate-flash"
-									)}
+									animate={isFlashing ? "flash" : "normal"}
+									className="group hover:!bg-gray-750 relative duration-300"
+									initial="initial"
+									variants={rowVariants}
 									onClick={() => {
 										void router.navigate({
 											to: `/${chain}/token/$id`,
@@ -613,8 +624,7 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 													isPinned && "sticky",
 													cell.column.getIsPinned() === "left" && "left-0",
 													cell.column.getIsPinned() === "right" && "right-0",
-													// Ensure flash background applies correctly to pinned cells if needed
-													isPinned && isFlashing && "bg-inherit" // Inherit flashing background if pinned
+													isPinned && isFlashing && "bg-inherit"
 												)}
 												style={{
 													width: cell.column.getSize(),
@@ -634,8 +644,7 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 														"flex h-full cursor-pointer items-center p-3",
 														isPinned &&
 															"bg-gray-760 group-hover:bg-gray-750 duration-300",
-														// Ensure flash background applies correctly to pinned cells if needed
-														isPinned && isFlashing && "bg-inherit" // Inherit flashing background if pinned
+														isPinned && isFlashing && "bg-inherit"
 													)}
 												>
 													{flexRender(
@@ -646,7 +655,7 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 											</td>
 										);
 									})}
-								</tr>
+								</motion.tr>
 							);
 						})}
 					</tbody>

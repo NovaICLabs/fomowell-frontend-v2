@@ -15,7 +15,7 @@ export const useInfiniteTokenList = (parameters: TokenListParameters) => {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},
 		initialPageParam: 1,
-		refetchInterval: 10000,
+		refetchInterval: 4000,
 	});
 };
 
