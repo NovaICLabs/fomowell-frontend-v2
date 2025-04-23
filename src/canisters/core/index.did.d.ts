@@ -330,6 +330,10 @@ export interface _SERVICE {
 		[bigint, bigint, bigint],
 		[Array<Holder>, bigint]
 	>;
+	query_user_create_meme_tokens: ActorMethod<
+		[[] | [Principal]],
+		Array<MemeToken>
+	>;
 	query_user_tokens: ActorMethod<[[] | [Account]], Array<MemeTokenBalance>>;
 	sell: ActorMethod<[BuyArgs], Result>;
 	update_creation_fee: ActorMethod<[TokenAmount], undefined>;

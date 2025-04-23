@@ -18,6 +18,7 @@ import { getICPCanisterToken } from "../icrc3/specials";
 
 import type { _SERVICE, LedgerType, StableToken } from "./index.did.d";
 import type { ActorCreator } from "@/lib/ic/connectors";
+import type { Principal } from "@dfinity/principal";
 
 export const getChainICCoreCanisterId = () => {
 	return validateCanisterIdText(
@@ -163,6 +164,142 @@ export const getCurrentPrice = async (canisterId: string, tokenId: bigint) => {
 	const result = await actor.query_meme_token_price(tokenId);
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
+	});
+};
+
+export type CreatedToken = {
+	id: string;
+	name: string;
+	ticker: string;
+	description: string;
+	logo: string;
+	process: number;
+	price: number;
+	creator: string;
+	completed: boolean;
+	available_token: bigint;
+	market_cap_token: bigint;
+	liquidity: bigint;
+	created_at: bigint;
+	decimals: number;
+};
+
+// query user created meme token
+export const getUserCreatedMemeTokens = async (
+	canisterId: string,
+	args: {
+		owner?: string;
+	}
+) => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+	const actor = await createActor<_SERVICE>({
+		idlFactory,
+		canisterId,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+
+	const { owner } = args;
+	const parameters: [Principal] | [] = owner
+		? [validatePrincipalText(owner)]
+		: [];
+
+	const result = await actor.query_user_create_meme_tokens(parameters);
+
+	if (!result) {
+		return [];
+	}
+	return result.map((r) => {
+		return {
+			id: r.id.toString(),
+			name: r.name,
+			ticker: r.ticker,
+			description: r.description,
+			logo: r.logo,
+			process: r.process,
+			price: r.price,
+			creator: r.creator,
+			completed: r.completed,
+			available_token: r.available_token,
+			market_cap_token: r.market_cap_token,
+			liquidity: r.market_cap_token,
+			created_at: r.created_at,
+			decimals: 8,
+		};
+	}) as Array<CreatedToken>;
+};
+
+// query user tokens
+export type MemeTokenDetails = {
+	id: string;
+	balance: string;
+	name: string;
+	ticker: string;
+	description: string;
+	logo: string;
+	price: number;
+	progress: number;
+	creator: string;
+	completed: boolean;
+	available_token: number;
+	liquidity: number;
+	created_at: Date;
+	bc: string; // no use
+	decimals: number;
+};
+export type UserHoldings = Array<MemeTokenDetails>;
+export const getUserTokens = async (
+	canisterId: string,
+	args: {
+		owner: string;
+	}
+) => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+	const actor = await createActor<_SERVICE>({
+		idlFactory,
+		canisterId,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+
+	const { owner } = args;
+	const result = await actor.query_user_tokens([
+		{
+			owner: validatePrincipalText(owner),
+			subaccount: [],
+		},
+	]);
+
+	if (!result) {
+		return [];
+	}
+
+	return result.map((r) => {
+		return {
+			id: r.token.id.toString(),
+			balance: r.balance.toString(),
+			name: r.token.name,
+			ticker: r.token.ticker,
+			description: r.token.description,
+			price: r.token.price,
+			logo: r.token.logo,
+			progress: r.token.process,
+			creator: r.token.creator,
+			completed: r.token.completed,
+			available_token: r.token.available_token,
+			liquidity: r.token.market_cap_token,
+			created_at: r.token.created_at,
+			bc: r.token.bc, // no use
+			decimals: 8,
+		} as unknown as MemeTokenDetails;
 	});
 };
 

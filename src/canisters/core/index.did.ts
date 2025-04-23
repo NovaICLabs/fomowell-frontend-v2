@@ -331,6 +331,11 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			[IDL.Vec(Holder), IDL.Nat64],
 			["query"]
 		),
+		query_user_create_meme_tokens: IDL.Func(
+			[IDL.Opt(IDL.Principal)],
+			[IDL.Vec(MemeToken)],
+			["query"]
+		),
 		query_user_tokens: IDL.Func(
 			[IDL.Opt(Account)],
 			[IDL.Vec(MemeTokenBalance)],

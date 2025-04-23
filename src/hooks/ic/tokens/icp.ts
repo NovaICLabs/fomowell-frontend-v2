@@ -1,5 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 
+import {
+	getChainICCoreCanisterId,
+	getUserCreatedMemeTokens,
+	getUserTokens,
+} from "@/canisters/core";
 import { getICPCanisterId } from "@/canisters/icrc3";
 import { getICPBalance } from "@/canisters/tokens/icp";
 import { useIcIdentityStore } from "@/store/ic";
@@ -15,5 +20,31 @@ export const useICPBalance = (principal?: string) => {
 		},
 		enabled: !!p,
 		refetchInterval: 15_000,
+	});
+};
+
+export const useUserHoldingTokens = () => {
+	const { principal: self } = useIcIdentityStore();
+	return useQuery({
+		queryKey: ["holdings", self],
+		queryFn: async () => {
+			if (!self) throw new Error("Principal is not set");
+			return getUserTokens(getChainICCoreCanisterId().toText(), {
+				owner: self,
+			});
+		},
+	});
+};
+
+export const useUserCreatedTokens = () => {
+	const { principal: self } = useIcIdentityStore();
+	return useQuery({
+		queryKey: ["created", self],
+		queryFn: async () => {
+			if (!self) throw new Error("Principal is not set");
+			return getUserCreatedMemeTokens(getChainICCoreCanisterId().toText(), {
+				owner: self,
+			});
+		},
 	});
 };
