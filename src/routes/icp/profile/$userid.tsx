@@ -10,6 +10,8 @@ import { EditIcon } from "@/components/icons/common/edit";
 import WithdrawIcon from "@/components/icons/common/withdraw";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
 import { Button } from "@/components/ui/button";
+import ProfileCreatedTokens from "@/components/views/icp/profile/create-list";
+import ProfileHoldings from "@/components/views/icp/profile/holdings";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useCoreTokenBalance } from "@/hooks/ic/core";
 import { getAvatar } from "@/lib/common/avatar";
@@ -39,8 +41,8 @@ function UserId() {
 	console.debug("🚀 ~ UserId ~ usdValue:", usdValue);
 	const { setDepositWithdrawOpen } = useDialogStore();
 	return (
-		<div className="mt-5 w-full">
-			<div className="mb-5 flex h-[162px] w-full gap-x-5">
+		<div className="mt-5 h-full w-full flex-1 flex-col">
+			<div className="mb-5 flex h-[162px] w-full shrink-0 gap-x-5">
 				<div className="bg-gray-760 relative flex w-full gap-x-2 rounded-2xl p-5">
 					<div className="flex items-center gap-2">
 						<img
@@ -122,14 +124,14 @@ function UserId() {
 					</div>
 				</div>
 			</div>
-			<div className="mb-4 flex items-center gap-[30px] px-4">
+			<div className="mb-4 flex shrink-0 items-center gap-[30px] px-4">
 				{["Holdings", "Created", "Activity"].map((tab) => {
 					const isActive = activeTab === tab;
 					return (
 						<div
 							key={tab}
 							className={cn(
-								`relative cursor-pointer py-2 text-sm font-semibold`,
+								"relative cursor-pointer py-2 text-sm font-semibold",
 								isActive ? "text-white" : "text-white/60 hover:text-white"
 							)}
 							onClick={() => {
@@ -139,7 +141,7 @@ function UserId() {
 							{tab}
 							<div
 								className={cn(
-									`absolute -bottom-px left-0 h-[2px] rounded-[1px] bg-white transition-all duration-300 ease-in-out`,
+									"absolute -bottom-px left-0 h-[2px] rounded-[1px] bg-white transition-all duration-300 ease-in-out",
 									isActive ? "w-full opacity-100" : "w-0 opacity-0"
 								)}
 								style={{
@@ -152,16 +154,15 @@ function UserId() {
 				})}
 			</div>
 
-			<div>
+			<div className="flex-1">
 				{activeTab === "Holdings" && (
-					<div className="bg-gray-760 rounded-2xl p-5 text-white/60">
-						Here is Holdings data...
+					<div className="bg-gray-760 h-full rounded-2xl p-5 text-white/60">
+						<ProfileHoldings />
 					</div>
 				)}
 				{activeTab === "Created" && (
 					<div className="bg-gray-760 rounded-2xl p-5 text-white/60">
-						Created items table goes here... (Requires table component and data
-						fetching)
+						<ProfileCreatedTokens />
 					</div>
 				)}
 				{activeTab === "Activity" && (

@@ -1,0 +1,324 @@
+import { useEffect, useMemo } from "react";
+
+import { useRouter } from "@tanstack/react-router";
+import {
+	createColumnHelper,
+	flexRender,
+	getCoreRowModel,
+	useReactTable,
+} from "@tanstack/react-table";
+import BigNumber from "bignumber.js";
+
+// import SortsIcon from "@/components/icons/common/sorts";
+import { useICPPrice } from "@/hooks/apis/coingecko";
+import { useMultipleCurrentPrice } from "@/hooks/ic/core";
+import { useUserCreatedTokens } from "@/hooks/ic/tokens/icp";
+import { formatNumberSmart, getTokenUsdValueTotal } from "@/lib/common/number";
+import { formatDate } from "@/lib/common/time";
+import { cn } from "@/lib/utils";
+import { useChainStore } from "@/store/chain";
+import { useIcIdentityStore } from "@/store/ic";
+
+import type { CreatedToken } from "@/canisters/core";
+
+const ProfileCreatedTokens = () => {
+	const router = useRouter();
+	const { chain } = useChainStore();
+	const { data: icpPrice } = useICPPrice();
+	const { principal } = useIcIdentityStore();
+
+	const { data, isFetching, refetch } = useUserCreatedTokens();
+	const columnHelper = createColumnHelper<CreatedToken>();
+
+	const {
+		data: allPrices,
+		isFetching: isPriceFetching,
+		refetch: priceRefetch,
+	} = useMultipleCurrentPrice({ ids: data ? data?.map((row) => row.id) : [] });
+
+	useEffect(() => {
+		if (!principal) return;
+
+		void refetch();
+		void priceRefetch();
+	}, [priceRefetch, principal, refetch]);
+
+	// const [sortStates, setSortStates] = useState<
+	// 	Record<string, "asc" | "desc" | "none">
+	// >({
+	// 	price: "none",
+	// 	market_cap_token: "none",
+	// 	status: "none",
+	// 	createdAt: "none",
+	// });
+
+	const columns = useMemo(
+		() => [
+			columnHelper.group({
+				id: "token",
+				header: () => (
+					<div className="flex cursor-pointer items-center gap-1 pl-5">
+						<span className="">Token</span>
+					</div>
+				),
+				cell: ({ row }) => {
+					return (
+						<div className="flex items-center gap-2">
+							<div className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full">
+								<div
+									className="absolute h-[36px] w-[36px] rounded-full p-[2px]"
+									style={{
+										backgroundImage: `url(${row.original.logo})`,
+										backgroundSize: "cover",
+										backgroundPosition: "center",
+									}}
+								/>
+							</div>
+							<div className="flex flex-col gap-1.5">
+								<div className="flex items-center gap-1">
+									<span className="text-sm leading-4 font-medium text-white">
+										{row.original.ticker}
+									</span>
+								</div>
+								<div className="text-xs leading-4 font-light text-white/60">
+									{row.original.name}
+								</div>
+							</div>
+						</div>
+					);
+				},
+				size: 250,
+				enablePinning: true,
+			}),
+			// Price column
+			columnHelper.accessor("price", {
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">Price</span>
+						{/* <SortsIcon /> */}
+					</div>
+				),
+				cell: ({ row }) => {
+					const currentPrice =
+						!isPriceFetching && allPrices
+							? allPrices?.find((price) => price.id === row.original.id)
+							: null;
+					const raw = currentPrice ? currentPrice.formattedPerPayToken : 0;
+
+					const priceInIcp =
+						raw === null || raw === 0 ? BigNumber(0) : BigNumber(raw);
+
+					const priceInUsd = priceInIcp.times(icpPrice ?? 0);
+
+					return (
+						<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
+							<span className="text-sm leading-4 font-medium text-white">
+								${raw === null ? "--" : formatNumberSmart(priceInUsd)}
+							</span>
+							<span className="text-xs leading-4 font-light text-white/60">
+								{raw === null ? "--" : formatNumberSmart(priceInIcp)} ICP
+							</span>
+						</div>
+					);
+				},
+				size: 140,
+			}),
+			// market_cap_token column
+			columnHelper.accessor("market_cap_token", {
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">Mkt Cap</span>
+						{/* <SortsIcon /> */}
+					</div>
+				),
+				cell: (info) => {
+					const value = info.getValue();
+					const isNull = value === null;
+					return (
+						<div className="flex h-full w-full items-center gap-1">
+							<span className="text-sm leading-4 font-medium text-white">
+								$
+								{getTokenUsdValueTotal(
+									{
+										amount: isNull ? 0n : BigInt(value) * 2n,
+									},
+									icpPrice ?? 0
+								)}
+							</span>
+						</div>
+					);
+				},
+				size: 120,
+			}),
+			// process column
+			columnHelper.accessor((row) => row.process, {
+				id: "status",
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">Status</span>
+						{/* <SortsIcon /> */}
+					</div>
+				),
+				cell: (info) => {
+					const value = info.getValue() * 100;
+					return (
+						<div className="text-sm leading-4 font-medium text-white">
+							{formatNumberSmart(value)}%
+						</div>
+					);
+				},
+				size: 120,
+			}),
+			// created_at column
+			columnHelper.accessor("created_at", {
+				id: "createdAt",
+				header: () => (
+					<div className="group flex cursor-pointer items-center justify-end gap-1">
+						<span className="duration-300 group-hover:text-white">
+							Created At
+						</span>
+						{/* <SortsIcon /> */}
+					</div>
+				),
+				cell: (info) => (
+					<div className="flex h-full w-full items-center justify-end gap-1">
+						<div className="text-right text-sm leading-4 font-medium text-white">
+							{formatDate(info.getValue())}
+						</div>
+					</div>
+				),
+				size: 120,
+			}),
+		],
+		[allPrices, columnHelper, icpPrice, isPriceFetching]
+	);
+
+	const items = useMemo(() => data ?? [], [data]);
+
+	const table = useReactTable({
+		data: items,
+		columns,
+		getCoreRowModel: getCoreRowModel(),
+		defaultColumn: {
+			size: 120,
+		},
+		state: {
+			// Pin first and last columns
+			columnPinning: {
+				left: ["token"],
+				right: ["actions"],
+			},
+		},
+	});
+
+	return (
+		<>
+			<table className="w-full min-w-max">
+				<thead className="sticky top-0 z-10">
+					{table.getHeaderGroups().map((headerGroup) => (
+						<tr key={headerGroup.id} className="border-gray-710">
+							{headerGroup.headers.map((header) => {
+								const isPinned =
+									header.column.getIsPinned() === "left" ||
+									header.column.getIsPinned() === "right";
+
+								return (
+									<th
+										key={header.id}
+										className={cn(
+											"bg-gray-760 border-gray-710 border-b p-3 text-left text-xs leading-4 font-medium text-white/40",
+											isPinned && "sticky",
+											header.column.getIsPinned() === "left" && "left-0",
+											header.column.getIsPinned() === "right" && "right-0"
+										)}
+										style={{
+											width: header.getSize(),
+											position: isPinned ? "sticky" : undefined,
+											left:
+												header.column.getIsPinned() === "left"
+													? `${header.getStart("left")}px`
+													: undefined,
+											right:
+												header.column.getIsPinned() === "right" ? 0 : undefined,
+										}}
+									>
+										{flexRender(
+											header.column.columnDef.header,
+											header.getContext()
+										)}
+									</th>
+								);
+							})}
+						</tr>
+					))}
+				</thead>
+				<tbody>
+					{table.getRowModel().rows.map((row) => (
+						// biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+						<tr
+							key={row.id}
+							className="group hover:bg-gray-750 relative duration-300"
+							onClick={() => {
+								void router.navigate({
+									to: `/${chain}/token/$id`,
+									params: { id: row.original.id.toString() },
+								});
+							}}
+						>
+							{row.getVisibleCells().map((cell) => {
+								const isPinned =
+									cell.column.getIsPinned() === "left" ||
+									cell.column.getIsPinned() === "right";
+
+								return (
+									<td
+										key={cell.id}
+										className={cn(
+											"border-gray-710 h-18 border-b p-0 pt-px text-sm text-white",
+											isPinned && "sticky",
+											cell.column.getIsPinned() === "left" && "left-0",
+											cell.column.getIsPinned() === "right" && "right-0"
+										)}
+										style={{
+											width: cell.column.getSize(),
+											position: isPinned ? "sticky" : undefined,
+											left:
+												cell.column.getIsPinned() === "left"
+													? `${cell.column.getStart("left")}px`
+													: undefined,
+											right:
+												cell.column.getIsPinned() === "right" ? 0 : undefined,
+										}}
+									>
+										<div
+											className={cn(
+												"flex h-full cursor-pointer items-center p-3",
+												isPinned &&
+													"bg-gray-760 group-hover:bg-gray-750 duration-300"
+											)}
+										>
+											{flexRender(
+												cell.column.columnDef.cell,
+												cell.getContext()
+											)}
+										</div>
+									</td>
+								);
+							})}
+						</tr>
+					))}
+				</tbody>
+			</table>
+			<div className="min-h-5 w-full">
+				{!isFetching && (!items || items.length === 0) && (
+					<div className="flex h-50 flex-col items-center justify-center text-center text-sm text-white/40">
+						<img alt={"noData"} src={"/svgs/noData.svg"} />
+						<div>No Data</div>
+					</div>
+				)}
+			</div>
+		</>
+	);
+};
+
+export default ProfileCreatedTokens;
