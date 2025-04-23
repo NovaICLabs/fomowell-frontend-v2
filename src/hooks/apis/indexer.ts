@@ -10,7 +10,11 @@ import { getICPCanisterId } from "@/canisters/icrc3";
 export const useInfiniteTokenList = (parameters: TokenListParameters) => {
 	return useInfiniteQuery({
 		queryKey: ["ic-core", "tokenList", parameters.sort],
-		queryFn: () => getTokenList(parameters),
+		queryFn: ({ pageParam: page = 1 }) =>
+			getTokenList({
+				...parameters,
+				page,
+			}),
 		getNextPageParam: (lastPage, pages) => {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},

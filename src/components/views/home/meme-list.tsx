@@ -1,14 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { useRouter } from "@tanstack/react-router";
 import {
 	createColumnHelper,
 	flexRender,
 	getCoreRowModel,
+	type Row,
 	useReactTable,
 } from "@tanstack/react-table";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import BigNumber from "bignumber.js";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 
 import SortsIcon from "@/components/icons/common/sorts";
 import Telegram from "@/components/icons/media/telegram";
@@ -50,8 +52,15 @@ const TableItemsSkeleton = () => {
 };
 
 export default function MemeList({ sort }: { sort: TokenListSortOption }) {
-	const { data, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } =
-		useInfiniteTokenList({ sort, pageSize: 16 });
+	const {
+		data,
+		hasNextPage,
+		fetchNextPage,
+		isFetchingNextPage,
+		status,
+		error,
+		isFetching,
+	} = useInfiniteTokenList({ sort, pageSize: 16 });
 	const router = useRouter();
 
 	const columnHelper = createColumnHelper<tokenInfo>();
@@ -122,6 +131,7 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			isInitialized.current = true;
 		}
 	}, [items]);
+
 	const columns = useMemo(
 		() => [
 			columnHelper.group({
@@ -508,18 +518,46 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			},
 		},
 	});
-	const { chain } = useChainStore();
-	const loadMoreRef = useRef(null);
-	const inView = useInView(loadMoreRef, { margin: "0px 0px -60px 0px" });
 
-	useEffect(() => {
-		if (inView && hasNextPage) {
+	const { chain } = useChainStore();
+	const parentRef = React.useRef<HTMLDivElement>(null);
+
+	const tableRows = table.getRowModel().rows;
+
+	const rowVirtualizer = useVirtualizer({
+		count: hasNextPage ? tableRows.length + 1 : tableRows.length,
+		getScrollElement: () => parentRef.current,
+		estimateSize: () => 72,
+		overscan: 5,
+	});
+
+	React.useEffect(() => {
+		const virtualItems = rowVirtualizer.getVirtualItems();
+		if (!virtualItems || virtualItems.length === 0) return;
+
+		const [lastItem] = [...virtualItems].reverse();
+
+		if (!lastItem) {
+			return;
+		}
+
+		if (
+			lastItem.index >= tableRows.length - 1 &&
+			hasNextPage &&
+			!isFetchingNextPage
+		) {
 			void fetchNextPage();
 		}
-	}, [inView, hasNextPage, fetchNextPage]);
+	}, [
+		hasNextPage,
+		fetchNextPage,
+		tableRows.length,
+		isFetchingNextPage,
+		rowVirtualizer.getVirtualItems(),
+	]);
 
 	const transparentBg = "rgba(0, 0, 0, 0)";
-	const yellowBg = "rgb(247, 180, 6)";
+	const yellowBg = "rgba(247, 180, 6, 0.7)";
 
 	const rowVariants = {
 		initial: { backgroundColor: transparentBg },
@@ -543,139 +581,180 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 		normal: { backgroundColor: transparentBg },
 	};
 
+	const virtualRows = rowVirtualizer.getVirtualItems();
+	const paddingTop =
+		virtualRows.length > 0 ? (virtualRows?.[0]?.start ?? 0) : 0;
+	const paddingBottom =
+		virtualRows.length > 0
+			? rowVirtualizer.getTotalSize() -
+				(virtualRows?.[virtualRows.length - 1]?.end ?? 0)
+			: 0;
+
+	if (status === "pending") {
+		return (
+			<div className="bg-gray-760 flex h-screen w-full flex-col items-center justify-center gap-2 rounded-t-2xl pt-10">
+				{Array.from({ length: 12 }).map((_, index) => (
+					<Skeleton key={index} className="h-18 w-full" />
+				))}
+			</div>
+		);
+	}
+
+	if (status === "error") {
+		return <span>Error: {error?.message}</span>;
+	}
+
 	return (
-		<div className="bg-gray-760 no-scrollbar h-screen overflow-auto rounded-t-2xl">
-			{isLoading ? (
-				<div className="flex w-full flex-col items-center justify-center gap-2 pt-10">
-					{Array.from({ length: 12 }).map((_, index) => (
-						<Skeleton key={index} className="h-18 w-full" />
+		<div
+			ref={parentRef}
+			className="bg-gray-760 no-scrollbar h-screen overflow-auto rounded-t-2xl"
+		>
+			<table className="w-full min-w-max">
+				<thead className="sticky top-0 z-10">
+					{table.getHeaderGroups().map((headerGroup) => (
+						<tr key={headerGroup.id} className="border-gray-710">
+							{headerGroup.headers.map((header) => {
+								const isPinned =
+									header.column.getIsPinned() === "left" ||
+									header.column.getIsPinned() === "right";
+
+								return (
+									<th
+										key={header.id}
+										className={cn(
+											"bg-gray-760 border-gray-710 border-b p-3 text-left text-xs leading-4 font-medium text-white/40",
+											isPinned && "sticky",
+											header.column.getIsPinned() === "left" && "left-0",
+											header.column.getIsPinned() === "right" && "right-0"
+										)}
+										style={{
+											width: header.getSize(),
+											position: isPinned ? "sticky" : undefined,
+											left:
+												header.column.getIsPinned() === "left"
+													? `${header.getStart("left")}px`
+													: undefined,
+											right:
+												header.column.getIsPinned() === "right"
+													? `0px`
+													: undefined,
+										}}
+									>
+										{flexRender(
+											header.column.columnDef.header,
+											header.getContext()
+										)}
+									</th>
+								);
+							})}
+						</tr>
 					))}
-				</div>
-			) : (
-				<table className="w-full min-w-max">
-					<thead className="sticky top-0 z-10">
-						{table.getHeaderGroups().map((headerGroup) => (
-							<tr key={headerGroup.id} className="border-gray-710">
-								{headerGroup.headers.map((header) => {
+				</thead>
+				<tbody>
+					{paddingTop > 0 && (
+						<tr>
+							<td style={{ height: `${paddingTop}px` }} />
+						</tr>
+					)}
+					{virtualRows.map((virtualRow) => {
+						const isLoaderRow = virtualRow.index >= tableRows.length;
+
+						if (isLoaderRow) {
+							return (
+								<tr key="loader" className="h-18">
+									<td colSpan={columns.length}>
+										<div className="flex h-full w-full items-center justify-center">
+											{hasNextPage ? (
+												<TableItemsSkeleton />
+											) : (
+												<span className="text-sm text-white/40">
+													No more tokens
+												</span>
+											)}
+										</div>
+									</td>
+								</tr>
+							);
+						}
+
+						const row = tableRows[virtualRow.index] as Row<tokenInfo>;
+						const isFlashing = flashingRows.has(
+							row.original.memeTokenId.toString()
+						);
+
+						return (
+							<motion.tr
+								key={row.id}
+								animate={isFlashing ? "flash" : "normal"}
+								className="group hover:!bg-gray-750 relative duration-300"
+								initial="initial"
+								variants={rowVariants}
+								onClick={() => {
+									void router.navigate({
+										to: `/${chain}/token/$id`,
+										params: { id: row.original.memeTokenId.toString() },
+									});
+								}}
+							>
+								{row.getVisibleCells().map((cell) => {
 									const isPinned =
-										header.column.getIsPinned() === "left" ||
-										header.column.getIsPinned() === "right";
+										cell.column.getIsPinned() === "left" ||
+										cell.column.getIsPinned() === "right";
 
 									return (
-										<th
-											key={header.id}
+										<td
+											key={cell.id}
 											className={cn(
-												"bg-gray-760 border-gray-710 border-b p-3 text-left text-xs leading-4 font-medium text-white/40",
+													"border-gray-710 h-18 border-b p-0 pt-px text-sm text-white",
 												isPinned && "sticky",
-												header.column.getIsPinned() === "left" && "left-0",
-												header.column.getIsPinned() === "right" && "right-0"
+												cell.column.getIsPinned() === "left" && "left-0",
+												cell.column.getIsPinned() === "right" && "right-0",
+													isPinned && isFlashing && "bg-inherit"
 											)}
 											style={{
-												width: header.getSize(),
-												position: isPinned ? "sticky" : undefined,
+												width: cell.column.getSize(),
+													position: isPinned ? "sticky" : undefined,
 												left:
-													header.column.getIsPinned() === "left"
-														? `${header.getStart("left")}px`
+													cell.column.getIsPinned() === "left"
+														? `${cell.column.getStart("left")}px`
 														: undefined,
 												right:
-													header.column.getIsPinned() === "right"
-														? `0px`
+													cell.column.getIsPinned() === "right"
+															? `0px`
 														: undefined,
 											}}
 										>
-											{flexRender(
-												header.column.columnDef.header,
-												header.getContext()
-											)}
-										</th>
-									);
-								})}
-							</tr>
-						))}
-					</thead>
-					<tbody>
-						{table.getRowModel().rows.map((row) => {
-							const rowId = row.original.memeTokenId.toString();
-							const isFlashing = flashingRows.has(rowId);
-							return (
-								<motion.tr
-									key={row.id}
-									animate={isFlashing ? "flash" : "normal"}
-									className="group hover:!bg-gray-750 relative duration-300"
-									initial="initial"
-									variants={rowVariants}
-									onClick={() => {
-										void router.navigate({
-											to: `/${chain}/token/$id`,
-											params: { id: row.original.memeTokenId.toString() },
-										});
-									}}
-								>
-									{row.getVisibleCells().map((cell) => {
-										const isPinned =
-											cell.column.getIsPinned() === "left" ||
-											cell.column.getIsPinned() === "right";
-
-										return (
-											<td
-												key={cell.id}
+											<div
 												className={cn(
-													"border-gray-710 h-18 border-b p-0 pt-px text-sm text-white",
-													isPinned && "sticky",
-													cell.column.getIsPinned() === "left" && "left-0",
-													cell.column.getIsPinned() === "right" && "right-0",
-													isPinned && isFlashing && "bg-inherit"
-												)}
-												style={{
-													width: cell.column.getSize(),
-													position: isPinned ? "sticky" : undefined,
-													left:
-														cell.column.getIsPinned() === "left"
-															? `${cell.column.getStart("left")}px`
-															: undefined,
-													right:
-														cell.column.getIsPinned() === "right"
-															? `0px`
-															: undefined,
-												}}
-											>
-												<div
-													className={cn(
-														"flex h-full cursor-pointer items-center p-3",
+													"flex h-full cursor-pointer items-center p-3",
 														isPinned &&
 															"bg-gray-760 group-hover:bg-gray-750 duration-300",
 														isPinned && isFlashing && "bg-inherit"
-													)}
-												>
-													{flexRender(
-														cell.column.columnDef.cell,
-														cell.getContext()
-													)}
-												</div>
-											</td>
-										);
-									})}
-								</motion.tr>
-							);
-						})}
-					</tbody>
-				</table>
-			)}
-
-			<div
-				ref={loadMoreRef}
-				className="sticky right-0 left-0 flex h-20 w-full items-start justify-center"
-			>
-				{isFetchingNextPage ? (
-					<TableItemsSkeleton />
-				) : (
-					!hasNextPage && (
-						<div className="flex h-full w-full items-center justify-center">
-							<span className="text-sm text-white/40">No more tokens</span>
-						</div>
-					)
-				)}
-			</div>
+												)}
+											>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext()
+												)}
+											</div>
+										</td>
+									);
+								})}
+							</motion.tr>
+						);
+					})}
+					{paddingBottom > 0 && (
+						<tr>
+							<td style={{ height: `${paddingBottom}px` }} />
+						</tr>
+					)}
+				</tbody>
+			</table>
+			{isFetching && !isFetchingNextPage ? (
+				<div className="fixed right-4 bottom-4 text-white/50">
+					Background Updating...
+				</div>
+			) : null}
 		</div>
 	);
 }
