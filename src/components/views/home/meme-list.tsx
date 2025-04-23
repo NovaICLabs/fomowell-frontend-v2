@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { useRouter } from "@tanstack/react-router";
 import {
@@ -8,6 +8,7 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import BigNumber from "bignumber.js";
+import { useInView } from "framer-motion";
 
 import SortsIcon from "@/components/icons/common/sorts";
 import Telegram from "@/components/icons/media/telegram";
@@ -27,6 +28,7 @@ import { useInfiniteTokenList } from "@/hooks/apis/indexer";
 import { useBuy } from "@/hooks/ic/core";
 import {
 	formatNumberSmart,
+	formatUnits,
 	getTokenUsdValueTotal,
 	parseUnits,
 } from "@/lib/common/number";
@@ -39,7 +41,8 @@ import { useQuickBuyStore } from "@/store/quick-buy";
 import type { tokenInfo } from "@/apis/indexer";
 
 export default function MemeList() {
-	const { data } = useInfiniteTokenList();
+	const { data, hasNextPage, fetchNextPage, isFetching } =
+		useInfiniteTokenList();
 	const router = useRouter();
 
 	const columnHelper = createColumnHelper<tokenInfo>();
@@ -110,7 +113,9 @@ export default function MemeList() {
 											<X
 												className="h-2.5 text-white/40 hover:text-white"
 												onClick={withStopPropagation(() => {
-													window.open(row.original.twitter, "_blank");
+													if (row.original.twitter) {
+														window.open(row.original.twitter, "_blank");
+													}
 												})}
 											/>
 										)}
@@ -118,7 +123,9 @@ export default function MemeList() {
 											<Telegram
 												className="h-2.5 text-white/40 hover:text-white"
 												onClick={withStopPropagation(() => {
-													window.open(row.original.telegram, "_blank");
+													if (row.original.telegram) {
+														window.open(row.original.telegram, "_blank");
+													}
 												})}
 											/>
 										)}
@@ -126,7 +133,9 @@ export default function MemeList() {
 											<Website
 												className="h-2.5 text-white/40 hover:text-white"
 												onClick={withStopPropagation(() => {
-													window.open(row.original.website, "_blank");
+													if (row.original.website) {
+														window.open(row.original.website, "_blank");
+													}
 												})}
 											/>
 										)}
@@ -170,15 +179,16 @@ export default function MemeList() {
 				),
 				cell: (info) => {
 					const raw = info.getValue();
-					const priceInIcp = BigNumber(1).div(BigNumber(raw));
+					const priceInIcp =
+						raw === null ? BigNumber(0) : BigNumber(1).div(BigNumber(raw));
 					const priceInUsd = priceInIcp.times(icpPrice ?? 0);
 					return (
 						<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
 							<span className="text-sm leading-4 font-medium text-white">
-								${formatNumberSmart(priceInUsd)}
+								${raw === null ? "--" : formatNumberSmart(priceInUsd)}
 							</span>
 							<span className="text-xs leading-4 font-light text-white/60">
-								{formatNumberSmart(priceInIcp)} ICP
+								{raw === null ? "--" : formatNumberSmart(priceInIcp)} ICP
 							</span>
 						</div>
 					);
@@ -195,19 +205,23 @@ export default function MemeList() {
 						<SortsIcon />
 					</div>
 				),
-				cell: (info) => (
-					<div className="flex h-full w-full items-center gap-1">
-						<span className="text-sm leading-4 font-medium text-white">
-							$
-							{getTokenUsdValueTotal(
-								{
-									amount: BigInt(info.getValue()),
-								},
-								icpPrice ?? 0
-							)}
-						</span>
-					</div>
-				),
+				cell: (info) => {
+					const value = info.getValue();
+					const isNull = value === null;
+					return (
+						<div className="flex h-full w-full items-center gap-1">
+							<span className="text-sm leading-4 font-medium text-white">
+								$
+								{getTokenUsdValueTotal(
+									{
+										amount: isNull ? 0n : BigInt(value) * 2n,
+									},
+									icpPrice ?? 0
+								)}
+							</span>
+						</div>
+					);
+				},
 				size: 120,
 			}),
 			// Market Cap column
@@ -220,14 +234,18 @@ export default function MemeList() {
 					</div>
 				),
 				cell: (info) => {
-					const priceInUsd = BigNumber(1)
-						.div(BigNumber(info.row.original.price))
-						.times(icpPrice ?? 0);
+					const value = info.getValue();
+					const priceInUsd =
+						value === null
+							? BigNumber(0)
+							: BigNumber(1)
+									.div(BigNumber(value))
+									.times(icpPrice ?? 0);
 					const mc = BigNumber(1_000_000_000).times(priceInUsd);
 					return (
 						<div className="flex h-full w-full items-center gap-1">
 							<span className="text-sm leading-4 font-medium text-white">
-								${formatNumberSmart(mc)}
+								${value === null ? "--" : formatNumberSmart(mc)}
 							</span>
 						</div>
 					);
@@ -348,7 +366,7 @@ export default function MemeList() {
 				size: 120,
 			}),
 			// Volume column
-			columnHelper.accessor((row) => row.tx_index, {
+			columnHelper.accessor("volume24H", {
 				id: "volume",
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
@@ -356,16 +374,25 @@ export default function MemeList() {
 						<SortsIcon />
 					</div>
 				),
-				cell: (info) => (
-					<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
-						<span className="text-sm leading-4 font-medium text-white">
-							{info.getValue()} ICP
-						</span>
-						<span className="text-xs leading-4 font-light text-white/60">
-							${info.getValue()}
-						</span>
-					</div>
-				),
+				cell: (info) => {
+					const value = info.getValue();
+					const inIcp =
+						value === null ? "--" : formatNumberSmart(formatUnits(value), true);
+					const inUsd =
+						value === null
+							? "--"
+							: getTokenUsdValueTotal({ amount: BigInt(value) }, icpPrice ?? 0);
+					return (
+						<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
+							<span className="text-sm leading-4 font-medium text-white">
+								{inIcp} ICP
+							</span>
+							<span className="text-xs leading-4 font-light text-white/60">
+								${inUsd}
+							</span>
+						</div>
+					);
+				},
 				size: 120,
 			}),
 			// Right fixed column - Quick buy
@@ -406,9 +433,10 @@ export default function MemeList() {
 		[buyToken, columnHelper, flashAmount, flashAmountBigInt, icpPrice]
 	);
 	const items = useMemo(
-		() => data?.pages.flatMap((page) => page.items) ?? [],
+		() => data?.pages.flatMap((page) => page.data) ?? [],
 		[data]
 	);
+
 	const table = useReactTable({
 		data: items,
 		columns,
@@ -425,6 +453,14 @@ export default function MemeList() {
 		},
 	});
 	const { chain } = useChainStore();
+	const loadMoreRef = useRef(null);
+	const inView = useInView(loadMoreRef, { margin: "0px 0px -60px 0px" });
+
+	useEffect(() => {
+		if (inView && hasNextPage) {
+			void fetchNextPage();
+		}
+	}, [inView, hasNextPage, fetchNextPage]);
 	return (
 		<div className="bg-gray-760 no-scrollbar h-screen overflow-auto rounded-t-2xl">
 			<table className="w-full min-w-max">
@@ -526,6 +562,14 @@ export default function MemeList() {
 					))}
 				</tbody>
 			</table>
+			<div
+				ref={loadMoreRef}
+				className="flex h-15 w-full items-center justify-center"
+			>
+				{!isFetching && !hasNextPage && (
+					<span className="text-sm text-white/40">No more tokens</span>
+				)}
+			</div>
 		</div>
 	);
 }

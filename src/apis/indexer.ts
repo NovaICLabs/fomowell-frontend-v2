@@ -14,11 +14,6 @@ interface PaginatedDataBase {
 	totalPages: number;
 }
 
-interface PaginatedDataWithItems<T> extends PaginatedDataBase {
-	items: Array<T>;
-	data?: never;
-}
-
 interface PaginatedDataWithData<T> extends PaginatedDataBase {
 	data: Array<T>;
 	items?: never;
@@ -37,37 +32,54 @@ export type tokenInfo = {
 	creator: string;
 	timestamp: string;
 	market: "ICP";
-	tokenAddress: string; // Meme token address
+	tokenAddress: string;
 	decimals: number;
 	holders: string;
 	fee: string;
 	tx_id: string | null;
 	tx_index: number;
 	maxTotalSupply: string;
-	createdAt: unknown;
-	updatedAt: unknown;
-	telegram?: string;
-	website?: string;
-	twitter?: string;
+	createdAt: object;
+	updatedAt: object;
+	telegram: string | null;
+	website: string | null;
+	twitter: string | null;
 	process: number;
 	completed: boolean;
-	price: number;
+	price: number | null;
 	priceChangeRate5M: number | null;
 	priceChangeRate1H: number | null;
 	priceChangeRate6H: number | null;
 	priceChangeRate8H: number | null;
 	priceChangeRate24H: number | null;
+	volume5M: string;
+	volume1H: string;
+	volume6H: string;
+	volume8H: string;
+	volume24H: string;
 	token_reserve: string;
 	meme_token_reserve: string;
-	market_cap_token: string;
+	market_cap_token: string | null;
 	token1Address: string;
 	token1Name: string;
+	recentTradeTs: string | null;
 };
 
 export const getTokenList = async (parameters: {
 	page?: number;
 	pageSize?: number;
+	name?: string;
+	ticker?: string;
 	market?: string;
+	sort?:
+		| "popularity_5m"
+		| "popularity_1h"
+		| "popularity_6h"
+		| "popularity_24h"
+		| "recent"
+		| "new"
+		| "completing"
+		| "completed";
 }) => {
 	const { page = 1, pageSize = 10, market = "ICP" } = parameters;
 	const queryParameters = new URLSearchParams({
@@ -76,7 +88,7 @@ export const getTokenList = async (parameters: {
 		market,
 	});
 	const response = await request<{
-		data: PaginatedDataWithItems<tokenInfo>;
+		data: PaginatedDataWithData<tokenInfo>;
 		statusCode: number;
 		message: string;
 	}>(

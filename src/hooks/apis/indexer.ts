@@ -9,12 +9,13 @@ export const useInfiniteTokenList = () => {
 		queryFn: ({ pageParam: pageParameter = 1 }) =>
 			getTokenList({
 				page: pageParameter,
-				pageSize: 10,
+				pageSize: 16,
 			}),
 		getNextPageParam: (lastPage, pages) => {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},
 		initialPageParam: 1,
+		refetchInterval: 10000,
 	});
 };
 
