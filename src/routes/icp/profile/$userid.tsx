@@ -41,8 +41,8 @@ function UserId() {
 	console.debug("🚀 ~ UserId ~ usdValue:", usdValue);
 	const { setDepositWithdrawOpen } = useDialogStore();
 	return (
-		<div className="mt-5 h-full w-full flex-1 flex-col">
-			<div className="mb-5 flex h-[162px] w-full shrink-0 gap-x-5">
+		<div className="flex h-full w-full flex-1 flex-col overflow-auto pt-5">
+			<div className="sticky mb-5 flex h-[162px] w-full gap-x-5">
 				<div className="bg-gray-760 relative flex w-full gap-x-2 rounded-2xl p-5">
 					<div className="flex items-center gap-2">
 						<img
@@ -124,7 +124,7 @@ function UserId() {
 					</div>
 				</div>
 			</div>
-			<div className="mb-4 flex shrink-0 items-center gap-[30px] px-4">
+			<div className="sticky mb-4 flex items-center gap-[30px] px-4">
 				{["Holdings", "Created", "Activity"].map((tab) => {
 					const isActive = activeTab === tab;
 					return (
@@ -154,22 +154,24 @@ function UserId() {
 				})}
 			</div>
 
-			<div className="flex-1">
-				{activeTab === "Holdings" && (
-					<div className="bg-gray-760 h-full rounded-2xl p-5 text-white/60">
-						<ProfileHoldings />
-					</div>
-				)}
-				{activeTab === "Created" && (
-					<div className="bg-gray-760 rounded-2xl p-5 text-white/60">
-						<ProfileCreatedTokens />
-					</div>
-				)}
-				{activeTab === "Activity" && (
-					<div className="bg-gray-760 rounded-2xl p-5 text-white/60">
-						Activity feed goes here...
-					</div>
-				)}
+			<div className="no-scrollbar flex-1 flex-col overflow-auto rounded-2xl pb-5">
+				<div className="h-max">
+					{activeTab === "Holdings" && (
+						<div className="bg-gray-760 h-full rounded-2xl p-5 text-white/60">
+							<ProfileHoldings />
+						</div>
+					)}
+					{activeTab === "Created" && (
+						<div className="bg-gray-760 rounded-2xl p-5 text-white/60">
+							<ProfileCreatedTokens />
+						</div>
+					)}
+					{activeTab === "Activity" && (
+						<div className="bg-gray-760 rounded-2xl p-5 text-white/60">
+							Activity feed goes here...
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);

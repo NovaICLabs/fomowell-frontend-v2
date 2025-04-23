@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useRouter } from "@tanstack/react-router";
 import {
@@ -35,6 +35,12 @@ const ProfileCreatedTokens = () => {
 		isFetching: isPriceFetching,
 		refetch: priceRefetch,
 	} = useMultipleCurrentPrice({ ids: data ? data?.map((row) => row.id) : [] });
+	const [pagination, setPagination] = useState({
+		pageIndex: 0,
+		pageSize: 10,
+	});
+	const [displayedItems, setDisplayedItems] = useState<Array<CreatedToken>>([]);
+	const loadingRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		if (!principal) return;
@@ -195,6 +201,49 @@ const ProfileCreatedTokens = () => {
 
 	const items = useMemo(() => data ?? [], [data]);
 
+	const allItemsLoaded = useMemo(() => {
+		return displayedItems.length >= (items?.length || 0);
+	}, [displayedItems, items]);
+
+	useEffect(() => {
+		if (items && items.length > 0) {
+			setDisplayedItems(items.slice(0, pagination.pageSize));
+		}
+	}, [items, pagination.pageSize]);
+
+	const loadMoreItems = useCallback(() => {
+		if (allItemsLoaded || !items) return;
+
+		const nextPageIndex = pagination.pageIndex + 1;
+		const startIndex = 0;
+		const endIndex = (nextPageIndex + 1) * pagination.pageSize;
+
+		setDisplayedItems(items.slice(startIndex, endIndex));
+		setPagination((previous) => ({ ...previous, pageIndex: nextPageIndex }));
+	}, [allItemsLoaded, items, pagination]);
+
+	useEffect(() => {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0] && entries[0].isIntersecting && !allItemsLoaded) {
+					loadMoreItems();
+				}
+			},
+			{ threshold: 0.1 }
+		);
+
+		if (loadingRef.current) {
+			observer.observe(loadingRef.current);
+		}
+
+		return () => {
+			if (loadingRef.current) {
+				// eslint-disable-next-line react-hooks/exhaustive-deps
+				observer.unobserve(loadingRef.current);
+			}
+		};
+	}, [loadMoreItems, allItemsLoaded]);
+
 	const table = useReactTable({
 		data: items,
 		columns,
@@ -212,7 +261,7 @@ const ProfileCreatedTokens = () => {
 	});
 
 	return (
-		<>
+		<div className="h-full rounded-2xl text-white/60">
 			<table className="w-full min-w-max">
 				<thead className="sticky top-0 z-10">
 					{table.getHeaderGroups().map((headerGroup) => (
@@ -309,6 +358,16 @@ const ProfileCreatedTokens = () => {
 					))}
 				</tbody>
 			</table>
+			<div ref={loadingRef}>
+				{!allItemsLoaded && !isFetching ? (
+					<div className="py-4 text-center text-sm text-white/60">
+						Loading more...
+					</div>
+				) : null}
+				{allItemsLoaded && displayedItems.length > 0 ? (
+					<div className="text-sm text-white/60"></div>
+				) : null}
+			</div>
 			<div className="min-h-5 w-full">
 				{!isFetching && (!items || items.length === 0) && (
 					<div className="flex h-50 flex-col items-center justify-center text-center text-sm text-white/40">
@@ -317,7 +376,7 @@ const ProfileCreatedTokens = () => {
 					</div>
 				)}
 			</div>
-		</>
+		</div>
 	);
 };
 
