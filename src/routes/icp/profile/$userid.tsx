@@ -155,7 +155,7 @@ function UserId() {
 			<div>
 				{activeTab === "Holdings" && (
 					<div className="bg-gray-760 rounded-2xl p-5 text-white/60">
-						Holdings data goes here...
+						Here is Holdings data...
 					</div>
 				)}
 				{activeTab === "Created" && (
