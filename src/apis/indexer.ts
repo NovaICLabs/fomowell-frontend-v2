@@ -118,6 +118,7 @@ export type Transaction = {
 	tradeType: "buy" | "sell";
 	token0: string;
 	token1: string;
+	maker: string | null;
 	token0Amount: string;
 	token1Amount: string;
 	token0Reserve: string;
@@ -138,7 +139,7 @@ export const getTokenTransactionList = async (parameters: {
 	page?: number;
 	pageSize?: number;
 }) => {
-	const { token0, token1, page = 1, pageSize = 10 } = parameters;
+	const { token0, token1, page = 1, pageSize = 20 } = parameters;
 	const queryParameters = new URLSearchParams({
 		page: page.toString(),
 		pageSize: pageSize.toString(),

@@ -314,7 +314,7 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 					return (
 						<div className="flex h-full w-full items-center gap-1">
 							<span className="text-sm leading-4 font-medium text-white">
-								${value === null ? "--" : formatNumberSmart(mc)}
+								${value === null ? "--" : formatNumberSmart(mc, true)}
 							</span>
 						</div>
 					);
