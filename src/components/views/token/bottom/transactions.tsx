@@ -161,7 +161,7 @@ export default function Transactions() {
 				size: 150,
 			}),
 			// Fee column
-			columnHelper.accessor("token1Volume", {
+			columnHelper.accessor("fee", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">Fee</span>
@@ -171,7 +171,7 @@ export default function Transactions() {
 					<div className="flex h-full w-full items-center">
 						<span className="text-sm leading-4 text-white/60">
 							{formatNumberSmart(
-								BigNumber(info.getValue())
+								BigNumber(info.getValue() ?? 0)
 									.div(BigNumber(10 ** getICPCanisterToken().decimals))
 									.toString()
 							)}{" "}
@@ -179,7 +179,7 @@ export default function Transactions() {
 						</span>
 					</div>
 				),
-				size: 120,
+				size: 130,
 			}), // Maker column
 			columnHelper.accessor("maker", {
 				header: () => (

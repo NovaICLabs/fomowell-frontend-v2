@@ -9,7 +9,12 @@ import { getICPCanisterId } from "@/canisters/icrc3";
 
 export const useInfiniteTokenList = (parameters: TokenListParameters) => {
 	return useInfiniteQuery({
-		queryKey: ["ic-core", "tokenList", parameters.sort],
+		queryKey: [
+			"ic-core",
+			"tokenList",
+			parameters.sort,
+			parameters.sortDirection,
+		],
 		queryFn: ({ pageParam: page = 1 }) =>
 			getTokenList({
 				...parameters,
@@ -19,7 +24,7 @@ export const useInfiniteTokenList = (parameters: TokenListParameters) => {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},
 		initialPageParam: 1,
-		refetchInterval: 4000,
+		refetchInterval: 2000,
 	});
 };
 
@@ -38,5 +43,6 @@ export const useInfiniteTokenTransactionsHistory = (parameters: {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},
 		initialPageParam: 1,
+		refetchInterval: 4000,
 	});
 };

@@ -65,14 +65,18 @@ export type tokenInfo = {
 	recentTradeTs: string | null;
 };
 export const tokenListSortOptions = [
-	"popularity_5m",
-	"popularity_1h",
-	"popularity_6h",
-	"popularity_24h",
 	"recent",
 	"new",
 	"completing",
 	"completed",
+	"popularity_5m",
+	"popularity_1h",
+	"popularity_6h",
+	"popularity_24h",
+	"price",
+	"liquidity",
+	"mc",
+	"volume",
 ] as const;
 
 export type TokenListSortOption = (typeof tokenListSortOptions)[number];
@@ -84,6 +88,7 @@ export type TokenListParameters = {
 	ticker?: string;
 	market?: string;
 	sort?: TokenListSortOption;
+	sortDirection?: "asc" | "desc";
 };
 export const getTokenList = async (parameters: TokenListParameters) => {
 	const {
@@ -91,12 +96,14 @@ export const getTokenList = async (parameters: TokenListParameters) => {
 		pageSize = 10,
 		market = "ICP",
 		sort = "recent",
+		sortDirection = "desc",
 	} = parameters;
 	const queryParameters = new URLSearchParams({
 		page: page.toString(),
 		pageSize: pageSize.toString(),
 		market,
 		sort,
+		sortDirection,
 	});
 	const response = await request<{
 		data: PaginatedDataWithData<tokenInfo>;
@@ -119,6 +126,7 @@ export type Transaction = {
 	token0: string;
 	token1: string;
 	maker: string | null;
+	fee: string | null;
 	token0Amount: string;
 	token1Amount: string;
 	token0Reserve: string;

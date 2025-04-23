@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { useRouter } from "@tanstack/react-router";
+import { useRouter, useSearch } from "@tanstack/react-router";
 import {
 	createColumnHelper,
 	flexRender,
@@ -51,7 +51,10 @@ const TableItemsSkeleton = () => {
 	);
 };
 
-export default function MemeList({ sort }: { sort: TokenListSortOption }) {
+export default function MemeList() {
+	const { sort, direction, ...search } = useSearch({
+		from: "/",
+	});
 	const {
 		data,
 		hasNextPage,
@@ -60,7 +63,11 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 		status,
 		error,
 		isFetching,
-	} = useInfiniteTokenList({ sort, pageSize: 16 });
+	} = useInfiniteTokenList({
+		sort,
+		sortDirection: direction,
+		pageSize: 16,
+	});
 	const router = useRouter();
 
 	const columnHelper = createColumnHelper<tokenInfo>();
@@ -86,7 +93,17 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 		() => data?.pages.flatMap((page) => page.data) ?? [],
 		[data]
 	);
-
+	const handleSort = useCallback(
+		(selectedSort: TokenListSortOption) => {
+			const currentDirection =
+				selectedSort === sort ? (direction === "asc" ? "desc" : "asc") : "desc";
+			void router.navigate({
+				to: "/",
+				search: { ...search, sort: selectedSort, direction: currentDirection },
+			});
+		},
+		[direction, router, search, sort]
+	);
 	useEffect(() => {
 		const currentRecentTradeTs = new Map<string, string | null>();
 		const newlyFlashed = new Set<string>();
@@ -227,9 +244,21 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			columnHelper.accessor("timestamp", {
 				id: "age",
 				header: () => (
-					<div className="group flex cursor-pointer items-center gap-1">
-						<span className="duration-300 group-hover:text-white">Age</span>
-						<SortsIcon />
+					<div
+						className="group flex cursor-pointer items-center gap-1"
+						onClick={withStopPropagation(() => {
+							handleSort("new");
+						})}
+					>
+						<span
+							className={cn(
+								"duration-300 group-hover:text-white",
+								sort === "new" && "text-white"
+							)}
+						>
+							Age
+						</span>
+						<SortsIcon direction={direction} selected={sort === "new"} />
 					</div>
 				),
 				cell: (info) => (
@@ -243,9 +272,21 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			}),
 			columnHelper.accessor("price", {
 				header: () => (
-					<div className="group flex cursor-pointer items-center gap-1">
-						<span className="duration-300 group-hover:text-white">Price</span>
-						<SortsIcon />
+					<div
+						className="group flex cursor-pointer items-center gap-1"
+						onClick={withStopPropagation(() => {
+							handleSort("price");
+						})}
+					>
+						<span
+							className={cn(
+								"duration-300 group-hover:text-white",
+								sort === "price" && "text-white"
+							)}
+						>
+							Price
+						</span>
+						<SortsIcon direction={direction} selected={sort === "price"} />
 					</div>
 				),
 				cell: (info) => {
@@ -268,18 +309,41 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			}),
 			columnHelper.accessor("market_cap_token", {
 				header: () => (
-					<div className="group flex cursor-pointer items-center gap-1">
-						<span className="duration-300 group-hover:text-white">
+					<div
+						className="group flex cursor-pointer items-center gap-1"
+						onClick={withStopPropagation(() => {
+							handleSort("liquidity");
+						})}
+					>
+						<span
+							className={cn(
+								"duration-300 group-hover:text-white",
+								sort === "liquidity" && "text-white"
+							)}
+						>
 							Liquidity
 						</span>
-						<SortsIcon />
+						<SortsIcon direction={direction} selected={sort === "liquidity"} />
 					</div>
 				),
 				cell: (info) => {
 					const value = info.getValue();
 					const isNull = value === null;
 					return (
-						<div className="flex h-full w-full items-center gap-1">
+						<div
+							className="flex h-full w-full items-center gap-1"
+							onClick={withStopPropagation(() => {
+								const currentDirection = direction === "asc" ? "desc" : "asc";
+								void router.navigate({
+									to: "/",
+									search: {
+										...search,
+										sort: "liquidity",
+										direction: currentDirection,
+									},
+								});
+							})}
+						>
 							<span className="text-sm leading-4 font-medium text-white">
 								$
 								{getTokenUsdValueTotal(
@@ -297,9 +361,21 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			columnHelper.accessor((row) => row.price, {
 				id: "mc",
 				header: () => (
-					<div className="group flex cursor-pointer items-center gap-1">
-						<span className="duration-300 group-hover:text-white">MC</span>
-						<SortsIcon />
+					<div
+						className="group flex cursor-pointer items-center gap-1"
+						onClick={withStopPropagation(() => {
+							handleSort("mc");
+						})}
+					>
+						<span
+							className={cn(
+								"duration-300 group-hover:text-white",
+								sort === "mc" && "text-white"
+							)}
+						>
+							MC
+						</span>
+						<SortsIcon direction={direction} selected={sort === "mc"} />
 					</div>
 				),
 				cell: (info) => {
@@ -324,9 +400,24 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			columnHelper.accessor((row) => row.priceChangeRate5M, {
 				id: "priceChangeRate5M",
 				header: () => (
-					<div className="group flex cursor-pointer items-center gap-1">
-						<span className="duration-300 group-hover:text-white">5m</span>
-						<SortsIcon />
+					<div
+						className="group flex cursor-pointer items-center gap-1"
+						onClick={withStopPropagation(() => {
+							handleSort("popularity_5m");
+						})}
+					>
+						<span
+							className={cn(
+								"duration-300 group-hover:text-white",
+								sort === "popularity_5m" && "text-white"
+							)}
+						>
+							5m
+						</span>
+						<SortsIcon
+							direction={direction}
+							selected={sort === "popularity_5m"}
+						/>
 					</div>
 				),
 				cell: (info) => {
@@ -352,9 +443,24 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			columnHelper.accessor((row) => row.priceChangeRate1H, {
 				id: "priceChangeRate1H",
 				header: () => (
-					<div className="group flex cursor-pointer items-center gap-1">
-						<span className="duration-300 group-hover:text-white">1h</span>
-						<SortsIcon />
+					<div
+						className="group flex cursor-pointer items-center gap-1"
+						onClick={withStopPropagation(() => {
+							handleSort("popularity_1h");
+						})}
+					>
+						<span
+							className={cn(
+								"duration-300 group-hover:text-white",
+								sort === "popularity_1h" && "text-white"
+							)}
+						>
+							1h
+						</span>
+						<SortsIcon
+							direction={direction}
+							selected={sort === "popularity_1h"}
+						/>
 					</div>
 				),
 				cell: (info) => {
@@ -381,9 +487,24 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			columnHelper.accessor((row) => row.priceChangeRate8H, {
 				id: "priceChangeRate8H",
 				header: () => (
-					<div className="group flex cursor-pointer items-center gap-1">
-						<span className="duration-300 group-hover:text-white">8h</span>
-						<SortsIcon />
+					<div
+						className="group flex cursor-pointer items-center gap-1"
+						onClick={withStopPropagation(() => {
+							handleSort("popularity_6h");
+						})}
+					>
+						<span
+							className={cn(
+								"duration-300 group-hover:text-white",
+								sort === "popularity_6h" && "text-white"
+							)}
+						>
+							8h
+						</span>
+						<SortsIcon
+							direction={direction}
+							selected={sort === "popularity_6h"}
+						/>
 					</div>
 				),
 				cell: (info) => {
@@ -409,9 +530,24 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			columnHelper.accessor((row) => row.priceChangeRate24H, {
 				id: "priceChangeRate24H",
 				header: () => (
-					<div className="group flex cursor-pointer items-center gap-1">
-						<span className="duration-300 group-hover:text-white">24h</span>
-						<SortsIcon />
+					<div
+						className="group flex cursor-pointer items-center gap-1"
+						onClick={withStopPropagation(() => {
+							handleSort("popularity_24h");
+						})}
+					>
+						<span
+							className={cn(
+								"duration-300 group-hover:text-white",
+								sort === "popularity_24h" && "text-white"
+							)}
+						>
+							24h
+						</span>
+						<SortsIcon
+							direction={direction}
+							selected={sort === "popularity_24h"}
+						/>
 					</div>
 				),
 				cell: (info) => {
@@ -437,9 +573,21 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 			columnHelper.accessor("volume24H", {
 				id: "volume",
 				header: () => (
-					<div className="group flex cursor-pointer items-center gap-1">
-						<span className="duration-300 group-hover:text-white">Volume</span>
-						<SortsIcon />
+					<div
+						className="group flex cursor-pointer items-center gap-1"
+						onClick={withStopPropagation(() => {
+							handleSort("volume");
+						})}
+					>
+						<span
+							className={cn(
+								"duration-300 group-hover:text-white",
+								sort === "volume" && "text-white"
+							)}
+						>
+							Volume
+						</span>
+						<SortsIcon direction={direction} selected={sort === "volume"} />
 					</div>
 				),
 				cell: (info) => {
@@ -501,7 +649,17 @@ export default function MemeList({ sort }: { sort: TokenListSortOption }) {
 				enablePinning: true,
 			}),
 		],
-		[buyToken, columnHelper, flashAmount, flashAmountBigInt, icpPrice]
+		[
+			buyToken,
+			columnHelper,
+			direction,
+			flashAmount,
+			flashAmountBigInt,
+			icpPrice,
+			router,
+			search,
+			sort,
+		]
 	);
 
 	const table = useReactTable({

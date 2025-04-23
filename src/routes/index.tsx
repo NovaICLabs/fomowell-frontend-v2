@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 
+import { type TokenListSortOption, tokenListSortOptions } from "@/apis/indexer";
 import SlippageSetting from "@/components/icons/common/slippage-setting";
 import Star from "@/components/icons/star";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,6 @@ import {
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
-	SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MemeList from "@/components/views/home/meme-list";
@@ -20,16 +20,6 @@ import { cn } from "@/lib/utils";
 import { chains, useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
 import { useQuickBuyStore } from "@/store/quick-buy";
-
-import type { TokenListSortOption } from "@/apis/indexer";
-
-const tabs = ["recent", "new", "completing", "completed", "favorite"] as const;
-type TabType = (typeof tabs)[number];
-// Using Zod to define search parameters schema
-const SearchSchema = z.object({
-	tab: z.enum(tabs).optional(),
-	chain: z.enum(chains).optional(),
-});
 
 // Derived type
 // type SearchParameters = z.infer<typeof SearchSchema>;
@@ -45,11 +35,35 @@ const trendingTimeOptions: Array<{
 ] as const;
 type TrendingTimeOption = (typeof trendingTimeOptions)[number]["label"];
 
-function Home() {
-	const { tab, chain: chainFromSearch, ...search } = Route.useSearch();
-	const [trendingTime, setTrendingTime] =
-		useState<TrendingTimeOption>("5 mins");
+const directionOptions = ["asc", "desc"] as const;
+export type SortDirection = (typeof directionOptions)[number];
+// Using Zod to define search parameters schema
+const SearchSchema = z.object({
+	chain: z.enum(chains).optional(),
+	sort: z.enum(tokenListSortOptions).optional(),
+	direction: z.enum(directionOptions).optional(),
+	tab: z.string().optional(),
+});
 
+function Home() {
+	const {
+		sort,
+		direction,
+		tab,
+		chain: chainFromSearch,
+		...search
+	} = Route.useSearch();
+
+	const [trendingTime, setTrendingTime] = useState<TrendingTimeOption>(
+		trendingTimeOptions.find((option) => option.value === sort)?.label ??
+			"5 mins"
+	);
+	const trendingTimeSelected = useMemo(
+		() =>
+			trendingTimeOptions.find((option) => option.value === sort)?.label ===
+				trendingTime && direction === "desc",
+		[sort, direction, trendingTime]
+	);
 	const router = useRouter();
 	const { chain, setChain } = useChainStore();
 
@@ -66,34 +80,57 @@ function Home() {
 	} = useQuickBuyStore();
 	const { setSlippageOpen } = useDialogStore();
 
-	const [sort, setSort] = useState<TokenListSortOption>("recent");
+	const handleTrendingTimeSort = useCallback(
+		(value: TrendingTimeOption) => {
+			const option = trendingTimeOptions.find(
+				(option) => option.label === value || option.value === value
+			);
+			if (!option) {
+				return;
+			}
+			const direction = "desc";
+			// navigate to the new tab
+			void router.navigate({
+				to: "/",
+				search: { ...search, sort: option.value, direction },
+			});
+		},
+		[router, search]
+	);
 
 	return (
 		<div className="mt-4.5 flex flex-col overflow-auto">
 			<div className="sticky top-0 z-10 flex gap-4 text-white">
 				<Select
-					value={trendingTime}
-					onValueChange={(value: TrendingTimeOption) => {
+					value={
+						trendingTime ??
+						trendingTimeOptions.find((option) => option.value === sort)?.label
+					}
+					onValueChange={(value) => {
+						handleTrendingTimeSort(value);
 						setTrendingTime(value);
-						const option = trendingTimeOptions.find(
-							(option) => option.label === value
-						);
-						if (!option) {
-							return;
-						}
-						setSort(option.value);
 					}}
 				>
-					<SelectTrigger className="dark:bg-gray-710 dark:hover:bg-gray-710/80 *:data-[slot=select-value]:bg-gray-760 h-[38px] min-w-[162px] rounded-full border-none px-4 text-sm font-semibold focus-visible:ring-0 *:data-[slot=select-value]:h-6 *:data-[slot=select-value]:rounded-full *:data-[slot=select-value]:px-2 *:data-[slot=select-value]:text-xs *:data-[slot=select-value]:font-medium *:data-[slot=select-value]:text-white/60">
-						<div className="flex items-center gap-x-1">
-							<img alt="fire" src="/svgs/fire.svg" />
-							<span className="text-sm font-semibold">Trending</span>
+					<div className={cn("relative flex items-center rounded-full p-px")}>
+						{trendingTimeSelected && (
+							<div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FF3D0C] to-[#FFEA14]"></div>
+						)}
+						<div className="relative flex h-full items-center rounded-full">
+							<div
+								className="absolute left-2 flex h-full cursor-pointer items-center justify-between gap-x-1"
+								onClick={() => {
+									handleTrendingTimeSort(trendingTime);
+								}}
+							>
+								<img alt="fire" src="/svgs/fire.svg" />
+								<span className="text-sm font-semibold">Trending</span>
+								<div className="bg-gray-760 flex h-6 w-[50px] items-center justify-center rounded-full px-1.5 text-xs font-medium">
+									<span className="text-white/60">{trendingTime}</span>
+								</div>
+							</div>
+							<SelectTrigger className="dark:bg-gray-710 dark:hover:bg-gray-710/80 *:data-[slot=select-value]:bg-gray-760 h-[38px] min-w-[175px] justify-end rounded-full border-none px-4 focus-visible:ring-0 *:data-[slot=select-value]:h-6 *:data-[slot=select-value]:rounded-full *:data-[slot=select-value]:px-2 *:data-[slot=select-value]:text-xs *:data-[slot=select-value]:font-medium *:data-[slot=select-value]:text-white/60"></SelectTrigger>
 						</div>
-						<SelectValue
-							className="dark:bg-gray-760 dark:text-gray-760 text-sm font-semibold"
-							placeholder=""
-						/>
-					</SelectTrigger>
+					</div>
 					<SelectContent className="bg-gray-750 rounded-2xl border-none py-[5px]">
 						{trendingTimeOptions.map((option) => (
 							<SelectItem
@@ -108,25 +145,30 @@ function Home() {
 				</Select>
 				<Tabs
 					className=""
-					defaultValue={tab ?? "recent"}
+					value={direction === "desc" ? sort : ""}
 					onValueChange={(value) => {
-						setSort(value as TokenListSortOption);
+						const direction = "desc";
+
 						void router.navigate({
 							to: "/",
-							search: { ...search, tab: value as TabType },
+							search: {
+								...search,
+								sort: value as TokenListSortOption,
+								direction,
+							},
 						});
 					}}
 				>
 					<TabsList className="border-gray-650 h-[38px] rounded-full border bg-transparent">
-						{tabs.slice(0, 4).map((tab) => (
+						{tokenListSortOptions.slice(0, 4).map((sort) => (
 							<TabsTrigger
-								key={tab}
-								value={tab}
+								key={sort}
+								value={sort}
 								className={cn(
 									"rounded-full px-4 py-2 text-white/60 capitalize dark:data-[state=active]:bg-white dark:data-[state=active]:text-black"
 								)}
 							>
-								{tab}
+								{sort}
 							</TabsTrigger>
 						))}
 					</TabsList>
@@ -218,7 +260,7 @@ function Home() {
 				</div>
 			</div>
 			<div className="mt-4 flex flex-col overflow-auto">
-				<MemeList sort={sort} />
+				<MemeList />
 			</div>
 		</div>
 	);
