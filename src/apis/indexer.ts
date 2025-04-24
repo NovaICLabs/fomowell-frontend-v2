@@ -135,6 +135,8 @@ export type Transaction = {
 	token1Price: string;
 	token0Volume: string;
 	token1Volume: string;
+	token0Usd: number;
+	token1Usd: number;
 	tradeTs: string;
 	tx_index: number;
 	createdAt: unknown;

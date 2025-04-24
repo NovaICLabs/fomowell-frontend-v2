@@ -12,6 +12,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { BigNumber } from "bignumber.js";
 
 import { getICPCanisterToken } from "@/canisters/icrc3/specials";
+import FormattedSmallNumber from "@/components/common/short-zero";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useInfiniteTokenTransactionsHistory } from "@/hooks/apis/indexer";
@@ -108,7 +109,7 @@ export default function Transactions() {
 				size: 100,
 			}),
 			// Total USD column
-			columnHelper.accessor("token1Amount", {
+			columnHelper.accessor("token1Usd", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">
@@ -126,17 +127,40 @@ export default function Transactions() {
 									: "text-price-positive"
 							)}
 						>
+							$
 							{getTokenUsdValueTotal(
 								{
-									amount: BigInt(info.getValue()),
+									amount: BigInt(info.row.original.token1Amount),
 								},
-								icpPrice ?? 0
+								info.row.original.token1Usd ?? 0
 							)}
 						</span>
 					</div>
 				),
 				size: 120,
-			}), // Price column
+			}),
+			// Fee column
+			columnHelper.accessor("token1Amount", {
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">
+							Total ICP
+						</span>
+					</div>
+				),
+				cell: (info) => (
+					<div className="flex h-full w-full items-center">
+						<span className="text-sm leading-4 text-white/60">
+							{formatNumberSmart(
+								formatUnits(info.getValue(), getICPCanisterToken().decimals)
+							)}{" "}
+							ICP
+						</span>
+					</div>
+				),
+				size: 130,
+			}),
+			// Price column
 			columnHelper.accessor("token1Price", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
@@ -144,43 +168,21 @@ export default function Transactions() {
 					</div>
 				),
 				cell: (info) => (
-					<div className="flex h-full w-full items-center">
-						<span className="text-sm leading-4 text-white/60">
-							<span className={cn("text-sm leading-4")}>
-								{formatNumberSmart(
-									BigNumber(1)
-										.times(10 ** getICPCanisterToken().decimals)
-										.div(BigNumber(info.getValue()))
-										.toString()
-								)}{" "}
-								ICP
-							</span>
-						</span>
+					<div className="flex h-full w-full items-center gap-1">
+						<FormattedSmallNumber
+							className="text-sm leading-4"
+							number={formatNumberSmart(
+								BigNumber(1)
+									.times(10 ** getICPCanisterToken().decimals)
+									.div(BigNumber(info.getValue()))
+									.toString()
+							)}
+						/>
+						<span className="text-sm leading-4 text-white/60">ICP</span>
 					</div>
 				),
 				size: 150,
 			}),
-			// Fee column
-			columnHelper.accessor("fee", {
-				header: () => (
-					<div className="group flex cursor-pointer items-center gap-1">
-						<span className="duration-300 group-hover:text-white">Fee</span>
-					</div>
-				),
-				cell: (info) => (
-					<div className="flex h-full w-full items-center">
-						<span className="text-sm leading-4 text-white/60">
-							{formatNumberSmart(
-								BigNumber(info.getValue() ?? 0)
-									.div(BigNumber(10 ** getICPCanisterToken().decimals))
-									.toString()
-							)}{" "}
-							ICP
-						</span>
-					</div>
-				),
-				size: 130,
-			}), // Maker column
 			columnHelper.accessor("maker", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center justify-end gap-1">
