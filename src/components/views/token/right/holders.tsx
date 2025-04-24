@@ -29,7 +29,13 @@ export default function Holders() {
 				<span className="text-base leading-normal font-semibold text-white">
 					Holders
 				</span>
-				<span className="text-base font-semibold text-yellow-500">(12k)</span>
+				<span className="text-base font-semibold text-yellow-500">
+					(
+					{holders?.total
+						? formatNumberSmart(Number(holders?.total ?? 0), true)
+						: "--"}
+					)
+				</span>
 			</div>
 			<div className="bg-gray-860 mt-2.5 flex h-[617px] w-full flex-col items-center justify-between rounded-[12px] pb-5">
 				<table className="w-full">
