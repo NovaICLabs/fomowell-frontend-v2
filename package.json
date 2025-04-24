@@ -78,6 +78,7 @@
 		"i18next-http-backend": "^2.6.1",
 		"ic-siwb-lasereyes-connector": "^0.1.9",
 		"ic-use-siwb-identity": "^0.1.0",
+		"lightweight-charts": "^5.0.6",
 		"lucide-react": "^0.487.0",
 		"next-themes": "^0.4.6",
 		"npm": "^11.2.0",

@@ -1,3 +1,5 @@
+import { getICPCanisterId } from "@/canisters/icrc3";
+
 import { request } from ".";
 
 const getIndexerBaseUrl = () => {
@@ -170,6 +172,65 @@ export const getTokenTransactionList = async (parameters: {
 	if (response.statusCode !== 200) {
 		throw new Error(
 			`Failed to fetch token trade list: ${response.message} (Status: ${response.statusCode})`
+		);
+	}
+	return response.data;
+};
+
+// =============================== token price candle ===============================
+
+export type CandleData = {
+	time: number;
+	open: string;
+	high: string;
+	low: string;
+	close: string;
+	volume: string;
+};
+
+type CandleApiResponse = {
+	data: Array<CandleData>;
+	statusCode: number;
+	message: string;
+};
+export type CandleParameters = {
+	tokenId: string;
+	interval: "minute" | "5min" | "15min" | "hourly" | "daily";
+	market?: string;
+	start?: number;
+	end?: number;
+};
+export const getTokenPriceCandle = async (parameters: CandleParameters) => {
+	const { tokenId, interval, market, start, end } = parameters;
+	const intervalPathMap: Record<typeof interval, string> = {
+		minute: "minute-candles",
+		"5min": "5min-candles",
+		"15min": "15min-candles",
+		hourly: "hourly-candles",
+		daily: "daily-candles",
+	};
+	const pathSegment = intervalPathMap[interval];
+
+	const queryParameters = new URLSearchParams({
+		token0: tokenId,
+		token1: getICPCanisterId().toText(),
+		market: market ?? "ICP",
+	});
+
+	if (start !== undefined) {
+		queryParameters.set("start", start.toString());
+	}
+	if (end !== undefined) {
+		queryParameters.set("end", end.toString());
+	}
+
+	const url = `${getIndexerBaseUrl()}/api/v1/token_trade/${pathSegment}?${queryParameters.toString()}`;
+
+	const response = await request<CandleApiResponse>(url);
+
+	if (response.statusCode !== 200) {
+		throw new Error(
+			`Failed to fetch token ${interval} candles for ${tokenId}/${market}: ${response.message} (Status: ${response.statusCode})`
 		);
 	}
 	return response.data;

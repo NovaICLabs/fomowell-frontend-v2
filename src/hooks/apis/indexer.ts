@@ -1,7 +1,9 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 import {
+	type CandleParameters,
 	getTokenList,
+	getTokenPriceCandle,
 	getTokenTransactionList,
 	type TokenListParameters,
 } from "@/apis/indexer";
@@ -31,7 +33,7 @@ export const useInfiniteTokenList = (parameters: TokenListParameters) => {
 export const useSingleTokenInfo = (parameters: { id: string }) => {
 	return useQuery({
 		queryKey: ["ic-core", "tokenInfo", parameters.id],
-		queryFn: () => getTokenList({ id: parameters.id }),
+		queryFn: () => getTokenList({ id: parameters.id, page: 1, pageSize: 1 }),
 	});
 };
 
@@ -51,5 +53,18 @@ export const useInfiniteTokenTransactionsHistory = (parameters: {
 		},
 		initialPageParam: 1,
 		refetchInterval: 2000,
+	});
+};
+
+export const useTokenPriceCandle = (parameters: CandleParameters) => {
+	return useQuery({
+		queryKey: [
+			"ic-core",
+			"tokenPriceCandle",
+			parameters.tokenId,
+			parameters.interval,
+		],
+		queryFn: () => getTokenPriceCandle(parameters),
+		refetchInterval: 10000,
 	});
 };
