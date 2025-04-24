@@ -36,6 +36,7 @@ export interface Burn {
 	spender: [] | [Account];
 }
 export interface Buy {
+	fee: [] | [bigint];
 	token: Principal;
 	from: Account;
 	amount_out: bigint;
@@ -225,8 +226,18 @@ export interface NumericEntity {
 	first: bigint;
 	last: bigint;
 }
+export interface QueryMemeTokenArgs {
+	sort: [] | [Sort];
+	start: bigint;
+	length: bigint;
+}
+export interface QueryMemeTokenResponse {
+	meme_tokens: Array<MemeToken>;
+	count: bigint;
+}
 export type Result = { Ok: bigint } | { Err: string };
 export type Result_1 = { Ok: MemeToken } | { Err: string };
+export type Sort = { CreateTimeDsc: null } | { MarketCapDsc: null };
 export interface StableToken {
 	fee: bigint;
 	decimals: number;
@@ -318,6 +329,7 @@ export interface _SERVICE {
 	calculate_sell: ActorMethod<[bigint, bigint], Result>;
 	create_token: ActorMethod<[CreateMemeTokenArg], Result_1>;
 	deposit: ActorMethod<[DepositArgs], Result>;
+	generate_random: ActorMethod<[], bigint>;
 	getCanistergeekInformation: ActorMethod<
 		[GetInformationRequest],
 		GetInformationResponse
@@ -326,10 +338,12 @@ export interface _SERVICE {
 	icrc1_balance_of: ActorMethod<[LedgerType, Account], bigint>;
 	query_meme_token: ActorMethod<[bigint], [] | [MemeToken]>;
 	query_meme_token_price: ActorMethod<[bigint], Result>;
+	query_meme_tokens: ActorMethod<[QueryMemeTokenArgs], QueryMemeTokenResponse>;
 	query_token_holders: ActorMethod<
 		[bigint, bigint, bigint],
 		[Array<Holder>, bigint]
 	>;
+	query_user_by_random: ActorMethod<[bigint], [] | [Principal]>;
 	query_user_create_meme_tokens: ActorMethod<
 		[[] | [Principal]],
 		Array<MemeToken>

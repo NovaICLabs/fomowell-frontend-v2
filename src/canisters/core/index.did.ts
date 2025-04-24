@@ -173,6 +173,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		length: IDL.Nat,
 	});
 	const Buy = IDL.Record({
+		fee: IDL.Opt(IDL.Nat),
 		token: IDL.Principal,
 		from: Account,
 		amount_out: IDL.Nat,
@@ -294,6 +295,19 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		transactions: IDL.Vec(Transaction),
 		archived_transactions: IDL.Vec(ArchivedRange),
 	});
+	const Sort = IDL.Variant({
+		CreateTimeDsc: IDL.Null,
+		MarketCapDsc: IDL.Null,
+	});
+	const QueryMemeTokenArgs = IDL.Record({
+		sort: IDL.Opt(Sort),
+		start: IDL.Nat64,
+		length: IDL.Nat64,
+	});
+	const QueryMemeTokenResponse = IDL.Record({
+		meme_tokens: IDL.Vec(MemeToken),
+		count: IDL.Nat64,
+	});
 	const Holder = IDL.Record({ balance: IDL.Nat, account: Account });
 	const MemeTokenBalance = IDL.Record({
 		token: MemeToken,
@@ -313,6 +327,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		calculate_sell: IDL.Func([IDL.Nat64, IDL.Nat], [Result], ["query"]),
 		create_token: IDL.Func([CreateMemeTokenArg], [Result_1], []),
 		deposit: IDL.Func([DepositArgs], [Result], []),
+		generate_random: IDL.Func([], [IDL.Nat64], []),
 		getCanistergeekInformation: IDL.Func(
 			[GetInformationRequest],
 			[GetInformationResponse],
@@ -326,9 +341,19 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		icrc1_balance_of: IDL.Func([LedgerType, Account], [IDL.Nat], ["query"]),
 		query_meme_token: IDL.Func([IDL.Nat64], [IDL.Opt(MemeToken)], ["query"]),
 		query_meme_token_price: IDL.Func([IDL.Nat64], [Result], ["query"]),
+		query_meme_tokens: IDL.Func(
+			[QueryMemeTokenArgs],
+			[QueryMemeTokenResponse],
+			["query"]
+		),
 		query_token_holders: IDL.Func(
 			[IDL.Nat64, IDL.Nat64, IDL.Nat64],
 			[IDL.Vec(Holder), IDL.Nat64],
+			["query"]
+		),
+		query_user_by_random: IDL.Func(
+			[IDL.Nat64],
+			[IDL.Opt(IDL.Principal)],
 			["query"]
 		),
 		query_user_create_meme_tokens: IDL.Func(

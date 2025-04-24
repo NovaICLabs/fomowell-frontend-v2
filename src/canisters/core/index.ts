@@ -339,6 +339,24 @@ export const getUserTokens = async (
 	});
 };
 
+export const get_generate_random = async (
+	canisterId: string
+): Promise<string | undefined> => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+	const actor = await createActor<_SERVICE>({
+		idlFactory,
+		canisterId,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const result = await actor.generate_random();
+	return result.toString();
+};
+
 // ================================ write ================================
 // createMemeToken
 export type CreateMemeTokenArgs = {
