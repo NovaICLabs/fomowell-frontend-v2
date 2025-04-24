@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 import {
 	getTokenList,
@@ -28,6 +28,13 @@ export const useInfiniteTokenList = (parameters: TokenListParameters) => {
 	});
 };
 
+export const useSingleTokenInfo = (parameters: { id: string }) => {
+	return useQuery({
+		queryKey: ["ic-core", "tokenInfo", parameters.id],
+		queryFn: () => getTokenList({ id: parameters.id }),
+	});
+};
+
 export const useInfiniteTokenTransactionsHistory = (parameters: {
 	token0: string;
 }) => {
@@ -43,6 +50,6 @@ export const useInfiniteTokenTransactionsHistory = (parameters: {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},
 		initialPageParam: 1,
-		refetchInterval: 4000,
+		refetchInterval: 2000,
 	});
 };

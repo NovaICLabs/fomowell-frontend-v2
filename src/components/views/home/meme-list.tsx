@@ -42,7 +42,7 @@ import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
 import { useQuickBuyStore } from "@/store/quick-buy";
 
-import type { tokenInfo, TokenListSortOption } from "@/apis/indexer";
+import type { TokenInfo, TokenListSortOption } from "@/apis/indexer";
 
 const TableItemsSkeleton = () => {
 	return (
@@ -71,7 +71,7 @@ export default function MemeList() {
 	});
 	const router = useRouter();
 
-	const columnHelper = createColumnHelper<tokenInfo>();
+	const columnHelper = createColumnHelper<TokenInfo>();
 
 	const { mutateAsync: buyToken } = useBuy();
 	const { amount: flashAmount } = useQuickBuyStore();
@@ -337,20 +337,7 @@ export default function MemeList() {
 					const value = info.getValue();
 					const isNull = value === null;
 					return (
-						<div
-							className="flex h-full w-full items-center gap-1"
-							onClick={withStopPropagation(() => {
-								const currentDirection = direction === "asc" ? "desc" : "asc";
-								void router.navigate({
-									to: "/",
-									search: {
-										...search,
-										sort: "liquidity",
-										direction: currentDirection,
-									},
-								});
-							})}
-						>
+						<div className="flex h-full w-full items-center gap-1">
 							<span className="text-sm leading-4 font-medium text-white">
 								$
 								{getTokenUsdValueTotal(
@@ -841,7 +828,7 @@ export default function MemeList() {
 							);
 						}
 
-						const row = tableRows[virtualRow.index] as Row<tokenInfo>;
+						const row = tableRows[virtualRow.index] as Row<TokenInfo>;
 						const isFlashing = flashingRows.has(
 							row.original.memeTokenId.toString()
 						);

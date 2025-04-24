@@ -88,3 +88,7 @@ export const getTokenUsdValueTotal = (
 		true
 	);
 };
+
+export const isNullOrUndefined = (value: number | undefined | null) => {
+	return value === undefined || value === null;
+};

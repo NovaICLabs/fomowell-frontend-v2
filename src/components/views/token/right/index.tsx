@@ -6,8 +6,13 @@ import BigNumber from "bignumber.js";
 import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 import { Progress } from "@/components/ui/progress";
 import { useICPPrice } from "@/hooks/apis/coingecko";
+import { useSingleTokenInfo } from "@/hooks/apis/indexer";
 import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
-import { formatNumberSmart, formatUnits } from "@/lib/common/number";
+import {
+	formatNumberSmart,
+	formatUnits,
+	isNullOrUndefined,
+} from "@/lib/common/number";
 import { fromNow } from "@/lib/common/time";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +20,10 @@ import Holders from "./holders";
 import Liquidity from "./liquidity";
 import Trade from "./trade";
 const tabs = ["Trade", "Liquidity"];
+
+const isNegative = (value: number) => {
+	return value < 0;
+};
 export default function Bottom() {
 	const [activeTab, setActiveTab] = useState(tabs[0]);
 	const { id } = useParams({ from: "/icp/token/$id" });
@@ -48,6 +57,18 @@ export default function Bottom() {
 					.toString()
 			: undefined;
 	}, [currentTokenPrice, totalSupply, icpPrice]);
+	const { data: tokenInfoData } = useSingleTokenInfo({ id });
+	const tokenInfo = useMemo(() => {
+		return tokenInfoData?.data[0];
+	}, [tokenInfoData]);
+
+	const {
+		priceChangeRate5M,
+		priceChangeRate1H,
+		priceChangeRate6H,
+
+		priceChangeRate24H,
+	} = tokenInfo ?? {};
 
 	return (
 		<div className="no-scrollbar flex w-[390px] flex-shrink-0 flex-col gap-7.5 overflow-auto">
@@ -89,27 +110,75 @@ export default function Bottom() {
 			<div className="bg-gray-860 grid h-21 flex-shrink-0 grid-cols-4 overflow-hidden rounded-[12px]">
 				<div className="border-r-gray-710 hover:bg-gray-710 flex cursor-pointer flex-col items-center justify-center gap-3 border-r">
 					<span className="text-sm leading-4 font-medium text-white/40">
-						1m
-					</span>
-					<span className="text-price-positive font-medium">12%</span>
-				</div>
-				<div className="border-r-gray-710 hover:bg-gray-710 flex cursor-pointer flex-col items-center justify-center gap-3 border-r">
-					<span className="text-sm leading-4 font-medium text-white/40">
 						5m
 					</span>
-					<span className="text-price-positive font-medium">12%</span>
+					<span
+						className={cn(
+							"text-price-positive font-medium",
+							!isNullOrUndefined(priceChangeRate5M) &&
+								isNegative(priceChangeRate5M)
+								? "text-price-negative"
+								: "text-price-positive"
+						)}
+					>
+						{!isNullOrUndefined(priceChangeRate5M)
+							? `${priceChangeRate5M}%`
+							: "--"}
+					</span>
 				</div>
 				<div className="border-r-gray-710 hover:bg-gray-710 flex cursor-pointer flex-col items-center justify-center gap-3 border-r">
 					<span className="text-sm leading-4 font-medium text-white/40">
 						1h
 					</span>
-					<span className="text-price-positive font-medium">12%</span>
+					<span
+						className={cn(
+							"text-price-positive font-medium",
+							!isNullOrUndefined(priceChangeRate1H) &&
+								isNegative(priceChangeRate1H)
+								? "text-price-negative"
+								: "text-price-positive"
+						)}
+					>
+						{!isNullOrUndefined(priceChangeRate1H)
+							? `${priceChangeRate1H}%`
+							: "--"}
+					</span>
+				</div>
+				<div className="border-r-gray-710 hover:bg-gray-710 flex cursor-pointer flex-col items-center justify-center gap-3 border-r">
+					<span className="text-sm leading-4 font-medium text-white/40">
+						6h
+					</span>
+					<span
+						className={cn(
+							"text-price-positive font-medium",
+							!isNullOrUndefined(priceChangeRate6H) &&
+								isNegative(priceChangeRate6H)
+								? "text-price-negative"
+								: "text-price-positive"
+						)}
+					>
+						{!isNullOrUndefined(priceChangeRate6H)
+							? `${priceChangeRate6H}%`
+							: "--"}
+					</span>
 				</div>
 				<div className="hover:bg-gray-710 flex cursor-pointer flex-col items-center justify-center gap-3">
 					<span className="text-sm leading-4 font-medium text-white/40">
 						24h
 					</span>
-					<span className="text-price-positive font-medium">12%</span>
+					<span
+						className={cn(
+							"text-price-positive font-medium",
+							!isNullOrUndefined(priceChangeRate24H) &&
+								isNegative(priceChangeRate24H)
+								? "text-price-negative"
+								: "text-price-positive"
+						)}
+					>
+						{!isNullOrUndefined(priceChangeRate24H)
+							? `${priceChangeRate24H}%`
+							: "--"}
+					</span>
 				</div>
 			</div>
 			<div className="flex flex-col items-center">

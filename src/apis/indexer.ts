@@ -22,7 +22,7 @@ interface PaginatedDataWithData<T> extends PaginatedDataBase {
 // type PaginatedData<T> = PaginatedDataWithItems<T> | PaginatedDataWithData<T>;
 // =============================== Token List ===============================
 
-export type tokenInfo = {
+export type TokenInfo = {
 	id: number;
 	memeTokenId: number;
 	name: string;
@@ -89,6 +89,9 @@ export type TokenListParameters = {
 	market?: string;
 	sort?: TokenListSortOption;
 	sortDirection?: "asc" | "desc";
+
+	// single token info
+	id?: string;
 };
 export const getTokenList = async (parameters: TokenListParameters) => {
 	const {
@@ -106,7 +109,7 @@ export const getTokenList = async (parameters: TokenListParameters) => {
 		sortDirection,
 	});
 	const response = await request<{
-		data: PaginatedDataWithData<tokenInfo>;
+		data: PaginatedDataWithData<TokenInfo>;
 		statusCode: number;
 		message: string;
 	}>(
