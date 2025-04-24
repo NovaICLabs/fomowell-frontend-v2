@@ -11,6 +11,7 @@ import WithdrawIcon from "@/components/icons/common/withdraw";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
 import { Button } from "@/components/ui/button";
 import ProfileCreatedTokens from "@/components/views/icp/profile/create-list";
+import EditInfoModal from "@/components/views/icp/profile/edit-info-modal";
 import ProfileHoldings from "@/components/views/icp/profile/holdings";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useCoreTokenBalance } from "@/hooks/ic/core";
@@ -28,6 +29,7 @@ function UserId() {
 	const { userid } = Route.useParams();
 	const [activeTab, setActiveTab] = useState("Created");
 	const [principalCopied, setPrincipalCopied] = useState(false);
+
 	const { data: coreTokenBalance } = useCoreTokenBalance({
 		owner: userid,
 		token: { ICRCToken: getICPCanisterId() },
@@ -40,8 +42,18 @@ function UserId() {
 
 	console.debug("🚀 ~ UserId ~ usdValue:", usdValue);
 	const { setDepositWithdrawOpen } = useDialogStore();
+	const [isShow, setIsShow] = useState<boolean>(false);
+
 	return (
 		<div className="flex h-full w-full flex-1 flex-col overflow-auto pt-5">
+			<EditInfoModal
+				initAvatar={getAvatar(userid)}
+				open={isShow}
+				setOpen={(open: boolean) => {
+					setIsShow(open);
+				}}
+			/>
+
 			<div className="sticky mb-5 flex h-[162px] w-full gap-x-5">
 				<div className="bg-gray-760 relative flex w-full gap-x-2 rounded-2xl p-5">
 					<div className="flex items-center gap-2">
@@ -59,7 +71,13 @@ function UserId() {
 										) /* Use default truncation or adjust as needed */
 									}
 								</span>
-								<EditIcon />
+								<span
+									onClick={() => {
+										setIsShow(true);
+									}}
+								>
+									<EditIcon />
+								</span>
 							</div>
 							<div className="flex items-center text-xs text-gray-400">
 								<span>ID: {truncatePrincipal(userid)}</span>

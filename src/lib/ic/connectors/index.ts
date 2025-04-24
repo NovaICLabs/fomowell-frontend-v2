@@ -84,10 +84,10 @@ export class WalletConnector {
 	}
 
 	public async isConnected() {
-			const connected = await this.connector?.isConnected();
+		const connected = await this.connector?.isConnected();
 
-			const principal = this.connector?.getPrincipal();
-			return { connected, principal };
+		const principal = this.connector?.getPrincipal();
+		return { connected, principal };
 	}
 
 	public async createActor<Service>(

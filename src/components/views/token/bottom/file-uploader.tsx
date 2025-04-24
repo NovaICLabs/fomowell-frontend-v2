@@ -9,10 +9,12 @@ import { withStopPropagation } from "@/lib/common/react-event";
 import { cn } from "@/lib/utils";
 
 interface FileUploaderProps {
+	isHideRemove?: boolean;
 	onChange?: (url: string | null) => void;
 	maxSize?: number; // in bytes
 	accept?: Record<string, Array<string>>;
 	imageIcon?: ReactNode;
+	defaultImage?: string;
 	wrapperClassName?: string;
 }
 
@@ -23,10 +25,12 @@ export function FileUploader({
 		"image/*": [],
 	},
 	imageIcon,
+	defaultImage,
+	isHideRemove = false,
 	wrapperClassName,
 }: FileUploaderProps) {
 	const [files, setFiles] = useState<Array<File>>([]);
-	const [preview, setPreview] = useState<string | null>(null);
+	const [preview, setPreview] = useState<string | null>(defaultImage || null);
 	const [error, setError] = useState<string | null>(null);
 	const onDrop = useCallback(
 		(acceptedFiles: Array<File>, rejectedFiles: Array<FileRejection>) => {
@@ -80,19 +84,26 @@ export function FileUploader({
 				/>
 
 				{preview ? (
-					<div className="relative h-full w-full">
+					<div className="group relative h-full w-full">
 						<img
 							alt="Preview"
 							className="h-full w-full object-cover"
 							src={preview}
 						/>
-						<button
-							className="absolute top-3 right-3 rounded-full bg-gray-800/70 p-1.5 text-white/80 hover:bg-gray-700 hover:text-white"
-							type="button"
-							onClick={withStopPropagation(removeFile)}
-						>
-							<X size={16} />
-						</button>
+						{!isHideRemove && (
+							<button
+								className="absolute top-3 right-3 rounded-full bg-gray-800/70 p-1.5 text-white/80 hover:bg-gray-700 hover:text-white"
+								type="button"
+								onClick={withStopPropagation(removeFile)}
+							>
+								<X size={16} />
+							</button>
+						)}
+						{isHideRemove && (
+							<div className="absolute top-0 left-0 flex h-full w-full items-center justify-center rounded-full bg-gray-500/40 opacity-0 transition-all group-hover:opacity-100">
+								<img alt="upload-svg" src={"/svgs/upload.svg"} />
+							</div>
+						)}
 						{files.length > 0 && (
 							<div className="absolute right-0 bottom-0 left-0 bg-black/50 px-2 py-1 text-center text-xs text-white">
 								({formatBytes(files[0]?.size ?? 0)})
