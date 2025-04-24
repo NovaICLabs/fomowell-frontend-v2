@@ -10,6 +10,7 @@ import {
 import BigNumber from "bignumber.js";
 
 // import SortsIcon from "@/components/icons/common/sorts";
+import { Empty } from "@/components/ui/empty";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useUserCreatedTokenList } from "@/hooks/ic/tokens/icp";
 import { formatNumberSmart, getTokenUsdValueTotal } from "@/lib/common/number";
@@ -383,12 +384,7 @@ const ProfileCreatedTokens = () => {
 				) : null}
 			</div>
 			<div className="min-h-5 w-full">
-				{!isFetching && (!items || items.length === 0) && (
-					<div className="flex h-50 flex-col items-center justify-center text-center text-sm text-white/40">
-						<img alt={"noData"} src={"/svgs/noData.svg"} />
-						<div>No Data</div>
-					</div>
-				)}
+				{!isFetching && (!items || items.length === 0) && <Empty />}
 			</div>
 		</div>
 	);
