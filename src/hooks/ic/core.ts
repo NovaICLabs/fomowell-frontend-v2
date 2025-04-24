@@ -166,9 +166,35 @@ export const useTokenHolders = (args: {
 		enabled: !!args.id && !!args.page,
 	});
 };
+
+export const useMultipleTokenHoldersCount = (args: {
+	ids: Array<string> | [];
+}) => {
+	return useQuery({
+		queryKey: ["ic-core", "multi-holders-count"],
+		queryFn: async () => {
+			if (args.ids.length === 0) {
+				throw new Error("No ids provided");
+			}
+			const result = await Promise.all(
+				args.ids.map((id) =>
+					getHolders(getChainICCoreCanisterId().toText(), BigInt(id), {
+						page: 1,
+						pageSize: 10,
+					})
+				)
+			);
+			return result.map((r, index) => ({
+				id: args.ids[index],
+				total: r.total.toString(),
+			}));
+		},
+		enabled: !!args.ids && args.ids.length > 0,
+	});
+};
 export const useMultipleCurrentPrice = (args: { ids: Array<string> | [] }) => {
 	return useQuery({
-		queryKey: ["ic-core", "current-price", args.ids.toString()],
+		queryKey: ["ic-core", "multi-current-price"],
 		queryFn: async () => {
 			if (args.ids.length === 0) {
 				throw new Error("No ids provided");
@@ -188,6 +214,7 @@ export const useMultipleCurrentPrice = (args: { ids: Array<string> | [] }) => {
 				),
 			}));
 		},
+		enabled: !!args.ids && args.ids.length > 0,
 	});
 };
 

@@ -207,7 +207,7 @@ export type CreatedToken = {
 	description: string;
 	logo: string;
 	process: number;
-	price: number;
+	price: number | string | undefined;
 	creator: string;
 	completed: boolean;
 	available_token: bigint;
@@ -215,6 +215,7 @@ export type CreatedToken = {
 	liquidity: bigint;
 	created_at: bigint;
 	decimals: number;
+	holders: string | undefined;
 };
 
 // query user created meme token
@@ -262,6 +263,7 @@ export const getUserCreatedMemeTokens = async (
 			liquidity: r.market_cap_token,
 			created_at: r.created_at,
 			decimals: 8,
+			holders: undefined,
 		};
 	}) as Array<CreatedToken>;
 };
@@ -274,7 +276,7 @@ export type MemeTokenDetails = {
 	ticker: string;
 	description: string;
 	logo: string;
-	price: number;
+	price: number | string | undefined;
 	progress: number;
 	creator: string;
 	completed: boolean;
@@ -283,6 +285,7 @@ export type MemeTokenDetails = {
 	created_at: Date;
 	bc: string; // no use
 	decimals: number;
+	holders: string | undefined;
 };
 export type UserHoldings = Array<MemeTokenDetails>;
 export const getUserTokens = async (

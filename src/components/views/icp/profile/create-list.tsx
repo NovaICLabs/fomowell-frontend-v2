@@ -11,8 +11,7 @@ import BigNumber from "bignumber.js";
 
 // import SortsIcon from "@/components/icons/common/sorts";
 import { useICPPrice } from "@/hooks/apis/coingecko";
-import { useMultipleCurrentPrice } from "@/hooks/ic/core";
-import { useUserCreatedTokens } from "@/hooks/ic/tokens/icp";
+import { useUserCreatedTokenList } from "@/hooks/ic/tokens/icp";
 import { formatNumberSmart, getTokenUsdValueTotal } from "@/lib/common/number";
 import { formatDate } from "@/lib/common/time";
 import { cn } from "@/lib/utils";
@@ -27,14 +26,11 @@ const ProfileCreatedTokens = () => {
 	const { data: icpPrice } = useICPPrice();
 	const { principal } = useIcIdentityStore();
 
-	const { data, isFetching, refetch } = useUserCreatedTokens();
+	// const { data, isFetching, refetch } = useUserCreatedTokens();
 	const columnHelper = createColumnHelper<CreatedToken>();
 
-	const {
-		data: allPrices,
-		isFetching: isPriceFetching,
-		refetch: priceRefetch,
-	} = useMultipleCurrentPrice({ ids: data ? data?.map((row) => row.id) : [] });
+	const { data: items, isFetching, refetch } = useUserCreatedTokenList();
+
 	const [pagination, setPagination] = useState({
 		pageIndex: 0,
 		pageSize: 10,
@@ -46,8 +42,7 @@ const ProfileCreatedTokens = () => {
 		if (!principal) return;
 
 		void refetch();
-		void priceRefetch();
-	}, [priceRefetch, principal, refetch]);
+	}, [principal, refetch]);
 
 	// const [sortStates, setSortStates] = useState<
 	// 	Record<string, "asc" | "desc" | "none">
@@ -93,7 +88,7 @@ const ProfileCreatedTokens = () => {
 						</div>
 					);
 				},
-				size: 250,
+				size: 200,
 				enablePinning: true,
 			}),
 			// Price column
@@ -105,14 +100,10 @@ const ProfileCreatedTokens = () => {
 					</div>
 				),
 				cell: ({ row }) => {
-					const currentPrice =
-						!isPriceFetching && allPrices
-							? allPrices?.find((price) => price.id === row.original.id)
-							: null;
-					const raw = currentPrice ? currentPrice.formattedPerPayToken : 0;
+					const raw = row.original.price;
 
 					const priceInIcp =
-						raw === null || raw === 0 ? BigNumber(0) : BigNumber(raw);
+						raw === undefined || raw === 0 ? BigNumber(0) : BigNumber(raw);
 
 					const priceInUsd = priceInIcp.times(icpPrice ?? 0);
 
@@ -140,16 +131,16 @@ const ProfileCreatedTokens = () => {
 				cell: (info) => {
 					const value = info.getValue();
 					const isNull = value === null;
+					const mc = getTokenUsdValueTotal(
+						{
+							amount: isNull ? 0n : BigInt(value) * 2n,
+						},
+						icpPrice ?? 0
+					);
 					return (
 						<div className="flex h-full w-full items-center gap-1">
 							<span className="text-sm leading-4 font-medium text-white">
-								$
-								{getTokenUsdValueTotal(
-									{
-										amount: isNull ? 0n : BigInt(value) * 2n,
-									},
-									icpPrice ?? 0
-								)}
+								${mc}
 							</span>
 						</div>
 					);
@@ -170,6 +161,24 @@ const ProfileCreatedTokens = () => {
 					return (
 						<div className="text-sm leading-4 font-medium text-white">
 							{formatNumberSmart(value)}%
+						</div>
+					);
+				},
+				size: 120,
+			}),
+			// holders column
+			columnHelper.accessor((row) => row.holders, {
+				id: "holders",
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span className="duration-300 group-hover:text-white">Holders</span>
+						{/* <SortsIcon /> */}
+					</div>
+				),
+				cell: (info) => {
+					return (
+						<div className="text-sm leading-4 font-medium text-white">
+							{info.getValue()}
 						</div>
 					);
 				},
@@ -196,10 +205,8 @@ const ProfileCreatedTokens = () => {
 				size: 120,
 			}),
 		],
-		[allPrices, columnHelper, icpPrice, isPriceFetching]
+		[columnHelper, icpPrice]
 	);
-
-	const items = useMemo(() => data ?? [], [data]);
 
 	const allItemsLoaded = useMemo(() => {
 		return displayedItems.length >= (items?.length || 0);
@@ -225,7 +232,14 @@ const ProfileCreatedTokens = () => {
 	useEffect(() => {
 		const observer = new IntersectionObserver(
 			(entries) => {
-				if (entries[0] && entries[0].isIntersecting && !allItemsLoaded) {
+				if (
+					entries[0] &&
+					entries[0].isIntersecting &&
+					!allItemsLoaded &&
+					items &&
+					items.length > pagination.pageSize &&
+					displayedItems.length < items.length
+				) {
 					loadMoreItems();
 				}
 			},
@@ -255,7 +269,7 @@ const ProfileCreatedTokens = () => {
 			// Pin first and last columns
 			columnPinning: {
 				left: ["token"],
-				right: ["actions"],
+				// right: ["actions"],
 			},
 		},
 	});
@@ -359,7 +373,7 @@ const ProfileCreatedTokens = () => {
 				</tbody>
 			</table>
 			<div ref={loadingRef}>
-				{!allItemsLoaded && !isFetching ? (
+				{!allItemsLoaded && !isFetching && items && items.length > 0 ? (
 					<div className="py-4 text-center text-sm text-white/60">
 						Loading more...
 					</div>

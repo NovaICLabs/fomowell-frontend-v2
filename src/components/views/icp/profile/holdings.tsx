@@ -12,8 +12,7 @@ import BigNumber from "bignumber.js";
 
 // import SortsIcon from "@/components/icons/common/sorts";
 import { useICPPrice } from "@/hooks/apis/coingecko";
-import { useMultipleCurrentPrice } from "@/hooks/ic/core";
-import { useUserHoldingTokens } from "@/hooks/ic/tokens/icp";
+import { useUserTokenHoldersList } from "@/hooks/ic/tokens/icp";
 import { formatNumberSmart } from "@/lib/common/number";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
@@ -26,14 +25,14 @@ const ProfileHoldings = () => {
 	const { chain } = useChainStore();
 	const { data: icpPrice } = useICPPrice();
 	const { principal } = useIcIdentityStore();
-	const { data, isFetching, refetch } = useUserHoldingTokens();
+	const { data: items, isFetching, refetch } = useUserTokenHoldersList();
 	const columnHelper = createColumnHelper<MemeTokenDetails>();
 
-	const {
-		data: allPrices,
-		isFetching: isPriceFetching,
-		refetch: priceRefetch,
-	} = useMultipleCurrentPrice({ ids: data ? data?.map((row) => row.id) : [] });
+	// const {
+	// 	data: allPrices,
+	// 	isFetching: isPriceFetching,
+	// 	refetch: priceRefetch,
+	// } = useMultipleCurrentPrice({ ids: data ? data?.map((row) => row.id) : [] });
 
 	const [pagination, setPagination] = useState({
 		pageIndex: 0,
@@ -48,8 +47,7 @@ const ProfileHoldings = () => {
 		if (!principal) return;
 
 		void refetch();
-		void priceRefetch();
-	}, [priceRefetch, principal, refetch]);
+	}, [principal, refetch]);
 
 	// const [sortStates, setSortStates] = useState<
 	// 	Record<string, "asc" | "desc" | "none">
@@ -109,30 +107,18 @@ const ProfileHoldings = () => {
 				),
 				cell: ({ row }) => {
 					const balance = row.original.balance;
-					const decimals = row.original.decimals;
-
-					const balanceFormatted =
-						balance === null || BigNumber(balance).isZero()
-							? "--"
-							: BigNumber(balance).dividedBy(BigNumber(10).pow(decimals));
-
-					const currentPrice =
-						!isPriceFetching && allPrices
-							? allPrices?.find((price) => price.id === row.original.id)
-							: null;
-
-					const raw = currentPrice ? currentPrice.formattedPerPayToken : 0;
+					const raw = row.original.price;
 
 					const priceInIcp =
-						raw === null || raw === 0 ? BigNumber(0) : BigNumber(raw);
+						raw === undefined || raw === 0 ? BigNumber(0) : BigNumber(raw);
 
 					const priceInUsd = priceInIcp.times(icpPrice ?? 0);
-					const totalUsd = priceInUsd.times(balanceFormatted);
+					const totalUsd = priceInUsd.times(balance);
 
 					return (
 						<div className="text-sm leading-4 font-medium text-white">
 							$
-							{raw === null || raw === 0 || BigNumber(balanceFormatted).isZero()
+							{raw === null || raw === 0 || BigNumber(balance).isZero()
 								? "--"
 								: formatNumberSmart(totalUsd)}
 						</div>
@@ -149,14 +135,10 @@ const ProfileHoldings = () => {
 					</div>
 				),
 				cell: ({ row }) => {
-					const currentPrice =
-						!isPriceFetching && allPrices
-							? allPrices?.find((price) => price.id === row.original.id)
-							: null;
-					const raw = currentPrice ? currentPrice.formattedPerPayToken : 0;
+					const raw = row.original.price;
 
 					const priceInIcp =
-						raw === null || raw === 0 ? BigNumber(0) : BigNumber(raw);
+						raw === undefined || raw === 0 ? BigNumber(0) : BigNumber(raw);
 
 					const priceInUsd = priceInIcp.times(icpPrice ?? 0);
 
@@ -187,14 +169,11 @@ const ProfileHoldings = () => {
 				},
 				cell: ({ row }) => {
 					const balance = row.original.balance;
-					const decimals = row.original.decimals;
 
 					const balanceFormatted =
 						balance === null || BigNumber(balance).isZero()
 							? "--"
-							: formatNumberSmart(
-									BigNumber(balance).dividedBy(BigNumber(10).pow(decimals))
-								);
+							: formatNumberSmart(balance, true);
 					return (
 						<div className="text-sm leading-4 font-medium text-white">
 							{balanceFormatted}
@@ -204,10 +183,8 @@ const ProfileHoldings = () => {
 				size: 140,
 			}),
 		],
-		[allPrices, columnHelper, icpPrice, isPriceFetching]
+		[columnHelper, icpPrice]
 	);
-
-	const items = useMemo(() => data ?? [], [data]);
 
 	const allItemsLoaded = useMemo(() => {
 		return displayedItems.length >= (items?.length || 0);
@@ -233,7 +210,14 @@ const ProfileHoldings = () => {
 	useEffect(() => {
 		const observer = new IntersectionObserver(
 			(entries) => {
-				if (entries[0] && entries[0].isIntersecting && !allItemsLoaded) {
+				if (
+					entries[0] &&
+					entries[0].isIntersecting &&
+					!allItemsLoaded &&
+					items &&
+					items.length > pagination.pageSize &&
+					displayedItems.length < items.length
+				) {
 					loadMoreItems();
 				}
 			},
@@ -250,7 +234,13 @@ const ProfileHoldings = () => {
 				observer.unobserve(loadingRef.current);
 			}
 		};
-	}, [loadMoreItems, allItemsLoaded]);
+	}, [
+		loadMoreItems,
+		allItemsLoaded,
+		items,
+		pagination.pageSize,
+		displayedItems.length,
+	]);
 
 	const table = useReactTable({
 		data: displayedItems,
