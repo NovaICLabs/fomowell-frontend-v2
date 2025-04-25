@@ -174,7 +174,9 @@ const ProfileHoldings = () => {
 					const balanceFormatted =
 						balance === null || BigNumber(balance).isZero()
 							? "--"
-							: formatNumberSmart(balance, true);
+							: formatNumberSmart(balance, {
+									shortenLarge: true,
+								});
 					return (
 						<div className="text-sm leading-4 font-medium text-white">
 							{balanceFormatted}

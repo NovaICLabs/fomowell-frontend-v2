@@ -32,7 +32,9 @@ export default function Holders() {
 				<span className="text-base font-semibold text-yellow-500">
 					(
 					{holders?.total
-						? formatNumberSmart(Number(holders?.total ?? 0), true)
+						? formatNumberSmart(Number(holders?.total ?? 0), {
+								shortenLarge: true,
+							})
 						: "--"}
 					)
 				</span>
@@ -78,7 +80,10 @@ export default function Holders() {
 									</Link>
 								</td>
 								<td className="h-[42px] px-4.5 py-5 text-right text-sm font-normal text-white">
-									{formatNumberSmart(formatUnits(holder.balance), true)} (
+									{formatNumberSmart(formatUnits(holder.balance), {
+										shortenLarge: true,
+									})}{" "}
+									(
 									{formatNumberSmart(
 										BigNumber(holder.balance)
 											.times(100)
