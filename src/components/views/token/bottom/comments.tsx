@@ -82,7 +82,7 @@ export default function Comments() {
 	const { data, isFetching, fetchNextPage, hasNextPage, refetch } =
 		useTokenComments({
 			meme_token_id: id,
-			pageSize: 2,
+			pageSize: 20,
 		});
 
 	const items = useMemo(
