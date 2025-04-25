@@ -14,23 +14,28 @@ import WalletOption from "../header/wallet-option";
 import type { Connector } from "@/lib/ic/connectors";
 
 export default function IcpConnectDialog() {
+	// todo ref code
 	const { connect, isLoading } = useIcWallet();
-	const { setPrincipal, setConnected } = useIcIdentityStore();
+	const { setPrincipal, connectByPrincipal } = useIcIdentityStore();
 	const { setLastConnectedWallet } = useIcLastConnectedWalletStore();
 	const { icpConnectOpen, setIcpConnectOpen } = useDialogStore();
 	const handleConnectWallet = async (connector: Connector) => {
 		try {
-			const { principal, connected } = await connect(connector);
+			const { principal } = await connect(connector);
+
 			if (principal) {
 				setPrincipal(principal);
-				setConnected(connected);
+				// setConnected(connected);
 				setLastConnectedWallet(connector);
+
+				void connectByPrincipal();
 			}
 			setIcpConnectOpen(false);
 		} catch (error) {
 			console.error(error);
 		}
 	};
+
 	return (
 		<Dialog open={icpConnectOpen} onOpenChange={setIcpConnectOpen}>
 			<DialogContent

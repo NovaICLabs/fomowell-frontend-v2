@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Actor, HttpAgent } from "@dfinity/agent";
 
@@ -17,53 +17,118 @@ import type { Principal } from "@dfinity/principal";
 
 const useDisconnect = () => {
 	const { setLastConnectedWallet } = useIcLastConnectedWalletStore();
-	const { setConnected, setPrincipal } = useIcIdentityStore();
+	const { setConnected, setPrincipal, clearToken } = useIcIdentityStore();
 	const disconnect = useCallback(async () => {
 		if ((window as any).icConnector) {
 			await (window as any).icConnector.disconnect();
 			setLastConnectedWallet(undefined);
 			setConnected(false);
 			setPrincipal(undefined);
+			clearToken();
 		}
-	}, [setConnected, setLastConnectedWallet, setPrincipal]);
+	}, [clearToken, setConnected, setLastConnectedWallet, setPrincipal]);
 	return disconnect;
 };
 
 export const useInitialConnect = () => {
 	const [initializing, setInitializing] = useState(false);
+	const [hasInitialized, setHasInitialized] = useState(false);
 	const disconnect = useDisconnect();
-	const { setConnected, setPrincipal } = useIcIdentityStore();
+	const {
+		setConnected,
+		setPrincipal,
+		connectByPrincipal,
+		checkLogin,
+		reloadIdentityProfile,
+	} = useIcIdentityStore();
 	const { lastConnectedWallet } = useIcLastConnectedWalletStore();
-	useEffect(() => {
-		async function call(lastConnectedWallet: Connector) {
-			await connectManager.init(lastConnectedWallet);
-			const expired = await connectManager.connector?.expired();
-			if (expired) {
-				await disconnect();
-				setInitializing(false);
+	const lastLoginRef = useRef<Connector | undefined>();
 
+	// Handle disconnected state
+	const handleNotConnected = useCallback(async () => {
+		try {
+			const { principal, connected } = await connectManager.connect();
+			if (!connected) {
 				return;
 			}
-			const { connected, principal } = await connectManager.isConnected();
-			if (!connected) {
-				const { principal, connected } = await connectManager.connect();
-				if (principal) {
-					setPrincipal(principal);
-					setConnected(connected);
-				} else {
-					throw new Error("Failed to connect to wallet");
-				}
-			} else {
-				setPrincipal(principal);
-				setConnected(connected);
-			}
-			// Initial actors
-			setInitializing(false);
+
+			setPrincipal(principal);
+			setConnected(connected);
+
+			// Get JWT token using random value
+			await connectByPrincipal();
+		} catch (error) {
+			console.error("Failed to connect wallet:", error);
 		}
+	}, [connectByPrincipal, setConnected, setPrincipal]);
+
+	// Handle connected state
+	const handleAlreadyConnected = useCallback(async () => {
+		const { principal, connected } = await connectManager.connect();
+		setPrincipal(principal);
+		setConnected(connected);
+
+		const isLoggedIn = await checkLogin();
+		// console.debug("Login status:", isLoggedIn);
+
+		if (!isLoggedIn) {
+			await connectByPrincipal();
+		}
+
+		await reloadIdentityProfile();
+	}, [
+		checkLogin,
+		connectByPrincipal,
+		reloadIdentityProfile,
+		setConnected,
+		setPrincipal,
+	]);
+
+	const call = useCallback(
+		async (lastConnectedWallet: Connector) => {
+			try {
+				await connectManager.init(lastConnectedWallet);
+				const expired = await connectManager.connector?.expired();
+				if (expired) {
+					await disconnect();
+				} else {
+					const { connected } = await connectManager.isConnected();
+
+					if (!connected) {
+						await handleNotConnected();
+					} else {
+						await handleAlreadyConnected();
+					}
+				}
+			} catch (error) {
+				console.error("Error during connection initialization:", error);
+			} finally {
+				// Mark as initialized regardless of success or failure
+				setInitializing(false);
+				setHasInitialized(true);
+			}
+		},
+		[disconnect, handleAlreadyConnected, handleNotConnected]
+	);
+
+	useEffect(() => {
+		if (
+			hasInitialized ||
+			initializing ||
+			!lastConnectedWallet ||
+			lastLoginRef.current === lastConnectedWallet
+		) {
+			return;
+		}
+
+		setInitializing(true);
+
 		if (lastConnectedWallet) {
+			lastLoginRef.current = lastConnectedWallet;
 			void call(lastConnectedWallet);
 		}
-	}, [disconnect, setConnected, setPrincipal, lastConnectedWallet]);
+	}, [lastConnectedWallet, hasInitialized, initializing, call]);
+
 	return initializing;
 };
 

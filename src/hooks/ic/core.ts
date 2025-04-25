@@ -12,6 +12,7 @@ import {
 	DEFAULT_HOLDERS_PAGE_SIZE,
 	deposit,
 	type DepositArgs,
+	get_generate_random,
 	getChainICCoreCanisterId,
 	getCoreTokenBalance,
 	getCurrentPrice,
@@ -299,6 +300,22 @@ export const useSell = () => {
 		},
 		onError: () => {
 			showToast("error", "Failed to sell token");
+		},
+	});
+};
+
+export const useGenerateRandom = () => {
+	const { actorCreator } = useConnectedIdentity();
+	return useMutation({
+		mutationKey: ["ic-core", "generate-random"],
+		mutationFn: async () => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			return get_generate_random(
+				actorCreator,
+				getChainICCoreCanisterId().toText()
+			);
 		},
 	});
 };

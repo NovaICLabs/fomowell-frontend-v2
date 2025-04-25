@@ -257,7 +257,13 @@ const ProfileCreatedTokens = () => {
 				observer.unobserve(loadingRef.current);
 			}
 		};
-	}, [loadMoreItems, allItemsLoaded]);
+	}, [
+		loadMoreItems,
+		allItemsLoaded,
+		items,
+		pagination.pageSize,
+		displayedItems.length,
+	]);
 
 	const table = useReactTable({
 		data: items,

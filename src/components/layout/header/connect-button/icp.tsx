@@ -26,7 +26,7 @@ import { useIcIdentityStore } from "@/store/ic";
 const IcpWalletConnect: React.FC = () => {
 	const { setIcpConnectOpen } = useDialogStore();
 	const { disconnect, isLoading } = useIcWallet();
-	const { principal, connected } = useIcIdentityStore();
+	const { principal, connected, connecting } = useIcIdentityStore();
 
 	const handleDisconnect = () => {
 		void disconnect();
@@ -69,7 +69,7 @@ const IcpWalletConnect: React.FC = () => {
 	});
 	return (
 		<>
-			{principal ? (
+			{principal && !connecting ? (
 				<div className="flex items-center justify-center gap-x-2">
 					<Popover open={openPopover} onOpenChange={setOpenPopover}>
 						<PopoverTrigger asChild>
@@ -161,12 +161,12 @@ const IcpWalletConnect: React.FC = () => {
 			) : (
 				<Button
 					className="h-[38px] w-[111px] rounded-full text-xs font-bold"
-					disabled={isLoading}
+					disabled={isLoading || connecting}
 					onClick={() => {
 						setIcpConnectOpen(true);
 					}}
 				>
-					{isLoading ? "Connecting..." : "Connect Wallet"}
+					{isLoading || connecting ? "Connecting..." : "Connect Wallet"}
 				</Button>
 			)}
 		</>
