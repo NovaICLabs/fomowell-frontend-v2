@@ -17,16 +17,24 @@ import type { Principal } from "@dfinity/principal";
 
 const useDisconnect = () => {
 	const { setLastConnectedWallet } = useIcLastConnectedWalletStore();
-	const { setConnected, setPrincipal, clearToken } = useIcIdentityStore();
+	const { setConnected, setPrincipal, clearToken, setConnecting } =
+		useIcIdentityStore();
 	const disconnect = useCallback(async () => {
 		if ((window as any).icConnector) {
 			await (window as any).icConnector.disconnect();
 			setLastConnectedWallet(undefined);
 			setConnected(false);
+			setConnecting(false);
 			setPrincipal(undefined);
 			clearToken();
 		}
-	}, [clearToken, setConnected, setLastConnectedWallet, setPrincipal]);
+	}, [
+		clearToken,
+		setConnected,
+		setConnecting,
+		setLastConnectedWallet,
+		setPrincipal,
+	]);
 	return disconnect;
 };
 
