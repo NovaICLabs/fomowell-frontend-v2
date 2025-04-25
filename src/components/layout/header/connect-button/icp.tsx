@@ -27,16 +27,20 @@ const IcpWalletConnect: React.FC = () => {
 	const { setIcpConnectOpen } = useDialogStore();
 	const { disconnect, isLoading } = useIcWallet();
 	const { principal, connected, connecting } = useIcIdentityStore();
+	const router = useRouter();
 
-	const handleDisconnect = () => {
+	const handleDisconnect = async () => {
 		void disconnect();
+		await router.navigate({
+			to: "/",
+			replace: true,
+		});
 	};
 
 	const [copied, setCopied] = useState(false);
 
 	const [openPopover, setOpenPopover] = useState(false);
 	const { setDepositWithdrawOpen } = useDialogStore();
-	const router = useRouter();
 	const popoverLinks = [
 		{
 			label: "Profile",
@@ -114,8 +118,9 @@ const IcpWalletConnect: React.FC = () => {
 								<div className="ml-2.5 h-6 w-px bg-white/20"></div>
 								<DisconnectIcon
 									className="ml-2.25 h-4 w-4"
-									onClick={() => {
-										handleDisconnect();
+									onClick={async (event: React.MouseEvent) => {
+										event.stopPropagation();
+										await handleDisconnect();
 									}}
 								/>
 							</div>

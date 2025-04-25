@@ -5,7 +5,7 @@ export const DisconnectIcon = ({
 	onClick,
 }: {
 	className?: string;
-	onClick?: () => void;
+	onClick?: (event: React.MouseEvent) => void;
 }) => {
 	return (
 		<svg
