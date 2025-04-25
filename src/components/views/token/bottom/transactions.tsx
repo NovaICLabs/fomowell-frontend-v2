@@ -12,7 +12,6 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { BigNumber } from "bignumber.js";
 
 import { getICPCanisterToken } from "@/canisters/icrc3/specials";
-import FormattedSmallNumber from "@/components/common/short-zero";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useInfiniteTokenTransactionsHistory } from "@/hooks/apis/indexer";
@@ -102,7 +101,9 @@ export default function Transactions() {
 				cell: (info) => (
 					<div className="flex h-full w-full items-center">
 						<span className="text-sm leading-4 text-white/60">
-							{formatNumberSmart(formatUnits(info.getValue()), true)}
+							{formatNumberSmart(formatUnits(info.getValue()), {
+								shortenLarge: true,
+							})}
 						</span>
 					</div>
 				),
@@ -169,15 +170,17 @@ export default function Transactions() {
 				),
 				cell: (info) => (
 					<div className="flex h-full w-full items-center gap-1">
-						<FormattedSmallNumber
-							className="text-sm leading-4"
-							number={formatNumberSmart(
+						<span className="text-sm leading-4">
+							{formatNumberSmart(
 								BigNumber(1)
 									.times(10 ** getICPCanisterToken().decimals)
 									.div(BigNumber(info.getValue()))
-									.toString()
+									.toString(),
+								{
+									shortZero: true,
+								}
 							)}
-						/>
+						</span>
 						<span className="text-sm leading-4 text-white/60">ICP</span>
 					</div>
 				),

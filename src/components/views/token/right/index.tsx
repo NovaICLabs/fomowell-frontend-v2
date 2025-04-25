@@ -241,7 +241,9 @@ export default function Bottom() {
 					<span className="text-sm text-white/40">Token Supply</span>
 					<div className="flex items-center gap-1 text-sm text-white">
 						<span className="text-white">
-							{formatNumberSmart(totalSupply, true)}
+							{formatNumberSmart(totalSupply, {
+								shortenLarge: true,
+							})}
 						</span>
 					</div>
 				</div>

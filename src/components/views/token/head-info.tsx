@@ -1,12 +1,12 @@
 import { Link, useParams } from "@tanstack/react-router";
 
-import FormattedSmallNumber from "@/components/common/short-zero";
 import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
 import X from "@/components/icons/media/x";
 import Star from "@/components/icons/star";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
+import { formatNumberSmart } from "@/lib/common/number";
 import { truncatePrincipal } from "@/lib/ic/principal";
 
 export default function HeadInfo() {
@@ -83,10 +83,9 @@ export default function HeadInfo() {
 						<Skeleton className="h-6 w-16" />
 					) : (
 						<div className="text-price-positive flex items-center gap-1 font-semibold">
-							<FormattedSmallNumber
-								className=""
-								number={currentPrice?.formattedPerPayToken ?? "0"}
-							></FormattedSmallNumber>{" "}
+							{formatNumberSmart(currentPrice?.formattedPerPayToken ?? "0", {
+								shortZero: true,
+							})}
 							ICP
 						</div>
 					)}

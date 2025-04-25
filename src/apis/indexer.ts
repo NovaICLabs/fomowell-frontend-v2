@@ -1,6 +1,10 @@
+import { BigNumber } from "bignumber.js";
+
 import { getICPCanisterId } from "@/canisters/icrc3";
 
 import { request } from ".";
+
+import type { UTCTimestamp } from "lightweight-charts";
 
 const getIndexerBaseUrl = () => {
 	const indexerBaseUrl = import.meta.env.VITE_INDEXER_BASE_URL;
@@ -180,7 +184,7 @@ export const getTokenTransactionList = async (parameters: {
 // =============================== token price candle ===============================
 
 export type CandleData = {
-	time: number;
+	time: string;
 	open: string;
 	high: string;
 	low: string;
@@ -233,5 +237,15 @@ export const getTokenPriceCandle = async (parameters: CandleParameters) => {
 			`Failed to fetch token ${interval} candles for ${tokenId}/${market}: ${response.message} (Status: ${response.statusCode})`
 		);
 	}
-	return response.data;
+	return response.data
+		.filter((candle) => candle.time !== "NULL")
+		.map((candle) => ({
+			...candle,
+			time: Number(candle.time.substring(0, 10)) as UTCTimestamp,
+			low: BigNumber(1).div(candle.low).toNumber(),
+			high: BigNumber(1).div(candle.high).toNumber(),
+			open: BigNumber(1).div(candle.open).toNumber(),
+			close: BigNumber(1).div(candle.close).toNumber(),
+		}))
+		.reverse();
 };

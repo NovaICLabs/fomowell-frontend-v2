@@ -11,7 +11,6 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { BigNumber } from "bignumber.js";
 import { ChevronLeft } from "lucide-react";
 
-import FormattedSmallNumber from "@/components/common/short-zero";
 import SortsIcon from "@/components/icons/common/sorts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useInfiniteTokenList } from "@/hooks/apis/indexer";
@@ -154,7 +153,9 @@ export default function Trending() {
 										formatUnits(
 											getVolume({ label: "", value: sort }, info.row.original)
 										),
-										true
+										{
+											shortenLarge: true,
+										}
 									)}{" "}
 									ICP
 								</span>
@@ -194,10 +195,11 @@ export default function Trending() {
 							{price === undefined ? (
 								<span className="text-[13px] font-medium text-white">--</span>
 							) : (
-								<FormattedSmallNumber
-									className="text-[13px] font-medium text-white"
-									number={price}
-								/>
+								<span className="text-[13px] font-medium text-white">
+									{formatNumberSmart(price, {
+										shortZero: true,
+									})}
+								</span>
 							)}
 							<span
 								className={cn(

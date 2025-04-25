@@ -12,7 +12,6 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import BigNumber from "bignumber.js";
 import { motion } from "framer-motion";
 
-import FormattedSmallNumber from "@/components/common/short-zero";
 import SortsIcon from "@/components/icons/common/sorts";
 import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
@@ -299,14 +298,16 @@ export default function MemeList() {
 						<div className="flex h-full w-full flex-col items-start justify-center">
 							<div className="flex items-center text-sm font-medium text-white">
 								<span>$</span>
-								{raw === null ? (
-									"--"
-								) : (
-									<FormattedSmallNumber number={priceInUsd} />
-								)}
+								{raw === null
+									? "--"
+									: formatNumberSmart(priceInUsd, {
+											shortZero: true,
+										})}
 							</div>
 							<div className="flex items-center gap-x-0.5 text-xs font-light text-white/60">
-								<FormattedSmallNumber number={priceInIcp} />
+								{formatNumberSmart(priceInIcp, {
+									shortZero: true,
+								})}
 								<span>ICP</span>
 							</div>
 						</div>
@@ -384,7 +385,12 @@ export default function MemeList() {
 					return (
 						<div className="flex h-full w-full items-center gap-1">
 							<span className="text-sm leading-4 font-medium text-white">
-								${value === null ? "--" : formatNumberSmart(mc, true)}
+								$
+								{value === null
+									? "--"
+									: formatNumberSmart(mc, {
+											shortenLarge: true,
+										})}
 							</span>
 						</div>
 					);
@@ -587,7 +593,11 @@ export default function MemeList() {
 				cell: (info) => {
 					const value = info.getValue();
 					const inIcp =
-						value === null ? "--" : formatNumberSmart(formatUnits(value), true);
+						value === null
+							? "--"
+							: formatNumberSmart(formatUnits(value), {
+									shortenLarge: true,
+								});
 					const inUsd =
 						value === null
 							? "--"
@@ -651,8 +661,6 @@ export default function MemeList() {
 			flashAmountBigInt,
 			handleSort,
 			icpPrice,
-			router,
-			search,
 			sort,
 		]
 	);

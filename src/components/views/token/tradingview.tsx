@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useParams } from "@tanstack/react-router";
-import { createChart, type IChartApi } from "lightweight-charts";
+import { BigNumber } from "bignumber.js";
+import {
+	CandlestickSeries,
+	createChart,
+	CrosshairMode,
+	type IChartApi,
+} from "lightweight-charts";
 
 import { useTokenPriceCandle } from "@/hooks/apis/indexer";
+import { formatNumberSmart } from "@/lib/common/number";
 
 import type { CandleParameters } from "@/apis/indexer";
-
 type ChartInterval = "1m" | "5m" | "15m" | "30m" | "1h" | "1d";
 type HookInterval = CandleParameters["interval"];
 
@@ -31,14 +37,14 @@ const intervals: Array<{
 	{ value: "1h", label: "1H", seconds: 3600 },
 	{ value: "1d", label: "1D", seconds: 86400 },
 ];
-
 export default function TradingView() {
 	const { id } = useParams({ from: "/icp/token/$id" });
-	const [selectedInterval, setSelectedInterval] = useState<ChartInterval>("1h");
+	const [selectedInterval, setSelectedInterval] = useState<ChartInterval>("5m");
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const chartRef = useRef<IChartApi>();
-
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const candleSeriesRef = useRef<any>();
 	const now = Math.floor(Date.now());
 	const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
 
@@ -54,14 +60,9 @@ export default function TradingView() {
 	}, []);
 
 	useEffect(() => {
-		if (!containerRef.current || !candleData) {
-			if (chartRef.current) {
-				chartRef.current.remove();
-				chartRef.current = undefined;
-			}
+		if (!containerRef.current) {
 			return;
 		}
-
 		if (!chartRef.current) {
 			chartRef.current = createChart(containerRef.current, {
 				layout: {
@@ -73,63 +74,60 @@ export default function TradingView() {
 					horzLines: { color: "rgba(42, 46, 57, 0.5)" },
 				},
 				crosshair: {
-					mode: 1,
-					vertLine: {
-						color: "#758696",
-						width: 1,
-						style: 3,
-						labelBackgroundColor: "#758696",
-					},
-					horzLine: {
-						color: "#758696",
-						width: 1,
-						style: 3,
-						labelBackgroundColor: "#758696",
-					},
+					mode: CrosshairMode.Normal,
 				},
-				width: containerRef.current.clientWidth,
-				height: containerRef.current.clientHeight,
 			});
 		}
 
 		const chart = chartRef.current;
 
+		candleSeriesRef.current = chart.addSeries(CandlestickSeries, {
+			upColor: "#4bffb5",
+			downColor: "#ff4976",
+			borderDownColor: "#ff4976",
+			borderUpColor: "#4bffb5",
+			wickDownColor: "#838ca1",
+			wickUpColor: "#838ca1",
+			priceFormat: {
+				type: "custom",
+				formatter: (value: string | number | BigNumber) => {
+					return formatNumberSmart(BigNumber(value).toString(), {
+						shortZero: true,
+					});
+				},
+			},
+		});
 		chart.priceScale("right").applyOptions({
 			autoScale: true,
-			scaleMargins: { top: 0.1, bottom: 0.05 },
 			borderVisible: false,
 			entireTextOnly: true,
-			mode: 0,
 			invertScale: false,
 			alignLabels: true,
 			ticksVisible: true,
 			borderColor: "rgba(197, 203, 206, 0.5)",
 			textColor: "#d1d4dc",
+			scaleMargins: {
+				top: 0.1,
+				bottom: 0.000000000000001,
+			},
 		});
 		chart.timeScale().applyOptions({
 			timeVisible: true,
-			secondsVisible: selectedInterval === "1m",
-			borderVisible: false,
 		});
-
-		chart.timeScale().fitContent();
-
-		const handleResize = () => {
-			if (chartRef.current && containerRef.current) {
-				chartRef.current.resize(
-					containerRef.current.clientWidth,
-					containerRef.current.clientHeight
-				);
+		window.addEventListener("resize", () => {
+			if (containerRef.current?.clientWidth) {
+				chartRef.current?.resize(containerRef.current?.clientWidth, 390);
 			}
-		};
+		});
+	}, []);
 
-		handleResize();
-		window.addEventListener("resize", handleResize);
-
-		return () => {
-			window.removeEventListener("resize", handleResize);
-		};
-	}, [candleData, selectedInterval]);
+	useEffect(() => {
+		if (!candleSeriesRef.current || !candleData) {
+			return;
+		}
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+		candleSeriesRef.current.setData(candleData);
+	}, [candleData]);
 
 	return (
 		<div className="relative w-full">
