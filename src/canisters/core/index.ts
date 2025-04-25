@@ -339,24 +339,6 @@ export const getUserTokens = async (
 	});
 };
 
-export const get_generate_random = async (
-	canisterId: string
-): Promise<string | undefined> => {
-	const createActor = getAnonymousActorCreator();
-	if (!createActor) {
-		throw new Error("Failed to create actor");
-	}
-	const actor = await createActor<_SERVICE>({
-		idlFactory,
-		canisterId,
-	});
-	if (!actor) {
-		throw new Error("Failed to create actor");
-	}
-	const result = await actor.generate_random();
-	return result.toString();
-};
-
 // ================================ write ================================
 // createMemeToken
 export type CreateMemeTokenArgs = {
@@ -545,4 +527,20 @@ export const sell = async (
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
 	});
+};
+
+// get generate random
+export const get_generate_random = async (
+	createActor: ActorCreator,
+	canisterId: string
+): Promise<string | undefined> => {
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		interfaceFactory: idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const result = await actor.generate_random();
+	return result.toString();
 };
