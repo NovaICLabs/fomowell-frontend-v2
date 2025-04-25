@@ -98,6 +98,9 @@ export const useCreateTokenComment = (parameters: { tokenId: string }) => {
 	return useMutation({
 		mutationKey: ["ic-core", "sendComment", parameters.tokenId],
 		mutationFn: async (args: SendCommentArgs) => {
+			if (!jwt_token) {
+				throw new Error("No login jwt token");
+			}
 			return createComment(jwt_token, {
 				tokenId: Number(args.tokenId),
 				content: args.content,
@@ -109,15 +112,18 @@ export const useCreateTokenComment = (parameters: { tokenId: string }) => {
 
 // update user info
 export type EditInfoArgs = {
-	userToken: string;
 	name: string;
 	avatar?: string;
 };
 export const useUpdateUserInfo = () => {
+	const { jwt_token } = useIcIdentityStore();
 	return useMutation({
 		mutationKey: ["ic-core", "updateUserInfo"],
 		mutationFn: async (args: EditInfoArgs) => {
-			return updateUserInfo(args.userToken, {
+			if (!jwt_token) {
+				throw new Error("No login jwt token");
+			}
+			return updateUserInfo(jwt_token, {
 				name: args.name,
 				avatar: args.avatar,
 			});

@@ -10,6 +10,8 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { showToast } from "@/components/utils/toast";
+import { useUpdateUserInfo } from "@/hooks/apis/indexer";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { useIcIdentityStore } from "@/store/ic";
 
@@ -22,42 +24,52 @@ interface EditModalProps {
 }
 
 const EditInfoModal = ({ open, setOpen, initAvatar }: EditModalProps) => {
-	const { principal } = useIcIdentityStore();
+	const { principal, identityProfile, reloadIdentityProfile } =
+		useIcIdentityStore();
 
 	const [avatar, setAvatar] = useState<string | undefined>();
 	const [nickname, setNickname] = useState<string | undefined>(
 		principal ? truncatePrincipal(principal) : undefined
 	);
 
-	const [isPending, setIsPending] = useState(false);
+	const { mutateAsync: updateProfile, isPending } = useUpdateUserInfo();
+
+	// const [isPending, setIsPending] = useState(false);
 
 	useEffect(() => {
 		// todo get user info
-
-		// user can't edit nickname and avatar
-		if (principal) {
-			setNickname(truncatePrincipal(principal));
-			setAvatar(initAvatar);
+		if (identityProfile) {
+			setNickname(identityProfile?.name);
+			setAvatar(identityProfile?.avatar || initAvatar);
 		}
+
 		return () => {
 			setNickname(undefined);
 			setAvatar(initAvatar);
 		};
-	}, [initAvatar, principal]);
+	}, [initAvatar, principal, identityProfile]);
 
-	// todo: get user info
+	const handleConfirm = async () => {
+		try {
+			if (!nickname) {
+				return;
+			}
 
-	const handleConfirm = () => {
-		setIsPending(true);
-		// await updateProfile({
-		// 	avatar: avatar,
-		// 	nickname: nickname,
-		// });
+			const parameters = {
+				avatar: avatar,
+				name: nickname,
+			};
 
-		setIsPending(false);
-		setOpen(false);
+			await updateProfile(parameters);
 
-		// todo: update user info
+			setOpen(false);
+			showToast("success", "Update profile successfully");
+			// reload user info
+			void reloadIdentityProfile();
+		} catch (error) {
+			console.error("🚀 ~ handleConfirm ~ error:", error);
+			showToast("error", "Update profile failed");
+		}
 	};
 
 	const onAvatarChange = (url: string) => {

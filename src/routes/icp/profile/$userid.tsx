@@ -20,6 +20,7 @@ import { getTokenUsdValueTotal } from "@/lib/common/number";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
+import { useIcIdentityStore } from "@/store/ic";
 
 export const Route = createFileRoute("/icp/profile/$userid")({
 	component: UserId,
@@ -29,7 +30,7 @@ function UserId() {
 	const { userid } = Route.useParams();
 	const [activeTab, setActiveTab] = useState("Created");
 	const [principalCopied, setPrincipalCopied] = useState(false);
-
+	const { identityProfile } = useIcIdentityStore();
 	const { data: coreTokenBalance } = useCoreTokenBalance({
 		owner: userid,
 		token: { ICRCToken: getICPCanisterId() },
@@ -66,9 +67,11 @@ function UserId() {
 							<div className="flex items-center gap-1">
 								<span className="text-lg font-semibold">
 									{
-										truncatePrincipal(
-											userid
-										) /* Use default truncation or adjust as needed */
+										identityProfile
+											? identityProfile.name
+											: truncatePrincipal(
+													userid
+												) /* Use default truncation or adjust as needed */
 									}
 								</span>
 								<span

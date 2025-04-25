@@ -180,7 +180,7 @@ export const updateUserInfo = async (
 		body: JSON.stringify(parameters),
 	});
 
-	if (response.statusCode !== 200 || !response.data) {
+	if (response.statusCode !== 201 || !response.data) {
 		throw new Error(
 			`Failed to update user info: ${response.message} (Status: ${response.statusCode})`
 		);
