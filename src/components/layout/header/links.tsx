@@ -5,10 +5,6 @@ const links = [
 		label: "Tokens",
 		to: "/",
 	},
-	{
-		label: "How it works",
-		to: "/how-it-works",
-	},
 ];
 
 export default function Links() {
@@ -39,6 +35,17 @@ export default function Links() {
 					</Link>
 				);
 			})}
+			<div
+				className={`relative cursor-pointer text-sm font-medium text-white/60 hover:text-white`}
+				onClick={() => {
+					window.open(
+						"https://docs.google.com/document/d/1-_9000000000000000000000000000000000000000/edit?tab=t.0",
+						"_blank"
+					);
+				}}
+			>
+				How it works
+			</div>
 		</div>
 	);
 }

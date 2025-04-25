@@ -69,8 +69,13 @@ const IcpWalletConnect: React.FC = () => {
 	});
 	return (
 		<>
-			{principal && !connecting ? (
-				<div className="flex items-center justify-center gap-x-2">
+			{principal ? (
+				<div
+					className="flex items-center justify-center gap-x-2"
+					onClick={() => {
+						void router.navigate({ to: `/icp/profile/${principal}` });
+					}}
+				>
 					<Popover open={openPopover} onOpenChange={setOpenPopover}>
 						<PopoverTrigger asChild>
 							<div

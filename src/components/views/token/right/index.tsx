@@ -73,36 +73,38 @@ export default function Bottom() {
 	return (
 		<div className="no-scrollbar flex w-[390px] flex-shrink-0 flex-col gap-7.5 overflow-auto">
 			<div className="flex items-center gap-[30px]">
-				{tabs.map((tab) => {
-					const isActive = activeTab === tab;
-					return (
-						<div
-							key={tab}
-							className={cn(
-								`relative cursor-pointer text-base font-semibold`,
-								isActive ? "text-white" : "text-white/60 hover:text-white",
-								tab === "Liquidity" && "cursor-not-allowed"
-							)}
-							onClick={() => {
-								if (tab === "Liquidity") {
-									return;
-								}
-								setActiveTab(tab);
-							}}
-						>
-							{tab}
+				{tabs
+					.filter((tab) => tab !== "Liquidity")
+					.map((tab) => {
+						const isActive = activeTab === tab;
+						return (
 							<div
-								className={`absolute -bottom-1 left-0 h-[1px] rounded-[1px] transition-all duration-300 ease-in-out ${
-									isActive ? "w-full opacity-100" : "w-0 opacity-0"
-								}`}
-								style={{
-									background:
-										"linear-gradient(90deg, #F7B406 0%, rgba(247, 180, 6, 0.00) 100%)",
+								key={tab}
+								className={cn(
+									`relative cursor-pointer text-base font-semibold`,
+									isActive ? "text-white" : "text-white/60 hover:text-white",
+									tab === "Liquidity" && "cursor-not-allowed"
+								)}
+								onClick={() => {
+									if (tab === "Liquidity") {
+										return;
+									}
+									setActiveTab(tab);
 								}}
-							/>
-						</div>
-					);
-				})}
+							>
+								{tab}
+								<div
+									className={`absolute -bottom-1 left-0 h-[1px] rounded-[1px] transition-all duration-300 ease-in-out ${
+										isActive ? "w-full opacity-100" : "w-0 opacity-0"
+									}`}
+									style={{
+										background:
+											"linear-gradient(90deg, #F7B406 0%, rgba(247, 180, 6, 0.00) 100%)",
+									}}
+								/>
+							</div>
+						);
+					})}
 			</div>
 			{activeTab === "Trade" && <Trade />}
 			{activeTab === "Liquidity" && <Liquidity />}
