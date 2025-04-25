@@ -16,6 +16,7 @@ interface FileUploaderProps {
 	imageIcon?: ReactNode;
 	defaultImage?: string;
 	wrapperClassName?: string;
+	setLoading?: (loading: boolean) => void;
 }
 
 export function FileUploader({
@@ -28,6 +29,7 @@ export function FileUploader({
 	defaultImage,
 	isHideRemove = false,
 	wrapperClassName,
+	setLoading,
 }: FileUploaderProps) {
 	const [files, setFiles] = useState<Array<File>>([]);
 	const [preview, setPreview] = useState<string | null>(defaultImage || null);
@@ -38,8 +40,11 @@ export function FileUploader({
 				const file = acceptedFiles[0];
 				if (!file) return;
 				setFiles([file]);
+
+				setLoading?.(true);
 				void uploadImage(file).then((url) => {
 					onChange?.(url);
+					setLoading?.(false);
 				});
 				const reader = new FileReader();
 				reader.onload = (event) => {
@@ -51,7 +56,7 @@ export function FileUploader({
 				setError(rejectedFiles[0]?.errors?.[0]?.message ?? null);
 			}
 		},
-		[onChange]
+		[onChange, setLoading]
 	);
 
 	const removeFile = () => {

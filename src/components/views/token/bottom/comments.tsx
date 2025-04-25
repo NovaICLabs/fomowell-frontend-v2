@@ -79,6 +79,7 @@ export default function Comments() {
 	});
 	const loadingRef = useRef<HTMLDivElement>(null);
 	const [imgUrl, setImgUrl] = useState<string | null>();
+	const [imgLoading, setImgLoading] = useState(false);
 	const { data, isFetching, fetchNextPage, hasNextPage, refetch } =
 		useTokenComments({
 			meme_token_id: id,
@@ -157,10 +158,10 @@ export default function Comments() {
 					}}
 				/>
 				<div className="bg-gray-860 border-gray-710 flex w-full items-end justify-between border-t p-5">
-					<FileUploader onChange={setImgUrl} />
+					<FileUploader setLoading={setImgLoading} onChange={setImgUrl} />
 					<Button
 						className="h-9 rounded-full font-semibold"
-						disabled={!comment || isPending}
+						disabled={!comment || isPending || imgLoading}
 						onClick={() => {
 							void handleSubmit();
 						}}
