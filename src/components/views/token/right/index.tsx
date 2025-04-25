@@ -57,16 +57,13 @@ export default function Bottom() {
 					.toString()
 			: undefined;
 	}, [currentTokenPrice, totalSupply, icpPrice]);
-	const { data: tokenInfoData } = useSingleTokenInfo({ id });
-	const tokenInfo = useMemo(() => {
-		return tokenInfoData?.data[0];
-	}, [tokenInfoData]);
+
+	const { data: tokenInfo } = useSingleTokenInfo({ id });
 
 	const {
 		priceChangeRate5M,
 		priceChangeRate1H,
 		priceChangeRate6H,
-
 		priceChangeRate24H,
 	} = tokenInfo ?? {};
 

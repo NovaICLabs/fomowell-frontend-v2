@@ -1,25 +1,34 @@
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import {
+	useInfiniteQuery,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { produce } from "immer";
 
 import { createComment, getCommentList } from "@/apis/comment";
 import {
 	type CandleParameters,
+	favoriteToken,
+	getFavoriteTokenList,
 	getTokenList,
 	getTokenPriceCandle,
 	getTokenTransactionList,
+	type PaginatedDataWithData,
+	type TokenInfo,
 	type TokenListParameters,
 } from "@/apis/indexer";
 import { updateUserInfo } from "@/apis/user-login";
 import { getICPCanisterId } from "@/canisters/icrc3";
 import { useIcIdentityStore } from "@/store/ic";
 
+import { useConnectedIdentity } from "../providers/wallet/ic";
+const getTokenListKey = (parameters: TokenListParameters) => {
+	return ["ic-core", "tokenList", parameters.sort, parameters.sortDirection];
+};
 export const useInfiniteTokenList = (parameters: TokenListParameters) => {
 	return useInfiniteQuery({
-		queryKey: [
-			"ic-core",
-			"tokenList",
-			parameters.sort,
-			parameters.sortDirection,
-		],
+		queryKey: getTokenListKey(parameters),
 		queryFn: ({ pageParam: page = 1 }) =>
 			getTokenList({
 				...parameters,
@@ -33,10 +42,45 @@ export const useInfiniteTokenList = (parameters: TokenListParameters) => {
 	});
 };
 
+export const useInfiniteFavoriteTokenList = (parameters: {
+	isEnabled?: boolean;
+}) => {
+	const { principal } = useConnectedIdentity();
+
+	return useInfiniteQuery({
+		queryKey: ["ic-core", "favoriteTokenList", principal],
+		queryFn: ({ pageParam: page = 1 }) =>
+			getFavoriteTokenList({
+				principal,
+				page,
+			}),
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
+		},
+		initialPageParam: 1,
+		refetchInterval: 2000,
+		enabled: !!principal && parameters.isEnabled,
+	});
+};
+
+export const getSingleTokenInfoKey = (id: string, principal?: string) => {
+	return ["ic-core", "tokenInfo", id, principal];
+};
+
 export const useSingleTokenInfo = (parameters: { id: string }) => {
+	const { principal } = useConnectedIdentity();
 	return useQuery({
-		queryKey: ["ic-core", "tokenInfo", parameters.id],
-		queryFn: () => getTokenList({ id: parameters.id, page: 1, pageSize: 1 }),
+		queryKey: getSingleTokenInfoKey(parameters.id, principal),
+		queryFn: async () => {
+			const { data } = await getTokenList({
+				tokenId: parameters.id,
+				page: 1,
+				pageSize: 1,
+				principal,
+			});
+			return data[0];
+		},
+		refetchInterval: 5000,
 	});
 };
 
@@ -131,6 +175,55 @@ export const useUpdateUserInfo = () => {
 				name: args.name,
 				avatar: args.avatar,
 			});
+		},
+	});
+};
+
+// favorite token
+export const useFavoriteToken = (listParameters?: TokenListParameters) => {
+	const { jwt_token } = useIcIdentityStore();
+	const queryClient = useQueryClient();
+	const { principal } = useConnectedIdentity();
+	return useMutation({
+		mutationKey: ["ic-core", "favoriteToken"],
+		mutationFn: async (args: { tokenId: string }) => {
+			if (!jwt_token || !principal) {
+				throw new Error("No token found");
+			}
+
+			try {
+				// optimistic update
+				if (listParameters) {
+					queryClient.setQueryData(
+						getTokenListKey(listParameters),
+						(oldData: { pages: Array<PaginatedDataWithData<TokenInfo>> }) => {
+							return produce(oldData, (old) => {
+								old.pages.forEach((page) => {
+									page.data.forEach((token) => {
+										if (token.memeTokenId === Number(args.tokenId)) {
+											token.isFollow = !token.isFollow;
+										}
+									});
+								});
+							});
+						}
+					);
+				} else {
+					queryClient.setQueryData(
+						getSingleTokenInfoKey(args.tokenId, principal),
+						(oldData: TokenInfo) => {
+							return produce(oldData, (old) => {
+								old.isFollow = !old.isFollow;
+							});
+						}
+					);
+				}
+				await favoriteToken(jwt_token, Number(args.tokenId));
+				return;
+			} catch (error) {
+				console.error(error);
+				throw error;
+			}
 		},
 	});
 };

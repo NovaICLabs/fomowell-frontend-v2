@@ -3,10 +3,12 @@ import { Link, useParams } from "@tanstack/react-router";
 import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
 import X from "@/components/icons/media/x";
-import Star from "@/components/icons/star";
+import { Star } from "@/components/icons/star";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useFavoriteToken, useSingleTokenInfo } from "@/hooks/apis/indexer";
 import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
 import { formatNumberSmart } from "@/lib/common/number";
+import { withStopPropagation } from "@/lib/common/react-event";
 import { truncatePrincipal } from "@/lib/ic/principal";
 
 export default function HeadInfo() {
@@ -16,11 +18,19 @@ export default function HeadInfo() {
 	);
 	const { data: currentPrice, isLoading: isLoadingCurrentPrice } =
 		useCurrentPrice({ id: Number(id) });
+	const { data: tokenInfo } = useSingleTokenInfo({ id });
+	const { mutateAsync: favoriteToken } = useFavoriteToken();
 	return (
 		<div className="text-white">
 			<div className="flex items-center justify-between pr-4">
 				<div className="flex items-center">
-					<Star className="h-5 w-5" />
+					<Star
+						className="h-5 w-5"
+						isActive={tokenInfo?.isFollow}
+						onClick={withStopPropagation(() => {
+							void favoriteToken({ tokenId: id });
+						})}
+					/>
 					<div className="relative ml-2 h-10 w-10 overflow-hidden rounded-full">
 						{isLoadingMemeToken ? (
 							<Skeleton className="h-full w-full" />

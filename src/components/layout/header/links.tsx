@@ -1,5 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 
+import { useDialogStore } from "@/store/dialog";
+
 const links = [
 	{
 		label: "Tokens",
@@ -9,7 +11,7 @@ const links = [
 
 export default function Links() {
 	const location = useLocation();
-
+	const { setHowItWorksOpen } = useDialogStore();
 	return (
 		<div className="flex items-center gap-[30px]">
 			{links.map((link) => {
@@ -38,10 +40,7 @@ export default function Links() {
 			<div
 				className={`relative cursor-pointer text-sm font-medium text-white/60 hover:text-white`}
 				onClick={() => {
-					window.open(
-						"https://docs.google.com/document/d/1-_9000000000000000000000000000000000000000/edit?tab=t.0",
-						"_blank"
-					);
+					setHowItWorksOpen(true);
 				}}
 			>
 				How it works

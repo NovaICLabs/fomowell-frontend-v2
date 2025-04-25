@@ -3,6 +3,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 
+import HowItWorksDialog from "./components/layout/dialog/how-it-works";
 import { ThemeProvider } from "./components/providers/theme-provider";
 import { WalletProvider } from "./components/providers/wallet";
 import { TanStackRouterDevelopmentTools } from "./components/utils/development-tools/TanStackRouterDevelopmentTools";
@@ -32,6 +33,7 @@ const App = () => {
 						duration={Number(import.meta.env.VITE_TOAST_DURATION)}
 						position="bottom-right"
 					/>
+					<HowItWorksDialog />
 				</WalletProvider>
 			</QueryClientProvider>
 		</ThemeProvider>

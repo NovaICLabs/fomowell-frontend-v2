@@ -16,7 +16,7 @@ import SortsIcon from "@/components/icons/common/sorts";
 import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
 import X from "@/components/icons/media/x";
-import Star from "@/components/icons/star";
+import { Star } from "@/components/icons/star";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -27,8 +27,13 @@ import {
 } from "@/components/ui/tooltip";
 import { showToast } from "@/components/utils/toast";
 import { useICPPrice } from "@/hooks/apis/coingecko";
-import { useInfiniteTokenList } from "@/hooks/apis/indexer";
+import {
+	useFavoriteToken,
+	useInfiniteFavoriteTokenList,
+	useInfiniteTokenList,
+} from "@/hooks/apis/indexer";
 import { useBuy } from "@/hooks/ic/core";
+import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
 import {
 	formatNumberSmart,
 	formatUnits,
@@ -52,9 +57,38 @@ const TableItemsSkeleton = () => {
 };
 
 export default function MemeList() {
-	const { sort, direction, ...search } = useSearch({
+	const { sort, direction, tab } = useSearch({
 		from: "/",
 	});
+
+	const { principal } = useConnectedIdentity();
+	const {
+		data: allTokenList,
+		hasNextPage: hasNextPageAllTokenList,
+		fetchNextPage: fetchNextPageAllTokenList,
+		isFetchingNextPage: isFetchingNextPageAllTokenList,
+		status: statusAllTokenList,
+		error: errorAllTokenList,
+		isFetching: isFetchingAllTokenList,
+	} = useInfiniteTokenList({
+		sort,
+		sortDirection: direction,
+		pageSize: 16,
+		principal,
+	});
+
+	const {
+		data: favoriteTokenList,
+		hasNextPage: hasNextPageFavoriteTokenList,
+		fetchNextPage: fetchNextPageFavoriteTokenList,
+		isFetchingNextPage: isFetchingNextPageFavoriteTokenList,
+		status: statusFavoriteTokenList,
+		error: errorFavoriteTokenList,
+		isFetching: isFetchingFavoriteTokenList,
+	} = useInfiniteFavoriteTokenList({
+		isEnabled: tab === "favorite",
+	});
+
 	const {
 		data,
 		hasNextPage,
@@ -63,14 +97,47 @@ export default function MemeList() {
 		status,
 		error,
 		isFetching,
-	} = useInfiniteTokenList({
-		sort,
-		sortDirection: direction,
-		pageSize: 16,
-	});
+	} = useMemo(() => {
+		return tab === "favorite"
+			? {
+					data: favoriteTokenList,
+					hasNextPage: hasNextPageFavoriteTokenList,
+					fetchNextPage: fetchNextPageFavoriteTokenList,
+					isFetchingNextPage: isFetchingNextPageFavoriteTokenList,
+					status: statusFavoriteTokenList,
+					error: errorFavoriteTokenList,
+					isFetching: isFetchingFavoriteTokenList,
+				}
+			: {
+					data: allTokenList,
+					hasNextPage: hasNextPageAllTokenList,
+					fetchNextPage: fetchNextPageAllTokenList,
+					isFetchingNextPage: isFetchingNextPageAllTokenList,
+					status: statusAllTokenList,
+					error: errorAllTokenList,
+					isFetching: isFetchingAllTokenList,
+				};
+	}, [
+		tab,
+		favoriteTokenList,
+		hasNextPageFavoriteTokenList,
+		fetchNextPageFavoriteTokenList,
+		isFetchingNextPageFavoriteTokenList,
+		statusFavoriteTokenList,
+		errorFavoriteTokenList,
+		isFetchingFavoriteTokenList,
+		allTokenList,
+		hasNextPageAllTokenList,
+		fetchNextPageAllTokenList,
+		isFetchingNextPageAllTokenList,
+		statusAllTokenList,
+		errorAllTokenList,
+		isFetchingAllTokenList,
+	]);
+
 	const router = useRouter();
 
-	const columnHelper = createColumnHelper<TokenInfo>();
+	const columnHelper = useMemo(() => createColumnHelper<TokenInfo>(), []);
 
 	const { mutateAsync: buyToken } = useBuy();
 	const { amount: flashAmount } = useQuickBuyStore();
@@ -99,10 +166,14 @@ export default function MemeList() {
 				selectedSort === sort ? (direction === "asc" ? "desc" : "asc") : "desc";
 			void router.navigate({
 				to: "/",
-				search: { ...search, sort: selectedSort, direction: currentDirection },
+				search: (search) => ({
+					...search,
+					sort: selectedSort,
+					direction: currentDirection,
+				}),
 			});
 		},
-		[direction, router, search, sort]
+		[direction, router, sort]
 	);
 	useEffect(() => {
 		const currentRecentTradeTs = new Map<string, string | null>();
@@ -149,6 +220,11 @@ export default function MemeList() {
 		}
 	}, [items]);
 
+	// favorite token
+	const { mutateAsync: favoriteToken } = useFavoriteToken({
+		sort,
+		sortDirection: direction,
+	});
 	const columns = useMemo(
 		() => [
 			columnHelper.group({
@@ -164,7 +240,12 @@ export default function MemeList() {
 						<div className="flex items-center gap-2">
 							<Star
 								className="h-4 w-4 cursor-pointer text-white/40"
-								onClick={withStopPropagation(() => {})}
+								isActive={row.original.isFollow}
+								onClick={withStopPropagation(() => {
+									void favoriteToken({
+										tokenId: row.original.memeTokenId.toString(),
+									});
+								})}
 							/>
 							<TooltipProvider>
 								<Tooltip>
@@ -657,6 +738,7 @@ export default function MemeList() {
 			buyToken,
 			columnHelper,
 			direction,
+			favoriteToken,
 			flashAmount,
 			flashAmountBigInt,
 			handleSort,
@@ -672,6 +754,7 @@ export default function MemeList() {
 		defaultColumn: {
 			size: 120,
 		},
+		getRowId: (row) => row.memeTokenId.toString(),
 		state: {
 			columnPinning: {
 				left: ["token"],
@@ -843,7 +926,7 @@ export default function MemeList() {
 
 						return (
 							<motion.tr
-								key={row.id}
+								key={row.original.memeTokenId}
 								animate={isFlashing ? "flash" : "normal"}
 								className="group hover:!bg-gray-750 relative duration-300"
 								initial="initial"

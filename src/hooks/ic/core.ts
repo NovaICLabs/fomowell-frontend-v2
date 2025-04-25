@@ -282,8 +282,12 @@ export const useBuy = () => {
 			}
 			return buy(actorCreator, getChainICCoreCanisterId().toText(), args);
 		},
-		onError: () => {
-			showToast("error", "Failed to purchase token");
+		onError: (error) => {
+			if (error.message.indexOf("is out of cycles") !== -1) {
+				showToast("error", `Cycles insufficient`);
+			} else {
+				showToast("error", "Failed to purchase token");
+			}
 		},
 	});
 };
@@ -298,8 +302,12 @@ export const useSell = () => {
 			}
 			return sell(actorCreator, getChainICCoreCanisterId().toText(), args);
 		},
-		onError: () => {
-			showToast("error", "Failed to sell token");
+		onError: (error) => {
+			if (error.message.indexOf("is out of cycles") !== -1) {
+				showToast("error", `Cycles insufficient`);
+			} else {
+				showToast("error", "Failed to sell token");
+			}
 		},
 	});
 };

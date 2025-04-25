@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useThrottleCallback } from "@react-hook/throttle";
 import { useParams } from "@tanstack/react-router";
 import { BigNumber } from "bignumber.js";
 import {
@@ -114,11 +115,6 @@ export default function TradingView() {
 		chart.timeScale().applyOptions({
 			timeVisible: true,
 		});
-		window.addEventListener("resize", () => {
-			if (containerRef.current?.clientWidth) {
-				chartRef.current?.resize(containerRef.current?.clientWidth, 390);
-			}
-		});
 	}, []);
 
 	useEffect(() => {
@@ -128,6 +124,35 @@ export default function TradingView() {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
 		candleSeriesRef.current.setData(candleData);
 	}, [candleData]);
+
+	const handleResize = useCallback((width: number, height: number) => {
+		if (chartRef.current) {
+			chartRef.current.resize(width, height);
+		}
+	}, []);
+
+	const handleResizeThrottled = useThrottleCallback(handleResize, 60, true);
+
+	useEffect(() => {
+		const targetElement = containerRef.current;
+
+		if (!targetElement) {
+			return;
+		}
+		const observer = new ResizeObserver((entries) => {
+			for (const entry of entries) {
+				const newWidth = entry.contentRect?.width ?? 0;
+				if (newWidth > 0) {
+					handleResizeThrottled(newWidth, 390);
+				}
+			}
+		});
+
+		observer.observe(targetElement);
+		return () => {
+			observer.disconnect();
+		};
+	}, [handleResizeThrottled]);
 
 	return (
 		<div className="relative w-full">

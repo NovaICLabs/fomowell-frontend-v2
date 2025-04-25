@@ -16,7 +16,7 @@ import {
 import type { Connector } from "@/lib/ic/connectors";
 
 type IcIdentity = {
-	jwt_token: string;
+	jwt_token?: string;
 	principal: string | undefined;
 	identityProfile: UserInfo | undefined;
 	reloadIdentityProfile: () => Promise<void>;
@@ -123,7 +123,7 @@ export const useIcIdentityStore = create<IcIdentity>()(
 			},
 			refreshToken: async (): Promise<string | undefined> => {
 				const token = get().jwt_token;
-
+				if (!token) return;
 				const newToken = await refreshToken(token);
 				if (newToken) {
 					set({ jwt_token: newToken });

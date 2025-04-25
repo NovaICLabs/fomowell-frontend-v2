@@ -20,7 +20,7 @@ interface PaginatedDataBase {
 	totalPages: number;
 }
 
-interface PaginatedDataWithData<T> extends PaginatedDataBase {
+export interface PaginatedDataWithData<T> extends PaginatedDataBase {
 	data: Array<T>;
 	items?: never;
 }
@@ -69,6 +69,7 @@ export type TokenInfo = {
 	token1Address: string;
 	token1Name: string;
 	recentTradeTs: string | null;
+	isFollow?: boolean;
 };
 export const tokenListSortOptions = [
 	"recent",
@@ -95,10 +96,11 @@ export type TokenListParameters = {
 	market?: string;
 	sort?: TokenListSortOption;
 	sortDirection?: "asc" | "desc";
-
 	// single token info
-	id?: string;
+	tokenId?: string;
+	principal?: string;
 };
+
 export const getTokenList = async (parameters: TokenListParameters) => {
 	const {
 		page = 1,
@@ -106,6 +108,8 @@ export const getTokenList = async (parameters: TokenListParameters) => {
 		market = "ICP",
 		sort = "recent",
 		sortDirection = "desc",
+		tokenId,
+		principal,
 	} = parameters;
 	const queryParameters = new URLSearchParams({
 		page: page.toString(),
@@ -114,6 +118,12 @@ export const getTokenList = async (parameters: TokenListParameters) => {
 		sort,
 		sortDirection,
 	});
+	if (principal) {
+		queryParameters.set("principal", principal);
+	}
+	if (tokenId) {
+		queryParameters.set("tokenId", tokenId);
+	}
 	const response = await request<{
 		data: PaginatedDataWithData<TokenInfo>;
 		statusCode: number;
@@ -121,6 +131,31 @@ export const getTokenList = async (parameters: TokenListParameters) => {
 	}>(
 		`${getIndexerBaseUrl()}/api/v1/token_info/list?${queryParameters.toString()}`
 	);
+	if (response.statusCode !== 200) {
+		throw new Error(response.message);
+	}
+	return response.data;
+};
+export const getFavoriteTokenList = async (parameters: {
+	page?: number;
+	pageSize?: number;
+	principal?: string;
+	market?: string;
+}) => {
+	const { page = 1, pageSize = 10, principal, market } = parameters;
+	const queryParameters = new URLSearchParams({
+		page: page.toString(),
+		pageSize: pageSize.toString(),
+		market: market ?? "ICP",
+	});
+	if (principal) {
+		queryParameters.set("principal", principal);
+	}
+	const response = await request<{
+		data: PaginatedDataWithData<TokenInfo>;
+		statusCode: number;
+		message: string;
+	}>(`${getIndexerBaseUrl()}/api/v1/follow?${queryParameters.toString()}`);
 	if (response.statusCode !== 200) {
 		throw new Error(response.message);
 	}
@@ -248,4 +283,23 @@ export const getTokenPriceCandle = async (parameters: CandleParameters) => {
 			close: BigNumber(1).div(candle.close).toNumber(),
 		}))
 		.reverse();
+};
+
+// favorite token
+export const favoriteToken = async (user_token: string, tokenId: number) => {
+	const response = await request<{
+		data: string;
+		statusCode: number;
+		message: string;
+	}>(`${getIndexerBaseUrl()}/api/v1/follow`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			authorization: `Bearer ${user_token}`,
+		},
+		body: JSON.stringify({ tokenId }),
+	});
+	if (response.statusCode !== 201) {
+		throw new Error(response.message);
+	}
 };

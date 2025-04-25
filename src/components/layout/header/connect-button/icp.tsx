@@ -19,6 +19,7 @@ import {
 import { useCoreTokenBalance } from "@/hooks/ic/core";
 import { useIcWallet } from "@/hooks/providers/wallet/ic";
 import { getAvatar } from "@/lib/common/avatar";
+import { withStopPropagation } from "@/lib/common/react-event";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore } from "@/store/ic";
@@ -106,13 +107,13 @@ const IcpWalletConnect: React.FC = () => {
 								) : (
 									<CopyIcon
 										className="ml-1 h-4 w-4"
-										onClick={() => {
+										onClick={withStopPropagation(() => {
 											setCopied(true);
 											copy(principal);
 											setTimeout(() => {
 												setCopied(false);
 											}, 2000);
-										}}
+										})}
 									/>
 								)}
 								<div className="ml-2.5 h-6 w-px bg-white/20"></div>

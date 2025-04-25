@@ -24,6 +24,10 @@ export const useDialogStore = create<{
 	setSlippageOpen: (slippageOpen: SlippageOpen) => void;
 	icpConnectOpen: boolean;
 	setIcpConnectOpen: (icpConnectOpen: boolean) => void;
+
+	// how it works
+	howItWorksOpen: boolean;
+	setHowItWorksOpen: (howItWorksOpen: boolean) => void;
 }>((set) => ({
 	depositWithdrawOpen: {
 		open: false,
@@ -42,5 +46,9 @@ export const useDialogStore = create<{
 	icpConnectOpen: false,
 	setIcpConnectOpen: (icpConnectOpen) => {
 		set({ icpConnectOpen });
+	},
+	howItWorksOpen: false,
+	setHowItWorksOpen: (howItWorksOpen) => {
+		set({ howItWorksOpen });
 	},
 }));

@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { type TokenListSortOption, tokenListSortOptions } from "@/apis/indexer";
 import SlippageSetting from "@/components/icons/common/slippage-setting";
-import Star from "@/components/icons/star";
+import { Star } from "@/components/icons/star";
 import { Input } from "@/components/ui/input";
 import {
 	Select,
@@ -46,13 +46,7 @@ const SearchSchema = z.object({
 });
 
 function Home() {
-	const {
-		sort,
-		direction,
-		tab,
-		chain: chainFromSearch,
-		...search
-	} = Route.useSearch();
+	const { sort, direction, tab, chain: chainFromSearch } = Route.useSearch();
 
 	const [trendingTime, setTrendingTime] = useState<TrendingTimeOption>(
 		trendingTimeOptions.find((option) => option.value === sort)?.label ??
@@ -92,10 +86,15 @@ function Home() {
 			// navigate to the new tab
 			void router.navigate({
 				to: "/",
-				search: { ...search, sort: option.value, direction },
+				search: (previous) => ({
+					...previous,
+					tab: undefined,
+					sort: option.value,
+					direction,
+				}),
 			});
 		},
-		[router, search]
+		[router]
 	);
 
 	return (
@@ -151,11 +150,12 @@ function Home() {
 
 						void router.navigate({
 							to: "/",
-							search: {
-								...search,
+							search: (previous) => ({
+								...previous,
+								tab: undefined,
 								sort: value as TokenListSortOption,
 								direction,
-							},
+							}),
 						});
 					}}
 				>
@@ -173,18 +173,25 @@ function Home() {
 						))}
 					</TabsList>
 				</Tabs>
-				<Link
-					className="bg-gray-750 rounded-full px-4 py-2 text-white/60"
-					search={{ ...search, tab: "favorite" }}
-					to="/"
+				<div
+					className={cn(
+						"bg-gray-750 cursor-pointer rounded-full px-4 py-2 text-white/60",
+						tab === "favorite" && "bg-white"
+					)}
+					onClick={() => {
+						void router.navigate({
+							to: "/",
+							search: (previous) => ({
+								...previous,
+								sort: undefined,
+								direction: undefined,
+								tab: "favorite",
+							}),
+						});
+					}}
 				>
-					<Star
-						className={cn(
-							"text-white/80 hover:text-yellow-500",
-							tab === "favorite" && "text-yellow-500"
-						)}
-					/>
-				</Link>
+					<Star isActive={tab === "favorite"} />
+				</div>
 				<div className="bg-gray-710 ml-auto flex h-[38px] items-center rounded-full px-4 text-white">
 					<img alt="flash" src="/svgs/flash.svg" />
 					<span className="ml-1.5 text-sm font-medium text-white">Buy</span>
