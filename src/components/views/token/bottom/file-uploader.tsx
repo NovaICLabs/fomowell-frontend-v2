@@ -16,6 +16,7 @@ interface FileUploaderProps {
 	imageIcon?: ReactNode;
 	defaultImage?: string;
 	wrapperClassName?: string;
+	isShowSize?: boolean;
 	setLoading?: (loading: boolean) => void;
 }
 
@@ -28,6 +29,7 @@ export function FileUploader({
 	imageIcon,
 	defaultImage,
 	isHideRemove = false,
+	isShowSize = true,
 	wrapperClassName,
 	setLoading,
 }: FileUploaderProps) {
@@ -109,7 +111,7 @@ export function FileUploader({
 								<img alt="upload-svg" src={"/svgs/upload.svg"} />
 							</div>
 						)}
-						{files.length > 0 && (
+						{isShowSize && files.length > 0 && (
 							<div className="absolute right-0 bottom-0 left-0 bg-black/50 px-2 py-1 text-center text-xs text-white">
 								({formatBytes(files[0]?.size ?? 0)})
 							</div>

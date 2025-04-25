@@ -158,7 +158,12 @@ export default function Comments() {
 					}}
 				/>
 				<div className="bg-gray-860 border-gray-710 flex w-full items-end justify-between border-t p-5">
-					<FileUploader setLoading={setImgLoading} onChange={setImgUrl} />
+					<FileUploader
+						isHideRemove
+						isShowSize={false}
+						setLoading={setImgLoading}
+						onChange={setImgUrl}
+					/>
 					<Button
 						className="h-9 rounded-full font-semibold"
 						disabled={!comment || isPending || imgLoading}
