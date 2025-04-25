@@ -1,9 +1,17 @@
-import Like from "@/components/icons/common/like";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import { useParams } from "@tanstack/react-router";
+
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
+import { Empty } from "@/components/ui/empty";
 import { Textarea } from "@/components/ui/textarea";
+import { showToast } from "@/components/utils/toast";
+import { useCreateTokenComment, useTokenComments } from "@/hooks/apis/indexer";
 import { useControllableState } from "@/hooks/common/controllable-state";
 import { getAvatar } from "@/lib/common/avatar";
+import { formatDate } from "@/lib/common/time";
+import { truncatePrincipal } from "@/lib/ic/principal";
 
 import { FileUploader } from "./file-uploader";
 
@@ -11,42 +19,46 @@ interface CommentProps {
 	username?: string;
 	comment?: string;
 	timestamp?: string;
+	photo?: string;
 	id?: string;
 	likes?: number;
 }
 
 const Comment = ({
-	username = "12321312321313212",
-	comment = "DeepSeek is a meme coin he crypto world. Inspired by the playful DeepSeek is a meme coin he crypto world. Inspired by the playfuDeepSeek is a meme coin he crypto world. Inspired by the playfuDeepSeek is a meme coin he crypto world. Inspired by the playfuDeepSeek is a meme coin he crypto world. Inspired by the playfuDeepSeek is a meme coin he crypto world. Inspired by the playfu",
-	timestamp = "01/31/25 12:00 PM",
-	id = "112312312312312312312312",
-	likes = 10,
+	username = "",
+	comment = "",
+	photo = "",
+	timestamp = "",
+	id = "",
 }: CommentProps) => {
+	//  MM/DD/YY HH:mm A
+	const formattedTime = timestamp
+		? formatDate(BigInt(timestamp), "MM/DD/YY hh:mm A")
+		: "";
+
 	return (
-		<div className="bg-gray-860 flex h-43 flex-col rounded-[12px] px-[23px] py-[15px]">
+		<div className="bg-gray-860 flex flex-col rounded-[12px] px-[23px] py-[15px]">
 			<div className="flex items-center">
 				<img
 					alt="avatar"
 					className="h-6 w-6 rounded-full"
 					src={getAvatar(id)}
 				/>
-				<span className="ml-1.5 text-sm">{username}</span>
-				<span className="text-gray-280 ml-1.5 text-xs">{timestamp}</span>
-				<div className="ml-[18px] flex cursor-pointer items-center">
+				<span className="ml-1.5 text-sm">{truncatePrincipal(username)}</span>
+				<span className="text-gray-280 ml-1.5 text-xs">{formattedTime}</span>
+				{/* <div className="ml-[18px] flex cursor-pointer items-center">
 					<Like className="text-gray-280" likes={likes} />
-				</div>
+				</div> */}
 			</div>
 			<div className="mt-2.5 flex flex-1 overflow-y-auto text-sm">
-				<div className="w-25 flex-shrink-0 rounded-[12px]">
-					<AspectRatio className="flex" ratio={1}>
-						<img
-							alt=""
-							className="object-contain"
-							src="https://www.azuki.com/homepage/thumbnail-world.jpg"
-						/>
-					</AspectRatio>
-				</div>
-				<span className="no-scrollbar ml-2.75 flex-1 overflow-y-auto leading-5 text-white/40">
+				{photo && (
+					<div className="mr-2.75 w-25 flex-shrink-0 rounded-[12px]">
+						<AspectRatio className="flex" ratio={1}>
+							<img alt="" className="object-contain" src={photo} />
+						</AspectRatio>
+					</div>
+				)}
+				<span className="no-scrollbar flex-1 overflow-y-auto leading-5 text-white/40">
 					{comment}
 				</span>
 			</div>
@@ -54,12 +66,85 @@ const Comment = ({
 	);
 };
 export default function Comments() {
+	const { id } = useParams({ from: "/icp/token/$id" });
+	const { mutateAsync: createComment, isPending } = useCreateTokenComment({
+		tokenId: id,
+	});
+
 	const [comment, setComment] = useControllableState({
 		defaultProp: "",
 		onChange: (value) => {
 			console.log(value);
 		},
 	});
+	const loadingRef = useRef<HTMLDivElement>(null);
+	const [imgUrl, setImgUrl] = useState<string | null>();
+	const { data, isFetching, fetchNextPage, hasNextPage, refetch } =
+		useTokenComments({
+			meme_token_id: id,
+			pageSize: 2,
+		});
+
+	const items = useMemo(
+		() => data?.pages.flatMap((page) => page.data) ?? [],
+		[data]
+	);
+
+	useEffect(() => {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (
+					entries &&
+					entries[0] &&
+					entries[0].isIntersecting &&
+					hasNextPage &&
+					!isFetching
+				) {
+					void fetchNextPage();
+				}
+			},
+			{ threshold: 0.1 }
+		);
+
+		const currentLoadingRef = loadingRef.current;
+		if (currentLoadingRef) {
+			observer.observe(currentLoadingRef);
+		}
+
+		// 清理函数
+		return () => {
+			if (currentLoadingRef) {
+				observer.unobserve(currentLoadingRef);
+			}
+		};
+	}, [fetchNextPage, hasNextPage, isFetching]);
+
+	const handleSubmit = async () => {
+		if (!comment || isPending) {
+			return;
+		}
+		try {
+			const parameters: { tokenId: string; content: string; photo?: string } = {
+				tokenId: id,
+				content: comment,
+			};
+
+			if (imgUrl) {
+				parameters.photo = imgUrl;
+			}
+
+			await createComment(parameters);
+
+			showToast("success", "Comment successfully");
+			setComment("");
+			setImgUrl(null);
+			void refetch();
+		} catch (error) {
+			console.error("🚀 ~ handleSubmit ~ error:", error);
+			showToast("error", "Comment failed");
+		}
+	};
+
 	return (
 		<div className="flex flex-col">
 			<div className="bg-gray-860 flex flex-col gap-0 overflow-hidden rounded-[12px]">
@@ -72,23 +157,43 @@ export default function Comments() {
 					}}
 				/>
 				<div className="bg-gray-860 border-gray-710 flex w-full items-end justify-between border-t p-5">
-					<FileUploader />
-					<Button className="h-9 rounded-full font-semibold">Submit</Button>
+					<FileUploader onChange={setImgUrl} />
+					<Button
+						className="h-9 rounded-full font-semibold"
+						disabled={!comment || isPending}
+						onClick={() => {
+							void handleSubmit();
+						}}
+					>
+						Submit
+					</Button>
 				</div>
 			</div>
 			<div className="no-scrollbar mt-3.75 flex h-screen flex-col gap-3 overflow-auto pb-3">
-				<Comment />
-				<Comment />
-				<Comment />
-				<Comment />
-				<Comment />
-				<Comment />
-				<Comment />
-				<Comment />
-				<Comment />
-				<Comment />
-				<Comment />
-				<Comment />
+				{items.map((item) => (
+					<Comment
+						key={item.id}
+						comment={item.content}
+						id={`${item.id}`}
+						timestamp={item.created_at}
+						username={item.principal}
+					/>
+				))}
+				<div ref={loadingRef}>
+					{isFetching ? (
+						<div className="py-4 text-center text-sm text-white/60">
+							Loading more...
+						</div>
+					) : null}
+					{!isFetching && items.length > 0 ? (
+						<div className="py-4 text-center text-sm text-white/60">
+							All comments loaded
+						</div>
+					) : null}
+				</div>
+				<div className="min-h-5 w-full">
+					{!isFetching && (!items || items.length === 0) && <Empty />}
+				</div>
 			</div>
 		</div>
 	);

@@ -11,14 +11,25 @@ const getIndexerBaseUrl = () => {
 // ================== comment ==================
 export type CommentInfo = {
 	id: number;
-	user_id: number;
-	tokenId: number;
-	meme_token_id: string;
+	principal: string;
+	tokenId?: number;
+	memeTokenId: number;
 	photo: string | undefined;
 	content: string;
 	created_at: string;
-	updated_at: string;
 };
+
+interface PaginatedDataBase {
+	total: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
+}
+interface PaginatedDataWithData<T> extends PaginatedDataBase {
+	data: Array<T>;
+	items?: never;
+}
+
 export const getCommentList = async ({
 	page = 1,
 	pageSize = 10,
@@ -35,10 +46,7 @@ export const getCommentList = async ({
 	});
 
 	const response = await request<{
-		data: {
-			list: Array<CommentInfo>;
-			total: number;
-		};
+		data: PaginatedDataWithData<CommentInfo>;
 		statusCode: number;
 		message: string;
 	}>(`${getIndexerBaseUrl()}/api/v1/comment?${queryParameters.toString()}`, {
@@ -71,13 +79,13 @@ export const createComment = async (
 			authorization: `Bearer ${user_token}`,
 		},
 		body: JSON.stringify({
-			tokenId: commentInfo.tokenId,
+			meme_token_id: commentInfo.tokenId,
 			photo: commentInfo.photo,
 			content: commentInfo.content,
 		}),
 	});
 
-	if (response.statusCode !== 200) {
+	if (response.statusCode !== 201) {
 		throw new Error(
 			`Failed to create token comment : ${response.message} (Status: ${response.statusCode})`
 		);

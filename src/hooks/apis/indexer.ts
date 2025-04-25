@@ -72,16 +72,20 @@ export const useTokenPriceCandle = (parameters: CandleParameters) => {
 	});
 };
 
-export const useTokenComments = (parameters: { meme_token_id: string }) => {
+export const useTokenComments = (parameters: {
+	meme_token_id: string;
+	page?: number;
+	pageSize?: number;
+}) => {
 	return useInfiniteQuery({
 		queryKey: ["ic-core", "tokenCommentList", parameters.meme_token_id],
-		queryFn: ({ pageParam: pageParameter = 1 }: { pageParam: number }) =>
+		queryFn: ({ pageParam: page = 1 }) =>
 			getCommentList({
 				...parameters,
-				page: pageParameter,
+				page,
 			}),
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage.total > pages.length ? pages.length + 1 : undefined;
+			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},
 		initialPageParam: 1,
 	});
