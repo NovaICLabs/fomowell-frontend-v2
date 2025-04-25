@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useParams } from "@tanstack/react-router";
+import dayjs from "dayjs";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
@@ -10,10 +11,9 @@ import { showToast } from "@/components/utils/toast";
 import { useCreateTokenComment, useTokenComments } from "@/hooks/apis/indexer";
 import { useControllableState } from "@/hooks/common/controllable-state";
 import { getAvatar } from "@/lib/common/avatar";
-import { formatDate } from "@/lib/common/time";
 import { truncatePrincipal } from "@/lib/ic/principal";
 
-import { FileUploader } from "./file-uploader";
+import { FileUploader, type FileUploaderRef } from "./file-uploader";
 
 interface CommentProps {
 	username?: string;
@@ -33,7 +33,7 @@ const Comment = ({
 }: CommentProps) => {
 	//  MM/DD/YY HH:mm A
 	const formattedTime = timestamp
-		? formatDate(BigInt(timestamp), "MM/DD/YY hh:mm A")
+		? dayjs(timestamp).format("YYYY/MM/DD HH:mm:ss")
 		: "";
 
 	return (
@@ -70,15 +70,13 @@ export default function Comments() {
 	const { mutateAsync: createComment, isPending } = useCreateTokenComment({
 		tokenId: id,
 	});
+	const fileUploaderRef = useRef<FileUploaderRef>(null);
 
 	const [comment, setComment] = useControllableState({
 		defaultProp: "",
-		onChange: (value) => {
-			console.log(value);
-		},
 	});
 	const loadingRef = useRef<HTMLDivElement>(null);
-	const [imgUrl, setImgUrl] = useState<string | null>();
+	const [imgUrl, setImgUrl] = useState<string | undefined | null>();
 	const [imgLoading, setImgLoading] = useState(false);
 	const { data, isFetching, fetchNextPage, hasNextPage, refetch } =
 		useTokenComments({
@@ -139,6 +137,7 @@ export default function Comments() {
 			showToast("success", "Comment successfully");
 			setComment("");
 			setImgUrl(null);
+			fileUploaderRef.current?.reset();
 			void refetch();
 		} catch (error) {
 			console.error("🚀 ~ handleSubmit ~ error:", error);
@@ -159,7 +158,9 @@ export default function Comments() {
 				/>
 				<div className="bg-gray-860 border-gray-710 flex w-full items-end justify-between border-t p-5">
 					<FileUploader
+						ref={fileUploaderRef}
 						isHideRemove
+						defaultImage={imgUrl as string | undefined}
 						isShowSize={false}
 						setLoading={setImgLoading}
 						onChange={setImgUrl}
@@ -181,7 +182,8 @@ export default function Comments() {
 						key={item.id}
 						comment={item.content}
 						id={`${item.id}`}
-						timestamp={item.created_at}
+						photo={item.photo}
+						timestamp={item.createdAt}
 						username={item.principal}
 					/>
 				))}

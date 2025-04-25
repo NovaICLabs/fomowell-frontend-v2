@@ -1,4 +1,10 @@
-import { type ReactNode, useCallback, useState } from "react";
+import {
+	forwardRef,
+	type ReactNode,
+	useCallback,
+	useImperativeHandle,
+	useState,
+} from "react";
 
 import { ImageIcon, X } from "lucide-react";
 import { type FileRejection, useDropzone } from "react-dropzone";
@@ -20,118 +26,141 @@ interface FileUploaderProps {
 	setLoading?: (loading: boolean) => void;
 }
 
-export function FileUploader({
-	onChange,
-	maxSize = 2 * 1024 * 1024, // 1MB
-	accept = {
-		"image/*": [],
-	},
-	imageIcon,
-	defaultImage,
-	isHideRemove = false,
-	isShowSize = true,
-	wrapperClassName,
-	setLoading,
-}: FileUploaderProps) {
-	const [files, setFiles] = useState<Array<File>>([]);
-	const [preview, setPreview] = useState<string | null>(defaultImage || null);
-	const [error, setError] = useState<string | null>(null);
-	const onDrop = useCallback(
-		(acceptedFiles: Array<File>, rejectedFiles: Array<FileRejection>) => {
-			if (acceptedFiles.length > 0) {
-				const file = acceptedFiles[0];
-				if (!file) return;
-				setFiles([file]);
+export interface FileUploaderRef {
+	reset: () => void;
+}
 
-				setLoading?.(true);
-				void uploadImage(file).then((url) => {
-					onChange?.(url);
-					setLoading?.(false);
-				});
-				const reader = new FileReader();
-				reader.onload = (event) => {
-					setPreview(event.target?.result as string);
-				};
-				reader.readAsDataURL(file);
-			}
-			if (rejectedFiles.length > 0) {
-				setError(rejectedFiles[0]?.errors?.[0]?.message ?? null);
-			}
-		},
-		[onChange, setLoading]
-	);
+export const FileUploader = forwardRef<FileUploaderRef, FileUploaderProps>(
+	(
+		{
+			onChange,
+			maxSize = 2 * 1024 * 1024, // 1MB
+			accept = {
+				"image/*": [],
+			},
+			imageIcon,
+			defaultImage,
+			isHideRemove = false,
+			isShowSize = true,
+			wrapperClassName,
+			setLoading,
+		}: FileUploaderProps,
+		ref
+	) => {
+		const [files, setFiles] = useState<Array<File>>([]);
+		const [preview, setPreview] = useState<string | null>(defaultImage || null);
+		const [error, setError] = useState<string | null>(null);
+		const onDrop = useCallback(
+			(acceptedFiles: Array<File>, rejectedFiles: Array<FileRejection>) => {
+				if (acceptedFiles.length > 0) {
+					const file = acceptedFiles[0];
+					if (!file) return;
+					setFiles([file]);
 
-	const removeFile = () => {
-		setFiles([]);
-		setPreview(null);
-		onChange?.(null);
-	};
+					setLoading?.(true);
+					void uploadImage(file).then((url) => {
+						onChange?.(url);
+						setLoading?.(false);
+					});
+					const reader = new FileReader();
+					reader.onload = (event) => {
+						setPreview(event.target?.result as string);
+					};
+					reader.readAsDataURL(file);
+				}
+				if (rejectedFiles.length > 0) {
+					setError(rejectedFiles[0]?.errors?.[0]?.message ?? null);
+				}
+			},
+			[onChange, setLoading]
+		);
 
-	const { getRootProps, getInputProps } = useDropzone({
-		onDrop,
-		maxFiles: 1,
-		maxSize,
-		accept,
-	});
+		const removeFile = () => {
+			setFiles([]);
+			setPreview(null);
+			onChange?.(null);
+		};
 
-	return (
-		<div className="flex flex-col items-center justify-center">
-			<div
-				{...getRootProps()}
-				className={cn(
-					"relative aspect-square w-10 overflow-hidden rounded-lg",
-					wrapperClassName
-				)}
-			>
-				<input
-					{...getInputProps()}
-					onClick={withStopPropagation(() => {
-						setError(null);
-					})}
-				/>
+		const reset = useCallback(() => {
+			setFiles([]);
+			setPreview(null);
+			onChange?.(null);
+		}, [onChange]);
 
-				{preview ? (
-					<div className="group relative h-full w-full">
-						<img
-							alt="Preview"
-							className="h-full w-full object-cover"
-							src={preview}
-						/>
-						{!isHideRemove && (
-							<button
-								className="absolute top-3 right-3 rounded-full bg-gray-800/70 p-1.5 text-white/80 hover:bg-gray-700 hover:text-white"
-								type="button"
-								onClick={withStopPropagation(removeFile)}
-							>
-								<X size={16} />
-							</button>
-						)}
-						{isHideRemove && (
-							<div className="absolute top-0 left-0 flex h-full w-full items-center justify-center rounded-full bg-gray-500/40 opacity-0 transition-all group-hover:opacity-100">
-								<img alt="upload-svg" src={"/svgs/upload.svg"} />
-							</div>
-						)}
-						{isShowSize && files.length > 0 && (
-							<div className="absolute right-0 bottom-0 left-0 bg-black/50 px-2 py-1 text-center text-xs text-white">
-								({formatBytes(files[0]?.size ?? 0)})
-							</div>
-						)}
-					</div>
-				) : (
-					<>
-						<div className="flex h-full w-full cursor-pointer flex-col items-center justify-center text-center">
-							{imageIcon ?? (
-								<ImageIcon
-									className="h-full w-full text-gray-400"
-									strokeWidth={1}
-								/>
+		useImperativeHandle(
+			ref,
+			() => ({
+				reset,
+			}),
+			[reset]
+		);
+
+		const { getRootProps, getInputProps } = useDropzone({
+			onDrop,
+			maxFiles: 1,
+			maxSize,
+			accept,
+		});
+
+		return (
+			<div className="flex flex-col items-center justify-center">
+				<div
+					{...getRootProps()}
+					className={cn(
+						"relative aspect-square w-10 overflow-hidden rounded-lg",
+						wrapperClassName
+					)}
+				>
+					<input
+						{...getInputProps()}
+						onClick={withStopPropagation(() => {
+							setError(null);
+						})}
+					/>
+
+					{preview ? (
+						<div className="group relative h-full w-full">
+							<img
+								alt="Preview"
+								className="h-full w-full object-cover"
+								src={preview}
+							/>
+							{!isHideRemove && (
+								<button
+									className="absolute top-3 right-3 rounded-full bg-gray-800/70 p-1.5 text-white/80 hover:bg-gray-700 hover:text-white"
+									type="button"
+									onClick={withStopPropagation(removeFile)}
+								>
+									<X size={16} />
+								</button>
+							)}
+							{isHideRemove && (
+								<div className="absolute top-0 left-0 flex h-full w-full items-center justify-center rounded-full bg-gray-500/40 opacity-0 transition-all group-hover:opacity-100">
+									<img alt="upload-svg" src={"/svgs/upload.svg"} />
+								</div>
+							)}
+							{isShowSize && files.length > 0 && (
+								<div className="absolute right-0 bottom-0 left-0 bg-black/50 px-2 py-1 text-center text-xs text-white">
+									({formatBytes(files[0]?.size ?? 0)})
+								</div>
 							)}
 						</div>
-					</>
-				)}
+					) : (
+						<>
+							<div className="flex h-full w-full cursor-pointer flex-col items-center justify-center text-center">
+								{imageIcon ?? (
+									<ImageIcon
+										className="h-full w-full text-gray-400"
+										strokeWidth={1}
+									/>
+								)}
+							</div>
+						</>
+					)}
+				</div>
+				{error && <p className="mt-2 text-xs text-red-500">{error}</p>}
+				{/* <p className="mt-2 text-xs text-gray-500">(JPG, PNG, GIF &lt; 1MB)</p> */}
 			</div>
-			{error && <p className="mt-2 text-xs text-red-500">{error}</p>}
-			{/* <p className="mt-2 text-xs text-gray-500">(JPG, PNG, GIF &lt; 1MB)</p> */}
-		</div>
-	);
-}
+		);
+	}
+);

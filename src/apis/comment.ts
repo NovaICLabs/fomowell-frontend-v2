@@ -16,7 +16,7 @@ export type CommentInfo = {
 	memeTokenId: number;
 	photo: string | undefined;
 	content: string;
-	created_at: string;
+	createdAt: string;
 };
 
 interface PaginatedDataBase {
