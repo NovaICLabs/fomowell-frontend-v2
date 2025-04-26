@@ -45,26 +45,26 @@ const IcpWalletConnect: React.FC = () => {
 	const popoverLinks = [
 		{
 			label: "Profile",
-			action: async () => {
-				await router.navigate({ to: `/icp/profile/${principal}` });
-			},
+			action: withStopPropagation(() => {
+				void router.navigate({ to: `/icp/profile/${principal}` });
+			}),
 			icon: <ProfileIcon />,
 		},
 		{
 			label: "Deposit",
-			action: () => {
+			action: withStopPropagation(() => {
 				setDepositWithdrawOpen({
 					open: true,
 					type: "deposit",
 				});
-			},
+			}),
 			icon: <DepositWithdrawIcon />,
 		},
 		{
 			label: "Linked Wallet",
-			action: async () => {
-				await router.navigate({ to: `/icp/wallet/${principal}` });
-			},
+			action: withStopPropagation(() => {
+				void router.navigate({ to: `/icp/wallet/${principal}` });
+			}),
 			icon: <LinkedWalletIcon />,
 		},
 	];
