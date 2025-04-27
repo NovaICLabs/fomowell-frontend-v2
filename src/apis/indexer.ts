@@ -272,17 +272,14 @@ export const getTokenPriceCandle = async (parameters: CandleParameters) => {
 			`Failed to fetch token ${interval} candles for ${tokenId}/${market}: ${response.message} (Status: ${response.statusCode})`
 		);
 	}
-	return response.data
-		.filter((candle) => candle.time !== "NULL")
-		.map((candle) => ({
-			...candle,
-			time: Number(candle.time.substring(0, 10)) as UTCTimestamp,
-			low: BigNumber(1).div(candle.low).toNumber(),
-			high: BigNumber(1).div(candle.high).toNumber(),
-			open: BigNumber(1).div(candle.open).toNumber(),
-			close: BigNumber(1).div(candle.close).toNumber(),
-		}))
-		.reverse();
+	return response.data.map((candle) => ({
+		...candle,
+		time: Number(candle.time.substring(0, 10)) as UTCTimestamp,
+		low: BigNumber(1).div(candle.low).toNumber(),
+		high: BigNumber(1).div(candle.high).toNumber(),
+		open: BigNumber(1).div(candle.open).toNumber(),
+		close: BigNumber(1).div(candle.close).toNumber(),
+	}));
 };
 
 // favorite token

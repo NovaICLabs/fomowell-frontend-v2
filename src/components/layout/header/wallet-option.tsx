@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 interface WalletOptionProps {
 	name: string;
 	onClick: () => void;
@@ -14,10 +16,9 @@ const WalletOption: React.FC<WalletOptionProps> = ({
 	icon,
 }) => {
 	return (
-		<button
-			className="bg-gray-750 flex h-[43px] items-center justify-between rounded-full border border-white/10 p-4 px-4 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+		<Button
+			className="bg-gray-750 flex h-[43px] items-center justify-between rounded-full border border-white/10 p-4 px-4 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:border-white/10 dark:focus-visible:ring-0"
 			disabled={disabled}
-			type="button"
 			onClick={onClick}
 		>
 			<span className="text-sm font-medium text-white">{name}</span>
@@ -29,7 +30,7 @@ const WalletOption: React.FC<WalletOptionProps> = ({
 			<div className="flex h-7 w-7 items-center justify-center rounded-full">
 				{icon}
 			</div>
-		</button>
+		</Button>
 	);
 };
 
