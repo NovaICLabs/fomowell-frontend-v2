@@ -91,7 +91,7 @@ export default function TradingView() {
 			vertAlign: "center",
 			lines: [
 				{
-					text: "FOMO WELL",
+					text: "FOMOWELL",
 					color: "rgba(255, 255, 255, 0.03)",
 					fontSize: 150,
 					fontFamily: "Albert Sans",
