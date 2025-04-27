@@ -143,6 +143,7 @@ export const useCurrentPrice = (args: { id: number }) => {
 				),
 			};
 		},
+		refetchInterval: 2000,
 	});
 };
 export const useTokenHolders = (args: {
