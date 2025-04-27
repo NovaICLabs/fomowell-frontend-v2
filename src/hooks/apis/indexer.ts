@@ -114,7 +114,7 @@ export const useTokenPriceCandle = (parameters: CandleParameters) => {
 			parameters.interval,
 		],
 		queryFn: () => getTokenPriceCandle(parameters),
-		refetchInterval: 10000,
+		refetchInterval: 2000,
 	});
 };
 

@@ -6,8 +6,11 @@ import { BigNumber } from "bignumber.js";
 import {
 	CandlestickSeries,
 	createChart,
+	createTextWatermark,
 	CrosshairMode,
 	type IChartApi,
+	type IPaneApi,
+	type Time,
 } from "lightweight-charts";
 
 import { useTokenPriceCandle } from "@/hooks/apis/indexer";
@@ -69,6 +72,7 @@ export default function TradingView() {
 				layout: {
 					background: { color: "#161616" },
 					textColor: "#d1d4dc",
+					attributionLogo: false,
 				},
 				grid: {
 					vertLines: { color: "rgba(42, 46, 57, 0.5)" },
@@ -81,6 +85,19 @@ export default function TradingView() {
 		}
 
 		const chart = chartRef.current;
+		const firstPane = chart.panes()[0];
+		createTextWatermark(firstPane as IPaneApi<Time>, {
+			horzAlign: "center",
+			vertAlign: "center",
+			lines: [
+				{
+					text: "FOMO WELL",
+					color: "rgba(255, 255, 255, 0.01)",
+					fontSize: 150,
+					fontFamily: "Albert Sans",
+				},
+			],
+		});
 
 		candleSeriesRef.current = chart.addSeries(CandlestickSeries, {
 			upColor: "#4bffb5",
