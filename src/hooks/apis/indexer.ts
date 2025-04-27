@@ -20,6 +20,7 @@ import {
 } from "@/apis/indexer";
 import { updateUserInfo } from "@/apis/user-login";
 import { getICPCanisterId } from "@/canisters/icrc3";
+import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore } from "@/store/ic";
 
 import { useConnectedIdentity } from "../providers/wallet/ic";
@@ -184,10 +185,15 @@ export const useFavoriteToken = (listParameters?: TokenListParameters) => {
 	const { jwt_token } = useIcIdentityStore();
 	const queryClient = useQueryClient();
 	const { principal } = useConnectedIdentity();
+	const { setIcpConnectOpen } = useDialogStore();
 	return useMutation({
 		mutationKey: ["ic-core", "favoriteToken"],
 		mutationFn: async (args: { tokenId: string }) => {
-			if (!jwt_token || !principal) {
+			if (!principal) {
+				setIcpConnectOpen(true);
+				return;
+			}
+			if (!jwt_token) {
 				throw new Error("No token found");
 			}
 
