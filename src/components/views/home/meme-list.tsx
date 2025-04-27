@@ -12,6 +12,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import BigNumber from "bignumber.js";
 import { motion } from "framer-motion";
 
+import { getICPCanisterId } from "@/canisters/icrc3";
 import SortsIcon from "@/components/icons/common/sorts";
 import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
@@ -32,8 +33,7 @@ import {
 	useInfiniteFavoriteTokenList,
 	useInfiniteTokenList,
 } from "@/hooks/apis/indexer";
-import { useBuy } from "@/hooks/ic/core";
-import { useICPBalance } from "@/hooks/ic/tokens/icp";
+import { useBuy, useCoreTokenBalance } from "@/hooks/ic/core";
 import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
 import {
 	formatNumberSmart,
@@ -65,7 +65,12 @@ export default function MemeList() {
 	});
 
 	const { principal } = useConnectedIdentity();
-	const { data: balance } = useICPBalance(principal);
+	const { data: balance } = useCoreTokenBalance({
+		owner: principal,
+		token: {
+			ICRCToken: getICPCanisterId(),
+		},
+	});
 	const {
 		data: allTokenList,
 		hasNextPage: hasNextPageAllTokenList,
@@ -717,11 +722,12 @@ export default function MemeList() {
 									setIcpConnectOpen(true);
 									return;
 								}
+								if (balance == undefined) {
+									showToast("error", "Waiting for ICP balance loading...");
+									return;
+								}
 								// not enough icp
-								if (
-									!balance ||
-									Number(balance.formatted) < Number(flashAmount)
-								) {
+								if (BigNumber(balance.raw).lt(flashAmountBigInt)) {
 									showToast("error", "Not enough ICP");
 									return;
 								}

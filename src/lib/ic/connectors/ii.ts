@@ -21,6 +21,8 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 		host: string;
 		providerUrl: string;
 		dev: boolean;
+		verifyQuerySignatures: boolean;
+		retryTimes: number;
 	};
 
 	private identity?: Identity;
@@ -41,6 +43,8 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 			host: config.host,
 			providerUrl: "https://identity.ic0.app",
 			dev: false,
+			verifyQuerySignatures: false,
+			retryTimes: 1,
 		};
 	}
 

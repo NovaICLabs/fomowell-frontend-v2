@@ -203,6 +203,7 @@ export const getAnonymousActorCreator = (fetchRootKey: boolean = false) => {
 			retryTimes: 1,
 			verifyQuerySignatures: false,
 		});
+
 		if (fetchRootKey) await agent.fetchRootKey();
 		return Actor.createActor<T>(idlFactory, { agent, canisterId });
 	};

@@ -1,6 +1,7 @@
 import { BigNumber } from "bignumber.js";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
+import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 
 import { request } from ".";
 
@@ -268,22 +269,47 @@ export const getTokenPriceCandle = async (parameters: CandleParameters) => {
 			`Failed to fetch token ${interval} candles for ${tokenId}/${market}: ${response.message} (Status: ${response.statusCode})`
 		);
 	}
+	const decimals = getICPCanisterToken().decimals;
 	return response.data.map((candle) => ({
 		time: Number(candle.wStart.substring(0, 10)) as UTCTimestamp,
 		...(candle.low === "NULL" ||
 		candle.high === "NULL" ||
 		candle.open === "NULL"
 			? {
-					low: BigNumber(1).div(candle.close).toNumber(),
-					high: BigNumber(1).div(candle.close).toNumber(),
-					open: BigNumber(1).div(candle.close).toNumber(),
-					close: BigNumber(1).div(candle.close).toNumber(),
+					low: BigNumber(1)
+						.times(10 ** decimals)
+						.div(candle.close)
+						.toNumber(),
+					high: BigNumber(1)
+						.times(10 ** decimals)
+						.div(candle.close)
+						.toNumber(),
+					open: BigNumber(1)
+						.times(10 ** decimals)
+						.div(candle.close)
+						.toNumber(),
+					close: BigNumber(1)
+						.times(10 ** decimals)
+						.div(candle.close)
+						.toNumber(),
 				}
 			: {
-					low: BigNumber(1).div(candle.low).toNumber(),
-					high: BigNumber(1).div(candle.high).toNumber(),
-					open: BigNumber(1).div(candle.open).toNumber(),
-					close: BigNumber(1).div(candle.close).toNumber(),
+					low: BigNumber(1)
+						.times(10 ** decimals)
+						.div(candle.low)
+						.toNumber(),
+					high: BigNumber(1)
+						.times(10 ** decimals)
+						.div(candle.high)
+						.toNumber(),
+					open: BigNumber(1)
+						.times(10 ** decimals)
+						.div(candle.open)
+						.toNumber(),
+					close: BigNumber(1)
+						.times(10 ** decimals)
+						.div(candle.close)
+						.toNumber(),
 				}),
 	}));
 };

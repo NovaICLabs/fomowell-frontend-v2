@@ -4,7 +4,7 @@
     "": {
       "name": "vite-react-boilerplate",
       "dependencies": {
-        "@dfinity/agent": "^2.1.2",
+        "@dfinity/agent": "^2.4.1",
         "@dfinity/auth-client": "^1.3.0",
         "@dfinity/oisy-wallet-signer": "^0.1.8",
         "@dfinity/principal": "^2.4.0",
@@ -137,6 +137,9 @@
         "wrangler": "^4.11.0",
       },
     },
+  },
+  "patchedDependencies": {
+    "@dfinity/agent@2.4.1": "patches/@dfinity%2Fagent@2.4.1.patch",
   },
   "packages": {
     "@adobe/css-tools": ["@adobe/css-tools@4.4.2", "", {}, "sha512-baYZExFpsdkBNuvGKTKWCwKH57HRZLVtycZS05WTQNVOiXVSeAki3nU35zlRbToeMW8aHlJfyS+1C4BOv27q0A=="],
