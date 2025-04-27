@@ -43,7 +43,7 @@ const intervals: Array<{
 ];
 export default function TradingView() {
 	const { id } = useParams({ from: "/icp/token/$id" });
-	const [selectedInterval, setSelectedInterval] = useState<ChartInterval>("5m");
+	const [selectedInterval, setSelectedInterval] = useState<ChartInterval>("1h");
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const chartRef = useRef<IChartApi>();
