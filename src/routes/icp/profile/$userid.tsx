@@ -10,6 +10,7 @@ import { EditIcon } from "@/components/icons/common/edit";
 import WithdrawIcon from "@/components/icons/common/withdraw";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
 import { Button } from "@/components/ui/button";
+import ProfileActivity from "@/components/views/icp/profile/activity";
 import ProfileCreatedTokens from "@/components/views/icp/profile/create-list";
 import EditInfoModal from "@/components/views/icp/profile/edit-info-modal";
 import ProfileHoldings from "@/components/views/icp/profile/holdings";
@@ -189,7 +190,7 @@ function UserId() {
 					)}
 					{activeTab === "Activity" && (
 						<div className="bg-gray-760 rounded-2xl p-5 text-white/60">
-							Activity feed goes here...
+							<ProfileActivity />
 						</div>
 					)}
 				</div>
