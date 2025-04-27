@@ -490,7 +490,7 @@ function TokenCreationPage() {
 						}
 						{connected ? (
 							<Button
-								className="w-full max-w-md rounded-full py-6 font-medium text-black"
+								className="w-full max-w-md rounded-full py-6 text-base font-bold text-black"
 								disabled={isCreating || !isBalanceEnough}
 								type="submit"
 							>
@@ -502,7 +502,7 @@ function TokenCreationPage() {
 							</Button>
 						) : (
 							<Button
-								className="w-full max-w-md rounded-full py-6 font-medium text-black"
+								className="w-full max-w-md rounded-full py-6 text-base font-bold text-black"
 								type="button"
 								onClick={() => {
 									setIcpConnectOpen(true);
