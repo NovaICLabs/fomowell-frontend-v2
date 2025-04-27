@@ -22,7 +22,7 @@ export default function HowItWorksDialog() {
 					<div className="mt-2 flex flex-1 flex-col">
 						<p className="leading-6 font-normal text-white">
 							Fomowell prevents rugs by making sure that all created tokens are
-							safe. Each coin on pump is a fair-launch with no team allocation.
+							safe. Each coin is a fair-launch with no team allocation.
 						</p>
 						<div className="mt-4 flex flex-col items-start gap-[10px] pb-6 text-white/40">
 							<div className="flex items-center gap-[10px]">
@@ -49,7 +49,7 @@ export default function HowItWorksDialog() {
 								<Circle />{" "}
 								<span>
 									Step 5: 500 ICP and 2 billion meme token will be mirgrated to
-									ICPEX and LP will be locked.
+									dex and LP will be locked.
 								</span>
 							</div>
 						</div>
