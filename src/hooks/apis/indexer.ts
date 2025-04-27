@@ -14,6 +14,7 @@ import {
 	getTokenList,
 	getTokenPriceCandle,
 	getTokenTransactionList,
+	getUserActivity,
 	type PaginatedDataWithData,
 	type TokenInfo,
 	type TokenListParameters,
@@ -128,6 +129,26 @@ export const useTokenComments = (parameters: {
 			getCommentList({
 				...parameters,
 				page,
+			}),
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
+		},
+		initialPageParam: 1,
+	});
+};
+
+export const useInfiniteUserActivity = (parameters: { pageSize: number }) => {
+	const { jwt_token } = useIcIdentityStore();
+	if (!jwt_token) {
+		throw new Error("No login jwt token");
+	}
+	return useInfiniteQuery({
+		queryKey: ["ic-core", "userActivityList"],
+		queryFn: ({ pageParam: pageParameter = 1 }) =>
+			getUserActivity({
+				...parameters,
+				page: pageParameter,
+				user_token: jwt_token,
 			}),
 		getNextPageParam: (lastPage, pages) => {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;

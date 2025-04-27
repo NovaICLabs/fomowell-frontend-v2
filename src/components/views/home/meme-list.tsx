@@ -753,6 +753,7 @@ export default function MemeList() {
 			}),
 		],
 		[
+			balance,
 			buyToken,
 			columnHelper,
 			direction,

@@ -308,3 +308,60 @@ export const favoriteToken = async (user_token: string, tokenId: number) => {
 		throw new Error(response.message);
 	}
 };
+
+export type ActivityItem = {
+	id: string;
+	trans_type: "buy" | "sell" | "deposit" | "withdraw";
+	tokenTicker: string;
+	tokenName: string;
+	token0: string;
+	token1: string;
+	maker: string | null;
+	fee: string | null;
+	token0Amount: string;
+	token1Amount: string;
+	token0Reserve: string;
+	token1Reserve: string;
+	token0Price: string;
+	token1Price: string;
+	token0Volume: string;
+	token1Volume: string;
+	token0Usd: number;
+	token1Usd: number;
+	tradeTs: string;
+	tx_index: number;
+	createdAt: unknown;
+	updatedAt: unknown;
+};
+
+export const getUserActivity = async (parameters: {
+	user_token: string;
+	page?: number;
+	pageSize?: number;
+}) => {
+	const { user_token, page = 1, pageSize = 20 } = parameters;
+	const queryParameters = new URLSearchParams({
+		page: page.toString(),
+		pageSize: pageSize.toString(),
+	});
+	const response = await request<{
+		data: PaginatedDataWithData<ActivityItem>;
+		statusCode: number;
+		message: string;
+	}>(
+		`${getIndexerBaseUrl()}/api/v1/users/activity?${queryParameters.toString()}`,
+		{
+			method: "GET",
+			headers: {
+				authorization: `Bearer ${user_token}`,
+			},
+		}
+	);
+
+	if (response.statusCode !== 200) {
+		throw new Error(
+			`Failed to fetch token trade list: ${response.message} (Status: ${response.statusCode})`
+		);
+	}
+	return response.data;
+};
