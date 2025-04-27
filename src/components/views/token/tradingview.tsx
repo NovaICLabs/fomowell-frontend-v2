@@ -96,20 +96,20 @@ export default function TradingView() {
 						shortZero: true,
 					});
 				},
+				minMove: 0.00000001,
 			},
 		});
 		chart.priceScale("right").applyOptions({
 			autoScale: true,
 			borderVisible: false,
 			entireTextOnly: true,
-			invertScale: false,
 			alignLabels: true,
 			ticksVisible: true,
 			borderColor: "rgba(197, 203, 206, 0.5)",
 			textColor: "#d1d4dc",
 			scaleMargins: {
 				top: 0.1,
-				bottom: 0.000000000000001,
+				bottom: 0,
 			},
 		});
 		chart.timeScale().applyOptions({

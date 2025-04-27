@@ -278,14 +278,18 @@ export const getTokenPriceCandle = async (parameters: CandleParameters) => {
 		time: Number(candle.wStart.substring(0, 10)) as UTCTimestamp,
 		...(candle.low === "NULL" ||
 		candle.high === "NULL" ||
-		candle.open === "NULL" ||
-		candle.close === "NULL"
-			? {}
+		candle.open === "NULL"
+			? {
+					low: BigNumber(1).div(candle.close).div(1000).toNumber(),
+					high: BigNumber(1).div(candle.close).div(1000).toNumber(),
+					open: BigNumber(1).div(candle.close).div(1000).toNumber(),
+					close: BigNumber(1).div(candle.close).div(1000).toNumber(),
+				}
 			: {
-					low: BigNumber(1).div(candle.low).toNumber(),
-					high: BigNumber(1).div(candle.high).toNumber(),
-					open: BigNumber(1).div(candle.open).toNumber(),
-					close: BigNumber(1).div(candle.close).toNumber(),
+					low: BigNumber(1).div(candle.low).div(1000).toNumber(),
+					high: BigNumber(1).div(candle.high).div(1000).toNumber(),
+					open: BigNumber(1).div(candle.open).div(1000).toNumber(),
+					close: BigNumber(1).div(candle.close).div(1000).toNumber(),
 				}),
 	}));
 };
