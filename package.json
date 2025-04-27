@@ -171,8 +171,5 @@
 		"commitizen": {
 			"path": "./node_modules/cz-conventional-changelog"
 		}
-	},
-	"patchedDependencies": {
-		"@dfinity/agent@2.4.1": "patches/@dfinity%2Fagent@2.4.1.patch"
 	}
 }

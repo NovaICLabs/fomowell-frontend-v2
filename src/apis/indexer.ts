@@ -251,8 +251,8 @@ export const getTokenPriceCandle = async (parameters: CandleParameters) => {
 		daily: "daily-candles",
 	};
 	const pathSegment = intervalPathMap[interval];
-	const now = Math.floor(Date.now() / 1000);
-	const start = now - duration * 24 * 60 * 60;
+	const now = Math.floor(Date.now() / 1000) * 1000;
+	const start = now - duration * 24 * 60 * 60 * 1000;
 	const queryParameters = new URLSearchParams({
 		token0: tokenId,
 		token1: getICPCanisterId().toText(),
