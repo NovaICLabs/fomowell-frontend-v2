@@ -159,14 +159,21 @@ const ProfileActivity = () => {
 				),
 				cell: (info) => {
 					const value = info.getValue();
-					if (!value) {
+					const type = info.row.original.trans_type;
+					const deposit = info.row.original.token0Amount;
+					const withdraw = info.row.original.token1Amount;
+					const isDeposit = type === "deposit";
+					const isWithdraw = type === "withdraw";
+
+					const amount = isDeposit ? deposit : isWithdraw ? withdraw : value;
+					if (!amount) {
 						return <div>--</div>;
 					}
 					return (
 						<div className="flex h-full w-full items-center">
 							<span className="text-sm leading-4 text-white/60">
 								{formatNumberSmart(
-									formatUnits(value, getICPCanisterToken().decimals)
+									formatUnits(amount, getICPCanisterToken().decimals)
 								)}{" "}
 								ICP
 							</span>
@@ -185,13 +192,16 @@ const ProfileActivity = () => {
 					</div>
 				),
 				cell: (info) => {
-					const value = info.getValue();
-					if (!value) {
+					const type = info.row.original.trans_type;
+					const sellPrice = info.row.original.token0Price;
+					const buyPrice = info.row.original.token1Price;
+					const isBuy = type === "buy";
+					const isSell = type === "sell";
+					const price = isSell ? sellPrice : isBuy ? buyPrice : undefined;
+
+					if (!price) {
 						return <div>--</div>;
 					}
-					const type = info.row.original.trans_type;
-					// const isSell = type === "sell";
-					const isBuy = type === "buy";
 
 					return (
 						<div className="flex h-full w-full items-center gap-1">
@@ -199,16 +209,14 @@ const ProfileActivity = () => {
 								{formatNumberSmart(
 									BigNumber(1)
 										.times(10 ** getICPCanisterToken().decimals)
-										.div(BigNumber(value))
+										.div(BigNumber(price))
 										.toString(),
 									{
 										shortZero: true,
 									}
 								)}
 							</span>
-							{isBuy && (
-								<span className="text-sm leading-4 text-white/60">ICP</span>
-							)}
+							<span className="text-sm leading-4 text-white/60">ICP</span>
 						</div>
 					);
 				},
