@@ -219,6 +219,8 @@ export const getTokenTransactionList = async (parameters: {
 // =============================== token price candle ===============================
 
 export type CandleData = {
+	wStart: string;
+	wEnd: string;
 	time: string;
 	open: string;
 	high: string;
@@ -273,12 +275,18 @@ export const getTokenPriceCandle = async (parameters: CandleParameters) => {
 		);
 	}
 	return response.data.map((candle) => ({
-		...candle,
-		time: Number(candle.time.substring(0, 10)) as UTCTimestamp,
-		low: BigNumber(1).div(candle.low).toNumber(),
-		high: BigNumber(1).div(candle.high).toNumber(),
-		open: BigNumber(1).div(candle.open).toNumber(),
-		close: BigNumber(1).div(candle.close).toNumber(),
+		time: Number(candle.wStart.substring(0, 10)) as UTCTimestamp,
+		...(candle.low === "NULL" ||
+		candle.high === "NULL" ||
+		candle.open === "NULL" ||
+		candle.close === "NULL"
+			? {}
+			: {
+					low: BigNumber(1).div(candle.low).toNumber(),
+					high: BigNumber(1).div(candle.high).toNumber(),
+					open: BigNumber(1).div(candle.open).toNumber(),
+					close: BigNumber(1).div(candle.close).toNumber(),
+				}),
 	}));
 };
 
