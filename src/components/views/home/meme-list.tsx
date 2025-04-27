@@ -33,6 +33,7 @@ import {
 	useInfiniteTokenList,
 } from "@/hooks/apis/indexer";
 import { useBuy } from "@/hooks/ic/core";
+import { useICPBalance } from "@/hooks/ic/tokens/icp";
 import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
 import {
 	formatNumberSmart,
@@ -44,6 +45,7 @@ import { withStopPropagation } from "@/lib/common/react-event";
 import { fromNow } from "@/lib/common/time";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
+import { useDialogStore } from "@/store/dialog";
 import { useQuickBuyStore } from "@/store/quick-buy";
 
 import type { TokenInfo, TokenListSortOption } from "@/apis/indexer";
@@ -57,11 +59,13 @@ const TableItemsSkeleton = () => {
 };
 
 export default function MemeList() {
+	const { setIcpConnectOpen } = useDialogStore();
 	const { sort, direction, tab } = useSearch({
 		from: "/",
 	});
 
 	const { principal } = useConnectedIdentity();
+	const { data: balance } = useICPBalance(principal);
 	const {
 		data: allTokenList,
 		hasNextPage: hasNextPageAllTokenList,
@@ -708,6 +712,20 @@ export default function MemeList() {
 						<Button
 							className="hover:bg-gray-710 h-9 w-[63px] rounded-full bg-transparent text-xs text-white"
 							onClick={withStopPropagation(() => {
+								// if not login
+								if (!principal) {
+									setIcpConnectOpen(true);
+									return;
+								}
+								// not enough icp
+								if (
+									!balance ||
+									Number(balance.formatted) < Number(flashAmount)
+								) {
+									showToast("error", "Not enough ICP");
+									return;
+								}
+
 								const tokenId = info.row.original.memeTokenId.toString();
 								showToast(
 									"loading",
@@ -743,6 +761,8 @@ export default function MemeList() {
 			flashAmountBigInt,
 			handleSort,
 			icpPrice,
+			principal,
+			setIcpConnectOpen,
 			sort,
 		]
 	);

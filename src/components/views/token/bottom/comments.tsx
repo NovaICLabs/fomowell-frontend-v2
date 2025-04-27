@@ -110,7 +110,6 @@ export default function Comments() {
 			observer.observe(currentLoadingRef);
 		}
 
-		// 清理函数
 		return () => {
 			if (currentLoadingRef) {
 				observer.unobserve(currentLoadingRef);
