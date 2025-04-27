@@ -49,14 +49,10 @@ export default function TradingView() {
 	const chartRef = useRef<IChartApi>();
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const candleSeriesRef = useRef<any>();
-	const now = Math.floor(Date.now());
-	const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
 
 	const { data: candleData } = useTokenPriceCandle({
 		tokenId: id,
 		interval: intervalMap[selectedInterval],
-		start: oneWeekAgo,
-		end: now,
 	});
 
 	const handleIntervalChange = useCallback((newInterval: ChartInterval) => {

@@ -238,11 +238,10 @@ export type CandleParameters = {
 	tokenId: string;
 	interval: "minute" | "5min" | "15min" | "hourly" | "daily";
 	market?: string;
-	start?: number;
-	end?: number;
+	duration?: number;
 };
 export const getTokenPriceCandle = async (parameters: CandleParameters) => {
-	const { tokenId, interval, market, start, end } = parameters;
+	const { tokenId, interval, market, duration = 7 } = parameters;
 	const intervalPathMap: Record<typeof interval, string> = {
 		minute: "minute-candles",
 		"5min": "5min-candles",
@@ -251,20 +250,15 @@ export const getTokenPriceCandle = async (parameters: CandleParameters) => {
 		daily: "daily-candles",
 	};
 	const pathSegment = intervalPathMap[interval];
-
+	const now = Math.floor(Date.now() / 1000);
+	const start = now - duration * 24 * 60 * 60;
 	const queryParameters = new URLSearchParams({
 		token0: tokenId,
 		token1: getICPCanisterId().toText(),
 		market: market ?? "ICP",
+		start: start.toString(),
+		end: now.toString(),
 	});
-
-	if (start !== undefined) {
-		queryParameters.set("start", start.toString());
-	}
-	if (end !== undefined) {
-		queryParameters.set("end", end.toString());
-	}
-
 	const url = `${getIndexerBaseUrl()}/api/v1/token_trade/${pathSegment}?${queryParameters.toString()}`;
 
 	const response = await request<CandleApiResponse>(url);
