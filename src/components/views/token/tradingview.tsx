@@ -92,7 +92,7 @@ export default function TradingView() {
 			lines: [
 				{
 					text: "FOMO WELL",
-					color: "rgba(255, 255, 255, 0.01)",
+					color: "rgba(255, 255, 255, 0.03)",
 					fontSize: 150,
 					fontFamily: "Albert Sans",
 				},
