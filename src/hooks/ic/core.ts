@@ -136,11 +136,10 @@ export const useCurrentPrice = (args: { id: number }) => {
 			);
 			return {
 				raw: result,
-				formattedPerPayToken: formatNumberSmart(
-					BigNumber(1)
-						.multipliedBy(10 ** getICPCanisterToken().decimals)
-						.div(BigNumber(result))
-				),
+				formattedPerPayToken: BigNumber(1)
+					.times(10 ** getICPCanisterToken().decimals)
+					.div(BigNumber(result))
+					.toString(),
 			};
 		},
 		refetchInterval: 2000,
