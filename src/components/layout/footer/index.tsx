@@ -8,8 +8,12 @@ export default function Footer() {
 				© 2025 Fomowell
 			</span>
 			<div className="flex items-center gap-x-8">
-				<X className="h-4 w-4 cursor-pointer" />
-				<Telegram className="h-4 w-4 cursor-pointer" />
+				<a href="https://x.com/fomowellcom" target="_blank">
+					<X className="h-4 w-4 cursor-pointer" />
+				</a>
+				<a href="https://t.me/fomowell" target="_blank">
+					<Telegram className="h-4 w-4 cursor-pointer" />
+				</a>
 			</div>
 		</div>
 	);
