@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useThrottleCallback } from "@react-hook/throttle";
@@ -10,6 +13,7 @@ import {
 	CrosshairMode,
 	type IChartApi,
 	type IPaneApi,
+	TickMarkType,
 	type Time,
 } from "lightweight-charts";
 
@@ -47,7 +51,7 @@ export default function TradingView() {
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const chartRef = useRef<IChartApi>();
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 	const candleSeriesRef = useRef<any>();
 
 	const { data: candleData } = useTokenPriceCandle({
@@ -77,6 +81,43 @@ export default function TradingView() {
 				crosshair: {
 					mode: CrosshairMode.Normal,
 				},
+				timeScale: {
+					timeVisible: true,
+					tickMarkFormatter: (time: Time, tickMarkType: TickMarkType) => {
+						const date = new Date((time as number) * 1000);
+						const locale = navigator.language;
+						switch (tickMarkType) {
+							case TickMarkType.Year:
+								return date.toLocaleDateString(locale, { year: "numeric" });
+							case TickMarkType.Month:
+								return date.toLocaleDateString(locale, { month: "short" });
+							case TickMarkType.DayOfMonth:
+								return date.toLocaleDateString(locale, {
+									day: "numeric",
+									month: "short",
+								});
+							case TickMarkType.Time:
+								return date.toLocaleTimeString(locale, {
+									hour: "2-digit",
+									minute: "2-digit",
+									hour12: false,
+								});
+							case TickMarkType.TimeWithSeconds:
+								return date.toLocaleTimeString(locale, {
+									hour: "2-digit",
+									minute: "2-digit",
+									second: "2-digit",
+									hour12: false,
+								});
+							default:
+								return new Date((time as number) * 1000).toLocaleTimeString(
+									locale,
+									{ hour12: false }
+								);
+						}
+					},
+				},
+
 				localization: {
 					locale: navigator.language,
 					timeFormatter: (time: number) => {
@@ -85,6 +126,7 @@ export default function TradingView() {
 							minute: "2-digit",
 							month: "short",
 							day: "numeric",
+							hour12: false,
 						});
 					},
 				},
@@ -136,16 +178,13 @@ export default function TradingView() {
 				bottom: 0,
 			},
 		});
-		chart.timeScale().applyOptions({
-			timeVisible: true,
-		});
 	}, []);
 
 	useEffect(() => {
 		if (!candleSeriesRef.current || !candleData) {
 			return;
 		}
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+
 		candleSeriesRef.current.setData(candleData);
 	}, [candleData]);
 
