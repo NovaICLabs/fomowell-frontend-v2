@@ -7,15 +7,17 @@ import { Star } from "@/components/icons/star";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFavoriteToken, useSingleTokenInfo } from "@/hooks/apis/indexer";
 import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
-import { formatNumberSmart } from "@/lib/common/number";
+import { formatNumberSmart, isNullOrUndefined } from "@/lib/common/number";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { truncatePrincipal } from "@/lib/ic/principal";
+import { cn } from "@/lib/utils";
 
 export default function HeadInfo() {
 	const { id } = useParams({ from: "/icp/token/$id" });
 	const { data: memeToken, isLoading: isLoadingMemeToken } = useMemeTokenInfo(
 		Number(id)
 	);
+
 	const { data: currentPrice, isLoading: isLoadingCurrentPrice } =
 		useCurrentPrice({ id: Number(id) });
 	const { data: tokenInfo } = useSingleTokenInfo({ id });
@@ -101,7 +103,17 @@ export default function HeadInfo() {
 					)}
 					<span className="flex items-center gap-1 text-sm">
 						<span className="text-white/40">24h</span>
-						<span className="text-price-negative">-1.23%</span>
+						<span
+							className={cn(
+								!isNullOrUndefined(tokenInfo?.priceChangeRate24H)
+									? tokenInfo?.priceChangeRate24H >= 0
+										? "text-price-positive"
+										: "text-price-negative"
+									: "text-price-negative"
+							)}
+						>
+							{tokenInfo?.priceChangeRate24H ?? "--"}%
+						</span>
 					</span>
 				</div>
 			</div>

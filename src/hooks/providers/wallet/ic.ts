@@ -21,12 +21,16 @@ const useDisconnect = () => {
 		useIcIdentityStore();
 	const disconnect = useCallback(async () => {
 		if ((window as any).icConnector) {
-			await (window as any).icConnector.disconnect();
 			setLastConnectedWallet(undefined);
 			setConnected(false);
 			setConnecting(false);
 			setPrincipal(undefined);
 			clearToken();
+			try {
+				await (window as any).icConnector.disconnect();
+			} catch (error) {
+				console.error("Failed to disconnect wallet:", error);
+			}
 		}
 	}, [
 		clearToken,

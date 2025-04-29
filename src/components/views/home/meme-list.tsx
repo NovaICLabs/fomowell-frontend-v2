@@ -347,7 +347,7 @@ export default function MemeList() {
 				),
 				cell: (info) => (
 					<div className="flex h-full w-full items-center gap-1">
-						<span className="text-sm leading-4 font-medium text-white/60">
+						<span className="text-sm leading-4 text-white">
 							{parseFloat(`${info.getValue() * 100}`).toFixed(2)}%
 						</span>
 					</div>
@@ -693,9 +693,9 @@ export default function MemeList() {
 					</div>
 				),
 				cell: (info) => (
-					<div className="ml-auto flex items-center justify-end pr-2">
+					<div className="relative ml-auto flex items-center justify-end p-px pr-2">
 						<Button
-							className="hover:bg-gray-710 h-9 w-[63px] rounded-full bg-transparent text-xs text-white"
+							className="dark:hover:bg-gray-710 dark:bg-background z-10 h-9 w-21 rounded-full bg-transparent text-xs text-white"
 							onClick={withStopPropagation(() => {
 								// if not login
 								if (!principal) {
@@ -732,6 +732,7 @@ export default function MemeList() {
 							<img alt="flash" src="/svgs/flash.svg" />
 							Buy
 						</Button>
+						<div className="absolute inset-0 right-1.75 z-0 rounded-full bg-gradient-to-r from-yellow-500 to-blue-500"></div>
 					</div>
 				),
 				size: 120,

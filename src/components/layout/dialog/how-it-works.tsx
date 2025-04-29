@@ -24,7 +24,7 @@ export default function HowItWorksDialog() {
 							Fomowell prevents rugs by making sure that all created tokens are
 							safe. Each coin is a fair-launch with no team allocation.
 						</p>
-						<div className="mt-4 flex flex-col items-start gap-[10px] pb-6 text-white/40">
+						<div className="mt-4 flex flex-col items-start gap-[10px] pb-6 text-sm text-white/40">
 							<div className="flex items-center gap-[10px]">
 								<Circle /> <span>Step 1: Pick a coin that you like.</span>
 							</div>
