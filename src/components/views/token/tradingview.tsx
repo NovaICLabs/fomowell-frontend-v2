@@ -77,6 +77,17 @@ export default function TradingView() {
 				crosshair: {
 					mode: CrosshairMode.Normal,
 				},
+				localization: {
+					locale: navigator.language,
+					timeFormatter: (time: number) => {
+						return new Date(time * 1000).toLocaleString(navigator.language, {
+							hour: "2-digit",
+							minute: "2-digit",
+							month: "short",
+							day: "numeric",
+						});
+					},
+				},
 			});
 		}
 
