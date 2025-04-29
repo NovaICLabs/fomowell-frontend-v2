@@ -331,6 +331,29 @@ export default function MemeList() {
 				size: 250,
 				enablePinning: true,
 			}),
+			columnHelper.accessor("process", {
+				id: "process",
+				header: () => (
+					<div className="group flex cursor-pointer items-center gap-1">
+						<span
+							className={cn(
+								"duration-300 group-hover:text-white",
+								sort === "new" && "text-white"
+							)}
+						>
+							Status
+						</span>
+					</div>
+				),
+				cell: (info) => (
+					<div className="flex h-full w-full items-center gap-1">
+						<span className="text-sm leading-4 font-medium text-white/60">
+							{parseFloat(`${info.getValue() * 100}`).toFixed(2)}%
+						</span>
+					</div>
+				),
+				size: 120,
+			}),
 			columnHelper.accessor("timestamp", {
 				id: "age",
 				header: () => (
@@ -481,49 +504,6 @@ export default function MemeList() {
 									: formatNumberSmart(mc, {
 											shortenLarge: true,
 										})}
-							</span>
-						</div>
-					);
-				},
-				size: 120,
-			}),
-			columnHelper.accessor((row) => row.priceChangeRate5M, {
-				id: "priceChangeRate5M",
-				header: () => (
-					<div
-						className="group flex cursor-pointer items-center gap-1"
-						onClick={withStopPropagation(() => {
-							handleSort("popularity_5m");
-						})}
-					>
-						<span
-							className={cn(
-								"duration-300 group-hover:text-white",
-								sort === "popularity_5m" && "text-white"
-							)}
-						>
-							5m
-						</span>
-						<SortsIcon
-							direction={direction}
-							selected={sort === "popularity_5m"}
-						/>
-					</div>
-				),
-				cell: (info) => {
-					const value = info.getValue();
-					const isNull = value === null;
-					const isNegative = !isNull && value < 0;
-					return (
-						<div className="flex h-full w-full items-center">
-							<span
-								className={cn(
-									"text-sm leading-4 font-medium",
-									isNegative ? "text-price-negative" : "text-price-positive",
-									isNull && "text-white/40"
-								)}
-							>
-								{!isNull ? `${value}%` : "--"}
 							</span>
 						</div>
 					);
