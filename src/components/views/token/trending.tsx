@@ -130,7 +130,6 @@ export default function Trending() {
 						<span className="text-xs font-medium text-white/40 group-hover:text-white">
 							Token/Vol
 						</span>
-						<SortsIcon direction={direction} selected={false} />
 					</div>
 				),
 				cell: (info) => (
@@ -175,7 +174,12 @@ export default function Trending() {
 							handleSort("price");
 						})}
 					>
-						<span className="text-xs font-medium text-white/40 group-hover:text-white">
+						<span
+							className={cn(
+								"text-xs font-medium text-white/40 group-hover:text-white",
+								sort === "price" && "text-white"
+							)}
+						>
 							Price/Change
 						</span>{" "}
 						<SortsIcon direction={direction} selected={sort === "price"} />

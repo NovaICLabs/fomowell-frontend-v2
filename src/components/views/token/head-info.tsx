@@ -52,7 +52,7 @@ export default function HeadInfo() {
 								</div>
 							) : (
 								<>
-									<span className="text-center text-lg leading-normal font-bold text-white">
+									<span className="text-center text-lg leading-normal font-bold text-white uppercase">
 										{memeToken?.ticker}
 									</span>{" "}
 									<span className="text-xs font-normal text-white/40">

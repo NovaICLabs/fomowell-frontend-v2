@@ -486,40 +486,45 @@ export default function Trade() {
 					</span>
 				</div>
 			</div>
-			<Input
-				placeholder="0.00"
-				value={activeTab === "Buy" ? buyAmount : sellAmount}
-				aria-invalid={
-					(!balanceEnough || !amountValid) &&
-					(activeTab === "Buy" ? buyAmount !== "" : sellAmount !== "")
-				}
-				className={cn(
-					"dark:bg-background mt-2 h-13.5 rounded-2xl border border-transparent text-lg font-semibold placeholder:text-lg placeholder:leading-[14px] placeholder:font-bold placeholder:text-white/40 focus-visible:border-transparent focus-visible:ring-0"
-				)}
-				onBlur={() => {
-					if (activeTab === "Buy") {
-						setBuyAmount(
-							buyAmount.endsWith(".") ? buyAmount.slice(0, -1) : buyAmount
-						);
-					} else {
-						setSellAmount(
-							sellAmount.endsWith(".") ? sellAmount.slice(0, -1) : sellAmount
-						);
+			<div className="relative mt-2 h-13.5 w-full">
+				<Input
+					placeholder="0.00"
+					value={activeTab === "Buy" ? buyAmount : sellAmount}
+					aria-invalid={
+						(!balanceEnough || !amountValid) &&
+						(activeTab === "Buy" ? buyAmount !== "" : sellAmount !== "")
 					}
-				}}
-				onChange={(event) => {
-					const value = event.target.value.trim();
-					validateInputNumber({
-						value,
-						callback: activeTab === "Buy" ? setBuyAmount : setSellAmount,
-					});
-				}}
-			/>
+					className={cn(
+						"dark:bg-background h-full w-full rounded-2xl border border-transparent text-lg font-semibold placeholder:text-lg placeholder:leading-[14px] placeholder:font-bold placeholder:text-white/40 focus-visible:border-transparent focus-visible:ring-0"
+					)}
+					onBlur={() => {
+						if (activeTab === "Buy") {
+							setBuyAmount(
+								buyAmount.endsWith(".") ? buyAmount.slice(0, -1) : buyAmount
+							);
+						} else {
+							setSellAmount(
+								sellAmount.endsWith(".") ? sellAmount.slice(0, -1) : sellAmount
+							);
+						}
+					}}
+					onChange={(event) => {
+						const value = event.target.value.trim();
+						validateInputNumber({
+							value,
+							callback: activeTab === "Buy" ? setBuyAmount : setSellAmount,
+						});
+					}}
+				/>
+				<div className="absolute top-1/2 right-2 -translate-y-1/2 text-[18px] font-bold text-white/40 uppercase">
+					{activeTab === "Buy" ? "ICP" : memeTokenInfo?.ticker}
+				</div>
+			</div>
 			<div className="mt-4 grid grid-cols-4 gap-2">
 				{percentages.map((percentage) => (
 					<Button
 						key={percentage}
-						className="bg-gray-710 hover:bg-gray-710/70 h-9 w-full flex-shrink-0 rounded-2xl text-sm font-medium text-white"
+						className="bg-gray-710 hover:bg-gray-710/70 h-9 w-full flex-shrink-0 rounded-[18px] text-sm font-medium text-white"
 						onClick={() => {
 							setPercentage(percentage);
 						}}

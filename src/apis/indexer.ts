@@ -85,6 +85,11 @@ export const tokenListSortOptions = [
 	"liquidity",
 	"mc",
 	"volume",
+	"price_change_5m",
+	"price_change_1h",
+	"price_change_6h",
+	"price_change_8h",
+	"price_change_24h",
 ] as const;
 
 export type TokenListSortOption = (typeof tokenListSortOptions)[number];

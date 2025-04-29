@@ -285,7 +285,7 @@ export default function MemeList() {
 							</TooltipProvider>
 							<div className="flex flex-col gap-1.5">
 								<div className="flex items-center gap-1">
-									<span className="text-sm leading-4 font-medium text-white">
+									<span className="text-sm leading-4 font-medium text-white uppercase">
 										{row.original.ticker}
 									</span>
 									<div className="ml-3 flex cursor-pointer items-center gap-x-2.5">
@@ -335,12 +335,7 @@ export default function MemeList() {
 				id: "process",
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
-						<span
-							className={cn(
-								"duration-300 group-hover:text-white",
-								sort === "new" && "text-white"
-							)}
-						>
+						<span className={cn("duration-300 group-hover:text-white")}>
 							Status
 						</span>
 					</div>
@@ -371,7 +366,10 @@ export default function MemeList() {
 						>
 							Age
 						</span>
-						<SortsIcon direction={direction} selected={sort === "new"} />
+						<SortsIcon
+							direction={direction === "desc" ? "asc" : "desc"}
+							selected={sort === "new"}
+						/>
 					</div>
 				),
 				cell: (info) => (
@@ -516,20 +514,20 @@ export default function MemeList() {
 					<div
 						className="group flex cursor-pointer items-center gap-1"
 						onClick={withStopPropagation(() => {
-							handleSort("popularity_1h");
+							handleSort("price_change_1h");
 						})}
 					>
 						<span
 							className={cn(
 								"duration-300 group-hover:text-white",
-								sort === "popularity_1h" && "text-white"
+								sort === "price_change_1h" && "text-white"
 							)}
 						>
 							1h
 						</span>
 						<SortsIcon
 							direction={direction}
-							selected={sort === "popularity_1h"}
+							selected={sort === "price_change_1h"}
 						/>
 					</div>
 				),
@@ -560,20 +558,20 @@ export default function MemeList() {
 					<div
 						className="group flex cursor-pointer items-center gap-1"
 						onClick={withStopPropagation(() => {
-							handleSort("popularity_6h");
+							handleSort("price_change_8h");
 						})}
 					>
 						<span
 							className={cn(
 								"duration-300 group-hover:text-white",
-								sort === "popularity_6h" && "text-white"
+								sort === "price_change_8h" && "text-white"
 							)}
 						>
 							8h
 						</span>
 						<SortsIcon
 							direction={direction}
-							selected={sort === "popularity_6h"}
+							selected={sort === "price_change_8h"}
 						/>
 					</div>
 				),
@@ -603,20 +601,20 @@ export default function MemeList() {
 					<div
 						className="group flex cursor-pointer items-center gap-1"
 						onClick={withStopPropagation(() => {
-							handleSort("popularity_24h");
+							handleSort("price_change_24h");
 						})}
 					>
 						<span
 							className={cn(
 								"duration-300 group-hover:text-white",
-								sort === "popularity_24h" && "text-white"
+								sort === "price_change_24h" && "text-white"
 							)}
 						>
 							24h
 						</span>
 						<SortsIcon
 							direction={direction}
-							selected={sort === "popularity_24h"}
+							selected={sort === "price_change_24h"}
 						/>
 					</div>
 				),
@@ -645,19 +643,19 @@ export default function MemeList() {
 				header: () => (
 					<div
 						className="group flex cursor-pointer items-center gap-1"
-						onClick={withStopPropagation(() => {
-							handleSort("volume");
-						})}
+						// onClick={withStopPropagation(() => {
+						// 	handleSort("volume");
+						// })}
 					>
 						<span
 							className={cn(
-								"duration-300 group-hover:text-white",
-								sort === "volume" && "text-white"
+								"duration-300 group-hover:text-white"
+								// sort === "volume" && "text-white"
 							)}
 						>
 							Volume
 						</span>
-						<SortsIcon direction={direction} selected={sort === "volume"} />
+						{/* <SortsIcon direction={direction} selected={sort === "volume"} /> */}
 					</div>
 				),
 				cell: (info) => {
