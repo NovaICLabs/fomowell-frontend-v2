@@ -549,7 +549,7 @@ export default function MemeList() {
 						</div>
 					);
 				},
-				size: 120,
+				size: 100,
 			}),
 
 			columnHelper.accessor((row) => row.priceChangeRate8H, {
@@ -593,7 +593,7 @@ export default function MemeList() {
 						</div>
 					);
 				},
-				size: 120,
+				size: 100,
 			}),
 			columnHelper.accessor((row) => row.priceChangeRate24H, {
 				id: "priceChangeRate24H",
@@ -636,7 +636,7 @@ export default function MemeList() {
 						</div>
 					);
 				},
-				size: 120,
+				size: 100,
 			}),
 			columnHelper.accessor("volume24H", {
 				id: "volume",
@@ -681,7 +681,7 @@ export default function MemeList() {
 						</div>
 					);
 				},
-				size: 120,
+				size: 100,
 			}),
 			columnHelper.group({
 				id: "actions",

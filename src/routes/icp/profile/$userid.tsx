@@ -119,7 +119,7 @@ function UserId() {
 										showToast("success", "100 tICP claimed");
 									} catch (error) {
 										console.debug("🚀 ~ onClick={ ~ error:", error);
-										showToast("error", "Claim Faucet Failed");
+										showToast("error", "Can only claim once per day");
 									}
 								}}
 							>
