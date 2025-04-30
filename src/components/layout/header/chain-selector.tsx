@@ -23,30 +23,30 @@ const chains: Array<{
 		name: "Bitcoin",
 		value: "bitcoin",
 	},
-	{
-		logo: (
-			<div className="flex h-6 w-6 items-center justify-center">
-				<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
-			</div>
-		),
-		name: "ICP",
-		value: "icp",
-	},
-	{
-		logo: (
-			<div className="flex h-6 w-6 items-center justify-center">
-				<img alt={"base-logo"} src={`/svgs/chains/base.svg`} />
-			</div>
-		),
-		name: "Base",
-		value: "base",
-	},
+	// {
+	// 	logo: (
+	// 		<div className="flex h-6 w-6 items-center justify-center">
+	// 			<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
+	// 		</div>
+	// 	),
+	// 	name: "ICP",
+	// 	value: "icp",
+	// },
+	// {
+	// 	logo: (
+	// 		<div className="flex h-6 w-6 items-center justify-center">
+	// 			<img alt={"base-logo"} src={`/svgs/chains/base.svg`} />
+	// 		</div>
+	// 	),
+	// 	name: "Base",
+	// 	value: "base",
+	// },
 ];
 
 export default function ChainSelector() {
 	const { chain, setChain } = useChainStore();
 	const router = useRouter();
-	const { ...search } = useSearch({ from: "__root__" });
+	const search = useSearch({ from: "__root__" });
 	return (
 		<Select
 			value={chain}
