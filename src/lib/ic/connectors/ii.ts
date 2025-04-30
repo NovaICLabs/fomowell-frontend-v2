@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/await-thenable */
 import {
 	Actor,
 	type ActorSubclass,
@@ -72,11 +72,12 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 		canisterId,
 		interfaceFactory,
 	}: CreateActorArgs): Promise<ActorSubclass<Service> | undefined> => {
+		if (!this.client?.getIdentity()) throw new Error("Identity not found");
 		const agent = await HttpAgent.create({
 			...this.config,
 			identity: this.identity,
 		});
-
+		agent.replaceIdentity(this.client?.getIdentity());
 		if (this.config.dev) {
 			// Fetch root key for certificate validation during development
 			agent.fetchRootKey().catch((error) => {
@@ -120,7 +121,7 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 	};
 
 	public expired = async () => {
-		const iiExpireTime = window.localStorage.getItem("ii-expire-time");
+		const iiExpireTime = await window.localStorage.getItem("ii-expire-time");
 		if (!iiExpireTime) return true;
 		return new Date().getTime() >= Number(iiExpireTime);
 	};
