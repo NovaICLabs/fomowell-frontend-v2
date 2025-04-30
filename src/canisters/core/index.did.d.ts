@@ -21,6 +21,20 @@ export interface ArchivedRange {
 	start: bigint;
 	length: bigint;
 }
+export type BTreeMap = Array<
+	[
+		string,
+		(
+			| { Int: bigint }
+			| { Map: BTreeMap }
+			| { Nat: bigint }
+			| { Nat64: bigint }
+			| { Blob: Uint8Array | number[] }
+			| { Text: string }
+			| { Array: Array<Value> }
+		),
+	]
+>;
 export interface BondingCurve {
 	token: StableToken;
 	token_reserve: bigint;
@@ -46,6 +60,7 @@ export interface Buy {
 	meme_token_id: bigint;
 }
 export interface BuyArgs {
+	memo: [] | [Uint8Array | number[]];
 	subaccount: [] | [Uint8Array | number[]];
 	amount_in: bigint;
 	meme_token_id: bigint;
@@ -77,10 +92,15 @@ export interface CanisterMetrics {
 export type CanisterMetricsData =
 	| { hourly: Array<HourlyMetricsData> }
 	| { daily: Array<DailyMetricsData> };
+export interface ClaimArg {
+	token: StableToken;
+	claimer: [] | [Principal];
+}
 export interface CreateMemeTokenArg {
 	creator: [] | [Principal];
 	token: StableToken;
 	ticker: string;
+	logo_base64: Uint8Array | number[];
 	twitter: [] | [string];
 	logo: string;
 	name: string;
@@ -187,9 +207,10 @@ export interface MemeToken {
 	market_cap_token: bigint;
 	completed: boolean;
 	description: string;
+	lp_canister: [] | [Principal];
 	created_at: bigint;
 	website: [] | [string];
-	ledger_canister: [] | [string];
+	ledger_canister: [] | [Principal];
 	price: number;
 	telegram: [] | [string];
 	process: number;
@@ -237,6 +258,7 @@ export interface QueryMemeTokenResponse {
 }
 export type Result = { Ok: bigint } | { Err: string };
 export type Result_1 = { Ok: MemeToken } | { Err: string };
+export type Result_2 = { Ok: null } | { Err: string };
 export type Sort = { CreateTimeDsc: null } | { MarketCapDsc: null };
 export interface StableToken {
 	fee: bigint;
@@ -309,7 +331,7 @@ export interface Transfer_1 {
 }
 export type Value =
 	| { Int: bigint }
-	| { Map: Array<[string, Value]> }
+	| { Map: BTreeMap }
 	| { Nat: bigint }
 	| { Nat64: bigint }
 	| { Blob: Uint8Array | number[] }
@@ -327,6 +349,7 @@ export interface _SERVICE {
 	buy: ActorMethod<[BuyArgs], Result>;
 	calculate_buy: ActorMethod<[bigint, bigint], Result>;
 	calculate_sell: ActorMethod<[bigint, bigint], Result>;
+	claim: ActorMethod<[ClaimArg], Result>;
 	create_token: ActorMethod<[CreateMemeTokenArg], Result_1>;
 	deposit: ActorMethod<[DepositArgs], Result>;
 	generate_random: ActorMethod<[], bigint>;
@@ -336,6 +359,8 @@ export interface _SERVICE {
 	>;
 	get_transactions: ActorMethod<[GetBlocksRequest], GetTransactionsResponse>;
 	icrc1_balance_of: ActorMethod<[LedgerType, Account], bigint>;
+	internal_transfer: ActorMethod<[bigint], Result_2>;
+	launch_meme_token: ActorMethod<[bigint], Result_2>;
 	query_meme_token: ActorMethod<[bigint], [] | [MemeToken]>;
 	query_meme_token_price: ActorMethod<[bigint], Result>;
 	query_meme_tokens: ActorMethod<[QueryMemeTokenArgs], QueryMemeTokenResponse>;
@@ -350,6 +375,7 @@ export interface _SERVICE {
 	>;
 	query_user_tokens: ActorMethod<[[] | [Account]], Array<MemeTokenBalance>>;
 	sell: ActorMethod<[BuyArgs], Result>;
+	test: ActorMethod<[], undefined>;
 	update_creation_fee: ActorMethod<[TokenAmount], undefined>;
 	withdraw: ActorMethod<[WithdrawArgs], Result>;
 }

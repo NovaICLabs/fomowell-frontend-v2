@@ -7,6 +7,7 @@ import {
 	type BuyArgs,
 	calculateBuy,
 	calculateSell,
+	claimFaucet,
 	createMemeToken,
 	type CreateMemeTokenArgs,
 	DEFAULT_HOLDERS_PAGE_SIZE,
@@ -23,13 +24,16 @@ import {
 	withdraw,
 	type WithdrawArgs,
 } from "@/canisters/core";
+import { getICPCanisterId } from "@/canisters/icrc3";
 import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 import { showToast } from "@/components/utils/toast";
 import { formatNumberSmart, formatUnits } from "@/lib/common/number";
+import { validatePrincipalText } from "@/lib/ic/principal";
 
 import { useConnectedIdentity } from "../providers/wallet/ic";
 
 import type { LedgerType } from "@/canisters/core/index.did.d";
+
 // ================================ read ================================
 export const useMemeTokenInfo = (id: number) => {
 	return useQuery({
@@ -61,6 +65,7 @@ export const useCoreTokenBalance = (args: {
 			});
 		},
 		enabled: !!args.owner && !!args.token,
+		refetchInterval: 1000 * 10,
 	});
 };
 
@@ -240,6 +245,7 @@ export const useCreateMemeToken = () => {
 					telegram: args.telegram,
 					twitter: args.twitter,
 					devBuy: args.devBuy,
+					logoBase64: args.logoBase64,
 				}
 			);
 		},
@@ -324,6 +330,28 @@ export const useGenerateRandom = () => {
 				actorCreator,
 				getChainICCoreCanisterId().toText()
 			);
+		},
+	});
+};
+
+export const useClaimFaucet = () => {
+	const { actorCreator, principal } = useConnectedIdentity();
+	const { refetch: refetchCoreTokenBalance } = useCoreTokenBalance({
+		owner: principal,
+		token: { ICRCToken: getICPCanisterId() },
+	});
+	return useMutation({
+		mutationKey: ["ic-core", "claim-faucet"],
+		mutationFn: () => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			return claimFaucet(actorCreator, getChainICCoreCanisterId().toText(), {
+				principal: validatePrincipalText(principal),
+			});
+		},
+		onSuccess: () => {
+			void refetchCoreTokenBalance();
 		},
 	});
 };

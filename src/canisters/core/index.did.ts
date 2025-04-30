@@ -1,4 +1,5 @@
 export const idlFactory = ({ IDL }: { IDL: any }) => {
+	const BTreeMap = IDL.Rec();
 	const Value = IDL.Rec();
 	const Account = IDL.Record({
 		owner: IDL.Principal,
@@ -9,6 +10,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		amount: IDL.Nat,
 	});
 	const BuyArgs = IDL.Record({
+		memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
 		subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
 		amount_in: IDL.Nat,
 		meme_token_id: IDL.Nat64,
@@ -22,10 +24,15 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		canister_id: IDL.Principal,
 		symbol: IDL.Text,
 	});
+	const ClaimArg = IDL.Record({
+		token: StableToken,
+		claimer: IDL.Opt(IDL.Principal),
+	});
 	const CreateMemeTokenArg = IDL.Record({
 		creator: IDL.Opt(IDL.Principal),
 		token: StableToken,
 		ticker: IDL.Text,
+		logo_base64: IDL.Vec(IDL.Nat8),
 		twitter: IDL.Opt(IDL.Text),
 		logo: IDL.Text,
 		name: IDL.Text,
@@ -53,9 +60,10 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		market_cap_token: IDL.Nat,
 		completed: IDL.Bool,
 		description: IDL.Text,
+		lp_canister: IDL.Opt(IDL.Principal),
 		created_at: IDL.Nat64,
 		website: IDL.Opt(IDL.Text),
-		ledger_canister: IDL.Opt(IDL.Text),
+		ledger_canister: IDL.Opt(IDL.Principal),
 		price: IDL.Float64,
 		telegram: IDL.Opt(IDL.Text),
 		process: IDL.Float64,
@@ -190,10 +198,26 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		amount: IDL.Nat,
 		spender: Account,
 	});
+	BTreeMap.fill(
+		IDL.Vec(
+			IDL.Tuple(
+				IDL.Text,
+				IDL.Variant({
+					Int: IDL.Int,
+					Map: BTreeMap,
+					Nat: IDL.Nat,
+					Nat64: IDL.Nat64,
+					Blob: IDL.Vec(IDL.Nat8),
+					Text: IDL.Text,
+					Array: IDL.Vec(Value),
+				})
+			)
+		)
+	);
 	Value.fill(
 		IDL.Variant({
 			Int: IDL.Int,
-			Map: IDL.Vec(IDL.Tuple(IDL.Text, Value)),
+			Map: BTreeMap,
 			Nat: IDL.Nat,
 			Nat64: IDL.Nat64,
 			Blob: IDL.Vec(IDL.Nat8),
@@ -295,6 +319,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		transactions: IDL.Vec(Transaction),
 		archived_transactions: IDL.Vec(ArchivedRange),
 	});
+	const Result_2 = IDL.Variant({ Ok: IDL.Null, Err: IDL.Text });
 	const Sort = IDL.Variant({
 		CreateTimeDsc: IDL.Null,
 		MarketCapDsc: IDL.Null,
@@ -325,6 +350,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		buy: IDL.Func([BuyArgs], [Result], []),
 		calculate_buy: IDL.Func([IDL.Nat64, IDL.Nat], [Result], ["query"]),
 		calculate_sell: IDL.Func([IDL.Nat64, IDL.Nat], [Result], ["query"]),
+		claim: IDL.Func([ClaimArg], [Result], []),
 		create_token: IDL.Func([CreateMemeTokenArg], [Result_1], []),
 		deposit: IDL.Func([DepositArgs], [Result], []),
 		generate_random: IDL.Func([], [IDL.Nat64], []),
@@ -339,6 +365,8 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			["query"]
 		),
 		icrc1_balance_of: IDL.Func([LedgerType, Account], [IDL.Nat], ["query"]),
+		internal_transfer: IDL.Func([IDL.Nat64], [Result_2], []),
+		launch_meme_token: IDL.Func([IDL.Nat64], [Result_2], []),
 		query_meme_token: IDL.Func([IDL.Nat64], [IDL.Opt(MemeToken)], ["query"]),
 		query_meme_token_price: IDL.Func([IDL.Nat64], [Result], ["query"]),
 		query_meme_tokens: IDL.Func(
@@ -367,6 +395,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			["query"]
 		),
 		sell: IDL.Func([BuyArgs], [Result], []),
+		test: IDL.Func([], [], []),
 		update_creation_fee: IDL.Func([TokenAmount], [], []),
 		withdraw: IDL.Func([WithdrawArgs], [Result], []),
 	});

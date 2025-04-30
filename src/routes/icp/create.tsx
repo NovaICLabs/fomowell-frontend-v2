@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
@@ -26,6 +28,7 @@ import { showToast } from "@/components/utils/toast";
 import { FileUploader } from "@/components/views/token/bottom/file-uploader";
 import { useCoreTokenBalance, useCreateMemeToken } from "@/hooks/ic/core";
 import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
+import { fileToNumberArray } from "@/lib/common/file";
 import { parseUnits } from "@/lib/common/number";
 import { useDialogStore } from "@/store/dialog";
 // Create form validation schema with Zod
@@ -134,7 +137,11 @@ function TokenCreationPage() {
 		useCreateMemeToken();
 	const router = useRouter();
 	// Form submission handler
+	const [logoBase64Array, setLogoBase64Array] = useState<Array<number>>([]);
 	async function onSubmit(values: z.infer<typeof formSchema>) {
+		if (!logoBase64Array) {
+			throw new Error("Logo is required");
+		}
 		try {
 			// Prepare Twitter URL
 			let twitterUrl: string | undefined = undefined;
@@ -175,6 +182,7 @@ function TokenCreationPage() {
 				twitter: twitterUrl,
 				telegram: telegramUrl,
 				website: websiteUrl,
+				logoBase64: logoBase64Array,
 			};
 
 			Object.keys(createArgs).forEach((key) => {
@@ -233,8 +241,11 @@ function TokenCreationPage() {
 														imageIcon={
 															<Upload className="h-8 w-8 text-gray-400" />
 														}
-														onChange={(url) => {
-															if (url) {
+														onChange={async (url, file) => {
+															if (url && file) {
+																const logoBase64Array =
+																	await fileToNumberArray(file);
+																setLogoBase64Array(logoBase64Array);
 																onChange(url);
 															}
 														}}

@@ -10,12 +10,13 @@ import { EditIcon } from "@/components/icons/common/edit";
 import WithdrawIcon from "@/components/icons/common/withdraw";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
 import { Button } from "@/components/ui/button";
+import { showToast } from "@/components/utils/toast";
 import ProfileActivity from "@/components/views/icp/profile/activity";
 import ProfileCreatedTokens from "@/components/views/icp/profile/create-list";
 import EditInfoModal from "@/components/views/icp/profile/edit-info-modal";
 import ProfileHoldings from "@/components/views/icp/profile/holdings";
 import { useICPPrice } from "@/hooks/apis/coingecko";
-import { useCoreTokenBalance } from "@/hooks/ic/core";
+import { useClaimFaucet, useCoreTokenBalance } from "@/hooks/ic/core";
 import { getAvatar } from "@/lib/common/avatar";
 import { getTokenUsdValueTotal } from "@/lib/common/number";
 import { truncatePrincipal } from "@/lib/ic/principal";
@@ -45,7 +46,8 @@ function UserId() {
 	console.debug("🚀 ~ UserId ~ usdValue:", usdValue);
 	const { setDepositWithdrawOpen } = useDialogStore();
 	const [isShow, setIsShow] = useState<boolean>(false);
-
+	const { mutateAsync: claimFaucet, isPending: isClaimingFaucet } =
+		useClaimFaucet();
 	return (
 		<div className="flex h-full w-full flex-1 flex-col overflow-auto pt-5">
 			<EditInfoModal
@@ -106,10 +108,30 @@ function UserId() {
 							</div>
 						</div>
 					</div>
-					<Button className="absolute top-1/2 right-5 -translate-y-1/2 rounded-full">
-						<img alt="Refer to earn" src="/svgs/common/refer.svg" />
-						Refer to earn
-					</Button>
+					<div className="absolute top-1/2 right-5 flex -translate-y-1/2 gap-x-6">
+						<div className="relative flex h-9 w-[102px] items-center justify-center rounded-full p-[2px]">
+							<Button
+								className="disabled:bg-gray-710 dark:hover:bg-gray-710 dark:bg-background z-1 h-full w-full rounded-full bg-transparent text-xs text-white disabled:opacity-100"
+								disabled={isClaimingFaucet}
+								onClick={async () => {
+									try {
+										await claimFaucet();
+										showToast("success", "100 tICP claimed");
+									} catch (error) {
+										console.debug("🚀 ~ onClick={ ~ error:", error);
+										showToast("error", "Claim Faucet Failed");
+									}
+								}}
+							>
+								{isClaimingFaucet ? "Claiming..." : "Get 100 tICP"}
+							</Button>
+							<div className="absolute inset-0 top-px right-px bottom-px left-px z-0 rounded-full bg-gradient-to-r from-yellow-500 to-blue-500"></div>
+						</div>
+						<Button className="rounded-full">
+							<img alt="Refer to earn" src="/svgs/common/refer.svg" />
+							Refer to earn
+						</Button>
+					</div>
 				</div>
 				<div className="bg-gray-760 flex w-120 flex-col items-center rounded-2xl p-5">
 					<div className="flex flex-col items-center">

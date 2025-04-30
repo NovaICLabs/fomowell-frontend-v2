@@ -351,6 +351,7 @@ export type CreateMemeTokenArgs = {
 	twitter?: string;
 	creator?: string;
 	devBuy?: bigint;
+	logoBase64: Array<number>;
 };
 
 export const createMemeToken = async (
@@ -375,7 +376,9 @@ export const createMemeToken = async (
 		twitter,
 		creator,
 		devBuy,
+		logoBase64,
 	} = args;
+
 	const result = await actor.create_token({
 		token: getICPCanisterToken(),
 		name,
@@ -387,6 +390,7 @@ export const createMemeToken = async (
 		creator: wrapOption(creator ? validatePrincipalText(creator) : undefined),
 		logo,
 		dev_buy: wrapOption(devBuy),
+		logo_base64: logoBase64,
 	});
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
@@ -492,6 +496,7 @@ export const buy = async (
 		subaccount: [],
 		amount_in: amount,
 		meme_token_id: id,
+		memo: wrapOption(string2array((Math.random() * 100).toString())),
 	});
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
@@ -523,6 +528,7 @@ export const sell = async (
 		subaccount: [],
 		slippage,
 		meme_token_id: id,
+		memo: wrapOption(string2array((Math.random() * 100).toString())),
 	});
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
@@ -543,4 +549,30 @@ export const get_generate_random = async (
 	}
 	const result = await actor.generate_random();
 	return result.toString();
+};
+
+// claim faucet
+export type ClaimFaucetArgs = {
+	principal?: Principal;
+};
+
+export const claimFaucet = async (
+	createActor: ActorCreator,
+	canisterId: string,
+	args: ClaimFaucetArgs
+) => {
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		interfaceFactory: idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const result = await actor.claim({
+		token: getICPCanisterToken(),
+		claimer: wrapOption(args.principal),
+	});
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
 };

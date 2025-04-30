@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 interface FileUploaderProps {
 	isHideRemove?: boolean;
-	onChange?: (url: string | null) => void;
+	onChange?: (url: string | null, file?: File) => void;
 	maxSize?: number; // in bytes
 	accept?: Record<string, Array<string>>;
 	imageIcon?: ReactNode;
@@ -59,7 +59,7 @@ export const FileUploader = forwardRef<FileUploaderRef, FileUploaderProps>(
 
 					setLoading?.(true);
 					void uploadImage(file).then((url) => {
-						onChange?.(url);
+						onChange?.(url, file);
 						setLoading?.(false);
 					});
 					const reader = new FileReader();
