@@ -14,24 +14,24 @@ const chains: Array<{
 	name: string;
 	value: ChainType;
 }> = [
-	{
-		logo: (
-			<div className="flex h-6 w-6 items-center justify-center">
-				<img alt={"bitcoin-logo"} src={`/svgs/chains/bitcoin.svg`} />
-			</div>
-		),
-		name: "Bitcoin",
-		value: "bitcoin",
-	},
 	// {
 	// 	logo: (
 	// 		<div className="flex h-6 w-6 items-center justify-center">
-	// 			<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
+	// 			<img alt={"bitcoin-logo"} src={`/svgs/chains/bitcoin.svg`} />
 	// 		</div>
 	// 	),
-	// 	name: "ICP",
-	// 	value: "icp",
+	// 	name: "Bitcoin",
+	// 	value: "bitcoin",
 	// },
+	{
+		logo: (
+			<div className="flex h-6 w-6 items-center justify-center">
+				<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
+			</div>
+		),
+		name: "ICP",
+		value: "icp",
+	},
 	// {
 	// 	logo: (
 	// 		<div className="flex h-6 w-6 items-center justify-center">
