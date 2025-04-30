@@ -63,7 +63,6 @@ export const useInitialConnect = () => {
 			if (!connected) {
 				return;
 			}
-
 			setPrincipal(principal);
 			setConnected(connected);
 
@@ -75,26 +74,28 @@ export const useInitialConnect = () => {
 	}, [connectByPrincipal, setConnected, setPrincipal]);
 
 	// Handle connected state
-	const handleAlreadyConnected = useCallback(async () => {
-		const { principal, connected } = await connectManager.connect();
-		setPrincipal(principal);
-		setConnected(connected);
+	const handleAlreadyConnected = useCallback(
+		async (principal: string | undefined) => {
+			if (!principal) throw new Error("Principal not found");
+			setPrincipal(principal);
+			setConnected(true);
+			const isLoggedIn = await checkLogin();
+			// console.debug("Login status:", isLoggedIn);
 
-		const isLoggedIn = await checkLogin();
-		// console.debug("Login status:", isLoggedIn);
+			if (!isLoggedIn) {
+				await connectByPrincipal();
+			}
 
-		if (!isLoggedIn) {
-			await connectByPrincipal();
-		}
-
-		await reloadIdentityProfile();
-	}, [
-		checkLogin,
-		connectByPrincipal,
-		reloadIdentityProfile,
-		setConnected,
-		setPrincipal,
-	]);
+			await reloadIdentityProfile();
+		},
+		[
+			checkLogin,
+			connectByPrincipal,
+			reloadIdentityProfile,
+			setConnected,
+			setPrincipal,
+		]
+	);
 
 	const call = useCallback(
 		async (lastConnectedWallet: Connector) => {
@@ -104,12 +105,12 @@ export const useInitialConnect = () => {
 				if (expired) {
 					await disconnect();
 				} else {
-					const { connected } = await connectManager.isConnected();
+					const { connected, principal } = await connectManager.isConnected();
 
 					if (!connected) {
 						await handleNotConnected();
 					} else {
-						await handleAlreadyConnected();
+						await handleAlreadyConnected(principal);
 					}
 				}
 			} catch (error) {
