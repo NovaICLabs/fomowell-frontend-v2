@@ -223,7 +223,7 @@ export default function Trade() {
 					const result = await buy({
 						amount: debouncedBuyAmountBigInt,
 						id: BigInt(id),
-						slippage: Number(slippage),
+						amount_out_min: minTokenReceived,
 					});
 					showToast(
 						"success",
@@ -241,7 +241,7 @@ export default function Trade() {
 					const result = await sell({
 						amount: debouncedSellAmountBigInt,
 						id: BigInt(id),
-						slippage: Number(slippage),
+						amount_out_min: minTokenReceived,
 					});
 					showToast(
 						"success",

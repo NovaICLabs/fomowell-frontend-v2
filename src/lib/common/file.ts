@@ -1,13 +1,16 @@
-async function fileToNumberArray(file: File): Promise<Array<number>> {
-	try {
-		const arrayBuffer = await file.arrayBuffer();
-		const uint8Array = new Uint8Array(arrayBuffer);
-		const numberArray = Array.from(uint8Array);
-		return numberArray;
-	} catch (error) {
-		console.error("Error converting file to number[]:", error);
-		throw error;
-	}
+import superjson from "superjson";
+
+async function fileToBase64(file: File): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onload = () => {
+			resolve(reader.result as string);
+		};
+		reader.onerror = (error) => {
+			reject(new Error(superjson.stringify(error) || "File read error"));
+		};
+	});
 }
 
-export { fileToNumberArray };
+export { fileToBase64 };

@@ -28,7 +28,8 @@ import { showToast } from "@/components/utils/toast";
 import { FileUploader } from "@/components/views/token/bottom/file-uploader";
 import { useCoreTokenBalance, useCreateMemeToken } from "@/hooks/ic/core";
 import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
-import { fileToNumberArray } from "@/lib/common/file";
+import { string2array } from "@/lib/common/data/arrays";
+import { fileToBase64 } from "@/lib/common/file";
 import { parseUnits } from "@/lib/common/number";
 import { useDialogStore } from "@/store/dialog";
 // Create form validation schema with Zod
@@ -243,9 +244,11 @@ function TokenCreationPage() {
 														}
 														onChange={async (url, file) => {
 															if (url && file) {
-																const logoBase64Array =
-																	await fileToNumberArray(file);
-																setLogoBase64Array(logoBase64Array);
+																const logoBase64String =
+																	await fileToBase64(file);
+																setLogoBase64Array(
+																	string2array(logoBase64String)
+																);
 																onChange(url);
 															}
 														}}

@@ -718,11 +718,11 @@ export default function MemeList() {
 								void buyToken({
 									amount: flashAmountBigInt,
 									id: BigInt(tokenId),
-									slippage: 100,
-								}).then(() => {
+									amount_out_min: BigInt(0),
+								}).then((receivedAmount) => {
 									showToast(
 										"success",
-										`${formatNumberSmart(flashAmount)} $${info.row.original.ticker.toLocaleUpperCase()} received!`
+										`${formatNumberSmart(formatUnits(receivedAmount, info.row.original.decimals))} $${info.row.original.ticker.toLocaleUpperCase()} received!`
 									);
 								});
 							})}

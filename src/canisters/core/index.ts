@@ -472,7 +472,7 @@ export const withdraw = async (
 
 // buy
 export type BuyArgs = {
-	slippage: number;
+	amount_out_min: bigint;
 	id: bigint;
 	amount: bigint;
 };
@@ -489,10 +489,10 @@ export const buy = async (
 		throw new Error("Failed to create actor");
 	}
 
-	const { slippage, id, amount } = args;
+	const { amount_out_min, id, amount } = args;
 
 	const result = await actor.buy({
-		slippage,
+		amount_out_min: wrapOption(amount_out_min),
 		subaccount: [],
 		amount_in: amount,
 		meme_token_id: id,
@@ -507,7 +507,7 @@ export const buy = async (
 export type SellArgs = {
 	amount: bigint;
 	id: bigint;
-	slippage: number;
+	amount_out_min: bigint;
 };
 
 export const sell = async (
@@ -522,11 +522,11 @@ export const sell = async (
 	if (!actor) {
 		throw new Error("Failed to create actor");
 	}
-	const { amount, id, slippage } = args;
+	const { amount, id, amount_out_min } = args;
 	const result = await actor.sell({
 		amount_in: amount,
 		subaccount: [],
-		slippage,
+		amount_out_min: wrapOption(amount_out_min),
 		meme_token_id: id,
 		memo: wrapOption(string2array((Math.random() * 100).toString())),
 	});

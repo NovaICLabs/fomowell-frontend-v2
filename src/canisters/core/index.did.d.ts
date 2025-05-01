@@ -60,11 +60,11 @@ export interface Buy {
 	meme_token_id: bigint;
 }
 export interface BuyArgs {
+	amount_out_min: [] | [bigint];
 	memo: [] | [Uint8Array | number[]];
 	subaccount: [] | [Uint8Array | number[]];
 	amount_in: bigint;
 	meme_token_id: bigint;
-	slippage: number;
 }
 export type CanisterLogFeature =
 	| { filterMessageByContains: null }
