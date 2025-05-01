@@ -158,6 +158,8 @@ export const getTokenUsdValueTotal = (
 	);
 };
 
-export const isNullOrUndefined = (value: number | undefined | null) => {
+export const isNullOrUndefined = (
+	value: number | string | undefined | null
+) => {
 	return value === undefined || value === null;
 };

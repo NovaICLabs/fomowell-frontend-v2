@@ -197,7 +197,12 @@ export default function Bottom() {
 					<span className="text-sm text-white/40">Price</span>
 					<span className="text-sm text-white">
 						<span className="text-gray-280">
-							{currentTokenPrice?.formattedPerPayToken} ICP
+							{isNullOrUndefined(currentTokenPrice?.formattedPerPayToken)
+								? "--"
+								: formatNumberSmart(currentTokenPrice?.formattedPerPayToken, {
+										shortZero: true,
+									})}{" "}
+							ICP
 						</span>
 					</span>
 				</div>
