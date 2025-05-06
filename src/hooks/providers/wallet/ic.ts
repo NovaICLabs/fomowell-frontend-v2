@@ -52,6 +52,7 @@ export const useInitialConnect = () => {
 		connectByPrincipal,
 		checkLogin,
 		reloadIdentityProfile,
+		handleIIBug,
 	} = useIcIdentityStore();
 	const { lastConnectedWallet } = useIcLastConnectedWalletStore();
 	const lastLoginRef = useRef<Connector | undefined>();
@@ -63,6 +64,10 @@ export const useInitialConnect = () => {
 			if (!connected) {
 				return;
 			}
+			const isBug = await handleIIBug();
+			if (isBug) {
+				return;
+			}
 			setPrincipal(principal);
 			setConnected(connected);
 
@@ -71,12 +76,16 @@ export const useInitialConnect = () => {
 		} catch (error) {
 			console.error("Failed to connect wallet:", error);
 		}
-	}, [connectByPrincipal, setConnected, setPrincipal]);
+	}, [connectByPrincipal, handleIIBug, setConnected, setPrincipal]);
 
 	// Handle connected state
 	const handleAlreadyConnected = useCallback(
 		async (principal: string | undefined) => {
 			if (!principal) throw new Error("Principal not found");
+			const isBug = await handleIIBug();
+			if (isBug) {
+				return;
+			}
 			setPrincipal(principal);
 			setConnected(true);
 			const isLoggedIn = await checkLogin();
@@ -91,6 +100,7 @@ export const useInitialConnect = () => {
 		[
 			checkLogin,
 			connectByPrincipal,
+			handleIIBug,
 			reloadIdentityProfile,
 			setConnected,
 			setPrincipal,

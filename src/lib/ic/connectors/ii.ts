@@ -51,9 +51,11 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 	public init = async () => {
 		this.client = await AuthClient.create({
 			idleOptions: {
+				disableIdle: true,
 				disableDefaultIdleCallback: true,
 			},
 		});
+
 		const isConnected = await this.isConnected();
 
 		if (isConnected) {

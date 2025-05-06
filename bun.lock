@@ -5,9 +5,9 @@
       "name": "vite-react-boilerplate",
       "dependencies": {
         "@dfinity/agent": "^2.4.1",
-        "@dfinity/auth-client": "^1.3.0",
+        "@dfinity/auth-client": "^2.4.1",
         "@dfinity/oisy-wallet-signer": "^0.1.8",
-        "@dfinity/principal": "^2.4.0",
+        "@dfinity/principal": "^2.4.1",
         "@hookform/resolvers": "^5.0.1",
         "@nivo/bar": "^0.87.0",
         "@nivo/core": "^0.87.0",
@@ -267,7 +267,7 @@
 
     "@dfinity/agent": ["@dfinity/agent@2.4.1", "", { "dependencies": { "@noble/curves": "^1.4.0", "@noble/hashes": "^1.3.1", "base64-arraybuffer": "^0.2.0", "borc": "^2.1.1", "buffer": "^6.0.3", "simple-cbor": "^0.4.1" }, "peerDependencies": { "@dfinity/candid": "^2.4.1", "@dfinity/principal": "^2.4.1" } }, "sha512-IczFFOUDGfMTdQ83yiCvGtvHr1IIB80lWBP0ZYRLogs6NVt8t6HYcMlu1sgT+9VivhT7iwX4pktPFxxOkO3COw=="],
 
-    "@dfinity/auth-client": ["@dfinity/auth-client@1.4.0", "", { "dependencies": { "idb": "^7.0.2" }, "peerDependencies": { "@dfinity/agent": "^1.4.0", "@dfinity/identity": "^1.4.0", "@dfinity/principal": "^1.4.0" } }, "sha512-9ImeOAw61SQvHJ+w4RHIuKKUL2xAQDLoce+JhmH3DbJuVvNbZIM5xMW8gHTZVlXaMw3Vhip+a1DPJIGy95r9pA=="],
+    "@dfinity/auth-client": ["@dfinity/auth-client@2.4.1", "", { "dependencies": { "idb": "^7.0.2" }, "peerDependencies": { "@dfinity/agent": "^2.4.1", "@dfinity/identity": "^2.4.1", "@dfinity/principal": "^2.4.1" } }, "sha512-osKgBWwMsMyQUNYhFxPqj14R2RhgdYVD0PoTGDig2sl1Hy4mQzPalCWbkW9R50vsZGmoMi/uiopvnXy036EyqA=="],
 
     "@dfinity/candid": ["@dfinity/candid@2.4.0", "", { "peerDependencies": { "@dfinity/principal": "^2.4.0" } }, "sha512-ZVuBIFlWOZOvEZaLtBKE2666rab32XSdHo1BtzdDy36NMvQbRXkZRbIEd7xoZXRud2wK7pk5cNsZULnXghAORg=="],
 
@@ -279,7 +279,7 @@
 
     "@dfinity/oisy-wallet-signer": ["@dfinity/oisy-wallet-signer@0.1.8", "", { "peerDependencies": { "@dfinity/agent": "^2.4.0", "@dfinity/candid": "^2.4.0", "@dfinity/ledger-icp": "^2", "@dfinity/ledger-icrc": "^2", "@dfinity/principal": "^2.4.0", "@dfinity/utils": "^2", "@dfinity/zod-schemas": "*", "borc": "^2.1.1", "simple-cbor": "^0.4.1", "zod": "^3.23.8" } }, "sha512-iUqnmKWNw9BjP1XFxZp36VbzkB8xk++p0rFDEc/otMl7isQlNe9ku6pUvHBE9alAO4oBm91Yt4ljeHg5XlbJEA=="],
 
-    "@dfinity/principal": ["@dfinity/principal@2.4.0", "", { "dependencies": { "@noble/hashes": "^1.3.1" } }, "sha512-gBKCyxrPYKdqHVk/Qh9cfxN0Hnt4BvRYVo5KgNEAOKyoySCIPO39xlcfE6JJzWtLqEftQLMbeSMrLrTHDdMZ5w=="],
+    "@dfinity/principal": ["@dfinity/principal@2.4.1", "", { "dependencies": { "@noble/hashes": "^1.3.1" } }, "sha512-Cz6XQVOwq0TXDBClPbcidDd4SqK1lfr1/Kn34ruDD13xVQ4iaP1iCntzS9O97+vGpY/6jwDtKd32Gn5YJ9BQNw=="],
 
     "@dfinity/utils": ["@dfinity/utils@2.12.0", "", { "peerDependencies": { "@dfinity/agent": "^2.0.0", "@dfinity/candid": "^2.0.0", "@dfinity/principal": "^2.0.0" } }, "sha512-k/qXa41sFbzOMcm7mk9gV4/w0C0owmVfWmX9LrPdmsM0Jjnwc76Uo5i9Mca7A2/mHw/F5sw4GM0LEmImtLW6Kw=="],
 
@@ -2668,6 +2668,8 @@
     "global-prefix/which": ["which@1.3.1", "", { "dependencies": { "isexe": "^2.0.0" }, "bin": { "which": "./bin/which" } }, "sha512-HxJdYWq1MTIQbJ3nw0cqssHoTNU267KlrDuGZ1WYlxDStUtKUhOaJmh112/TZmHxxUfuJqPXSOm7tDyas0OSIQ=="],
 
     "globby/slash": ["slash@3.0.0", "", {}, "sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q=="],
+
+    "ic-siwb-lasereyes-connector/@dfinity/principal": ["@dfinity/principal@2.4.0", "", { "dependencies": { "@noble/hashes": "^1.3.1" } }, "sha512-gBKCyxrPYKdqHVk/Qh9cfxN0Hnt4BvRYVo5KgNEAOKyoySCIPO39xlcfE6JJzWtLqEftQLMbeSMrLrTHDdMZ5w=="],
 
     "ic-siwb-lasereyes-connector/@omnisat/lasereyes-core": ["@omnisat/lasereyes-core@0.0.61", "", { "dependencies": { "@bitcoinerlab/secp256k1": "^1.1.1", "@cmdcode/crypto-utils": "^2.4.6", "@cmdcode/tapscript": "^1.4.6", "@magiceden-oss/runestone-lib": "^1.0.2", "@nanostores/persistent": "^0.10.2", "@orangecrypto/orange-connect": "^1.2.2", "axios": "^1.7.7", "bip32": "5.0.0-rc.0", "bip39": "^3.1.0", "bitcoinjs-lib": "^7.0.0-rc.0", "buffer": "^6.0.3", "nanostores": "^0.11.3", "sats-connect": "^2.8.0" } }, "sha512-BAJk7PnAj/0pmpwOcR/4T8zdpYv2yil6rm+JbWLgl6GZPIQi2qZ2KRna5DowGn5qWIdnfsA2VVZTrpCExQyr+w=="],
 

@@ -28,14 +28,13 @@ export const useICPBalance = (principal?: string) => {
 	});
 };
 
-export const useUserHoldingTokens = () => {
-	const { principal: self } = useIcIdentityStore();
+export const useUserHoldingTokens = (id: string) => {
 	return useQuery({
-		queryKey: ["holdings", self],
+		queryKey: ["holdings", id],
 		queryFn: async () => {
-			if (!self) throw new Error("Principal is not set");
+			if (!id) throw new Error("Principal is not set");
 			return getUserTokens(getChainICCoreCanisterId().toText(), {
-				owner: self,
+				owner: id,
 			});
 		},
 	});
@@ -54,8 +53,8 @@ export const useUserCreatedTokens = () => {
 	});
 };
 
-export const useUserTokenHoldersList = () => {
-	const { data, isFetching, refetch } = useUserHoldingTokens();
+export const useUserTokenHoldersList = (id: string) => {
+	const { data, isFetching, refetch } = useUserHoldingTokens(id);
 	const {
 		data: allPrices,
 		isFetching: isPriceFetching,

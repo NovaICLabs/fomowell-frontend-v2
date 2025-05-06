@@ -24,13 +24,34 @@ type IcIdentity = {
 	connecting: boolean;
 	setConnecting: (c: boolean) => void;
 	connectByPrincipal: (randomValue?: string) => Promise<string | undefined>;
+	handleIIBug: () => Promise<boolean>;
 	setPrincipal: (principal?: string) => void;
 	setConnected: (connected: boolean) => void;
 	refreshToken: () => Promise<string | undefined>;
 	checkLogin: () => Promise<boolean>;
 	clearToken: () => void;
 };
-
+// check ii kun bug
+const checkIIBug = async () => {
+	const connector = window.icConnector;
+	let isBug = false;
+	try {
+		if (connector?.type === "II") {
+			await get_generate_random(
+				connector.createActor,
+				getChainICCoreCanisterId().toText()
+			);
+		}
+	} catch (error) {
+		if (
+			error instanceof Error &&
+			error.message.includes("anonymous user is not allowed")
+		) {
+			isBug = true;
+		}
+	}
+	return isBug;
+};
 export const useIcIdentityStore = create<IcIdentity>()(
 	persist(
 		(set, get) => ({
@@ -44,6 +65,17 @@ export const useIcIdentityStore = create<IcIdentity>()(
 			clearToken: () => {
 				set({ jwt_token: "" });
 			},
+			handleIIBug: async () => {
+				const isBug = await checkIIBug();
+				// if ii kun bug
+				if (isBug) {
+					await window.icConnector.disconnect();
+					get().clearToken();
+					get().setConnected(false);
+					get().setPrincipal(undefined);
+				}
+				return isBug;
+			},
 			connectByPrincipal: async (
 				randomValue?: string
 			): Promise<string | undefined> => {
@@ -56,12 +88,10 @@ export const useIcIdentityStore = create<IcIdentity>()(
 					if (token) {
 						// check token
 						const isValid = await get().checkLogin();
-
 						if (isValid) {
 							return token;
 						} else {
 							const newToken = await get().refreshToken();
-
 							if (newToken) {
 								set({ jwt_token: newToken });
 								return newToken;
@@ -81,6 +111,7 @@ export const useIcIdentityStore = create<IcIdentity>()(
 						return;
 					}
 					set({ connecting: true });
+
 					const r = await login2ByPrincipal(principal, randomValue);
 
 					set({ jwt_token: r, connected: true });
@@ -135,8 +166,8 @@ export const useIcIdentityStore = create<IcIdentity>()(
 			checkLogin: async (): Promise<boolean> => {
 				const token = get().jwt_token;
 				if (!token) return false;
-
 				const isValid = await checkLogin(token);
+
 				if (!isValid) {
 					return false;
 				}
@@ -191,7 +222,6 @@ const login2ByPrincipal = async (
 				actorCreator,
 				getChainICCoreCanisterId().toText()
 			);
-
 			if (!random) {
 				console.error("Failed to get random value");
 				return undefined;

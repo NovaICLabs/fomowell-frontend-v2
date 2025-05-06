@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { useRouter } from "@tanstack/react-router";
+import { useParams, useRouter } from "@tanstack/react-router";
 import {
 	createColumnHelper,
 	flexRender,
@@ -17,7 +17,6 @@ import { useUserTokenHoldersList } from "@/hooks/ic/tokens/icp";
 import { formatNumberSmart } from "@/lib/common/number";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
-import { useIcIdentityStore } from "@/store/ic";
 
 import type { MemeTokenDetails } from "@/canisters/core";
 
@@ -25,8 +24,8 @@ const ProfileHoldings = () => {
 	const router = useRouter();
 	const { chain } = useChainStore();
 	const { data: icpPrice } = useICPPrice();
-	const { principal } = useIcIdentityStore();
-	const { data: items, isFetching, refetch } = useUserTokenHoldersList();
+	const { userid } = useParams({ from: "/icp/profile/$userid" });
+	const { data: items, isFetching, refetch } = useUserTokenHoldersList(userid);
 	const columnHelper = createColumnHelper<MemeTokenDetails>();
 
 	// const {
@@ -45,10 +44,10 @@ const ProfileHoldings = () => {
 	const loadingRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		if (!principal) return;
+		if (!userid) return;
 
 		void refetch();
-	}, [principal, refetch]);
+	}, [userid, refetch]);
 
 	// const [sortStates, setSortStates] = useState<
 	// 	Record<string, "asc" | "desc" | "none">
@@ -233,7 +232,6 @@ const ProfileHoldings = () => {
 
 		return () => {
 			if (loadingRef.current) {
-				// eslint-disable-next-line react-hooks/exhaustive-deps
 				observer.unobserve(loadingRef.current);
 			}
 		};
