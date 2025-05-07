@@ -397,7 +397,7 @@ export const getUserActivity = async (parameters: {
 	return response.data;
 };
 
-type UserInfo = {
+export type UserInfo = {
 	id: number;
 	principal: string;
 	eth_account: string | null;

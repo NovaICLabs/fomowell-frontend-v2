@@ -16,6 +16,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useCoreTokenBalance } from "@/hooks/ic/core";
 import { useIcWallet } from "@/hooks/providers/wallet/ic";
 import { getAvatar } from "@/lib/common/avatar";
@@ -27,7 +28,8 @@ import { useIcIdentityStore } from "@/store/ic";
 const IcpWalletConnect: React.FC = () => {
 	const { setIcpConnectOpen } = useDialogStore();
 	const { disconnect, isLoading } = useIcWallet();
-	const { principal, connected, connecting } = useIcIdentityStore();
+	const { principal, connected, identityProfile, connecting } =
+		useIcIdentityStore();
 	const router = useRouter();
 
 	const handleDisconnect = async () => {
@@ -92,11 +94,19 @@ const IcpWalletConnect: React.FC = () => {
 									setOpenPopover(false);
 								}}
 							>
-								<img
-									alt="avatar"
-									className="h-6 w-6 rounded-full"
-									src={getAvatar(principal)}
-								/>
+								{identityProfile ? (
+									<div
+										className="h-6 w-6 rounded-full"
+										style={{
+											backgroundImage: `url(${identityProfile?.avatar ?? getAvatar(principal)})`,
+											backgroundSize: "cover",
+											backgroundPosition: "center",
+										}}
+									></div>
+								) : (
+									<Skeleton className="h-6 w-6 rounded-full" />
+								)}
+
 								<span className="ml-2">{truncatePrincipal(principal)}</span>
 								{copied ? (
 									<Check

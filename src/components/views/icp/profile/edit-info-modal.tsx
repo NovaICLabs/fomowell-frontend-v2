@@ -48,7 +48,6 @@ const EditInfoModal = ({
 			setNickname(identityProfile?.name);
 			setAvatar(identityProfile?.avatar || initAvatar);
 		}
-
 		return () => {
 			setNickname(undefined);
 			setAvatar(initAvatar);

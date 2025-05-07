@@ -1,5 +1,7 @@
 import { request } from ".";
 
+import type { UserInfo } from "./indexer";
+
 const getIndexerBaseUrl = () => {
 	const indexerBaseUrl = import.meta.env.VITE_INDEXER_BASE_URL;
 	if (!indexerBaseUrl) {
@@ -122,16 +124,6 @@ export const createNewUser = async () => {
 	return response.data;
 };
 
-export type UserInfo = {
-	id: number;
-	name: string;
-	email?: string;
-	avatar: string;
-	description: string;
-	principal: string;
-	created_at: string;
-	updated_at: string;
-};
 export const getUserInfoByToken = async (user_token: string) => {
 	if (!user_token) {
 		return undefined;

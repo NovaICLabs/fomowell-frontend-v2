@@ -6,13 +6,13 @@ import {
 	getUserInfoByToken,
 	loginOrRegisterByPrincipal,
 	refreshToken,
-	type UserInfo,
 } from "@/apis/user-login";
 import {
 	get_generate_random,
 	getChainICCoreCanisterId,
 } from "@/canisters/core";
 
+import type { UserInfo } from "@/apis/indexer";
 import type { Connector } from "@/lib/ic/connectors";
 
 type IcIdentity = {
@@ -30,6 +30,7 @@ type IcIdentity = {
 	refreshToken: () => Promise<string | undefined>;
 	checkLogin: () => Promise<boolean>;
 	clearToken: () => void;
+	setIdentityProfile: (identityProfile?: UserInfo) => void;
 };
 // check ii kun bug
 const checkIIBug = async () => {
@@ -58,6 +59,10 @@ export const useIcIdentityStore = create<IcIdentity>()(
 			principal: undefined,
 			connected: false,
 			connecting: false,
+			identityProfile: undefined,
+			setIdentityProfile: (identityProfile?: UserInfo) => {
+				set({ identityProfile });
+			},
 			setConnecting: (c: boolean) => {
 				set({ connecting: c });
 			},
@@ -125,7 +130,6 @@ export const useIcIdentityStore = create<IcIdentity>()(
 					set({ connecting: false });
 				}
 			},
-			identityProfile: undefined,
 			reloadIdentityProfile: async (): Promise<void> => {
 				const token = get().jwt_token;
 				if (!token) return;
@@ -181,6 +185,7 @@ export const useIcIdentityStore = create<IcIdentity>()(
 				jwt_token: state.jwt_token,
 				principal: state.principal,
 				connected: state.connected,
+				identityProfile: state.identityProfile,
 			}),
 		}
 	)
