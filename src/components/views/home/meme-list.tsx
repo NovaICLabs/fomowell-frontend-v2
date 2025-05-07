@@ -268,8 +268,9 @@ export default function MemeList() {
 													clipPath: "circle(50% at center)",
 												}}
 											></div>
+											<div className="bg-gray-710 absolute h-9 w-9 rounded-full p-[2px]"></div>
 											<div
-												className="absolute h-[36px] w-[36px] rounded-full p-[2px]"
+												className="absolute h-9 w-9 rounded-full p-[2px]"
 												style={{
 													backgroundImage: `url(${row.original.logo})`,
 													backgroundSize: "cover",

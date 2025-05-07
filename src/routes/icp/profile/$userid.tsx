@@ -10,15 +10,15 @@ import { EditIcon } from "@/components/icons/common/edit";
 import WithdrawIcon from "@/components/icons/common/withdraw";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { showToast } from "@/components/utils/toast";
 import ProfileActivity from "@/components/views/icp/profile/activity";
 import ProfileCreatedTokens from "@/components/views/icp/profile/create-list";
 import EditInfoModal from "@/components/views/icp/profile/edit-info-modal";
 import ProfileHoldings from "@/components/views/icp/profile/holdings";
-import { useICPPrice } from "@/hooks/apis/coingecko";
+import { useUserInfo } from "@/hooks/apis/user";
 import { useClaimFaucet, useCoreTokenBalance } from "@/hooks/ic/core";
 import { getAvatar } from "@/lib/common/avatar";
-import { getTokenUsdValueTotal } from "@/lib/common/number";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
@@ -37,53 +37,67 @@ function UserId() {
 		owner: userid,
 		token: { ICRCToken: getICPCanisterId() },
 	});
-	const { data: icpPrice } = useICPPrice();
-	const usdValue =
-		coreTokenBalance && icpPrice
-			? getTokenUsdValueTotal({ amount: coreTokenBalance.raw }, icpPrice)
-			: "--";
+	const { data: userInfo, refetch: refetchUserInfo } = useUserInfo(userid);
+	// const { data: icpPrice } = useICPPrice();
+	// const usdValue =
+	// 	coreTokenBalance && icpPrice
+	// 		? getTokenUsdValueTotal({ amount: coreTokenBalance.raw }, icpPrice)
+	//         : "--";
 
-	console.debug("🚀 ~ UserId ~ usdValue:", usdValue);
 	const { setDepositWithdrawOpen } = useDialogStore();
 	const [isShow, setIsShow] = useState<boolean>(false);
 	const { mutateAsync: claimFaucet, isPending: isClaimingFaucet } =
 		useClaimFaucet();
+
+	// is self
+	const isSelf = userid === identityProfile?.principal;
 	return (
 		<div className="flex h-full w-full flex-1 flex-col overflow-auto pt-5">
 			<EditInfoModal
-				initAvatar={getAvatar(userid)}
+				initAvatar={userInfo?.avatar ?? getAvatar(userid)}
 				open={isShow}
 				setOpen={(open: boolean) => {
 					setIsShow(open);
+				}}
+				onSuccess={() => {
+					void refetchUserInfo();
 				}}
 			/>
 
 			<div className="sticky mb-5 flex h-[162px] w-full gap-x-5">
 				<div className="bg-gray-760 relative flex w-full gap-x-2 rounded-2xl p-5">
 					<div className="flex items-center gap-2">
-						<img
-							alt="avatar"
-							className="h-16 w-16 rounded-full"
-							src={getAvatar(userid)}
-						/>
+						{userInfo ? (
+							<div
+								className="h-16 w-16 rounded-full"
+								style={{
+									backgroundImage: `url(${userInfo.avatar ?? getAvatar(userid)})`,
+									backgroundSize: "cover",
+									backgroundPosition: "center",
+									backgroundRepeat: "no-repeat",
+								}}
+							></div>
+						) : (
+							<Skeleton className="h-16 w-16 rounded-full"></Skeleton>
+						)}
+
 						<div className="flex flex-col gap-1">
 							<div className="flex items-center gap-1">
-								<span className="text-lg font-semibold">
-									{
-										identityProfile
-											? identityProfile.name
-											: truncatePrincipal(
-													userid
-												) /* Use default truncation or adjust as needed */
-									}
-								</span>
-								<span
-									onClick={() => {
-										setIsShow(true);
-									}}
-								>
-									<EditIcon />
-								</span>
+								{userInfo ? (
+									<span className="text-lg font-semibold">{userInfo.name}</span>
+								) : (
+									<Skeleton className="h-7 w-20"></Skeleton>
+								)}
+
+								{isSelf && (
+									<span
+										onClick={() => {
+											setIsShow(true);
+										}}
+									>
+										<EditIcon />
+									</span>
+								)}
 							</div>
 							<div className="flex items-center text-xs text-gray-400">
 								<span>ID: {truncatePrincipal(userid)}</span>
@@ -108,7 +122,12 @@ function UserId() {
 							</div>
 						</div>
 					</div>
-					<div className="absolute top-1/2 right-5 flex -translate-y-1/2 gap-x-6">
+					<div
+						className={cn(
+							"absolute top-1/2 right-5 flex -translate-y-1/2 gap-x-6",
+							isSelf ? "flex" : "hidden"
+						)}
+					>
 						<div className="relative flex h-9 w-[102px] items-center justify-center rounded-full p-[2px]">
 							<Button
 								className="disabled:bg-gray-710 dark:hover:bg-gray-710 dark:bg-background z-1 h-full w-full rounded-full bg-transparent text-xs text-white disabled:opacity-100"
@@ -145,7 +164,7 @@ function UserId() {
 								ICP
 							</span>
 						</div>
-						<div className="mt-4 flex gap-4">
+						<div className={cn("mt-4 flex gap-4", isSelf ? "flex" : "hidden")}>
 							<Button
 								className="h-[38px] w-[103px] rounded-full bg-white text-sm font-semibold hover:bg-white/80"
 								onClick={() => {

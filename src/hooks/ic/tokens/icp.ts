@@ -40,14 +40,13 @@ export const useUserHoldingTokens = (id: string) => {
 	});
 };
 
-export const useUserCreatedTokens = () => {
-	const { principal: self } = useIcIdentityStore();
+export const useUserCreatedTokens = (userid: string) => {
 	return useQuery({
-		queryKey: ["created", self],
+		queryKey: ["created", userid],
 		queryFn: async () => {
-			if (!self) throw new Error("Principal is not set");
+			if (!userid) throw new Error("Principal is not set");
 			return getUserCreatedMemeTokens(getChainICCoreCanisterId().toText(), {
-				owner: self,
+				owner: userid,
 			});
 		},
 	});
@@ -98,8 +97,8 @@ export const useUserTokenHoldersList = (id: string) => {
 	};
 };
 
-export const useUserCreatedTokenList = () => {
-	const { data, isFetching, refetch } = useUserCreatedTokens();
+export const useUserCreatedTokenList = (userid: string) => {
+	const { data, isFetching, refetch } = useUserCreatedTokens(userid);
 	const {
 		data: allPrices,
 		isFetching: isPriceFetching,

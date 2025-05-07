@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { useRouter } from "@tanstack/react-router";
+import { useParams, useRouter } from "@tanstack/react-router";
 import {
 	createColumnHelper,
 	flexRender,
@@ -13,11 +13,14 @@ import BigNumber from "bignumber.js";
 import { Empty } from "@/components/ui/empty";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useUserCreatedTokenList } from "@/hooks/ic/tokens/icp";
-import { formatNumberSmart, getTokenUsdValueTotal } from "@/lib/common/number";
+import {
+	formatNumberSmart,
+	getTokenUsdValueTotal,
+	isNullOrUndefined,
+} from "@/lib/common/number";
 import { formatDate } from "@/lib/common/time";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
-import { useIcIdentityStore } from "@/store/ic";
 
 import type { CreatedToken } from "@/canisters/core";
 
@@ -25,12 +28,11 @@ const ProfileCreatedTokens = () => {
 	const router = useRouter();
 	const { chain } = useChainStore();
 	const { data: icpPrice } = useICPPrice();
-	const { principal } = useIcIdentityStore();
-
+	const { userid } = useParams({ from: "/icp/profile/$userid" });
 	// const { data, isFetching, refetch } = useUserCreatedTokens();
 	const columnHelper = createColumnHelper<CreatedToken>();
 
-	const { data: items, isFetching, refetch } = useUserCreatedTokenList();
+	const { data: items, isFetching, refetch } = useUserCreatedTokenList(userid);
 
 	const [pagination, setPagination] = useState({
 		pageIndex: 0,
@@ -40,10 +42,10 @@ const ProfileCreatedTokens = () => {
 	const loadingRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		if (!principal) return;
+		if (!userid) return;
 
 		void refetch();
-	}, [principal, refetch]);
+	}, [userid, refetch]);
 
 	// const [sortStates, setSortStates] = useState<
 	// 	Record<string, "asc" | "desc" | "none">
@@ -111,10 +113,20 @@ const ProfileCreatedTokens = () => {
 					return (
 						<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
 							<span className="text-sm leading-4 font-medium text-white">
-								${raw === null ? "--" : formatNumberSmart(priceInUsd)}
+								$
+								{isNullOrUndefined(raw)
+									? "--"
+									: formatNumberSmart(priceInUsd, {
+											shortZero: true,
+										})}
 							</span>
 							<span className="text-xs leading-4 font-light text-white/60">
-								{raw === null ? "--" : formatNumberSmart(priceInIcp)} ICP
+								{isNullOrUndefined(raw)
+									? "--"
+									: formatNumberSmart(priceInIcp, {
+											shortZero: true,
+										})}
+								ICP
 							</span>
 						</div>
 					);
@@ -125,7 +137,9 @@ const ProfileCreatedTokens = () => {
 			columnHelper.accessor("market_cap_token", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
-						<span className="duration-300 group-hover:text-white">Mkt Cap</span>
+						<span className="duration-300 group-hover:text-white">
+							Market Cap
+						</span>
 						{/* <SortsIcon /> */}
 					</div>
 				),

@@ -14,7 +14,7 @@ import BigNumber from "bignumber.js";
 import { Empty } from "@/components/ui/empty";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useUserTokenHoldersList } from "@/hooks/ic/tokens/icp";
-import { formatNumberSmart } from "@/lib/common/number";
+import { formatNumberSmart, isNullOrUndefined } from "@/lib/common/number";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
 
@@ -118,9 +118,11 @@ const ProfileHoldings = () => {
 					return (
 						<div className="text-sm leading-4 font-medium text-white">
 							$
-							{raw === null || raw === 0 || BigNumber(balance).isZero()
+							{isNullOrUndefined(raw)
 								? "--"
-								: formatNumberSmart(totalUsd)}
+								: formatNumberSmart(totalUsd, {
+										shortZero: true,
+									})}
 						</div>
 					);
 				},
@@ -145,10 +147,20 @@ const ProfileHoldings = () => {
 					return (
 						<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
 							<span className="text-sm leading-4 font-medium text-white">
-								${raw === null ? "--" : formatNumberSmart(priceInUsd)}
+								$
+								{isNullOrUndefined(raw)
+									? "--"
+									: formatNumberSmart(priceInUsd, {
+											shortZero: true,
+										})}
 							</span>
 							<span className="text-xs leading-4 font-light text-white/60">
-								{raw === null ? "--" : formatNumberSmart(priceInIcp)} ICP
+								{isNullOrUndefined(raw)
+									? "--"
+									: formatNumberSmart(priceInIcp, {
+											shortZero: true,
+										})}{" "}
+								ICP
 							</span>
 						</div>
 					);

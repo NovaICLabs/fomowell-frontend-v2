@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 
+import { useParams } from "@tanstack/react-router";
 import {
 	createColumnHelper,
 	flexRender,
@@ -19,7 +20,6 @@ import {
 	getTokenUsdValueTotal,
 } from "@/lib/common/number";
 import { cn } from "@/lib/utils";
-import { useIcIdentityStore } from "@/store/ic";
 
 import type { ActivityItem } from "@/apis/indexer";
 
@@ -27,10 +27,11 @@ const ProfileActivity = () => {
 	// const router = useRouter();
 	// const { chain } = useChainStore();
 	// const { data: icpPrice } = useICPPrice();
-	const { principal } = useIcIdentityStore();
+	const { userid } = useParams({ from: "/icp/profile/$userid" });
 	const { data, isFetching, refetch, hasNextPage, fetchNextPage } =
 		useInfiniteUserActivity({
 			pageSize: 10,
+			userid,
 		});
 	const columnHelper = createColumnHelper<ActivityItem>();
 
@@ -38,15 +39,14 @@ const ProfileActivity = () => {
 		() => data?.pages.flatMap((page) => page.data) ?? [],
 		[data]
 	);
-	console.debug("🚀 ~ ProfileActivity ~ items:", items);
 
 	const loadingRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		if (!principal) return;
+		if (!userid) return;
 
 		void refetch();
-	}, [principal, refetch]);
+	}, [userid, refetch]);
 
 	const columns = useMemo(
 		() => [

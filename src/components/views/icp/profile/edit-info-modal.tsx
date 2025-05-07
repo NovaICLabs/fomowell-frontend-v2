@@ -21,9 +21,15 @@ interface EditModalProps {
 	open: boolean;
 	initAvatar: string;
 	setOpen: (open: boolean) => void;
+	onSuccess: () => void;
 }
 
-const EditInfoModal = ({ open, setOpen, initAvatar }: EditModalProps) => {
+const EditInfoModal = ({
+	open,
+	setOpen,
+	initAvatar,
+	onSuccess,
+}: EditModalProps) => {
 	const { principal, identityProfile, reloadIdentityProfile } =
 		useIcIdentityStore();
 
@@ -65,6 +71,7 @@ const EditInfoModal = ({ open, setOpen, initAvatar }: EditModalProps) => {
 			setOpen(false);
 			showToast("success", "Update profile successfully");
 			// reload user info
+			onSuccess();
 			void reloadIdentityProfile();
 		} catch (error) {
 			console.error("🚀 ~ handleConfirm ~ error:", error);
@@ -98,7 +105,7 @@ const EditInfoModal = ({ open, setOpen, initAvatar }: EditModalProps) => {
 			<DialogContent className="bg-gray-760 w-[500px] rounded-3xl">
 				<DialogHeader>
 					<DialogTitle>
-						<div className="flex items-center gap-[30px]">Change nickname</div>
+						<div className="flex items-center gap-[30px]">Edit profile</div>
 					</DialogTitle>
 					<div className="mt-5 flex flex-1 flex-col p-5">
 						<div>

@@ -2,6 +2,7 @@ import { BigNumber } from "bignumber.js";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
 import { getICPCanisterToken } from "@/canisters/icrc3/specials";
+import { validatePrincipalText } from "@/lib/ic/principal";
 
 import { request } from ".";
 
@@ -365,10 +366,11 @@ export type ActivityItem = {
 
 export const getUserActivity = async (parameters: {
 	user_token: string;
+	userid: string;
 	page?: number;
 	pageSize?: number;
 }) => {
-	const { user_token, page = 1, pageSize = 20 } = parameters;
+	const { user_token, userid, page = 1, pageSize = 20 } = parameters;
 	const queryParameters = new URLSearchParams({
 		page: page.toString(),
 		pageSize: pageSize.toString(),
@@ -378,7 +380,7 @@ export const getUserActivity = async (parameters: {
 		statusCode: number;
 		message: string;
 	}>(
-		`${getIndexerBaseUrl()}/api/v1/users/activity?${queryParameters.toString()}`,
+		`${getIndexerBaseUrl()}/api/v1/users/activity/${userid}?${queryParameters.toString()}`,
 		{
 			method: "GET",
 			headers: {
@@ -391,6 +393,35 @@ export const getUserActivity = async (parameters: {
 		throw new Error(
 			`Failed to fetch token trade list: ${response.message} (Status: ${response.statusCode})`
 		);
+	}
+	return response.data;
+};
+
+type UserInfo = {
+	id: number;
+	principal: string;
+	eth_account: string | null;
+	btc_account: string | null;
+	avatar: string | null;
+	email: string | null;
+	name: string;
+	role: string;
+	invite_code: string;
+	createdAt: string;
+	updatedAt: string;
+};
+
+export const getUserInfo = async (userid: string) => {
+	// validate principal
+	validatePrincipalText(userid);
+
+	const response = await request<{
+		data: UserInfo;
+		statusCode: number;
+		message: string;
+	}>(`${getIndexerBaseUrl()}/api/v1/users/${userid}`);
+	if (response.statusCode !== 200) {
+		throw new Error(response.message);
 	}
 	return response.data;
 };
