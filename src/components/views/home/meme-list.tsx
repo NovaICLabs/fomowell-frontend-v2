@@ -1021,9 +1021,7 @@ export default function MemeList() {
 				</tbody>
 			</table>
 			{isFetching && !isFetchingNextPage ? (
-				<div className="fixed right-4 bottom-4 text-white/50">
-					Background Updating...
-				</div>
+				<div className="fixed right-4 bottom-4 text-white/50">...</div>
 			) : null}
 		</div>
 	);

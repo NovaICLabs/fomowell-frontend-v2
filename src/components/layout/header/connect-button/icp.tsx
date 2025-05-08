@@ -78,16 +78,68 @@ const IcpWalletConnect: React.FC = () => {
 	return (
 		<>
 			{principal ? (
-				<div
-					className="flex items-center justify-center gap-x-2"
-					onClick={() => {
-						void router.navigate({ to: `/icp/profile/${principal}` });
-					}}
-				>
-					<Popover open={openPopover} onOpenChange={setOpenPopover}>
-						<PopoverTrigger asChild>
-							<div
-								className="bg-gray-750 inline-flex h-[38px] cursor-pointer items-center justify-start rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700"
+				<div className="flex items-center justify-center gap-x-2">
+					{!isMobile && (
+						<Popover open={openPopover} onOpenChange={setOpenPopover}>
+							<PopoverTrigger
+								asChild
+								onClick={() => {
+									void router.navigate({ to: `/icp/profile/${principal}` });
+								}}
+							>
+								<div
+									className="bg-gray-750 inline-flex h-[38px] cursor-pointer items-center justify-start rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700"
+									onMouseEnter={() => {
+										setOpenPopover(true);
+									}}
+									onMouseLeave={() => {
+										setOpenPopover(false);
+									}}
+								>
+									{identityProfile ? (
+										<div
+											className="h-6 w-6 rounded-full"
+											style={{
+												backgroundImage: `url(${identityProfile?.avatar ?? getAvatar(principal)})`,
+												backgroundSize: "cover",
+												backgroundPosition: "center",
+											}}
+										></div>
+									) : (
+										<Skeleton className="h-6 w-6 rounded-full" />
+									)}
+
+									<span className="ml-2">{truncatePrincipal(principal)}</span>
+									{copied ? (
+										<Check
+											className="ml-1 opacity-40"
+											size={16}
+											strokeWidth={4}
+										/>
+									) : (
+										<CopyIcon
+											className="ml-1 h-4 w-4"
+											onClick={withStopPropagation(() => {
+												setCopied(true);
+												copy(principal);
+												setTimeout(() => {
+													setCopied(false);
+												}, 2000);
+											})}
+										/>
+									)}
+									<div className="ml-2.5 h-6 w-px bg-white/20"></div>
+									<DisconnectIcon
+										className="ml-2.25 h-4 w-4"
+										onClick={async (event: React.MouseEvent) => {
+											event.stopPropagation();
+											await handleDisconnect();
+										}}
+									/>
+								</div>
+							</PopoverTrigger>
+							<PopoverContent
+								className="z-100 -mt-1 w-43 border-none border-gray-700 bg-transparent p-0 pt-1"
 								onMouseEnter={() => {
 									setOpenPopover(true);
 								}}
@@ -95,75 +147,25 @@ const IcpWalletConnect: React.FC = () => {
 									setOpenPopover(false);
 								}}
 							>
-								{identityProfile ? (
-									<div
-										className="h-6 w-6 rounded-full"
-										style={{
-											backgroundImage: `url(${identityProfile?.avatar ?? getAvatar(principal)})`,
-											backgroundSize: "cover",
-											backgroundPosition: "center",
-										}}
-									></div>
-								) : (
-									<Skeleton className="h-6 w-6 rounded-full" />
-								)}
-
-								<span className="ml-2">{truncatePrincipal(principal)}</span>
-								{copied ? (
-									<Check
-										className="ml-1 opacity-40"
-										size={16}
-										strokeWidth={4}
-									/>
-								) : (
-									<CopyIcon
-										className="ml-1 h-4 w-4"
-										onClick={withStopPropagation(() => {
-											setCopied(true);
-											copy(principal);
-											setTimeout(() => {
-												setCopied(false);
-											}, 2000);
-										})}
-									/>
-								)}
-								<div className="ml-2.5 h-6 w-px bg-white/20"></div>
-								<DisconnectIcon
-									className="ml-2.25 h-4 w-4"
-									onClick={async (event: React.MouseEvent) => {
-										event.stopPropagation();
-										await handleDisconnect();
-									}}
-								/>
-							</div>
-						</PopoverTrigger>
-						<PopoverContent
-							className="z-100 -mt-1 w-43 border-none border-gray-700 bg-transparent p-0 pt-1"
-							onMouseEnter={() => {
-								setOpenPopover(true);
-							}}
-							onMouseLeave={() => {
-								setOpenPopover(false);
-							}}
-						>
-							<div className="bg-gray-750 flex flex-col gap-y-2 rounded-2xl p-2.5 text-white">
-								{popoverLinks.map((link) => (
-									<div
-										key={link.label}
-										className="group flex h-10.5 cursor-pointer items-center rounded-[14px] px-2.5 hover:bg-gray-700"
-										onClick={link.action}
-									>
-										<div className="flex h-4 items-center gap-x-2">
-											{link.icon}
-											<span className="text-sm leading-2 text-white/60 group-hover:text-white">
-												{link.label}
-											</span>
+								<div className="bg-gray-750 flex flex-col gap-y-2 rounded-2xl p-2.5 text-white">
+									{popoverLinks.map((link) => (
+										<div
+											key={link.label}
+											className="group flex h-10.5 cursor-pointer items-center rounded-[14px] px-2.5 hover:bg-gray-700"
+											onClick={link.action}
+										>
+											<div className="flex h-4 items-center gap-x-2">
+												{link.icon}
+												<span className="text-sm leading-2 text-white/60 group-hover:text-white">
+													{link.label}
+												</span>
+											</div>
 										</div>
-									</div>
-								))}
-							</div>
-						</PopoverContent>
-					</Popover>
+									))}
+								</div>
+							</PopoverContent>
+						</Popover>
+					)}
 
 					<div
 						className="bg-gray-750 inline-flex h-[38px] min-w-[80px] cursor-pointer items-center justify-start gap-0.5 gap-x-1 rounded-full px-3 text-xs leading-4 font-medium text-white hover:bg-gray-700"

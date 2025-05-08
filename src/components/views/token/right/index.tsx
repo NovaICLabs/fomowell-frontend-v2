@@ -24,8 +24,7 @@ const tabs = ["Trade", "Liquidity"];
 const isNegative = (value: number) => {
 	return value < 0;
 };
-export default function Bottom() {
-	const [activeTab, setActiveTab] = useState(tabs[0]);
+export const InfoDetail = () => {
 	const { id } = useParams({ from: "/icp/token/$id" });
 	const { data: currentTokenPrice } = useCurrentPrice({ id: Number(id) });
 	const { data: memeTokenInfo } = useMemeTokenInfo(Number(id));
@@ -57,6 +56,74 @@ export default function Bottom() {
 					.toString()
 			: undefined;
 	}, [currentTokenPrice, totalSupply, icpPrice]);
+
+	return (
+		<div className="bg-gray-860 flex flex-col gap-5.5 rounded-[12px] px-4.5 py-5">
+			<div className="flex items-center justify-between">
+				<span className="text-sm text-white/40">Price</span>
+				<span className="text-sm text-white">
+					<span className="text-gray-280">
+						{isNullOrUndefined(currentTokenPrice?.formattedPerPayToken)
+							? "--"
+							: formatNumberSmart(currentTokenPrice?.formattedPerPayToken, {
+									shortZero: true,
+								})}{" "}
+						ICP
+					</span>
+				</span>
+			</div>
+			<div className="flex items-center justify-between">
+				<span className="text-sm text-white/40">Market Cap:</span>
+				<div className="flex items-center gap-1 text-sm text-white">
+					<span className="text-white">
+						{marketCap ? `$${formatNumberSmart(marketCap)}` : "0"}
+					</span>
+				</div>
+			</div>
+			<div className="flex items-center justify-between">
+				<span className="text-sm text-white/40">Liquidity</span>
+				<div className="flex items-center gap-1 text-sm text-white">
+					<span className="text-white">
+						{liquidityUSD ? `$${formatNumberSmart(liquidityUSD)}` : "$0"}
+					</span>
+					<div className="text-gray-280 flex items-center">
+						(
+						<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
+						<span className="text-gray-280">
+							{liquidityICP ? formatNumberSmart(liquidityICP) : "0"}
+						</span>
+						)
+					</div>
+				</div>
+			</div>
+			<div className="flex items-center justify-between">
+				<span className="text-sm text-white/40">Created at</span>
+				<div className="flex items-center gap-1 text-sm text-white">
+					<span className="text-white">
+						{memeTokenInfo?.created_at
+							? fromNow(memeTokenInfo.created_at)
+							: "N/A"}{" "}
+						ago
+					</span>
+				</div>
+			</div>
+			<div className="flex items-center justify-between">
+				<span className="text-sm text-white/40">Token Supply</span>
+				<div className="flex items-center gap-1 text-sm text-white">
+					<span className="text-white">
+						{formatNumberSmart(totalSupply, {
+							shortenLarge: true,
+						})}
+					</span>
+				</div>
+			</div>
+		</div>
+	);
+};
+export default function Bottom() {
+	const [activeTab, setActiveTab] = useState(tabs[0]);
+	const { id } = useParams({ from: "/icp/token/$id" });
+	const { data: memeTokenInfo } = useMemeTokenInfo(Number(id));
 
 	const { data: tokenInfo } = useSingleTokenInfo({ id });
 
@@ -192,66 +259,7 @@ export default function Bottom() {
 					value={(memeTokenInfo?.progress ?? 0) * 100}
 				/>
 			</div>
-			<div className="bg-gray-860 flex flex-col gap-5.5 rounded-[12px] px-4.5 py-5">
-				<div className="flex items-center justify-between">
-					<span className="text-sm text-white/40">Price</span>
-					<span className="text-sm text-white">
-						<span className="text-gray-280">
-							{isNullOrUndefined(currentTokenPrice?.formattedPerPayToken)
-								? "--"
-								: formatNumberSmart(currentTokenPrice?.formattedPerPayToken, {
-										shortZero: true,
-									})}{" "}
-							ICP
-						</span>
-					</span>
-				</div>
-				<div className="flex items-center justify-between">
-					<span className="text-sm text-white/40">Market Cap:</span>
-					<div className="flex items-center gap-1 text-sm text-white">
-						<span className="text-white">
-							{marketCap ? `$${formatNumberSmart(marketCap)}` : "0"}
-						</span>
-					</div>
-				</div>
-				<div className="flex items-center justify-between">
-					<span className="text-sm text-white/40">Liquidity</span>
-					<div className="flex items-center gap-1 text-sm text-white">
-						<span className="text-white">
-							{liquidityUSD ? `$${formatNumberSmart(liquidityUSD)}` : "$0"}
-						</span>
-						<div className="text-gray-280 flex items-center">
-							(
-							<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
-							<span className="text-gray-280">
-								{liquidityICP ? formatNumberSmart(liquidityICP) : "0"}
-							</span>
-							)
-						</div>
-					</div>
-				</div>
-				<div className="flex items-center justify-between">
-					<span className="text-sm text-white/40">Created at</span>
-					<div className="flex items-center gap-1 text-sm text-white">
-						<span className="text-white">
-							{memeTokenInfo?.created_at
-								? fromNow(memeTokenInfo.created_at)
-								: "N/A"}{" "}
-							ago
-						</span>
-					</div>
-				</div>
-				<div className="flex items-center justify-between">
-					<span className="text-sm text-white/40">Token Supply</span>
-					<div className="flex items-center gap-1 text-sm text-white">
-						<span className="text-white">
-							{formatNumberSmart(totalSupply, {
-								shortenLarge: true,
-							})}
-						</span>
-					</div>
-				</div>
-			</div>
+			<InfoDetail />
 			<Holders />
 		</div>
 	);

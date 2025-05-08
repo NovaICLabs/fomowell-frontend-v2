@@ -33,7 +33,11 @@ const App = () => {
 							<ReactQueryDevtools initialIsOpen={false} />
 						</>
 					)}
-					<Toaster />
+					<Toaster
+						expand
+						duration={Number(import.meta.env.VITE_TOAST_DURATION)}
+						position={isMobile ? "top-right" : "bottom-right"}
+					/>
 					<HowItWorksDialog />
 				</WalletProvider>
 			</QueryClientProvider>

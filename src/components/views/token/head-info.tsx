@@ -1,9 +1,11 @@
 import { Link, useParams } from "@tanstack/react-router";
+import { isMobile } from "react-device-detect";
 
 import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
 import X from "@/components/icons/media/x";
 import { Star } from "@/components/icons/star";
+import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFavoriteToken, useSingleTokenInfo } from "@/hooks/apis/indexer";
 import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
@@ -21,18 +23,21 @@ export default function HeadInfo() {
 	const { data: currentPrice, isLoading: isLoadingCurrentPrice } =
 		useCurrentPrice({ id: Number(id) });
 	const { data: tokenInfo } = useSingleTokenInfo({ id });
+
 	const { mutateAsync: favoriteToken } = useFavoriteToken();
 	return (
 		<div className="text-white">
 			<div className="flex items-center justify-between pr-4">
 				<div className="flex items-center">
-					<Star
-						className="h-5 w-5"
-						isActive={tokenInfo?.isFollow}
-						onClick={withStopPropagation(() => {
-							void favoriteToken({ tokenId: id });
-						})}
-					/>
+					{!isMobile && (
+						<Star
+							className="h-5 w-5"
+							isActive={tokenInfo?.isFollow}
+							onClick={withStopPropagation(() => {
+								void favoriteToken({ tokenId: id });
+							})}
+						/>
+					)}
 					<div className="relative ml-2 h-10 w-10 overflow-hidden rounded-full">
 						{isLoadingMemeToken ? (
 							<Skeleton className="h-full w-full" />
@@ -118,15 +123,28 @@ export default function HeadInfo() {
 				</div>
 			</div>
 
-			{isLoadingMemeToken ? (
-				<div className="mt-3 flex max-w-[70%] flex-col gap-2">
-					<Skeleton className="h-4 w-1/3" />
-				</div>
-			) : (
-				<p className="mt-3 max-w-[70%] text-xs text-white/40">
-					{memeToken?.description}
-				</p>
-			)}
+			<div className="mt-3 flex items-center justify-between">
+				{isLoadingMemeToken ? (
+					<div className="flex max-w-[70%] flex-col gap-2">
+						<Skeleton className="h-4 w-1/3" />
+					</div>
+				) : (
+					<p className="max-w-[70%] text-xs text-white/40">
+						{memeToken?.description}
+					</p>
+				)}
+				{isMobile && (
+					<div className="flex flex-col items-end gap-1.5">
+						<span className="text-xs text-yellow-500">
+							({formatNumberSmart((memeToken?.progress ?? 0) * 100)}%)
+						</span>
+						<Progress
+							className="w-22"
+							value={(memeToken?.progress ?? 0) * 100}
+						/>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }

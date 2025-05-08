@@ -36,12 +36,12 @@ import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
 const percentages = [25, 50, 75, 100];
 const tabs = ["Buy", "Sell"] as const;
-type Tab = (typeof tabs)[number];
+export type TradeTab = (typeof tabs)[number];
 
 const buyRange = [0.0001, Infinity] as const;
 const sellRange = [0.1, Infinity] as const;
 
-export default function Trade() {
+export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 	const { id } = useParams({ from: "/icp/token/$id" });
 	const { principal } = useConnectedIdentity();
 	const { data: coreTokenBalance, refetch: refetchCoreTokenBalance } =
@@ -56,7 +56,7 @@ export default function Trade() {
 		useCurrentPrice({ id: Number(id) });
 
 	// tab
-	const [activeTab, setActiveTab] = useState<Tab>("Buy");
+	const [activeTab, setActiveTab] = useState<TradeTab>(initialTab ?? "Buy");
 
 	// meme token
 	const { data: memeTokenInfo } = useMemeTokenInfo(Number(id));

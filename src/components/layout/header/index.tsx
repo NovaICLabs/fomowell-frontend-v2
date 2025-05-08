@@ -1,4 +1,4 @@
-import { useRouter } from "@tanstack/react-router";
+import { useLocation, useRouter } from "@tanstack/react-router";
 import { isMobile } from "react-device-detect";
 
 import ChainSelector from "@/components/layout/header/chain-selector";
@@ -6,6 +6,7 @@ import BitcoinWalletConnect from "@/components/layout/header/connect-button/bitc
 import CreateToken from "@/components/layout/header/create-token";
 import Links from "@/components/layout/header/links";
 import Search from "@/components/layout/header/search";
+import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
 
 import IcpWalletConnect from "./connect-button/icp";
@@ -13,10 +14,18 @@ import IcpWalletConnect from "./connect-button/icp";
 export const Header = () => {
 	const router = useRouter();
 	const { chain } = useChainStore();
+	const pathname = useLocation({
+		select: (location) => location.pathname,
+	});
 	return (
 		<>
 			{isMobile ? (
-				<div className="flex h-11 items-center justify-between gap-2 px-2.5">
+				<div
+					className={cn(
+						"flex h-11 items-center justify-between gap-2 px-2.5",
+						pathname.includes("/icp/token") && "hidden"
+					)}
+				>
 					<div className="flex items-center gap-2">
 						<img alt="Menu" src="/svgs/common/menu.svg" />
 						<ChainSelector />

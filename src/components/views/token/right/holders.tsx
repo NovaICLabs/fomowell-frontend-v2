@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Link, useParams } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
+import { isMobile } from "react-device-detect";
 import ReactPaginate from "react-paginate";
 
 import { getChainICCoreCanisterId } from "@/canisters/core";
@@ -12,6 +13,7 @@ import {
 	parseUnits,
 } from "@/lib/common/number";
 import { truncatePrincipal } from "@/lib/ic/principal";
+import { cn } from "@/lib/utils";
 export default function Holders() {
 	const { id } = useParams({ from: "/icp/token/$id" });
 	const [page, setPage] = useState(1);
@@ -25,7 +27,12 @@ export default function Holders() {
 
 	return (
 		<div className="-mt-2.5 flex flex-col items-center justify-between">
-			<div className="flex w-full items-center justify-between">
+			<div
+				className={cn(
+					"flex w-full items-center justify-between",
+					isMobile && "hidden"
+				)}
+			>
 				<span className="text-base leading-normal font-semibold text-white">
 					Holders
 				</span>

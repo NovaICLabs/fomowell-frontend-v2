@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useThrottleCallback } from "@react-hook/throttle";
+// import { useThrottleCallback } from "@react-hook/throttle";
 import { useParams } from "@tanstack/react-router";
 import { BigNumber } from "bignumber.js";
 import {
@@ -16,9 +16,11 @@ import {
 	TickMarkType,
 	type Time,
 } from "lightweight-charts";
+import { isMobile } from "react-device-detect";
 
-import { useTokenPriceCandle } from "@/hooks/apis/indexer";
-import { formatNumberSmart } from "@/lib/common/number";
+import { useSingleTokenInfo, useTokenPriceCandle } from "@/hooks/apis/indexer";
+import { formatNumberSmart, isNullOrUndefined } from "@/lib/common/number";
+import { cn } from "@/lib/utils";
 
 import type { CandleParameters } from "@/apis/indexer";
 type ChartInterval = "1m" | "5m" | "15m" | "30m" | "1h" | "1d";
@@ -70,7 +72,7 @@ export default function TradingView() {
 		if (!chartRef.current) {
 			chartRef.current = createChart(containerRef.current, {
 				layout: {
-					background: { color: "#161616" },
+					background: { color: "#111111" },
 					textColor: "#d1d4dc",
 					attributionLogo: false,
 				},
@@ -81,6 +83,7 @@ export default function TradingView() {
 				crosshair: {
 					mode: CrosshairMode.Normal,
 				},
+				autoSize: true,
 				timeScale: {
 					timeVisible: true,
 					tickMarkFormatter: (time: Time, tickMarkType: TickMarkType) => {
@@ -188,39 +191,45 @@ export default function TradingView() {
 		candleSeriesRef.current.setData(candleData);
 	}, [candleData]);
 
-	const handleResize = useCallback((width: number, height: number) => {
-		if (chartRef.current) {
-			chartRef.current.resize(width, height);
-		}
-	}, []);
+	// const handleResize = useCallback((width: number, height: number) => {
+	// 	if (chartRef.current) {
+	// 		chartRef.current.resize(width, height);
+	// 	}
+	// }, []);
 
-	const handleResizeThrottled = useThrottleCallback(handleResize, 60, true);
+	// const handleResizeThrottled = useThrottleCallback(handleResize, 60, true);
 
-	useEffect(() => {
-		const targetElement = containerRef.current;
+	// useEffect(() => {
+	// 	const targetElement = containerRef.current;
 
-		if (!targetElement) {
-			return;
-		}
-		const observer = new ResizeObserver((entries) => {
-			for (const entry of entries) {
-				const newWidth = entry.contentRect?.width ?? 0;
-				if (newWidth > 0) {
-					handleResizeThrottled(newWidth, 390);
-				}
-			}
-		});
+	// 	if (!targetElement) {
+	// 		return;
+	// 	}
+	// 	const observer = new ResizeObserver((entries) => {
+	// 		for (const entry of entries) {
+	// 			const newWidth = entry.contentRect?.width ?? 0;
+	// 			if (newWidth > 0) {
+	// 				// handleResizeThrottled(newWidth, 300);
+	// 			}
+	// 		}
+	// 	});
 
-		observer.observe(targetElement);
-		return () => {
-			observer.disconnect();
-		};
-	}, [handleResizeThrottled]);
+	// 	observer.observe(targetElement);
+	// 	return () => {
+	// 		observer.disconnect();
+	// 	};
+	// }, [handleResizeThrottled]);
 
 	return (
 		<div className="relative w-full">
-			<div className="h-full w-full overflow-hidden rounded-lg bg-[#161616]">
-				<div className="flex items-center border-b border-gray-800 p-4">
+			<div className="h-full w-full overflow-hidden rounded-lg">
+				{isMobile && <MobileTradingViewIntervals />}
+				<div
+					className={cn(
+						"flex items-center border-b border-gray-800 px-2.5",
+						!isMobile && "p-4"
+					)}
+				>
 					<div className="no-scrollbar flex w-full gap-1 overflow-scroll">
 						{intervals.map(({ value, label }) => (
 							<button
@@ -245,3 +254,51 @@ export default function TradingView() {
 		</div>
 	);
 }
+
+const MobileTradingViewIntervals = () => {
+	const { id } = useParams({ from: "/icp/token/$id" });
+	const { data: tokenInfo } = useSingleTokenInfo({ id });
+	const {
+		priceChangeRate5M,
+		priceChangeRate1H,
+		priceChangeRate6H,
+		priceChangeRate24H,
+	} = tokenInfo ?? {};
+
+	const mobileIntervals = [
+		{ label: "5m", value: priceChangeRate5M },
+		{ label: "1h", value: priceChangeRate1H },
+		{ label: "6h", value: priceChangeRate6H },
+		{ label: "24h", value: priceChangeRate24H },
+	];
+
+	return (
+		<div className="px-2.5">
+			<div className="bg-gray-860 mb-2.5 grid h-9.5 flex-shrink-0 grid-cols-4 overflow-hidden rounded-[12px]">
+				{mobileIntervals.map((interval, index) => (
+					<div
+						key={interval.label}
+						className={cn(
+							"hover:bg-gray-710 flex cursor-pointer items-center justify-center gap-3",
+							index < mobileIntervals.length - 1 && "border-r-gray-710 border-r"
+						)}
+					>
+						<span className="text-xs leading-4 font-medium text-white/40">
+							{interval.label}
+						</span>
+						<span
+							className={cn(
+								"text-price-positive text-xs font-medium",
+								!isNullOrUndefined(interval.value) && interval.value < 0
+									? "text-price-negative"
+									: "text-price-positive"
+							)}
+						>
+							{!isNullOrUndefined(interval.value) ? `${interval.value}%` : "--"}
+						</span>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+};

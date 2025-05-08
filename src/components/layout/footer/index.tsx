@@ -1,4 +1,4 @@
-import { useRouter } from "@tanstack/react-router";
+import { useLocation, useRouter } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
@@ -8,6 +8,7 @@ import ProfileIcon from "@/components/icons/links-popover/profile";
 import Telegram from "@/components/icons/media/telegram";
 import X from "@/components/icons/media/x";
 import { withStopPropagation } from "@/lib/common/react-event";
+import { cn } from "@/lib/utils";
 import { useIcIdentityStore } from "@/store/ic";
 
 const MobileFooter = () => {
@@ -55,8 +56,17 @@ const MobileFooter = () => {
 			icon: <ProfileIcon className="h-6.5 w-6.5" />,
 		},
 	];
+	const pathname = useLocation({
+		select: (location) => location.pathname,
+	});
+	console.debug("🚀 ~ MobileFooter ~ pathname:", pathname);
 	return (
-		<div className="fixed right-0 bottom-0 left-0 grid h-[55px] grid-cols-5 items-center justify-between bg-gray-800">
+		<div
+			className={cn(
+				"fixed right-0 bottom-0 left-0 grid h-[55px] grid-cols-5 items-center justify-between bg-gray-800",
+				pathname.includes("/icp/token") && "hidden"
+			)}
+		>
 			{bottomBar.map((item) => (
 				<div
 					key={item.label}

@@ -290,7 +290,7 @@ export default function Transactions() {
 	}
 
 	return (
-		<div ref={parentRef} className="no-scrollbar h-screen overflow-auto">
+		<div ref={parentRef} className={cn("no-scrollbar h-dvh overflow-auto")}>
 			<table className="w-full" style={{ minWidth: "max-content" }}>
 				<thead className="bg-background sticky top-0 z-10">
 					{table.getHeaderGroups().map((headerGroup) => (
@@ -367,9 +367,7 @@ export default function Transactions() {
 				</tbody>
 			</table>
 			{isFetching && !isFetchingNextPage ? (
-				<div className="fixed right-4 bottom-4 text-white/50">
-					Background Updating...
-				</div>
+				<div className="fixed right-4 bottom-4 text-white/50">...</div>
 			) : null}
 		</div>
 	);
