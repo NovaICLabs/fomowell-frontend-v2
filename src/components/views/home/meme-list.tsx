@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useRouter, useSearch } from "@tanstack/react-router";
 import {
+	type CellContext,
 	createColumnHelper,
 	flexRender,
 	getCoreRowModel,
@@ -11,6 +12,7 @@ import {
 import { useVirtualizer } from "@tanstack/react-virtual";
 import BigNumber from "bignumber.js";
 import { motion } from "framer-motion";
+import { isMobile } from "react-device-detect";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
 import SortsIcon from "@/components/icons/common/sorts";
@@ -152,6 +154,7 @@ export default function MemeList() {
 	const { amount: flashAmount } = useQuickBuyStore();
 
 	const [flashingRows, setFlashingRows] = useState<Set<string>>(new Set());
+
 	const previousRecentTradeTsRef = useRef<Map<string, string | null>>(
 		new Map()
 	);
@@ -234,6 +237,43 @@ export default function MemeList() {
 		sort,
 		sortDirection: direction,
 	});
+	// handle quick buy
+	const handleQuickBuy = useCallback(
+		(info: CellContext<TokenInfo, unknown>) => {
+			// if not login
+			if (!principal) {
+				setIcpConnectOpen(true);
+				return;
+			}
+			if (balance == undefined) {
+				showToast("error", "Waiting for ICP balance loading...");
+				return;
+			}
+			// not enough icp
+			if (BigNumber(balance.raw).lt(flashAmountBigInt)) {
+				showToast("error", "Not enough ICP");
+				return;
+			}
+
+			const tokenId = info.row.original.memeTokenId.toString();
+			showToast(
+				"loading",
+				`Buying token($${info.row.original.ticker.toLocaleUpperCase()})...`
+			);
+			void buyToken({
+				amount: flashAmountBigInt,
+				id: BigInt(tokenId),
+				amount_out_min: BigInt(0),
+			}).then((receivedAmount) => {
+				showToast(
+					"success",
+					`${formatNumberSmart(formatUnits(receivedAmount, info.row.original.decimals))} $${info.row.original.ticker.toLocaleUpperCase()} received!`
+				);
+			});
+		},
+		[balance, buyToken, flashAmountBigInt, principal, setIcpConnectOpen]
+	);
+
 	const columns = useMemo(
 		() => [
 			columnHelper.group({
@@ -246,9 +286,9 @@ export default function MemeList() {
 				cell: ({ row }) => {
 					const process = row.original.process * 100;
 					return (
-						<div className="flex items-center gap-2">
+						<div className="flex w-full items-center gap-2">
 							<Star
-								className="h-4 w-4 cursor-pointer text-white/40"
+								className="h-4 w-4 shrink-0 cursor-pointer text-white/40"
 								isActive={row.original.isFollow}
 								onClick={withStopPropagation(() => {
 									void favoriteToken({
@@ -259,7 +299,7 @@ export default function MemeList() {
 							<TooltipProvider>
 								<Tooltip>
 									<TooltipTrigger asChild>
-										<div className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full">
+										<div className="relative flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full">
 											<div className="absolute inset-0 rounded-full border-[2px] border-gray-500"></div>
 											<div
 												className="absolute inset-0 rounded-full"
@@ -322,14 +362,14 @@ export default function MemeList() {
 										)}
 									</div>
 								</div>
-								<div className="text-xs leading-4 font-light text-white/60">
+								<div className="w-20 truncate text-xs leading-4 font-light text-white/60">
 									{row.original.name}
 								</div>
 							</div>
 						</div>
 					);
 				},
-				size: 250,
+				size: isMobile ? 150 : 250,
 				enablePinning: true,
 			}),
 			columnHelper.accessor("process", {
@@ -688,68 +728,49 @@ export default function MemeList() {
 				id: "actions",
 				header: () => (
 					<div className="flex cursor-pointer justify-end pr-2.5">
-						<span className="text-right">Quick buy</span>
+						<span className={cn("text-right", isMobile && "hidden")}>
+							Quick buy
+						</span>
 					</div>
 				),
 				cell: (info) => (
-					<div className="relative ml-auto flex items-center justify-end p-px pr-2">
-						<Button
-							className="dark:hover:bg-gray-710 dark:bg-background z-10 h-9 w-21 rounded-full bg-transparent text-xs text-white"
-							onClick={withStopPropagation(() => {
-								// if not login
-								if (!principal) {
-									setIcpConnectOpen(true);
-									return;
-								}
-								if (balance == undefined) {
-									showToast("error", "Waiting for ICP balance loading...");
-									return;
-								}
-								// not enough icp
-								if (BigNumber(balance.raw).lt(flashAmountBigInt)) {
-									showToast("error", "Not enough ICP");
-									return;
-								}
-
-								const tokenId = info.row.original.memeTokenId.toString();
-								showToast(
-									"loading",
-									`Buying token($${info.row.original.ticker.toLocaleUpperCase()})...`
-								);
-								void buyToken({
-									amount: flashAmountBigInt,
-									id: BigInt(tokenId),
-									amount_out_min: BigInt(0),
-								}).then((receivedAmount) => {
-									showToast(
-										"success",
-										`${formatNumberSmart(formatUnits(receivedAmount, info.row.original.decimals))} $${info.row.original.ticker.toLocaleUpperCase()} received!`
-									);
-								});
-							})}
-						>
-							<img alt="flash" src="/svgs/flash.svg" />
-							Buy
-						</Button>
-						<div className="absolute inset-0 right-1.75 z-0 rounded-full bg-gradient-to-r from-yellow-500 to-blue-500"></div>
-					</div>
+					<>
+						{isMobile ? (
+							<div
+								className="bg-gray-710 flex h-9 w-13 items-center justify-center rounded-full"
+								onClick={withStopPropagation(() => {
+									handleQuickBuy(info);
+								})}
+							>
+								<img alt="flash" src="/svgs/flash.svg" />
+							</div>
+						) : (
+							<div className="relative ml-auto flex items-center justify-end p-px pr-2">
+								<Button
+									className="dark:hover:bg-gray-710 dark:bg-background z-10 h-9 w-21 rounded-full bg-transparent text-xs text-white"
+									onClick={withStopPropagation(() => {
+										handleQuickBuy(info);
+									})}
+								>
+									<img alt="flash" src="/svgs/flash.svg" />
+									Buy
+								</Button>
+								<div className="absolute inset-0 right-1.75 z-0 rounded-full bg-gradient-to-r from-yellow-500 to-blue-500"></div>
+							</div>
+						)}
+					</>
 				),
-				size: 120,
+				size: isMobile ? 52 : 120,
 				enablePinning: true,
 			}),
 		],
 		[
-			balance,
-			buyToken,
 			columnHelper,
 			direction,
 			favoriteToken,
-			flashAmount,
-			flashAmountBigInt,
+			handleQuickBuy,
 			handleSort,
 			icpPrice,
-			principal,
-			setIcpConnectOpen,
 			sort,
 		]
 	);

@@ -58,12 +58,12 @@ export default function ChainSelector() {
 				setChain(value);
 			}}
 		>
-			<SelectContent className="bg-gray-750 rounded-2xl border-none px-1 py-[5px]">
+			<SelectContent className="bg-gray-750 rounded-2xl border-none px-0.5 py-[3px] sm:px-1 sm:py-[5px]">
 				<SelectGroup className="bg-gray-750">
 					{chains.map((chain) => (
 						<SelectItem
 							key={chain.value}
-							className="flex h-[42px] cursor-pointer items-center gap-x-1.5 rounded-[14px] text-sm font-semibold hover:bg-gray-700 data-[state=checked]:bg-gray-700"
+							className="flex h-7 cursor-pointer items-center gap-x-1.5 rounded-[14px] text-sm font-semibold hover:bg-gray-700 data-[state=checked]:bg-gray-700 sm:h-[42px]"
 							value={chain.value}
 						>
 							{chain.logo}
@@ -72,7 +72,7 @@ export default function ChainSelector() {
 					))}
 				</SelectGroup>
 			</SelectContent>
-			<SelectTrigger className="dark:bg-gray-750 h-[38px] min-w-[126px] rounded-full border-none px-4 text-sm font-semibold focus-visible:ring-0">
+			<SelectTrigger className="dark:bg-gray-750 !h-7 min-w-22.5 rounded-full border-none px-4 text-sm font-semibold focus-visible:ring-0 sm:!h-[38px] sm:min-w-[126px]">
 				<SelectValue placeholder="" />
 			</SelectTrigger>
 		</Select>

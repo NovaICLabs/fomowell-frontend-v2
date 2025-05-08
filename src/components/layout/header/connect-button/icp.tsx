@@ -3,12 +3,13 @@ import { useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import copy from "copy-to-clipboard";
 import { Check } from "lucide-react";
+import { isMobile } from "react-device-detect";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
 import { CopyIcon } from "@/components/icons/common/copy";
 import { DisconnectIcon } from "@/components/icons/common/disconnect";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
-import LinkedWalletIcon from "@/components/icons/links-popover/linked-wallet";
+import WalletIcon from "@/components/icons/links-popover/linked-wallet";
 import ProfileIcon from "@/components/icons/links-popover/profile";
 import { Button } from "@/components/ui/button";
 import {
@@ -67,7 +68,7 @@ const IcpWalletConnect: React.FC = () => {
 			action: withStopPropagation(() => {
 				void router.navigate({ to: `/icp/wallet/${principal}` });
 			}),
-			icon: <LinkedWalletIcon />,
+			icon: <WalletIcon />,
 		},
 	];
 	const { data: coreTokenBalance } = useCoreTokenBalance({
@@ -179,6 +180,13 @@ const IcpWalletConnect: React.FC = () => {
 						</span>
 					</div>
 				</div>
+			) : isMobile ? (
+				<WalletIcon
+					className="h-6 w-6 text-yellow-500"
+					onClick={() => {
+						setIcpConnectOpen(true);
+					}}
+				/>
 			) : (
 				<Button
 					className="h-[38px] w-[111px] rounded-full text-xs font-bold"

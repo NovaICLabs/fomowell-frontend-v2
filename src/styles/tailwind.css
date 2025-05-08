@@ -264,6 +264,11 @@
 	[role="button"]:not([disabled]) {
 		cursor: pointer;
 	}
+	html,
+	body {
+		overscroll-behavior: none;
+		-webkit-overflow-scrolling: touch;
+	}
 }
 
 @layer utilities {

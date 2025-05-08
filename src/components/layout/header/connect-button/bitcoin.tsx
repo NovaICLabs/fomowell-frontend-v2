@@ -249,7 +249,7 @@ const BitcoinWalletConnect: React.FC = () => {
 							<img
 								alt="fomowell"
 								className="mt-10 w-40"
-								src="/svgs/fomowell.png"
+								src="/images/logo/fomowell.png"
 							/>
 							<img
 								alt="loading"

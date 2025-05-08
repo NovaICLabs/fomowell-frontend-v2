@@ -90,10 +90,6 @@ export class PlugConnector implements ConnectorAbstract {
 		if (await this.isConnected()) {
 			this.principal = (window as any).ic.plug.principalId;
 		} else {
-			console.debug(
-				"🚀 ~ PlugConnector ~ connect= ~ this.isConnected():",
-				this.isConnected()
-			);
 			await (window as any).ic.plug.requestConnect({
 				whitelist:
 					this.config.whitelist.length > MAX_PLUG_WHITELIST_NUMBER

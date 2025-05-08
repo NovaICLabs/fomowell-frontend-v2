@@ -1,3 +1,5 @@
+import { isMobile } from "react-device-detect";
+
 import {
 	Dialog,
 	DialogContent,
@@ -55,7 +57,7 @@ export default function IcpConnectDialog() {
 						<img
 							alt="fomowell"
 							className="mt-10 w-40"
-							src="/svgs/fomowell.png"
+							src="/images/logo/fomowell.png"
 						/>
 						<img
 							alt="loading"
@@ -73,14 +75,16 @@ export default function IcpConnectDialog() {
 								void handleConnectWallet("II");
 							}}
 						/>
-						<WalletOption
-							disabled={isLoading}
-							icon={<img alt="Plug" src="/svgs/wallet/plug.svg" />}
-							name="Plug"
-							onClick={() => {
-								void handleConnectWallet("PLUG");
-							}}
-						/>
+						{!isMobile && (
+							<WalletOption
+								disabled={isLoading}
+								icon={<img alt="Plug" src="/svgs/wallet/plug.svg" />}
+								name="Plug"
+								onClick={() => {
+									void handleConnectWallet("PLUG");
+								}}
+							/>
+						)}
 						<WalletOption
 							disabled={isLoading}
 							icon={<img alt="Oisy" src="/svgs/wallet/oisy.svg" />}
