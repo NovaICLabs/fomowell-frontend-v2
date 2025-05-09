@@ -225,10 +225,10 @@ function TokenCreationPage() {
 		<div className="container m-auto pb-10">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)}>
-					<div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+					<div className="grid grid-cols-1 gap-y-3 md:grid-cols-2 md:gap-8">
 						{/* Left Column - Basic Token Information */}
 						<Card className="rounded-2xl border-gray-800 bg-gray-800">
-							<CardContent className="px-12.5">
+							<CardContent className="px-3 md:px-12.5">
 								<div className="mb-6 flex flex-col items-center">
 									{/* Logo Upload Field */}
 									<FormField
@@ -347,7 +347,7 @@ function TokenCreationPage() {
 						{/* Right Column - Additional Token Settings */}
 						<div className="flex flex-col gap-y-3.5">
 							<Card className="rounded-2xl border-gray-800 bg-gray-800">
-								<CardContent className="space-y-6 px-12.5">
+								<CardContent className="space-y-6 px-3 md:px-12.5">
 									{/* Social Media - Twitter Field */}
 									<div>
 										<h3 className="mb-3 text-gray-400">Twitter (Optional)</h3>
@@ -419,7 +419,7 @@ function TokenCreationPage() {
 								</CardContent>
 							</Card>
 							<Card className="rounded-2xl border-gray-800 bg-gray-800">
-								<CardContent className="space-y-6 px-12.5">
+								<CardContent className="space-y-6 px-3 md:px-12.5">
 									<div className="flex flex-col gap-y-2">
 										<span className="text-sm text-white/60">
 											Dev buy (Optional)

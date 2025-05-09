@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 
+import { isMobile } from "react-device-detect";
+
 import { getICPCanisterId } from "@/canisters/icrc3";
 import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 import { Button } from "@/components/ui/button";
@@ -447,6 +449,56 @@ const Withdraw = () => {
 		</div>
 	);
 };
+
+export const DepositWithdrawHeader = () => {
+	const { depositWithdrawOpen, setDepositWithdrawOpen } = useDialogStore();
+	return (
+		<>
+			{tabs.map((tab) => {
+				const isActive = depositWithdrawOpen.type === tab;
+				return (
+					<div
+						key={tab}
+						className={`relative cursor-pointer text-base font-semibold capitalize ${
+							isActive ? "text-white" : "text-white/60 hover:text-white"
+						}`}
+						onClick={() => {
+							setDepositWithdrawOpen({
+								open: true,
+								type: tab,
+							});
+						}}
+					>
+						{tab}
+						<div
+							className={`absolute -bottom-1 left-0 h-[1px] rounded-[1px] transition-all duration-300 ease-in-out ${
+								isActive ? "w-full opacity-100" : "w-0 opacity-0"
+							}`}
+							style={{
+								background:
+									"linear-gradient(90deg, #F7B406 0%, rgba(247, 180, 6, 0.00) 100%)",
+							}}
+						/>
+					</div>
+				);
+			})}
+		</>
+	);
+};
+export const DepositWithdrawContent = () => {
+	const { depositWithdrawOpen } = useDialogStore();
+	return (
+		<div
+			className={cn(
+				"bg-gray-740 mt-5 flex flex-1 flex-col rounded-2xl p-5",
+				isMobile && "h-[561] flex-0"
+			)}
+		>
+			{depositWithdrawOpen.type === "deposit" && <Deposit />}
+			{depositWithdrawOpen.type === "withdraw" && <Withdraw />}
+		</div>
+	);
+};
 export default function DepositWithdrawDialog() {
 	const { depositWithdrawOpen, setDepositWithdrawOpen } = useDialogStore();
 	return (
@@ -463,40 +515,10 @@ export default function DepositWithdrawDialog() {
 				<DialogHeader>
 					<DialogTitle>
 						<div className="flex items-center gap-[30px]">
-							{tabs.map((tab) => {
-								const isActive = depositWithdrawOpen.type === tab;
-								return (
-									<div
-										key={tab}
-										className={`relative cursor-pointer text-base font-semibold capitalize ${
-											isActive ? "text-white" : "text-white/60 hover:text-white"
-										}`}
-										onClick={() => {
-											setDepositWithdrawOpen({
-												open: true,
-												type: tab,
-											});
-										}}
-									>
-										{tab}
-										<div
-											className={`absolute -bottom-1 left-0 h-[1px] rounded-[1px] transition-all duration-300 ease-in-out ${
-												isActive ? "w-full opacity-100" : "w-0 opacity-0"
-											}`}
-											style={{
-												background:
-													"linear-gradient(90deg, #F7B406 0%, rgba(247, 180, 6, 0.00) 100%)",
-											}}
-										/>
-									</div>
-								);
-							})}
+							<DepositWithdrawHeader />
 						</div>
 					</DialogTitle>
-					<div className="bg-gray-740 mt-5 flex flex-1 flex-col rounded-2xl p-5">
-						{depositWithdrawOpen.type === "deposit" && <Deposit />}
-						{depositWithdrawOpen.type === "withdraw" && <Withdraw />}
-					</div>
+					<DepositWithdrawContent />
 				</DialogHeader>
 			</DialogContent>
 		</Dialog>

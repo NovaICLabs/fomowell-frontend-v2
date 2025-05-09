@@ -23,6 +23,7 @@ import { useIcWallet } from "@/hooks/providers/wallet/ic";
 import { getAvatar } from "@/lib/common/avatar";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { truncatePrincipal } from "@/lib/ic/principal";
+import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore } from "@/store/ic";
 
@@ -168,7 +169,10 @@ const IcpWalletConnect: React.FC = () => {
 					)}
 
 					<div
-						className="bg-gray-750 inline-flex h-[38px] min-w-[80px] cursor-pointer items-center justify-start gap-0.5 gap-x-1 rounded-full px-3 text-xs leading-4 font-medium text-white hover:bg-gray-700"
+						className={cn(
+							"bg-gray-750 inline-flex h-[38px] min-w-[80px] cursor-pointer items-center justify-start gap-0.5 gap-x-1 rounded-full px-3 text-xs leading-4 font-medium text-white hover:bg-gray-700",
+							isMobile && "h-7"
+						)}
 						onClick={() => {
 							setDepositWithdrawOpen({
 								open: true,

@@ -27,7 +27,7 @@ export const Header = () => {
 					)}
 				>
 					<div className="flex items-center gap-2">
-						<img alt="Menu" src="/svgs/common/menu.svg" />
+						{/* <img alt="Menu" src="/svgs/common/menu.svg" /> */}
 						<ChainSelector />
 					</div>
 					{chain === "bitcoin" && <BitcoinWalletConnect />}

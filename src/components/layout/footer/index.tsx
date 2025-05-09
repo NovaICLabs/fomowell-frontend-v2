@@ -1,4 +1,7 @@
+import { useMemo } from "react";
+
 import { useLocation, useRouter } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
@@ -14,52 +17,84 @@ import { useIcIdentityStore } from "@/store/ic";
 const MobileFooter = () => {
 	const { principal } = useIcIdentityStore();
 	const router = useRouter();
-	const bottomBar = [
-		{
-			icon: (
-				<img
-					alt="fomowell"
-					className="w-9"
-					src="/images/logo/small-fomowell.png"
-				/>
-			),
-		},
-		{
-			label: "Deposit",
-			action: withStopPropagation(() => {
-				// setDepositWithdrawOpen({
-				// 	open: true,
-				// 	type: "deposit",
-				// });
-			}),
-			icon: <DepositWithdrawIcon className="h-6.5 w-6.5" />,
-		},
-		{
-			label: "Create",
-			action: withStopPropagation(() => {
-				void router.navigate({ to: "/icp/create" });
-			}),
-			icon: <div className="h-6.5 w-6.5"></div>,
-		},
-		{
-			label: "Wallet",
-			action: withStopPropagation(() => {
-				void router.navigate({ to: `/icp/wallet/${principal}` });
-			}),
-			icon: <WalletIcon className="h-6.5 w-6.5" />,
-		},
-		{
-			label: "Profile",
-			action: withStopPropagation(() => {
-				void router.navigate({ to: `/icp/profile/${principal}` });
-			}),
-			icon: <ProfileIcon className="h-6.5 w-6.5" />,
-		},
-	];
 	const pathname = useLocation({
 		select: (location) => location.pathname,
 	});
-	console.debug("🚀 ~ MobileFooter ~ pathname:", pathname);
+	const isHome = pathname === "/";
+	const bottomBar = useMemo(
+		() => [
+			{
+				label: isHome ? "" : "Token",
+				action: withStopPropagation(() => {
+					void router.navigate({ to: "/" });
+				}),
+				icon: isHome ? (
+					<motion.img
+						alt="fomowell"
+						className="w-9"
+						src="/images/logo/small-fomowell.png"
+						animate={{
+							scale: [0.5, 1],
+						}}
+					/>
+				) : (
+					<img
+						alt="fomowell"
+						className="w-6.5"
+						src="/svgs/mobile/footer/token.svg"
+					/>
+				),
+			},
+			{
+				label: "Deposit",
+				action: () => {
+					void router.navigate({ to: "/mobile/icp/deposit-withdraw" });
+				},
+				icon: (
+					<DepositWithdrawIcon
+						className={cn(
+							"h-6.5 w-6.5",
+							pathname.includes("/mobile/icp/deposit-withdraw") &&
+								"text-yellow-500"
+						)}
+					/>
+				),
+				active: pathname.includes("/mobile/icp/deposit-withdraw"),
+			},
+			{
+				label: "Create",
+				action: withStopPropagation(() => {
+					void router.navigate({ to: "/icp/create" });
+				}),
+				icon: <div className="h-6.5 w-6.5"></div>,
+				active: pathname === "/icp/create",
+			},
+			{
+				label: "Wallet",
+				action: withStopPropagation(() => {
+					void router.navigate({ to: `/icp/wallet/${principal}` });
+				}),
+				icon: (
+					<WalletIcon
+						className={cn(
+							"h-6.5 w-6.5",
+							pathname === `/icp/wallet/${principal}` && "text-yellow-500"
+						)}
+					/>
+				),
+				active: pathname === `/icp/wallet/${principal}`,
+			},
+			{
+				label: "Profile",
+				action: withStopPropagation(() => {
+					void router.navigate({ to: `/icp/profile/${principal}` });
+				}),
+				icon: <ProfileIcon className="h-6.5 w-6.5" />,
+			},
+		],
+		[isHome, pathname, principal, router]
+	);
+
 	return (
 		<div
 			className={cn(
@@ -71,17 +106,28 @@ const MobileFooter = () => {
 				<div
 					key={item.label}
 					className="relative flex h-full flex-col items-center justify-center gap-y-[1px]"
+					onClick={item.action}
 				>
 					{item.label === "Create" && (
 						<div className="absolute top-0 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full p-px">
 							<div className="absolute inset-0 z-0 rounded-full bg-gradient-to-r from-yellow-500 to-blue-500"></div>
-							<div className="relative flex h-full w-full items-center justify-center rounded-full bg-gray-800">
+							<div
+								className={cn(
+									"relative flex h-full w-full items-center justify-center rounded-full bg-gray-800",
+									item.active && "bg-transparent"
+								)}
+							>
 								<Plus size={26} />
 							</div>
 						</div>
 					)}
 					{item.icon}
-					<span className="text-[11px] font-medium text-white/60">
+					<span
+						className={cn(
+							"text-[11px] font-medium text-white/60",
+							item.active && "text-yellow-500"
+						)}
+					>
 						{item.label}
 					</span>
 				</div>
