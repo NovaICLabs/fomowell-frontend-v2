@@ -244,17 +244,17 @@ function UserId() {
 			<div className="no-scrollbar flex-1 flex-col overflow-auto rounded-2xl pb-5">
 				<div className="h-max">
 					{activeTab === "Holdings" && (
-						<div className="bg-gray-760 h-full w-fit min-w-full rounded-2xl p-5 text-white/60">
+						<div className="bg-gray-760 h-full overflow-auto rounded-2xl p-5 text-white/60">
 							<ProfileHoldings />
 						</div>
 					)}
 					{activeTab === "Created" && (
-						<div className="bg-gray-760 h-full w-fit min-w-full rounded-2xl p-5 text-white/60">
+						<div className="bg-gray-760 h-full overflow-auto rounded-2xl p-5 text-white/60">
 							<ProfileCreatedTokens />
 						</div>
 					)}
 					{activeTab === "Activity" && (
-						<div className="bg-gray-760 h-full w-fit min-w-full rounded-2xl p-5 text-white/60">
+						<div className="bg-gray-760 h-full overflow-auto rounded-2xl p-5 text-white/60">
 							<ProfileActivity />
 						</div>
 					)}

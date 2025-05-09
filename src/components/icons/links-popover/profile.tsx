@@ -9,8 +9,8 @@ export default function ProfileIcon({ className }: { className?: string }) {
 			width="14"
 			xmlns="http://www.w3.org/2000/svg"
 			className={cn(
-				className,
-				"text-white/60 group-hover:text-white hover:text-white"
+				"text-white/60 group-hover:text-white hover:text-white",
+				className
 			)}
 		>
 			<path

@@ -73,16 +73,16 @@ export default function IcpConnectDialog() {
 								void handleConnectWallet("II");
 							}}
 						/>
-						{
-							<WalletOption
-								disabled={isLoading}
-								icon={<img alt="Plug" src="/svgs/wallet/plug.svg" />}
-								name="Plug"
-								onClick={() => {
-									void handleConnectWallet("PLUG");
-								}}
-							/>
-						}
+
+						<WalletOption
+							disabled={isLoading}
+							icon={<img alt="Plug" src="/svgs/wallet/plug.svg" />}
+							name="Plug"
+							onClick={() => {
+								void handleConnectWallet("PLUG");
+							}}
+						/>
+
 						<WalletOption
 							disabled={isLoading}
 							icon={<img alt="Oisy" src="/svgs/wallet/oisy.svg" />}

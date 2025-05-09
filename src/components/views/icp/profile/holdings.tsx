@@ -93,7 +93,6 @@ const ProfileHoldings = () => {
 					);
 				},
 				size: 250,
-				enablePinning: true,
 			}),
 			columnHelper.accessor("price", {
 				id: "totalUsd",
@@ -279,28 +278,14 @@ const ProfileHoldings = () => {
 					{table.getHeaderGroups().map((headerGroup) => (
 						<tr key={headerGroup.id} className="border-gray-710">
 							{headerGroup.headers.map((header) => {
-								const isPinned =
-									header.column.getIsPinned() === "left" ||
-									header.column.getIsPinned() === "right";
-
 								return (
 									<th
 										key={header.id}
 										className={cn(
-											"bg-gray-760 border-gray-710 border-b p-3 text-left text-xs leading-4 font-medium text-white/40",
-											isPinned && "sticky",
-											header.column.getIsPinned() === "left" && "left-0",
-											header.column.getIsPinned() === "right" && "right-0"
+											"bg-gray-760 border-gray-710 border-b p-3 text-left text-xs leading-4 font-medium text-white/40"
 										)}
 										style={{
 											width: header.getSize(),
-											position: isPinned ? "sticky" : undefined,
-											left:
-												header.column.getIsPinned() === "left"
-													? `${header.getStart("left")}px`
-													: undefined,
-											right:
-												header.column.getIsPinned() === "right" ? 0 : undefined,
 										}}
 									>
 										{flexRender(
@@ -327,35 +312,19 @@ const ProfileHoldings = () => {
 							}}
 						>
 							{row.getVisibleCells().map((cell) => {
-								const isPinned =
-									cell.column.getIsPinned() === "left" ||
-									cell.column.getIsPinned() === "right";
-
 								return (
 									<td
 										key={cell.id}
 										className={cn(
-											"border-gray-710 h-18 border-b p-0 pt-px text-sm text-white",
-											isPinned && "sticky",
-											cell.column.getIsPinned() === "left" && "left-0",
-											cell.column.getIsPinned() === "right" && "right-0"
+											"border-gray-710 h-18 border-b p-0 pt-px text-sm text-white"
 										)}
 										style={{
 											width: cell.column.getSize(),
-											position: isPinned ? "sticky" : undefined,
-											left:
-												cell.column.getIsPinned() === "left"
-													? `${cell.column.getStart("left")}px`
-													: undefined,
-											right:
-												cell.column.getIsPinned() === "right" ? 0 : undefined,
 										}}
 									>
 										<div
 											className={cn(
-												"flex h-full cursor-pointer items-center p-3",
-												isPinned &&
-													"bg-gray-760 group-hover:bg-gray-750 duration-300"
+												"flex h-full cursor-pointer items-center p-3"
 											)}
 										>
 											{flexRender(

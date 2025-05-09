@@ -107,7 +107,15 @@ const MobileFooter = () => {
 						setIcpConnectOpen(true);
 					}
 				}),
-				icon: <ProfileIcon className="h-6.5 w-6.5" />,
+				icon: (
+					<ProfileIcon
+						className={cn(
+							"h-6.5 w-6.5",
+							pathname === `/icp/profile/${principal}` && "text-yellow-500"
+						)}
+					/>
+				),
+				active: pathname === `/icp/profile/${principal}`,
 			},
 		],
 		[connected, isHome, pathname, principal, router, setIcpConnectOpen]
