@@ -17,7 +17,7 @@ export const Route = createFileRoute("/mobile/icp/deposit-withdraw")({
 
 function RouteComponent() {
 	return (
-		<div className="bg-gray-760 container m-auto flex h-full flex-col justify-start gap-5 px-2.5 pt-12.5">
+		<div className="bg-gray-760 container m-auto flex h-full flex-col justify-start gap-5 px-2.5 pt-4">
 			<div className="flex gap-6">
 				<DepositWithdrawHeader />
 			</div>

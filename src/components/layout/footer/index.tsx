@@ -12,10 +12,12 @@ import Telegram from "@/components/icons/media/telegram";
 import X from "@/components/icons/media/x";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { cn } from "@/lib/utils";
+import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore } from "@/store/ic";
 
 const MobileFooter = () => {
-	const { principal } = useIcIdentityStore();
+	const { principal, connected } = useIcIdentityStore();
+	const { setIcpConnectOpen } = useDialogStore();
 	const router = useRouter();
 	const pathname = useLocation({
 		select: (location) => location.pathname,
@@ -47,9 +49,13 @@ const MobileFooter = () => {
 			},
 			{
 				label: "Deposit",
-				action: () => {
-					void router.navigate({ to: "/mobile/icp/deposit-withdraw" });
-				},
+				action: withStopPropagation(() => {
+					if (connected) {
+						void router.navigate({ to: "/mobile/icp/deposit-withdraw" });
+					} else {
+						setIcpConnectOpen(true);
+					}
+				}),
 				icon: (
 					<DepositWithdrawIcon
 						className={cn(
@@ -64,7 +70,11 @@ const MobileFooter = () => {
 			{
 				label: "Create",
 				action: withStopPropagation(() => {
-					void router.navigate({ to: "/icp/create" });
+					if (connected) {
+						void router.navigate({ to: "/icp/create" });
+					} else {
+						setIcpConnectOpen(true);
+					}
 				}),
 				icon: <div className="h-6.5 w-6.5"></div>,
 				active: pathname === "/icp/create",
@@ -72,7 +82,11 @@ const MobileFooter = () => {
 			{
 				label: "Wallet",
 				action: withStopPropagation(() => {
-					void router.navigate({ to: `/icp/wallet/${principal}` });
+					if (connected) {
+						void router.navigate({ to: `/icp/wallet/${principal}` });
+					} else {
+						setIcpConnectOpen(true);
+					}
 				}),
 				icon: (
 					<WalletIcon
@@ -87,12 +101,16 @@ const MobileFooter = () => {
 			{
 				label: "Profile",
 				action: withStopPropagation(() => {
-					void router.navigate({ to: `/icp/profile/${principal}` });
+					if (connected) {
+						void router.navigate({ to: `/icp/profile/${principal}` });
+					} else {
+						setIcpConnectOpen(true);
+					}
 				}),
 				icon: <ProfileIcon className="h-6.5 w-6.5" />,
 			},
 		],
-		[isHome, pathname, principal, router]
+		[connected, isHome, pathname, principal, router, setIcpConnectOpen]
 	);
 
 	return (
