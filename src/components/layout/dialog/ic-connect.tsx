@@ -1,5 +1,3 @@
-import { isMobile } from "react-device-detect";
-
 import {
 	Dialog,
 	DialogContent,
@@ -75,7 +73,7 @@ export default function IcpConnectDialog() {
 								void handleConnectWallet("II");
 							}}
 						/>
-						{!isMobile && (
+						{
 							<WalletOption
 								disabled={isLoading}
 								icon={<img alt="Plug" src="/svgs/wallet/plug.svg" />}
@@ -84,7 +82,7 @@ export default function IcpConnectDialog() {
 									void handleConnectWallet("PLUG");
 								}}
 							/>
-						)}
+						}
 						<WalletOption
 							disabled={isLoading}
 							icon={<img alt="Oisy" src="/svgs/wallet/oisy.svg" />}

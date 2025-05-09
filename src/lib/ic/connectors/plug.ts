@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/require-await */
+import { isMobile } from "react-device-detect";
+
 import type {
 	ConnectorAbstract,
 	CreateActorArgs,
@@ -55,7 +57,8 @@ export class PlugConnector implements ConnectorAbstract {
 	public async isConnected() {
 		const plug = (window as any).ic.plug;
 		const isUnLocked = plug.isWalletLocked; // Replace with proper implementation
-		if (typeof isUnLocked === "boolean" && !isUnLocked) {
+		// Mobile's isUnlocked is incorrect
+		if (typeof isUnLocked === "boolean" && !isUnLocked && !isMobile) {
 			this.principal = plug.principalId;
 			return true;
 		}

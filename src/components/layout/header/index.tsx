@@ -6,8 +6,10 @@ import BitcoinWalletConnect from "@/components/layout/header/connect-button/bitc
 import CreateToken from "@/components/layout/header/create-token";
 import Links from "@/components/layout/header/links";
 import Search from "@/components/layout/header/search";
+import MenuSheet from "@/components/layout/mobile-sheet/menu";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
+import { useMobileSheetStore } from "@/store/mobile/sheet";
 
 import IcpWalletConnect from "./connect-button/icp";
 
@@ -17,6 +19,7 @@ export const Header = () => {
 	const pathname = useLocation({
 		select: (location) => location.pathname,
 	});
+	const { setMenuOpen } = useMobileSheetStore();
 	return (
 		<>
 			{isMobile ? (
@@ -27,8 +30,16 @@ export const Header = () => {
 					)}
 				>
 					<div className="flex items-center gap-2">
-						{/* <img alt="Menu" src="/svgs/common/menu.svg" /> */}
+						<img
+							alt="Menu"
+							className="cursor-pointer"
+							src="/svgs/common/menu.svg"
+							onClick={() => {
+								setMenuOpen(true);
+							}}
+						/>
 						<ChainSelector />
+						<MenuSheet />
 					</div>
 					{chain === "bitcoin" && <BitcoinWalletConnect />}
 					{chain === "icp" && <IcpWalletConnect />}

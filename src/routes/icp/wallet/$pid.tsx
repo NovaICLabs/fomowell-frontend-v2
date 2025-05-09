@@ -3,6 +3,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import copy from "copy-to-clipboard";
 import { Check } from "lucide-react";
+import { isMobile } from "react-device-detect";
 
 import { CopyIcon } from "@/components/icons/common/copy";
 import Assets from "@/components/views/icp/wallet/assets";
@@ -10,6 +11,7 @@ import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useICPBalance } from "@/hooks/ic/tokens/icp";
 import { getTokenUsdValueTotal } from "@/lib/common/number";
 import { truncatePrincipal } from "@/lib/ic/principal";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/icp/wallet/$pid")({
 	component: RouteComponent,
@@ -29,7 +31,12 @@ function RouteComponent() {
 
 	return (
 		<div className="mt-5 w-full">
-			<div className="bg-gray-760 relative w-full space-y-2 rounded-2xl p-5 text-white">
+			<div
+				className={cn(
+					"bg-gray-760 relative w-full space-y-2 rounded-2xl p-5 text-white",
+					isMobile && "bg-background px-2.5 pt-0"
+				)}
+			>
 				<div className="flex items-center gap-2">
 					<div className="flex items-end gap-1">
 						<span className="text-sm font-medium text-gray-400">PID: </span>
@@ -76,7 +83,14 @@ function RouteComponent() {
 			</div>
 
 			<div className="mt-5">
-				<h2 className="mb-3 text-lg font-semibold text-white">Assets</h2>
+				<h2
+					className={cn(
+						"mb-3 text-lg font-semibold text-white",
+						isMobile && "ml-2.5"
+					)}
+				>
+					Assets
+				</h2>
 				<Assets pid={pid} />
 			</div>
 		</div>

@@ -26,20 +26,24 @@ import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore } from "@/store/ic";
-
-const IcpWalletConnect: React.FC = () => {
-	const { setIcpConnectOpen } = useDialogStore();
-	const { disconnect, isLoading } = useIcWallet();
-	const { principal, connected, identityProfile, connecting } =
-		useIcIdentityStore();
+import { useMobileSheetStore } from "@/store/mobile/sheet";
+export const IcpAccountInfo = () => {
+	const { disconnect } = useIcWallet();
+	const { principal, identityProfile } = useIcIdentityStore();
 	const router = useRouter();
+	// mobile
+	const { setMenuOpen } = useMobileSheetStore();
 
 	const handleDisconnect = async () => {
 		void disconnect();
-		await router.navigate({
-			to: "/",
-			replace: true,
-		});
+		if (isMobile) {
+			setMenuOpen(false);
+		} else {
+			await router.navigate({
+				to: "/",
+				replace: true,
+			});
+		}
 	};
 
 	const [copied, setCopied] = useState(false);
@@ -72,101 +76,107 @@ const IcpWalletConnect: React.FC = () => {
 			icon: <WalletIcon />,
 		},
 	];
+
+	if (!principal) return null;
+	return (
+		<Popover open={openPopover} onOpenChange={setOpenPopover}>
+			<PopoverTrigger
+				asChild
+				onClick={() => {
+					void router.navigate({ to: `/icp/profile/${principal}` });
+				}}
+			>
+				<div
+					className="bg-gray-750 inline-flex h-[38px] cursor-pointer items-center justify-start rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700"
+					onMouseEnter={() => {
+						setOpenPopover(true);
+					}}
+					onMouseLeave={() => {
+						setOpenPopover(false);
+					}}
+				>
+					{identityProfile ? (
+						<div
+							className="h-6 w-6 rounded-full"
+							style={{
+								backgroundImage: `url(${identityProfile?.avatar ?? getAvatar(principal)})`,
+								backgroundSize: "cover",
+								backgroundPosition: "center",
+							}}
+						></div>
+					) : (
+						<Skeleton className="h-6 w-6 rounded-full" />
+					)}
+
+					<span className="ml-2">{truncatePrincipal(principal)}</span>
+					{copied ? (
+						<Check className="ml-1 opacity-40" size={16} strokeWidth={4} />
+					) : (
+						<CopyIcon
+							className="ml-1 h-4 w-4"
+							onClick={withStopPropagation(() => {
+								setCopied(true);
+								copy(principal);
+								setTimeout(() => {
+									setCopied(false);
+								}, 2000);
+							})}
+						/>
+					)}
+					<div className="ml-2.5 h-6 w-px bg-white/20"></div>
+					<DisconnectIcon
+						className="ml-2.25 h-4 w-4"
+						onClick={async (event: React.MouseEvent) => {
+							event.stopPropagation();
+							await handleDisconnect();
+						}}
+					/>
+				</div>
+			</PopoverTrigger>
+			<PopoverContent
+				className="z-100 -mt-1 w-43 border-none border-gray-700 bg-transparent p-0 pt-1"
+				onMouseEnter={() => {
+					setOpenPopover(true);
+				}}
+				onMouseLeave={() => {
+					setOpenPopover(false);
+				}}
+			>
+				<div className="bg-gray-750 flex flex-col gap-y-2 rounded-2xl p-2.5 text-white">
+					{popoverLinks.map((link) => (
+						<div
+							key={link.label}
+							className="group flex h-10.5 cursor-pointer items-center rounded-[14px] px-2.5 hover:bg-gray-700"
+							onClick={link.action}
+						>
+							<div className="flex h-4 items-center gap-x-2">
+								{link.icon}
+								<span className="text-sm leading-2 text-white/60 group-hover:text-white">
+									{link.label}
+								</span>
+							</div>
+						</div>
+					))}
+				</div>
+			</PopoverContent>
+		</Popover>
+	);
+};
+const IcpWalletConnect: React.FC = () => {
+	const { setIcpConnectOpen } = useDialogStore();
+	const { isLoading } = useIcWallet();
+	const { principal, connected, connecting } = useIcIdentityStore();
+	const { setDepositWithdrawOpen } = useDialogStore();
 	const { data: coreTokenBalance } = useCoreTokenBalance({
 		owner: principal,
 		token: { ICRCToken: getICPCanisterId() },
 	});
+	const router = useRouter();
 	return (
 		<>
 			{principal ? (
 				<div className="flex items-center justify-center gap-x-2">
-					{!isMobile && (
-						<Popover open={openPopover} onOpenChange={setOpenPopover}>
-							<PopoverTrigger
-								asChild
-								onClick={() => {
-									void router.navigate({ to: `/icp/profile/${principal}` });
-								}}
-							>
-								<div
-									className="bg-gray-750 inline-flex h-[38px] cursor-pointer items-center justify-start rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700"
-									onMouseEnter={() => {
-										setOpenPopover(true);
-									}}
-									onMouseLeave={() => {
-										setOpenPopover(false);
-									}}
-								>
-									{identityProfile ? (
-										<div
-											className="h-6 w-6 rounded-full"
-											style={{
-												backgroundImage: `url(${identityProfile?.avatar ?? getAvatar(principal)})`,
-												backgroundSize: "cover",
-												backgroundPosition: "center",
-											}}
-										></div>
-									) : (
-										<Skeleton className="h-6 w-6 rounded-full" />
-									)}
-
-									<span className="ml-2">{truncatePrincipal(principal)}</span>
-									{copied ? (
-										<Check
-											className="ml-1 opacity-40"
-											size={16}
-											strokeWidth={4}
-										/>
-									) : (
-										<CopyIcon
-											className="ml-1 h-4 w-4"
-											onClick={withStopPropagation(() => {
-												setCopied(true);
-												copy(principal);
-												setTimeout(() => {
-													setCopied(false);
-												}, 2000);
-											})}
-										/>
-									)}
-									<div className="ml-2.5 h-6 w-px bg-white/20"></div>
-									<DisconnectIcon
-										className="ml-2.25 h-4 w-4"
-										onClick={async (event: React.MouseEvent) => {
-											event.stopPropagation();
-											await handleDisconnect();
-										}}
-									/>
-								</div>
-							</PopoverTrigger>
-							<PopoverContent
-								className="z-100 -mt-1 w-43 border-none border-gray-700 bg-transparent p-0 pt-1"
-								onMouseEnter={() => {
-									setOpenPopover(true);
-								}}
-								onMouseLeave={() => {
-									setOpenPopover(false);
-								}}
-							>
-								<div className="bg-gray-750 flex flex-col gap-y-2 rounded-2xl p-2.5 text-white">
-									{popoverLinks.map((link) => (
-										<div
-											key={link.label}
-											className="group flex h-10.5 cursor-pointer items-center rounded-[14px] px-2.5 hover:bg-gray-700"
-											onClick={link.action}
-										>
-											<div className="flex h-4 items-center gap-x-2">
-												{link.icon}
-												<span className="text-sm leading-2 text-white/60 group-hover:text-white">
-													{link.label}
-												</span>
-											</div>
-										</div>
-									))}
-								</div>
-							</PopoverContent>
-						</Popover>
-					)}
+					{!isMobile && <IcpAccountInfo />}
 
 					<div
 						className={cn(
@@ -174,10 +184,17 @@ const IcpWalletConnect: React.FC = () => {
 							isMobile && "h-7"
 						)}
 						onClick={() => {
-							setDepositWithdrawOpen({
-								open: true,
-								type: "deposit",
-							});
+							if (isMobile) {
+								void router.navigate({
+									to: `/icp/profile/${principal}`,
+									replace: true,
+								});
+							} else {
+								setDepositWithdrawOpen({
+									open: true,
+									type: "deposit",
+								});
+							}
 						}}
 					>
 						<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
