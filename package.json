@@ -27,12 +27,14 @@
 		"test:e2e": "playwright test",
 		"test:e2e:report": "playwright show-report",
 		"build": "tsc && vite build",
+		"build:dev": "tsc && vite build --mode development --out-dir dist-dev",
 		"preview": "vite preview",
 		"commitlint": "commitlint --edit",
 		"commitizen": "exec < /dev/tty && git cz --hook || true",
 		"prepare": "husky",
 		"postinstall": "patch-package",
-		"deploy:manual": "bun run build && wrangler pages deploy"
+		"deploy:manual:prod": "bun run build && wrangler pages deploy --directory dist && netlify deploy --no-build --prod --dir dist",
+		"deploy:manual:dev": "bun run build:dev && wrangler pages deploy --directory dist-dev && netlify deploy --no-build --dir dist-dev"
 	},
 	"dependencies": {
 		"@dfinity/agent": "^2.4.1",

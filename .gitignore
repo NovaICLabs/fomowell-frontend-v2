@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+dist-dev
 *.local
 
 # Editor directories and files
@@ -34,3 +35,6 @@ storybook-static
 /coverage/
 
 .env.production
+
+# Local Netlify folder
+.netlify

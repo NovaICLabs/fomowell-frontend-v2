@@ -803,19 +803,25 @@ export default function MemeList() {
 		overscan: 5,
 	});
 	const virtualItems = rowVirtualizer.getVirtualItems();
+
+	// enable the infinite query
+	// sort by recent is not supported by the infinite query because the data is update frequently
+	const infiniteQueryEnabled = useMemo(() => sort && sort !== "recent", [sort]);
+
 	useEffect(() => {
 		if (!virtualItems || virtualItems.length === 0) return;
 
 		const [lastItem] = [...virtualItems].reverse();
-
 		if (!lastItem) {
 			return;
 		}
 
+		// if the last item is the last item in the table and there are more pages to fetch, fetch the next page
 		if (
 			lastItem.index >= tableRows.length - 1 &&
 			hasNextPage &&
-			!isFetchingNextPage
+			!isFetchingNextPage &&
+			infiniteQueryEnabled
 		) {
 			void fetchNextPage();
 		}
@@ -825,6 +831,7 @@ export default function MemeList() {
 		tableRows.length,
 		isFetchingNextPage,
 		virtualItems,
+		sort,
 	]);
 
 	const transparentBg = "rgba(0, 0, 0, 0)";
@@ -934,7 +941,7 @@ export default function MemeList() {
 								<tr key="loader" className="h-18">
 									<td colSpan={columns.length}>
 										<div className="flex h-full w-full items-center justify-center">
-											{hasNextPage ? (
+											{hasNextPage && infiniteQueryEnabled ? (
 												<TableItemsSkeleton />
 											) : (
 												<span className="text-sm text-white/40">
