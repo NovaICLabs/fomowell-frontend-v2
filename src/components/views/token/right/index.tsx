@@ -4,6 +4,7 @@ import { useParams } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
 
 import { getICPCanisterToken } from "@/canisters/icrc3/specials";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useSingleTokenInfo } from "@/hooks/apis/indexer";
@@ -170,7 +171,21 @@ export default function Bottom() {
 						);
 					})}
 			</div>
-			{activeTab === "Trade" && <Trade />}
+			{activeTab === "Trade" &&
+				(memeTokenInfo?.completed ? (
+					<div className="flex flex-col items-center justify-center gap-2">
+						<img
+							alt="completed"
+							className="w-50"
+							src="/svgs/common/launched.svg"
+						/>
+						<Button className="-mt-9.5 h-9 w-88 rounded-full text-base font-bold">
+							Go to Dex
+						</Button>
+					</div>
+				) : (
+					<Trade />
+				))}
 			{activeTab === "Liquidity" && <Liquidity />}
 
 			<div className="bg-gray-860 grid h-21 flex-shrink-0 grid-cols-4 overflow-hidden rounded-[12px]">

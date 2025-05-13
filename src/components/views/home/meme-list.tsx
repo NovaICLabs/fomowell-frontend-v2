@@ -832,6 +832,7 @@ export default function MemeList() {
 		isFetchingNextPage,
 		virtualItems,
 		sort,
+		infiniteQueryEnabled,
 	]);
 
 	const transparentBg = "rgba(0, 0, 0, 0)";
