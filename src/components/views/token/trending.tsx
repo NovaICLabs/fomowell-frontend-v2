@@ -98,7 +98,7 @@ export default function Trending() {
 		[data]
 	);
 
-	const columnHelper = createColumnHelper<TokenInfo>();
+	const columnHelper = useMemo(() => createColumnHelper<TokenInfo>(), []);
 
 	const handleSort = useCallback(
 		(selectedSort: TokenListSortOption) => {
