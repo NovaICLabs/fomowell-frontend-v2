@@ -154,7 +154,7 @@ const MobileToken = () => {
 
 			<div className="fixed right-0 bottom-0 left-0 flex h-14 items-center justify-between bg-gray-800 px-2.5 shadow">
 				<div
-					className="ml-10 flex flex-col items-center"
+					className="flex flex-col items-center"
 					onClick={() => {
 						setInfoOpen(true);
 					}}
