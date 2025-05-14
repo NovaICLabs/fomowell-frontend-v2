@@ -288,13 +288,6 @@ export const useBuy = () => {
 			}
 			return buy(actorCreator, getChainICCoreCanisterId().toText(), args);
 		},
-		onError: (error) => {
-			if (error.message.indexOf("is out of cycles") !== -1) {
-				showToast("error", `Cycles insufficient`);
-			} else {
-				showToast("error", "Failed to purchase token");
-			}
-		},
 	});
 };
 

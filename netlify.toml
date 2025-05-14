@@ -2,3 +2,11 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[headers]]
+  for = "/(images|svgs)/*"
+  [headers.values]
+    cache-control = '''
+    public,
+    max-age=31536000,
+    immutable'''

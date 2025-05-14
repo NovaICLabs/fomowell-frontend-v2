@@ -218,40 +218,50 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 		) {
 			return;
 		}
-		switch (activeTab) {
-			case "Buy":
-				if (debouncedBuyAmountBigInt) {
-					const result = await buy({
-						amount: debouncedBuyAmountBigInt,
-						id: BigInt(id),
-						amount_out_min: minTokenReceived,
-					});
-					showToast(
-						"success",
-						`${formatNumberSmart(formatUnits(result.toString(), memeTokenInfo?.decimals))} ${memeTokenInfo?.ticker.toUpperCase()} received`
-					);
-					refetchBalance();
-					void refetchCurrentTokenPrice();
-					setBuyAmount("");
-				} else {
-					throw new Error("Invalid amount");
-				}
-				break;
-			case "Sell":
-				if (debouncedSellAmountBigInt) {
-					const result = await sell({
-						amount: debouncedSellAmountBigInt,
-						id: BigInt(id),
-						amount_out_min: minTokenReceived,
-					});
-					showToast(
-						"success",
-						`${formatNumberSmart(formatUnits(result))} ${"ICP"} received`
-					);
-					refetchBalance();
-					void refetchCurrentTokenPrice();
-					setSellAmount("");
-				}
+		try {
+			switch (activeTab) {
+				case "Buy":
+					if (debouncedBuyAmountBigInt) {
+						const result = await buy({
+							amount: debouncedBuyAmountBigInt,
+							id: BigInt(id),
+							amount_out_min: minTokenReceived,
+						});
+						showToast(
+							"success",
+							`${formatNumberSmart(formatUnits(result.toString(), memeTokenInfo?.decimals))} ${memeTokenInfo?.ticker.toUpperCase()} received`
+						);
+						refetchBalance();
+						void refetchCurrentTokenPrice();
+						setBuyAmount("");
+					} else {
+						throw new Error("Invalid amount");
+					}
+					break;
+				case "Sell":
+					if (debouncedSellAmountBigInt) {
+						const result = await sell({
+							amount: debouncedSellAmountBigInt,
+							id: BigInt(id),
+							amount_out_min: minTokenReceived,
+						});
+						showToast(
+							"success",
+							`${formatNumberSmart(formatUnits(result))} ${"ICP"} received`
+						);
+						refetchBalance();
+						void refetchCurrentTokenPrice();
+						setSellAmount("");
+					}
+			}
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+			if (error.message.indexOf("is out of cycles") !== -1) {
+				showToast("error", `Cycles insufficient`);
+			} else {
+				showToast("error", `Failed to ${activeTab.toLowerCase()} token`);
+			}
 		}
 	}, [
 		isCalculatingBuy,

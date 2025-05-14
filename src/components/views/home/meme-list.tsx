@@ -266,13 +266,23 @@ export default function MemeList() {
 				amount: flashAmountBigInt,
 				id: BigInt(tokenId),
 				amount_out_min: BigInt(0),
-			}).then((receivedAmount) => {
-				toast.dismiss(loadingToastId);
-				showToast(
-					"success",
-					`${formatNumberSmart(formatUnits(receivedAmount, info.row.original.decimals))} $${info.row.original.ticker.toLocaleUpperCase()} received!`
-				);
-			});
+			})
+				.then((receivedAmount) => {
+					showToast(
+						"success",
+						`${formatNumberSmart(formatUnits(receivedAmount, info.row.original.decimals))} $${info.row.original.ticker.toLocaleUpperCase()} received!`
+					);
+				})
+				.catch((error: Error) => {
+					if (error.message.indexOf("is out of cycles") !== -1) {
+						showToast("error", `Cycles insufficient`);
+					} else {
+						showToast("error", "Failed to purchase token");
+					}
+				})
+				.finally(() => {
+					toast.dismiss(loadingToastId);
+				});
 		},
 		[balance, buyToken, flashAmountBigInt, principal, setIcpConnectOpen]
 	);
