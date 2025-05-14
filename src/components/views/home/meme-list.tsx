@@ -260,7 +260,10 @@ export default function MemeList() {
 			const tokenId = info.row.original.memeTokenId.toString();
 			const loadingToastId = showToast(
 				"loading",
-				`Buying token($${info.row.original.ticker.toLocaleUpperCase()})...`
+				`Buying token($${info.row.original.ticker.toLocaleUpperCase()})...`,
+				{
+					duration: Infinity,
+				}
 			);
 			void buyToken({
 				amount: flashAmountBigInt,

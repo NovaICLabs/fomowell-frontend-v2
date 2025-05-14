@@ -4,9 +4,16 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 type ToastType = "success" | "error" | "warning" | "info" | "loading";
 
-export const showToast = (type: ToastType, message: string) => {
+export const showToast = (
+	type: ToastType,
+	message: string,
+	options?: {
+		duration?: number;
+	}
+) => {
 	return toast.custom(() => {
-		const duration = Number(import.meta.env.VITE_TOAST_DURATION);
+		const duration =
+			options?.duration ?? Number(import.meta.env.VITE_TOAST_DURATION);
 		return (
 			<div className="flex h-full w-full items-center justify-end">
 				<div className="bg-gray-710 relative flex h-[78px] w-[302px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl pt-[17px] pb-4.5 shadow-[0px_4px_18px_2px_rgba(0,0,0,0.25)]">
