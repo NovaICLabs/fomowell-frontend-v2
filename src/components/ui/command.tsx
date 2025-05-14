@@ -57,7 +57,7 @@ const CommandInput = React.forwardRef<
 >(({ className, ...props }, ref) => {
 	return (
 		<div
-			className="flex h-9 items-center gap-2 rounded-xl bg-gray-800 px-3"
+			className="flex h-9 items-center gap-2 rounded-xl border border-transparent bg-gray-800 px-3 focus-within:border-yellow-500"
 			data-slot="command-input-wrapper"
 		>
 			<img alt="search" className="size-4 shrink-0" src="/svgs/search.svg" />

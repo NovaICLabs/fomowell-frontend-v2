@@ -103,6 +103,7 @@ export type TokenListParameters = {
 	market?: string;
 	sort?: TokenListSortOption;
 	sortDirection?: "asc" | "desc";
+	search?: string;
 	// single token info
 	tokenId?: string;
 	principal?: string;

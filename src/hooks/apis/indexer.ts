@@ -26,7 +26,29 @@ import { useIcIdentityStore } from "@/store/ic";
 
 import { useConnectedIdentity } from "../providers/wallet/ic";
 const getTokenListKey = (parameters: TokenListParameters) => {
-	return ["ic-core", "tokenList", parameters.sort, parameters.sortDirection];
+	return [
+		"ic-core",
+		"tokenList",
+		parameters.sort,
+		parameters.sortDirection,
+		parameters.principal,
+	];
+};
+export const useSearchTokenList = (parameters: TokenListParameters) => {
+	return useQuery({
+		queryKey: [
+			"ic-core",
+			"searchTokenList",
+			parameters.search,
+			parameters.principal,
+		],
+		queryFn: () =>
+			getTokenList({
+				...parameters,
+				page: 1,
+				pageSize: 10,
+			}),
+	});
 };
 export const useInfiniteTokenList = (parameters: TokenListParameters) => {
 	return useInfiniteQuery({
