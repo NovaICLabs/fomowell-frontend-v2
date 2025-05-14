@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import copy from "copy-to-clipboard";
 import { Check } from "lucide-react";
 import { isMobile } from "react-device-detect";
@@ -8,6 +8,7 @@ import { isMobile } from "react-device-detect";
 import { getICPCanisterId } from "@/canisters/icrc3";
 import { CopyIcon } from "@/components/icons/common/copy";
 import { EditIcon } from "@/components/icons/common/edit";
+import ReferIcon from "@/components/icons/common/refer";
 import WithdrawIcon from "@/components/icons/common/withdraw";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
 import { Button } from "@/components/ui/button";
@@ -122,7 +123,7 @@ function UserId() {
 	const { setDepositWithdrawOpen } = useDialogStore();
 	const { mutateAsync: claimFaucet, isPending: isClaimingFaucet } =
 		useClaimFaucet();
-
+	const router = useRouter();
 	// is self
 	const isSelf = userid === identityProfile?.principal;
 	return (
@@ -143,8 +144,7 @@ function UserId() {
 					<div
 						className={cn(
 							"absolute top-1/2 right-5 flex -translate-y-1/2 gap-x-6",
-							isSelf ? "flex" : "hidden",
-							isMobile && "hidden"
+							isSelf ? "flex" : "hidden"
 						)}
 					>
 						<div className="relative flex h-9 w-[102px] items-center justify-center rounded-full p-[2px]">
@@ -165,12 +165,13 @@ function UserId() {
 							</Button>
 							<div className="absolute inset-0 top-px right-px bottom-px left-px z-0 rounded-full bg-gradient-to-r from-yellow-500 to-blue-500"></div>
 						</div>
-						<Button className="rounded-full">
-							<img alt="Refer to earn" src="/svgs/common/refer.svg" />
+						<Button className={cn("rounded-full", isMobile && "hidden")}>
+							<ReferIcon className="text-black" />
 							Refer to earn
 						</Button>
 					</div>
 				</div>
+
 				<div
 					className={cn(
 						"bg-gray-760 flex w-120 flex-col items-center rounded-2xl p-5",
@@ -209,6 +210,48 @@ function UserId() {
 							</Button>
 						</div>
 					</div>
+				</div>
+			</div>
+			<div
+				className={cn(
+					"mt-3 mb-7.5 flex justify-between px-7.5",
+					!isMobile && "hidden"
+				)}
+			>
+				<div
+					className="flex flex-col items-center gap-y-1.5"
+					onClick={() => {
+						setDepositWithdrawOpen({
+							open: true,
+							type: "deposit",
+						});
+						void router.navigate({ to: "/mobile/icp/deposit-withdraw" });
+					}}
+				>
+					<div className="bg-gray-710 flex h-14 w-14 items-center justify-center rounded-full">
+						<DepositWithdrawIcon className="text-yellow-500" size={28} />
+					</div>
+					<span className="text-sm">Deposit</span>
+				</div>
+				<div
+					className="flex flex-col items-center gap-y-1.5"
+					onClick={() => {
+						setDepositWithdrawOpen({ open: true, type: "withdraw" });
+						void router.navigate({
+							to: "/mobile/icp/deposit-withdraw",
+						});
+					}}
+				>
+					<div className="bg-gray-710 flex h-14 w-14 items-center justify-center rounded-full">
+						<WithdrawIcon className="text-yellow-500" size={28} />
+					</div>
+					<span className="text-sm">Withdraw</span>
+				</div>
+				<div className="flex flex-col items-center gap-y-1.5">
+					<div className="bg-gray-710 flex h-14 w-14 items-center justify-center rounded-full">
+						<ReferIcon className="text-yellow-500" size={28} />
+					</div>
+					<span className="text-sm">Refer to earn</span>
 				</div>
 			</div>
 			<div className="sticky mb-4 flex items-center gap-[30px] px-4">

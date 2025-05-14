@@ -24,6 +24,9 @@ interface FileUploaderProps {
 	wrapperClassName?: string;
 	isShowSize?: boolean;
 	setLoading?: (loading: boolean) => void;
+	option?: {
+		alwaysShowEdit?: boolean;
+	};
 }
 
 export interface FileUploaderRef {
@@ -41,6 +44,7 @@ export const FileUploader = forwardRef<FileUploaderRef, FileUploaderProps>(
 			imageIcon,
 			defaultImage,
 			isHideRemove = false,
+			option,
 			isShowSize = true,
 			wrapperClassName,
 			setLoading,
@@ -50,6 +54,7 @@ export const FileUploader = forwardRef<FileUploaderRef, FileUploaderProps>(
 		const [files, setFiles] = useState<Array<File>>([]);
 		const [preview, setPreview] = useState<string | null>(defaultImage || null);
 		const [error, setError] = useState<string | null>(null);
+		const { alwaysShowEdit } = option ?? {};
 		const onDrop = useCallback(
 			(acceptedFiles: Array<File>, rejectedFiles: Array<FileRejection>) => {
 				if (acceptedFiles.length > 0) {
@@ -119,7 +124,7 @@ export const FileUploader = forwardRef<FileUploaderRef, FileUploaderProps>(
 					/>
 
 					{preview ? (
-						<div className="group relative h-full w-full">
+						<div className="group relative h-full w-full cursor-pointer">
 							<img
 								alt="Preview"
 								className="h-full w-full object-cover"
@@ -134,8 +139,8 @@ export const FileUploader = forwardRef<FileUploaderRef, FileUploaderProps>(
 									<X size={16} />
 								</button>
 							)}
-							{isHideRemove && (
-								<div className="absolute top-0 left-0 flex h-full w-full items-center justify-center rounded-full bg-gray-500/40 opacity-0 transition-all group-hover:opacity-100">
+							{alwaysShowEdit && (
+								<div className="absolute top-0 left-0 flex h-full w-full items-center justify-center rounded-full bg-gray-500/40 opacity-100 transition-all">
 									<img alt="upload-svg" src={"/svgs/upload.svg"} />
 								</div>
 							)}

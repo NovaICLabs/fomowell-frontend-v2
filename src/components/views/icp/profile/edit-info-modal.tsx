@@ -113,6 +113,9 @@ const EditInfoModal = ({
 								defaultImage={avatar}
 								imageIcon={<Upload className="h-8 w-8 text-gray-400" />}
 								wrapperClassName="bg-gray-710 mb-2 flex h-25 w-25 items-center justify-center rounded-full"
+								option={{
+									alwaysShowEdit: true,
+								}}
 								onChange={(url) => {
 									if (url) {
 										onAvatarChange(url);

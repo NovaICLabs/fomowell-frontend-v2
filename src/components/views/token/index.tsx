@@ -152,7 +152,7 @@ const MobileToken = () => {
 				</div>
 			</div>
 
-			<div className="fixed right-0 bottom-0 left-0 flex h-14 items-center justify-between bg-gray-800 px-2.5 shadow">
+			<div className="fixed right-0 bottom-0 left-0 z-10 flex h-14 items-center justify-between bg-gray-800 px-2.5 shadow">
 				<div
 					className="flex flex-col items-center"
 					onClick={() => {

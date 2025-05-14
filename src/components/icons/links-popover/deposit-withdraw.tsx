@@ -2,15 +2,17 @@ import { cn } from "@/lib/utils";
 
 export default function DepositWithdrawIcon({
 	className,
+	size = 14,
 }: {
 	className?: string;
+	size?: number;
 }) {
 	return (
 		<svg
 			fill="none"
-			height="14"
+			height={size}
 			viewBox="0 0 14 14"
-			width="14"
+			width={size}
 			xmlns="http://www.w3.org/2000/svg"
 			className={cn(
 				"text-white/60 group-hover:text-white hover:text-white",

@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { useParams } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
+import { isMobile } from "react-device-detect";
 import { useDebounce } from "use-debounce";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
@@ -422,7 +423,7 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 					/>
 					<span className="font-medium">{coreTokenBalance?.formatted}</span>
 					<DepositPlus
-						className="h-4 w-4 cursor-pointer"
+						className={cn("h-4 w-4 cursor-pointer", isMobile && "hidden")}
 						onClick={() => {
 							setDepositWithdrawOpen({
 								open: true,

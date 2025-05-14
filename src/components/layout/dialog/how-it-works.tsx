@@ -20,7 +20,7 @@ export default function HowItWorksDialog() {
 						<div className="flex items-center gap-[30px]">How it works</div>
 					</DialogTitle>
 					<div className="mt-2 flex flex-1 flex-col">
-						<p className="leading-6 font-normal text-white">
+						<p className="text-left leading-6 font-normal text-white">
 							Fomowell prevents rugs by making sure that all created tokens are
 							safe. Each coin is a fair-launch with no team allocation.
 						</p>
@@ -30,24 +30,26 @@ export default function HowItWorksDialog() {
 							</div>
 							<div className="flex items-center gap-[10px]">
 								<Circle />{" "}
-								<span>Step 2: Buy the coin on the bonding curve.</span>
+								<span className="text-left">
+									Step 2: Buy the coin on the bonding curve.
+								</span>
 							</div>
 							<div className="flex items-center gap-[10px]">
 								<Circle />{" "}
-								<span>
+								<span className="text-left">
 									Step 3: Sell at any time to lock in your profits or losses.
 								</span>
 							</div>
 							<div className="flex items-center gap-[10px]">
 								<Circle />{" "}
-								<span>
+								<span className="text-left">
 									Step 4: When enough people buy on the bonding curve, the pool
 									reaches a 500 ICP reserve (8 billion meme token was sold out).
 								</span>
 							</div>
 							<div className="flex items-center gap-[10px]">
 								<Circle />{" "}
-								<span>
+								<span className="text-left">
 									Step 5: 500 ICP and 2 billion meme token will be mirgrated to
 									dex and LP will be locked.
 								</span>

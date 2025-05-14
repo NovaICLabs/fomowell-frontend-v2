@@ -1,13 +1,19 @@
 import { cn } from "@/lib/utils";
 
-export default function WithdrawIcon({ className }: { className?: string }) {
+export default function WithdrawIcon({
+	className,
+	size = 14,
+}: {
+	className?: string;
+	size?: number;
+}) {
 	return (
 		<svg
 			className={cn("text-white/40 group-hover:text-white", className)}
 			fill="none"
-			height="14"
+			height={size}
 			viewBox="0 0 14 14"
-			width="14"
+			width={size}
 			xmlns="http://www.w3.org/2000/svg"
 		>
 			<path
