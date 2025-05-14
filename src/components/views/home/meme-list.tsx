@@ -13,6 +13,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import BigNumber from "bignumber.js";
 import { motion } from "framer-motion";
 import { isMobile } from "react-device-detect";
+import { toast } from "sonner";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
 import SortsIcon from "@/components/icons/common/sorts";
@@ -257,7 +258,7 @@ export default function MemeList() {
 			}
 
 			const tokenId = info.row.original.memeTokenId.toString();
-			showToast(
+			const loadingToastId = showToast(
 				"loading",
 				`Buying token($${info.row.original.ticker.toLocaleUpperCase()})...`
 			);
@@ -266,6 +267,7 @@ export default function MemeList() {
 				id: BigInt(tokenId),
 				amount_out_min: BigInt(0),
 			}).then((receivedAmount) => {
+				toast.dismiss(loadingToastId);
 				showToast(
 					"success",
 					`${formatNumberSmart(formatUnits(receivedAmount, info.row.original.decimals))} $${info.row.original.ticker.toLocaleUpperCase()} received!`

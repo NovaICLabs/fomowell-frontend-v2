@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 type ToastType = "success" | "error" | "warning" | "info" | "loading";
 
 export const showToast = (type: ToastType, message: string) => {
-	toast.custom(() => {
+	return toast.custom(() => {
 		const duration = Number(import.meta.env.VITE_TOAST_DURATION);
 		return (
 			<div className="flex h-full w-full items-center justify-end">
