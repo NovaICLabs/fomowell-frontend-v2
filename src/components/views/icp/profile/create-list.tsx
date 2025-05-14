@@ -30,7 +30,10 @@ const ProfileCreatedTokens = () => {
 	const { data: icpPrice } = useICPPrice();
 	const { userid } = useParams({ from: "/icp/profile/$userid" });
 	// const { data, isFetching, refetch } = useUserCreatedTokens();
-	const columnHelper = createColumnHelper<CreatedToken>();
+	const columnHelper = useMemo(
+		() => createColumnHelper<CreatedToken>(),
+		[]
+	);
 
 	const { data: items, isFetching, refetch } = useUserCreatedTokenList(userid);
 

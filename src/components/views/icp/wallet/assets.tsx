@@ -65,7 +65,7 @@ export default function Assets({ pid }: { pid: string }) {
 		[]
 	);
 
-	const columnHelper = createColumnHelper<Asset>();
+	const columnHelper = useMemo(() => createColumnHelper<Asset>(), []);
 	const [transferDialogOpen, setTransferDialogOpen] = useState(false);
 	const { principal } = useConnectedIdentity();
 	const isSelf = useMemo(() => {

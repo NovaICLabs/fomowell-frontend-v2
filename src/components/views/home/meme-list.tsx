@@ -73,6 +73,15 @@ export default function MemeList() {
 			ICRCToken: getICPCanisterId(),
 		},
 	});
+	const queryParameters = useMemo(
+		() => ({
+			sort,
+			sortDirection: direction,
+			pageSize: 16,
+			principal,
+		}),
+		[sort, direction, principal]
+	);
 	const {
 		data: allTokenList,
 		hasNextPage: hasNextPageAllTokenList,
@@ -81,12 +90,7 @@ export default function MemeList() {
 		status: statusAllTokenList,
 		error: errorAllTokenList,
 		isFetching: isFetchingAllTokenList,
-	} = useInfiniteTokenList({
-		sort,
-		sortDirection: direction,
-		pageSize: 16,
-		principal,
-	});
+	} = useInfiniteTokenList(queryParameters);
 
 	const {
 		data: favoriteTokenList,
@@ -233,10 +237,7 @@ export default function MemeList() {
 	}, [items]);
 
 	// favorite token
-	const { mutateAsync: favoriteToken } = useFavoriteToken({
-		sort,
-		sortDirection: direction,
-	});
+	const { mutateAsync: favoriteToken } = useFavoriteToken(queryParameters);
 	// handle quick buy
 	const handleQuickBuy = useCallback(
 		(info: CellContext<TokenInfo, unknown>) => {

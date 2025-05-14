@@ -57,12 +57,18 @@ export default function Search() {
 	const { recentSearch, addRecentSearch, clearRecentSearch } = useSearchStore();
 	// Fetch trending tokens (24h)
 	const { principal } = useConnectedIdentity();
-	const { data: trendingTokensData, hasNextPage } = useInfiniteTokenList({
-		sort: "popularity_24h",
-		sortDirection: "desc",
-		pageSize: 20,
-		principal,
-	});
+
+	const queryParameters = useMemo(
+		() => ({
+			sort: "popularity_24h" as const,
+			sortDirection: "desc" as const,
+			pageSize: 20,
+			principal,
+		}),
+		[principal]
+	);
+	const { data: trendingTokensData, hasNextPage } =
+		useInfiniteTokenList(queryParameters);
 	const { data: searchTokensData, isLoading: isSearchLoading } =
 		useSearchTokenList({
 			sort: "popularity_24h",
@@ -81,11 +87,7 @@ export default function Search() {
 
 	// Setup react-table for trending tokens
 	const columnHelper = useMemo(() => createColumnHelper<TokenInfo>(), []);
-	const { mutateAsync: favoriteToken } = useFavoriteToken({
-		sort: "popularity_24h",
-		sortDirection: "desc",
-		principal,
-	});
+	const { mutateAsync: favoriteToken } = useFavoriteToken(queryParameters);
 	const columns = useMemo(
 		() => [
 			columnHelper.accessor("ticker", {

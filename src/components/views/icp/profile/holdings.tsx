@@ -26,7 +26,10 @@ const ProfileHoldings = () => {
 	const { data: icpPrice } = useICPPrice();
 	const { userid } = useParams({ from: "/icp/profile/$userid" });
 	const { data: items, isFetching, refetch } = useUserTokenHoldersList(userid);
-	const columnHelper = createColumnHelper<MemeTokenDetails>();
+	const columnHelper = useMemo(
+		() => createColumnHelper<MemeTokenDetails>(),
+		[]
+	);
 
 	// const {
 	// 	data: allPrices,

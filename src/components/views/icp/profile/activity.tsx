@@ -33,7 +33,7 @@ const ProfileActivity = () => {
 			pageSize: 10,
 			userid,
 		});
-	const columnHelper = createColumnHelper<ActivityItem>();
+	const columnHelper = useMemo(() => createColumnHelper<ActivityItem>(), []);
 
 	const items = useMemo(
 		() => data?.pages.flatMap((page) => page.data) ?? [],

@@ -48,7 +48,7 @@ export default function Transactions() {
 	} = useInfiniteTokenTransactionsHistory({
 		token0: id,
 	});
-	const columnHelper = createColumnHelper<Transaction>();
+	const columnHelper = useMemo(() => createColumnHelper<Transaction>(), []);
 	const { data: icpPrice } = useICPPrice();
 
 	const columns = useMemo(

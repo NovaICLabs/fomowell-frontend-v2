@@ -40,6 +40,7 @@ export const getMemeToken = async (canisterId: string, id: bigint) => {
 		throw new Error("Failed to create actor");
 	}
 	const result = await actor.query_meme_token(id);
+	console.debug("🚀 ~ getMemeToken ~ result:", result);
 	const memeToken = unwrapOptionMap(result, (r) => ({
 		name: r.name,
 		ticker: r.ticker,
