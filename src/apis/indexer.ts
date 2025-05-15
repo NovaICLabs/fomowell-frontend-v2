@@ -366,12 +366,11 @@ export type ActivityItem = {
 };
 
 export const getUserActivity = async (parameters: {
-	user_token: string;
 	userid: string;
 	page?: number;
 	pageSize?: number;
 }) => {
-	const { user_token, userid, page = 1, pageSize = 20 } = parameters;
+	const { userid, page = 1, pageSize = 20 } = parameters;
 	const queryParameters = new URLSearchParams({
 		page: page.toString(),
 		pageSize: pageSize.toString(),
@@ -381,13 +380,7 @@ export const getUserActivity = async (parameters: {
 		statusCode: number;
 		message: string;
 	}>(
-		`${getIndexerBaseUrl()}/api/v1/users/activity/${userid}?${queryParameters.toString()}`,
-		{
-			method: "GET",
-			headers: {
-				authorization: `Bearer ${user_token}`,
-			},
-		}
+		`${getIndexerBaseUrl()}/api/v1/users/activity/${userid}?${queryParameters.toString()}`
 	);
 
 	if (response.statusCode !== 200) {

@@ -163,17 +163,12 @@ export const useInfiniteUserActivity = (parameters: {
 	pageSize: number;
 	userid: string;
 }) => {
-	const { jwt_token } = useIcIdentityStore();
-	if (!jwt_token) {
-		throw new Error("No login jwt token");
-	}
 	return useInfiniteQuery({
 		queryKey: ["ic-core", "userActivityList", parameters.userid],
 		queryFn: ({ pageParam: pageParameter = 1 }) =>
 			getUserActivity({
 				...parameters,
 				page: pageParameter,
-				user_token: jwt_token,
 			}),
 		getNextPageParam: (lastPage, pages) => {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
