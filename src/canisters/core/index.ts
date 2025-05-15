@@ -352,7 +352,7 @@ export type CreateMemeTokenArgs = {
 	twitter?: string;
 	creator?: string;
 	devBuy?: bigint;
-	logoBase64: Array<number>;
+	logoBase64: string;
 };
 
 export const createMemeToken = async (

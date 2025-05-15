@@ -28,7 +28,6 @@ import { showToast } from "@/components/utils/toast";
 import { FileUploader } from "@/components/views/token/bottom/file-uploader";
 import { useCoreTokenBalance, useCreateMemeToken } from "@/hooks/ic/core";
 import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
-import { string2array } from "@/lib/common/data/arrays";
 import { fileToBase64 } from "@/lib/common/file";
 import { parseUnits } from "@/lib/common/number";
 import { useDialogStore } from "@/store/dialog";
@@ -138,9 +137,10 @@ function TokenCreationPage() {
 		useCreateMemeToken();
 	const router = useRouter();
 	// Form submission handler
-	const [logoBase64Array, setLogoBase64Array] = useState<Array<number>>([]);
+	const [logoBase64String, setLogoBase64String] = useState<string>("");
+	console.debug("🚀 ~ TokenCreationPage ~ logoBase64String:", logoBase64String);
 	async function onSubmit(values: z.infer<typeof formSchema>) {
-		if (!logoBase64Array) {
+		if (!logoBase64String) {
 			throw new Error("Logo is required");
 		}
 		try {
@@ -183,7 +183,7 @@ function TokenCreationPage() {
 				twitter: twitterUrl,
 				telegram: telegramUrl,
 				website: websiteUrl,
-				logoBase64: logoBase64Array,
+				logoBase64: logoBase64String,
 			};
 
 			Object.keys(createArgs).forEach((key) => {
@@ -246,9 +246,7 @@ function TokenCreationPage() {
 															if (url && file) {
 																const logoBase64String =
 																	await fileToBase64(file);
-																setLogoBase64Array(
-																	string2array(logoBase64String)
-																);
+																setLogoBase64String(logoBase64String);
 																onChange(url);
 															}
 														}}

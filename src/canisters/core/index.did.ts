@@ -9,6 +9,15 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		token: IDL.Principal,
 		amount: IDL.Nat,
 	});
+	const InitArchiveArg = IDL.Record({
+		maxRecordsToArchive: IDL.Nat,
+		maxArchivePages: IDL.Nat,
+		settleToRecords: IDL.Nat,
+		archiveCycles: IDL.Nat,
+		maxActiveRecords: IDL.Nat,
+		maxRecordsInArchiveInstance: IDL.Nat,
+		archiveControllers: IDL.Opt(IDL.Opt(IDL.Vec(IDL.Principal))),
+	});
 	const BuyArgs = IDL.Record({
 		amount_out_min: IDL.Opt(IDL.Nat),
 		memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
@@ -32,7 +41,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		creator: IDL.Opt(IDL.Principal),
 		token: StableToken,
 		ticker: IDL.Text,
-		logo_base64: IDL.Vec(IDL.Nat8),
+		logo_base64: IDL.Text,
 		twitter: IDL.Opt(IDL.Text),
 		logo: IDL.Text,
 		name: IDL.Text,
@@ -176,7 +185,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		logs: IDL.Opt(CanisterLogResponse),
 		version: IDL.Opt(IDL.Nat),
 	});
-	const GetBlocksRequest = IDL.Record({
+	const TransactionRange = IDL.Record({
 		start: IDL.Nat,
 		length: IDL.Nat,
 	});
@@ -305,11 +314,11 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		timestamp: IDL.Nat64,
 		transfer: IDL.Opt(Transfer_1),
 	});
-	const TransactionRange = IDL.Record({
+	const TransactionRange_1 = IDL.Record({
 		transactions: IDL.Vec(Transaction_1),
 	});
 	const ArchivedRange = IDL.Record({
-		callback: IDL.Func([GetBlocksRequest], [TransactionRange], ["query"]),
+		callback: IDL.Func([TransactionRange], [TransactionRange_1], ["query"]),
 		start: IDL.Nat,
 		length: IDL.Nat,
 	});
@@ -332,6 +341,34 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 	const QueryMemeTokenResponse = IDL.Record({
 		meme_tokens: IDL.Vec(MemeToken),
 		count: IDL.Nat64,
+	});
+	const ArchiveSetting = IDL.Record({
+		max_records_in_archive_instance: IDL.Nat,
+		archive_cycles: IDL.Nat,
+		settle_to_records: IDL.Nat,
+		archive_controllers: IDL.Opt(IDL.Opt(IDL.Vec(IDL.Principal))),
+		max_active_records: IDL.Nat,
+		max_records_to_archive: IDL.Nat,
+		max_archive_pages: IDL.Nat,
+	});
+	const ArchiveLedgerInfo = IDL.Record({
+		setting: ArchiveSetting,
+		last_index: IDL.Nat,
+		first_index: IDL.Nat,
+		local_ledger_size: IDL.Nat,
+		txn_count: IDL.Nat,
+		archive_txn_count: IDL.Nat,
+		is_cleaning: IDL.Bool,
+		archives: IDL.Vec(IDL.Tuple(IDL.Principal, TransactionRange)),
+	});
+	const State = IDL.Record({
+		archive_ledger_info: ArchiveLedgerInfo,
+		fee_receiver: Account,
+		create_token_fee: IDL.Vec(TokenAmount),
+		token_launch_threshold: IDL.Vec(TokenAmount),
+		maintainer: Account,
+		maintenance: IDL.Bool,
+		fee_percentage: IDL.Opt(IDL.Float32),
 	});
 	const Holder = IDL.Record({ balance: IDL.Nat, account: Account });
 	const MemeTokenBalance = IDL.Record({
@@ -360,12 +397,11 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			["query"]
 		),
 		get_transactions: IDL.Func(
-			[GetBlocksRequest],
+			[TransactionRange],
 			[GetTransactionsResponse],
 			["query"]
 		),
 		icrc1_balance_of: IDL.Func([LedgerType, Account], [IDL.Nat], ["query"]),
-		internal_transfer: IDL.Func([IDL.Nat64], [Result_2], []),
 		launch_meme_token: IDL.Func([IDL.Nat64], [Result_2], []),
 		query_meme_token: IDL.Func([IDL.Nat64], [IDL.Opt(MemeToken)], ["query"]),
 		query_meme_token_price: IDL.Func([IDL.Nat64], [Result], ["query"]),
@@ -374,11 +410,13 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			[QueryMemeTokenResponse],
 			["query"]
 		),
+		query_state: IDL.Func([], [State], ["query"]),
 		query_token_holders: IDL.Func(
 			[IDL.Nat64, IDL.Nat64, IDL.Nat64],
 			[IDL.Vec(Holder), IDL.Nat64],
 			["query"]
 		),
+		query_txn_size: IDL.Func([], [IDL.Nat64], ["query"]),
 		query_user_by_random: IDL.Func(
 			[IDL.Nat64],
 			[IDL.Opt(IDL.Principal)],
@@ -395,8 +433,8 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			["query"]
 		),
 		sell: IDL.Func([BuyArgs], [Result], []),
-		test: IDL.Func([], [], []),
-		update_creation_fee: IDL.Func([TokenAmount], [], []),
+		test_internal_transfer: IDL.Func([IDL.Nat64], [Result_2], []),
+		test_launch: IDL.Func([IDL.Nat64], [Result_2], []),
 		withdraw: IDL.Func([WithdrawArgs], [Result], []),
 	});
 };
@@ -409,10 +447,20 @@ export const init = ({ IDL }: { IDL: any }) => {
 		token: IDL.Principal,
 		amount: IDL.Nat,
 	});
+	const InitArchiveArg = IDL.Record({
+		maxRecordsToArchive: IDL.Nat,
+		maxArchivePages: IDL.Nat,
+		settleToRecords: IDL.Nat,
+		archiveCycles: IDL.Nat,
+		maxActiveRecords: IDL.Nat,
+		maxRecordsInArchiveInstance: IDL.Nat,
+		archiveControllers: IDL.Opt(IDL.Opt(IDL.Vec(IDL.Principal))),
+	});
 	const InitArg = IDL.Record({
 		fee_receiver: Account,
-		token_launch_tread_hold: IDL.Vec(TokenAmount),
 		create_token_fee: IDL.Vec(TokenAmount),
+		archive_init: IDL.Opt(InitArchiveArg),
+		token_launch_threshold: IDL.Vec(TokenAmount),
 		maintenance: IDL.Bool,
 		fee_percentage: IDL.Opt(IDL.Float32),
 	});

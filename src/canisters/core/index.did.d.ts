@@ -16,6 +16,25 @@ export interface Approve {
 	expires_at: [] | [bigint];
 	spender: Account;
 }
+export interface ArchiveLedgerInfo {
+	setting: ArchiveSetting;
+	last_index: bigint;
+	first_index: bigint;
+	local_ledger_size: bigint;
+	txn_count: bigint;
+	archive_txn_count: bigint;
+	is_cleaning: boolean;
+	archives: Array<[Principal, TransactionRange]>;
+}
+export interface ArchiveSetting {
+	max_records_in_archive_instance: bigint;
+	archive_cycles: bigint;
+	settle_to_records: bigint;
+	archive_controllers: [] | [[] | [Array<Principal>]];
+	max_active_records: bigint;
+	max_records_to_archive: bigint;
+	max_archive_pages: bigint;
+}
 export interface ArchivedRange {
 	callback: [Principal, string];
 	start: bigint;
@@ -100,7 +119,7 @@ export interface CreateMemeTokenArg {
 	creator: [] | [Principal];
 	token: StableToken;
 	ticker: string;
-	logo_base64: Uint8Array | number[];
+	logo_base64: string;
 	twitter: [] | [string];
 	logo: string;
 	name: string;
@@ -129,10 +148,6 @@ export interface DepositArgs {
 	memo: [] | [Uint8Array | number[]];
 	subaccount: [] | [Uint8Array | number[]];
 	amount: bigint;
-}
-export interface GetBlocksRequest {
-	start: bigint;
-	length: bigint;
 }
 export interface GetInformationRequest {
 	status: [] | [StatusRequest];
@@ -183,10 +198,20 @@ export interface HourlyMetricsData {
 	canisterMemorySize: BigUint64Array | bigint[];
 	timeMillis: bigint;
 }
+export interface InitArchiveArg {
+	maxRecordsToArchive: bigint;
+	maxArchivePages: bigint;
+	settleToRecords: bigint;
+	archiveCycles: bigint;
+	maxActiveRecords: bigint;
+	maxRecordsInArchiveInstance: bigint;
+	archiveControllers: [] | [[] | [Array<Principal>]];
+}
 export interface InitArg {
 	fee_receiver: Account;
-	token_launch_tread_hold: Array<TokenAmount>;
 	create_token_fee: Array<TokenAmount>;
+	archive_init: [] | [InitArchiveArg];
+	token_launch_threshold: Array<TokenAmount>;
 	maintenance: boolean;
 	fee_percentage: [] | [number];
 }
@@ -267,6 +292,15 @@ export interface StableToken {
 	canister_id: Principal;
 	symbol: string;
 }
+export interface State {
+	archive_ledger_info: ArchiveLedgerInfo;
+	fee_receiver: Account;
+	create_token_fee: Array<TokenAmount>;
+	token_launch_threshold: Array<TokenAmount>;
+	maintainer: Account;
+	maintenance: boolean;
+	fee_percentage: [] | [number];
+}
 export interface StatusRequest {
 	memory_size: boolean;
 	cycles: boolean;
@@ -303,6 +337,10 @@ export interface Transaction {
 	transfer: [] | [Transfer];
 }
 export interface TransactionRange {
+	start: bigint;
+	length: bigint;
+}
+export interface TransactionRange_1 {
 	transactions: Array<Transaction_1>;
 }
 export interface Transaction_1 {
@@ -357,17 +395,18 @@ export interface _SERVICE {
 		[GetInformationRequest],
 		GetInformationResponse
 	>;
-	get_transactions: ActorMethod<[GetBlocksRequest], GetTransactionsResponse>;
+	get_transactions: ActorMethod<[TransactionRange], GetTransactionsResponse>;
 	icrc1_balance_of: ActorMethod<[LedgerType, Account], bigint>;
-	internal_transfer: ActorMethod<[bigint], Result_2>;
 	launch_meme_token: ActorMethod<[bigint], Result_2>;
 	query_meme_token: ActorMethod<[bigint], [] | [MemeToken]>;
 	query_meme_token_price: ActorMethod<[bigint], Result>;
 	query_meme_tokens: ActorMethod<[QueryMemeTokenArgs], QueryMemeTokenResponse>;
+	query_state: ActorMethod<[], State>;
 	query_token_holders: ActorMethod<
 		[bigint, bigint, bigint],
 		[Array<Holder>, bigint]
 	>;
+	query_txn_size: ActorMethod<[], bigint>;
 	query_user_by_random: ActorMethod<[bigint], [] | [Principal]>;
 	query_user_create_meme_tokens: ActorMethod<
 		[[] | [Principal]],
@@ -375,8 +414,8 @@ export interface _SERVICE {
 	>;
 	query_user_tokens: ActorMethod<[[] | [Account]], Array<MemeTokenBalance>>;
 	sell: ActorMethod<[BuyArgs], Result>;
-	test: ActorMethod<[], undefined>;
-	update_creation_fee: ActorMethod<[TokenAmount], undefined>;
+	test_internal_transfer: ActorMethod<[bigint], Result_2>;
+	test_launch: ActorMethod<[bigint], Result_2>;
 	withdraw: ActorMethod<[WithdrawArgs], Result>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;
