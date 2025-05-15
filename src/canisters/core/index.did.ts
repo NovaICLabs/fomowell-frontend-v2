@@ -9,15 +9,6 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		token: IDL.Principal,
 		amount: IDL.Nat,
 	});
-	const InitArchiveArg = IDL.Record({
-		maxRecordsToArchive: IDL.Nat,
-		maxArchivePages: IDL.Nat,
-		settleToRecords: IDL.Nat,
-		archiveCycles: IDL.Nat,
-		maxActiveRecords: IDL.Nat,
-		maxRecordsInArchiveInstance: IDL.Nat,
-		archiveControllers: IDL.Opt(IDL.Opt(IDL.Vec(IDL.Principal))),
-	});
 	const BuyArgs = IDL.Record({
 		amount_out_min: IDL.Opt(IDL.Nat),
 		memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
