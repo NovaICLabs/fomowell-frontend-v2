@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/require-await */
-import { ShipWheel } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
 import { showToast } from "@/components/utils/toast";
