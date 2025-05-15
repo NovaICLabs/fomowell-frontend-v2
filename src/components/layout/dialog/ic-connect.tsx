@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import {
 	Dialog,
 	DialogContent,
@@ -5,13 +7,12 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { useIcWallet } from "@/hooks/providers/wallet/ic";
+import { connectManager, type Connector } from "@/lib/ic/connectors";
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore, useIcLastConnectedWalletStore } from "@/store/ic";
 
 import WalletOption from "../header/wallet-option";
-
-import type { Connector } from "@/lib/ic/connectors";
 
 export default function IcpConnectDialog() {
 	// todo ref code
@@ -19,15 +20,21 @@ export default function IcpConnectDialog() {
 	const { setPrincipal, connectByPrincipal } = useIcIdentityStore();
 	const { setLastConnectedWallet } = useIcLastConnectedWalletStore();
 	const { icpConnectOpen, setIcpConnectOpen } = useDialogStore();
+
+	useEffect(() => {
+		// init internet identity connector to avoid safari pop-up window was blocked
+		if (icpConnectOpen) {
+			void connectManager.init("II");
+		}
+	}, [icpConnectOpen]);
+
 	const handleConnectWallet = async (connector: Connector) => {
 		try {
 			const { principal } = await connect(connector);
-
 			if (principal) {
 				setPrincipal(principal);
 				// setConnected(connected);
 				setLastConnectedWallet(connector);
-
 				void connectByPrincipal();
 			}
 			setIcpConnectOpen(false);

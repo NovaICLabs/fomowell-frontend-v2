@@ -168,7 +168,6 @@ export function useIcWallet() {
 		async (connector: Connector, connectorOutside?: null | WalletConnector) => {
 			setConnecting(true);
 			try {
-				await connectManager.init(connector);
 				// Fix pop-up window was blocked when there is a asynchronous call before connecting the wallet
 				if (connectorOutside) {
 					const isSafari = /^((?!chrome|android).)*safari/i.test(
@@ -181,6 +180,7 @@ export function useIcWallet() {
 						"Some unknown error happened. Please refresh the page to reconnect."
 					);
 				}
+				await connectManager.init(connector);
 				return await connectManager.connect();
 			} catch (error) {
 				console.debug("🚀 ~ error:", error);
