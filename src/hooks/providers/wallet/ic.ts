@@ -183,7 +183,7 @@ export function useIcWallet() {
 				await connectManager.init(connector);
 				return await connectManager.connect();
 			} catch (error) {
-				console.debug("🚀 ~ error:", error);
+				console.error("🚀 ~ error:", error);
 				throw error;
 			} finally {
 				setConnecting(false);
