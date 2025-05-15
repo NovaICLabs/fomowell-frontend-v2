@@ -89,10 +89,14 @@ export const IcpAccountInfo = () => {
 				<div
 					className="bg-gray-750 inline-flex h-[38px] cursor-pointer items-center justify-start rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700"
 					onMouseEnter={() => {
-						setOpenPopover(true);
+						if (!isMobile) {
+							setOpenPopover(true);
+						}
 					}}
 					onMouseLeave={() => {
-						setOpenPopover(false);
+						if (!isMobile) {
+							setOpenPopover(false);
+						}
 					}}
 				>
 					{identityProfile ? (
