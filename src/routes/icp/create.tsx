@@ -138,7 +138,6 @@ function TokenCreationPage() {
 	const router = useRouter();
 	// Form submission handler
 	const [logoBase64String, setLogoBase64String] = useState<string>("");
-	console.debug("🚀 ~ TokenCreationPage ~ logoBase64String:", logoBase64String);
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		if (!logoBase64String) {
 			throw new Error("Logo is required");
