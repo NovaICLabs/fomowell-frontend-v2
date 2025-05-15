@@ -176,7 +176,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		logs: IDL.Opt(CanisterLogResponse),
 		version: IDL.Opt(IDL.Nat),
 	});
-	const TransactionRange = IDL.Record({
+	const GetBlocksRequest = IDL.Record({
 		start: IDL.Nat,
 		length: IDL.Nat,
 	});
@@ -305,11 +305,11 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		timestamp: IDL.Nat64,
 		transfer: IDL.Opt(Transfer_1),
 	});
-	const TransactionRange_1 = IDL.Record({
+	const TransactionRange = IDL.Record({
 		transactions: IDL.Vec(Transaction_1),
 	});
 	const ArchivedRange = IDL.Record({
-		callback: IDL.Func([TransactionRange], [TransactionRange_1], ["query"]),
+		callback: IDL.Func([GetBlocksRequest], [TransactionRange], ["query"]),
 		start: IDL.Nat,
 		length: IDL.Nat,
 	});
@@ -319,7 +319,41 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		transactions: IDL.Vec(Transaction),
 		archived_transactions: IDL.Vec(ArchivedRange),
 	});
-	const Result_2 = IDL.Variant({ Ok: IDL.Null, Err: IDL.Text });
+	const SupportedStandard = IDL.Record({ url: IDL.Text, name: IDL.Text });
+	const ConsentMessageMetadata = IDL.Record({
+		utc_offset_minutes: IDL.Opt(IDL.Int16),
+		language: IDL.Text,
+	});
+	const DisplayMessageType = IDL.Variant({
+		GenericDisplay: IDL.Null,
+		LineDisplay: IDL.Record({
+			characters_per_line: IDL.Nat16,
+			lines_per_page: IDL.Nat16,
+		}),
+	});
+	const ConsentMessageSpec = IDL.Record({
+		metadata: ConsentMessageMetadata,
+		device_spec: IDL.Opt(DisplayMessageType),
+	});
+	const ConsentMessageRequest = IDL.Record({
+		arg: IDL.Vec(IDL.Nat8),
+		method: IDL.Text,
+		user_preferences: ConsentMessageSpec,
+	});
+	const LineDisplayPage = IDL.Record({ lines: IDL.Vec(IDL.Text) });
+	const ConsentMessage = IDL.Variant({
+		LineDisplayMessage: IDL.Record({ pages: IDL.Vec(LineDisplayPage) }),
+		GenericDisplayMessage: IDL.Text,
+	});
+	const ConsentInfo = IDL.Record({
+		metadata: ConsentMessageMetadata,
+		consent_message: ConsentMessage,
+	});
+	const ErrorInfo = IDL.Record({ description: IDL.Text });
+	const Result_2 = IDL.Variant({ Ok: ConsentInfo, Err: ErrorInfo });
+	const Icrc28TrustedOrigins = IDL.Record({
+		trusted_origins: IDL.Vec(IDL.Text),
+	});
 	const Sort = IDL.Variant({
 		CreateTimeDsc: IDL.Null,
 		MarketCapDsc: IDL.Null,
@@ -350,7 +384,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		txn_count: IDL.Nat,
 		archive_txn_count: IDL.Nat,
 		is_cleaning: IDL.Bool,
-		archives: IDL.Vec(IDL.Tuple(IDL.Principal, TransactionRange)),
+		archives: IDL.Vec(IDL.Tuple(IDL.Principal, GetBlocksRequest)),
 	});
 	const State = IDL.Record({
 		archive_ledger_info: ArchiveLedgerInfo,
@@ -366,6 +400,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		token: MemeToken,
 		balance: IDL.Nat,
 	});
+	const Result_3 = IDL.Variant({ Ok: IDL.Null, Err: IDL.Text });
 	const WithdrawArgs = IDL.Record({
 		to: Account,
 		token: StableToken,
@@ -388,12 +423,22 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			["query"]
 		),
 		get_transactions: IDL.Func(
-			[TransactionRange],
+			[GetBlocksRequest],
 			[GetTransactionsResponse],
 			["query"]
 		),
+		icrc10_supported_standards: IDL.Func(
+			[],
+			[IDL.Vec(SupportedStandard)],
+			["query"]
+		),
 		icrc1_balance_of: IDL.Func([LedgerType, Account], [IDL.Nat], ["query"]),
-		launch_meme_token: IDL.Func([IDL.Nat64], [Result_2], []),
+		icrc21_canister_call_consent_message: IDL.Func(
+			[ConsentMessageRequest],
+			[Result_2],
+			[]
+		),
+		icrc28_trusted_origins: IDL.Func([], [Icrc28TrustedOrigins], []),
 		query_meme_token: IDL.Func([IDL.Nat64], [IDL.Opt(MemeToken)], ["query"]),
 		query_meme_token_price: IDL.Func([IDL.Nat64], [Result], ["query"]),
 		query_meme_tokens: IDL.Func(
@@ -424,8 +469,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			["query"]
 		),
 		sell: IDL.Func([BuyArgs], [Result], []),
-		test_internal_transfer: IDL.Func([IDL.Nat64], [Result_2], []),
-		test_launch: IDL.Func([IDL.Nat64], [Result_2], []),
+		test_launch: IDL.Func([IDL.Nat64], [Result_3], []),
 		withdraw: IDL.Func([WithdrawArgs], [Result], []),
 	});
 };

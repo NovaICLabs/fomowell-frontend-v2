@@ -13,7 +13,10 @@ export default function MenuSheet() {
 	const { setHowItWorksOpen } = useDialogStore();
 	return (
 		<Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-			<SheetContent className="w-[360px] pt-5" side="left">
+			<SheetContent
+				className="w-[360px] pt-5 focus-visible:ring-0 focus-visible:outline-none"
+				side="left"
+			>
 				<div className="flex flex-col justify-start">
 					<div
 						className={cn(

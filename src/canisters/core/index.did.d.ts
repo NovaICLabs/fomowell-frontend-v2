@@ -24,7 +24,7 @@ export interface ArchiveLedgerInfo {
 	txn_count: bigint;
 	archive_txn_count: bigint;
 	is_cleaning: boolean;
-	archives: Array<[Principal, TransactionRange]>;
+	archives: Array<[Principal, GetBlocksRequest]>;
 }
 export interface ArchiveSetting {
 	max_records_in_archive_instance: bigint;
@@ -115,6 +115,28 @@ export interface ClaimArg {
 	token: StableToken;
 	claimer: [] | [Principal];
 }
+export interface ConsentInfo {
+	metadata: ConsentMessageMetadata;
+	consent_message: ConsentMessage;
+}
+export type ConsentMessage =
+	| {
+			LineDisplayMessage: { pages: Array<LineDisplayPage> };
+	  }
+	| { GenericDisplayMessage: string };
+export interface ConsentMessageMetadata {
+	utc_offset_minutes: [] | [number];
+	language: string;
+}
+export interface ConsentMessageRequest {
+	arg: Uint8Array | number[];
+	method: string;
+	user_preferences: ConsentMessageSpec;
+}
+export interface ConsentMessageSpec {
+	metadata: ConsentMessageMetadata;
+	device_spec: [] | [DisplayMessageType];
+}
 export interface CreateMemeTokenArg {
 	creator: [] | [Principal];
 	token: StableToken;
@@ -148,6 +170,21 @@ export interface DepositArgs {
 	memo: [] | [Uint8Array | number[]];
 	subaccount: [] | [Uint8Array | number[]];
 	amount: bigint;
+}
+export type DisplayMessageType =
+	| { GenericDisplay: null }
+	| {
+			LineDisplay: {
+				characters_per_line: number;
+				lines_per_page: number;
+			};
+	  };
+export interface ErrorInfo {
+	description: string;
+}
+export interface GetBlocksRequest {
+	start: bigint;
+	length: bigint;
 }
 export interface GetInformationRequest {
 	status: [] | [StatusRequest];
@@ -198,6 +235,9 @@ export interface HourlyMetricsData {
 	canisterMemorySize: BigUint64Array | bigint[];
 	timeMillis: bigint;
 }
+export interface Icrc28TrustedOrigins {
+	trusted_origins: Array<string>;
+}
 export interface InitArchiveArg {
 	maxRecordsToArchive: bigint;
 	maxArchivePages: bigint;
@@ -216,6 +256,9 @@ export interface InitArg {
 	fee_percentage: [] | [number];
 }
 export type LedgerType = { MemeToken: bigint } | { ICRCToken: Principal };
+export interface LineDisplayPage {
+	lines: Array<string>;
+}
 export interface LogMessageData {
 	timeNanos: bigint;
 	message: string;
@@ -283,7 +326,8 @@ export interface QueryMemeTokenResponse {
 }
 export type Result = { Ok: bigint } | { Err: string };
 export type Result_1 = { Ok: MemeToken } | { Err: string };
-export type Result_2 = { Ok: null } | { Err: string };
+export type Result_2 = { Ok: ConsentInfo } | { Err: ErrorInfo };
+export type Result_3 = { Ok: null } | { Err: string };
 export type Sort = { CreateTimeDsc: null } | { MarketCapDsc: null };
 export interface StableToken {
 	fee: bigint;
@@ -311,6 +355,10 @@ export interface StatusResponse {
 	cycles: [] | [bigint];
 	heap_memory_size: [] | [bigint];
 }
+export interface SupportedStandard {
+	url: string;
+	name: string;
+}
 export interface Swap {
 	from: Account;
 	reserve0: bigint;
@@ -337,10 +385,6 @@ export interface Transaction {
 	transfer: [] | [Transfer];
 }
 export interface TransactionRange {
-	start: bigint;
-	length: bigint;
-}
-export interface TransactionRange_1 {
 	transactions: Array<Transaction_1>;
 }
 export interface Transaction_1 {
@@ -395,9 +439,14 @@ export interface _SERVICE {
 		[GetInformationRequest],
 		GetInformationResponse
 	>;
-	get_transactions: ActorMethod<[TransactionRange], GetTransactionsResponse>;
+	get_transactions: ActorMethod<[GetBlocksRequest], GetTransactionsResponse>;
+	icrc10_supported_standards: ActorMethod<[], Array<SupportedStandard>>;
 	icrc1_balance_of: ActorMethod<[LedgerType, Account], bigint>;
-	launch_meme_token: ActorMethod<[bigint], Result_2>;
+	icrc21_canister_call_consent_message: ActorMethod<
+		[ConsentMessageRequest],
+		Result_2
+	>;
+	icrc28_trusted_origins: ActorMethod<[], Icrc28TrustedOrigins>;
 	query_meme_token: ActorMethod<[bigint], [] | [MemeToken]>;
 	query_meme_token_price: ActorMethod<[bigint], Result>;
 	query_meme_tokens: ActorMethod<[QueryMemeTokenArgs], QueryMemeTokenResponse>;
@@ -414,8 +463,7 @@ export interface _SERVICE {
 	>;
 	query_user_tokens: ActorMethod<[[] | [Account]], Array<MemeTokenBalance>>;
 	sell: ActorMethod<[BuyArgs], Result>;
-	test_internal_transfer: ActorMethod<[bigint], Result_2>;
-	test_launch: ActorMethod<[bigint], Result_2>;
+	test_launch: ActorMethod<[bigint], Result_3>;
 	withdraw: ActorMethod<[WithdrawArgs], Result>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;

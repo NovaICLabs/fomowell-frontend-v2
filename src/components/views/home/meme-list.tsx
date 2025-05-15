@@ -55,7 +55,7 @@ import type { TokenInfo, TokenListSortOption } from "@/apis/indexer";
 
 const TableItemsSkeleton = () => {
 	return (
-		<div className="flex h-18 w-full items-center justify-center">
+		<div className="flex h-18 w-full flex-shrink-0 items-center justify-center">
 			<Skeleton className="h-18 w-full" />
 		</div>
 	);
@@ -887,9 +887,9 @@ export default function MemeList() {
 
 	if (status === "pending") {
 		return (
-			<div className="bg-gray-760 flex h-screen w-full flex-col items-center justify-center gap-2 rounded-t-2xl pt-10">
+			<div className="bg-gray-760 flex h-screen w-full flex-col items-center justify-start gap-2 rounded-t-2xl pt-10">
 				{Array.from({ length: 12 }).map((_, index) => (
-					<Skeleton key={index} className="h-18 w-full" />
+					<Skeleton key={index} className="h-18 w-full flex-shrink-0" />
 				))}
 			</div>
 		);
@@ -957,7 +957,7 @@ export default function MemeList() {
 							return (
 								<tr key="loader" className="h-18">
 									<td colSpan={columns.length}>
-										<div className="flex h-full w-full items-center justify-center">
+										<div className="flex h-18 w-full items-center justify-center">
 											{hasNextPage && infiniteQueryEnabled ? (
 												<TableItemsSkeleton />
 											) : (

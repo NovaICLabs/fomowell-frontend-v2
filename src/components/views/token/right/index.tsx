@@ -6,6 +6,7 @@ import BigNumber from "bignumber.js";
 import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useSingleTokenInfo } from "@/hooks/apis/indexer";
 import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
@@ -172,7 +173,11 @@ export default function Bottom() {
 					})}
 			</div>
 			{activeTab === "Trade" &&
-				(memeTokenInfo?.completed ? (
+				(!memeTokenInfo ? (
+					<div className="flex h-[426px] w-[390px] flex-1 flex-col items-center justify-center gap-2">
+						<Skeleton className="h-[426px] w-[390px]" />
+					</div>
+				) : memeTokenInfo.completed ? (
 					<div className="flex flex-col items-center justify-center gap-2">
 						<img
 							alt="completed"
