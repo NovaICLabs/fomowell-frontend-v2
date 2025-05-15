@@ -7,6 +7,7 @@ import { isMobile } from "react-device-detect";
 import { Star } from "@/components/icons/star";
 import BitcoinWalletConnect from "@/components/layout/header/connect-button/bitcoin";
 import IcpWalletConnect from "@/components/layout/header/connect-button/icp";
+import { Button } from "@/components/ui/button";
 import Bottom from "@/components/views/token/bottom";
 import HeadInfo from "@/components/views/token/head-info";
 import Right from "@/components/views/token/right";
@@ -162,10 +163,10 @@ const MobileToken = () => {
 					<img alt="info" className="h-6 w-6" src="/svgs/common/info.svg" />
 					<span className="text-xs text-white/60">Info</span>
 				</div>
-				<button
+				<Button
 					key={"buy"}
 					className={cn(
-						"bg-price-positive hover:bg-price-positive/80 h-9.5 w-37 rounded-[19px] px-2.5 py-1.5 text-sm font-medium"
+						"bg-price-positive hover:bg-price-positive/80 h-9.5 w-37 rounded-[19px] px-2.5 py-1.5 text-sm font-medium text-white"
 					)}
 					onClick={() => {
 						if (!connected) {
@@ -177,11 +178,11 @@ const MobileToken = () => {
 					}}
 				>
 					Buy
-				</button>
-				<button
+				</Button>
+				<Button
 					key={"sell"}
 					className={cn(
-						"bg-price-negative hover:bg-price-negative/80 h-9.5 w-37 rounded-[19px] px-2.5 py-1.5 text-sm font-medium"
+						"bg-price-negative hover:bg-price-negative/80 h-9.5 w-37 rounded-[19px] px-2.5 py-1.5 text-sm font-medium text-white"
 					)}
 					onClick={() => {
 						if (!connected) {
@@ -193,7 +194,7 @@ const MobileToken = () => {
 					}}
 				>
 					Sell
-				</button>
+				</Button>
 			</div>
 		</div>
 	);

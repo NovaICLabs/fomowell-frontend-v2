@@ -131,13 +131,12 @@ export const FileUploader = forwardRef<FileUploaderRef, FileUploaderProps>(
 								src={preview}
 							/>
 							{!isHideRemove && (
-								<button
+								<div
 									className="absolute top-3 right-3 rounded-full bg-gray-800/70 p-1.5 text-white/80 hover:bg-gray-700 hover:text-white"
-									type="button"
 									onClick={withStopPropagation(removeFile)}
 								>
 									<X size={16} />
-								</button>
+								</div>
 							)}
 							{alwaysShowEdit && (
 								<div className="absolute top-0 left-0 flex h-full w-full items-center justify-center rounded-full bg-gray-500/40 opacity-100 transition-all">

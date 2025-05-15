@@ -232,9 +232,8 @@ export default function TradingView() {
 				>
 					<div className="no-scrollbar flex w-full gap-1 overflow-scroll">
 						{intervals.map(({ value, label }) => (
-							<button
+							<div
 								key={value}
-								type="button"
 								className={`rounded-md px-3 py-1 text-xs transition-colors sm:text-sm ${
 									selectedInterval === value
 										? "bg-[#F6D54F] text-black"
@@ -245,7 +244,7 @@ export default function TradingView() {
 								}}
 							>
 								{label}
-							</button>
+							</div>
 						))}
 					</div>
 				</div>

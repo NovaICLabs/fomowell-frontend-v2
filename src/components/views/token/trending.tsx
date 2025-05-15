@@ -294,20 +294,20 @@ export default function Trending() {
 					<div className="flex h-full flex-col p-4 pt-0">
 						<div className="flex items-center justify-between">
 							<h2 className="text-base font-semibold text-white">Trending</h2>
-							<button
-								className="flex-shrink-0 text-gray-400"
+							<div
+								className="flex-shrink-0 cursor-pointer text-gray-400"
 								onClick={toggleExpanded}
 							>
 								<ChevronLeft />
-							</button>
+							</div>
 						</div>
 
 						<div className="border-gray-710 mt-4 grid grid-cols-4 gap-0 rounded-[12px] border">
 							{trendingTimeOptions.map((time, index) => (
-								<button
+								<div
 									key={time.value}
 									className={cn(
-										"bg-gray-860 py-2 text-center text-sm font-medium",
+										"bg-gray-860 cursor-pointer py-2 text-center text-sm font-medium",
 										sort === time.value
 											? "bg-gray-700 text-white"
 											: "bg-transparent text-gray-500",
@@ -320,7 +320,7 @@ export default function Trending() {
 									}}
 								>
 									{time.label}
-								</button>
+								</div>
 							))}
 						</div>
 						<div
@@ -361,12 +361,12 @@ export default function Trending() {
 						</div>
 					</div>
 				) : (
-					<button
-						className="bg-gray-760 absolute top-20 left-0 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-r-full text-gray-400"
+					<div
+						className="bg-gray-760 absolute top-20 left-0 inline-flex h-10 w-10 flex-shrink-0 cursor-pointer items-center justify-center rounded-r-full text-gray-400"
 						onClick={toggleExpanded}
 					>
 						<ChevronLeft className="rotate-180" />
-					</button>
+					</div>
 				)}
 			</div>
 		);
@@ -392,20 +392,20 @@ export default function Trending() {
 				<div className="flex h-full flex-col p-4 pt-0">
 					<div className="flex items-center justify-between">
 						<h2 className="text-base font-semibold text-white">Trending</h2>
-						<button
-							className="flex-shrink-0 text-gray-400"
+						<div
+							className="flex-shrink-0 cursor-pointer text-gray-400"
 							onClick={toggleExpanded}
 						>
 							<ChevronLeft />
-						</button>
+						</div>
 					</div>
 
 					<div className="border-gray-710 mt-4 grid grid-cols-4 gap-0 rounded-[12px] border">
 						{trendingTimeOptions.map((time, index) => (
-							<button
+							<div
 								key={time.value}
 								className={cn(
-									"bg-gray-860 py-2 text-center text-sm font-medium",
+									"bg-gray-860 cursor-pointer py-2 text-center text-sm font-medium",
 									sort === time.value
 										? "bg-gray-700 text-white"
 										: "bg-transparent text-gray-500",
@@ -417,7 +417,7 @@ export default function Trending() {
 								}}
 							>
 								{time.label}
-							</button>
+							</div>
 						))}
 					</div>
 
@@ -516,12 +516,12 @@ export default function Trending() {
 					) : null}
 				</div>
 			) : (
-				<button
-					className="bg-gray-760 absolute top-20 left-0 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-r-full text-gray-400"
+				<div
+					className="bg-gray-760 absolute top-20 left-0 inline-flex h-10 w-10 flex-shrink-0 cursor-pointer items-center justify-center rounded-r-full text-gray-400"
 					onClick={toggleExpanded}
 				>
 					<ChevronLeft className="rotate-180" />
-				</button>
+				</div>
 			)}
 		</div>
 	);

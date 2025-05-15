@@ -445,10 +445,10 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 			</div>
 			<div className="mt-4 flex justify-between gap-2">
 				{tabs.map((tab) => (
-					<button
+					<Button
 						key={tab}
 						className={cn(
-							"bg-gray-710 hover:bg-gray-710/80 h-8 w-[158px] rounded-[19px] px-2.5 py-1.5 text-sm font-medium",
+							"bg-gray-710 hover:bg-gray-710/80 h-8 w-[158px] rounded-[19px] px-2.5 py-1.5 text-sm font-medium text-white",
 							activeTab === tab &&
 								(tab === "Buy"
 									? "bg-price-positive hover:bg-price-positive/80"
@@ -459,7 +459,7 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 						}}
 					>
 						{tab}
-					</button>
+					</Button>
 				))}
 			</div>
 			<div className="mt-4 flex items-center justify-between px-2 text-end text-sm font-medium">

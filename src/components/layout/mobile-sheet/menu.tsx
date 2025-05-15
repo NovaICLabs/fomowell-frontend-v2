@@ -24,14 +24,14 @@ export default function MenuSheet() {
 						<div className={cn("w-[171px]")}>
 							<IcpAccountInfo />
 						</div>
-						<button
+						<div
 							className="bg-gray-760 inline-flex h-10 w-10 flex-shrink-0 rotate-180 items-center justify-center rounded-r-full text-gray-400"
 							onClick={() => {
 								setMenuOpen(false);
 							}}
 						>
 							<ChevronLeft className="rotate-180" />
-						</button>
+						</div>
 					</div>
 					<div
 						className="border-gray-710 flex h-12 items-center border-t border-b text-sm font-medium text-white/60"
