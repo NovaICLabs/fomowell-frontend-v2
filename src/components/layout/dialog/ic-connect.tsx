@@ -31,6 +31,7 @@ export default function IcpConnectDialog() {
 	const handleConnectWallet = async (connector: Connector) => {
 		try {
 			const { principal } = await connect(connector);
+			console.debug("🚀 ~ handleConnectWal ~ principal:", principal);
 			if (principal) {
 				setPrincipal(principal);
 				// setConnected(connected);

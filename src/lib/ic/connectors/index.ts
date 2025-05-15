@@ -10,6 +10,7 @@ export type CreateActorArgs = {
 export interface WalletConnectorConfig {
 	whitelist: Array<string>;
 	host: string;
+	plugOnConnectionUpdate?: () => void;
 }
 
 export type ConnectCallback = () => Promise<void>;
@@ -45,9 +46,15 @@ export class WalletConnector {
 	public connectorType: Connector = "II";
 
 	// initial connect instance
-	public async init(connectorType: Connector) {
+	public async init(
+		connectorType: Connector,
+		plugOnConnectionUpdate?: () => void
+	) {
 		if (!this.connector || this.connector.type !== connectorType) {
-			const connector = WalletConnector.create(connectorType);
+			const connector = WalletConnector.create(
+				connectorType,
+				plugOnConnectionUpdate
+			);
 			this.connectorType = connectorType;
 			await connector.init();
 			this.connector = connector;
@@ -55,17 +62,21 @@ export class WalletConnector {
 		}
 	}
 
-	public static create(connector: Connector) {
+	public static create(
+		connector: Connector,
+		plugOnConnectionUpdate?: () => void
+	) {
 		const config = {
 			host: import.meta.env.VITE_IC_HOST,
 			whitelist: [getChainICCoreCanisterId().toText()],
+			plugOnConnectionUpdate,
 		};
 
 		switch (connector) {
 			case "II":
 				return new InternetIdentityConnector(config);
 			case "PLUG":
-				return new PlugConnector(config);
+				return new PlugConnector(config, plugOnConnectionUpdate);
 			case "OISY":
 				return new OisyConnector(config);
 			default:

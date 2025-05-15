@@ -4,7 +4,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/require-await */
+import { ShipWheel } from "lucide-react";
 import { isMobile } from "react-device-detect";
+
+import { showToast } from "@/components/utils/toast";
 
 import type {
 	ConnectorAbstract,
@@ -21,6 +24,7 @@ export class PlugConnector implements ConnectorAbstract {
 		providerUrl: string;
 		host: string;
 		dev: boolean;
+		onConnectionUpdate?: () => void;
 	};
 
 	private principal?: string;
@@ -31,12 +35,16 @@ export class PlugConnector implements ConnectorAbstract {
 		return this.principal;
 	}
 
-	public constructor(config: WalletConnectorConfig) {
+	public constructor(
+		config: WalletConnectorConfig,
+		plugOnConnectionUpdate?: () => void
+	) {
 		this.config = {
 			whitelist: config.whitelist,
 			host: config.host,
 			providerUrl: "",
 			dev: false,
+			onConnectionUpdate: plugOnConnectionUpdate,
 		};
 	}
 
@@ -58,7 +66,12 @@ export class PlugConnector implements ConnectorAbstract {
 		const plug = (window as any).ic.plug;
 		const isUnLocked = plug.isWalletLocked; // Replace with proper implementation
 		// Mobile's isUnlocked is incorrect
-		if (typeof isUnLocked === "boolean" && !isUnLocked && !isMobile) {
+		if (
+			typeof isUnLocked === "boolean" &&
+			plug.principalId &&
+			!isUnLocked &&
+			!isMobile
+		) {
 			this.principal = plug.principalId;
 			return true;
 		}
@@ -86,10 +99,19 @@ export class PlugConnector implements ConnectorAbstract {
 
 	public async connect() {
 		// Fix tracing message if plug is uninstalled but still connect to
-		if (!(window as any).ic?.plug) {
+		const plug = (window as any).ic?.plug;
+		if (!plug) {
+			console.error("Plug is not installed");
+			showToast(
+				"error",
+				isMobile ? "Open in Plug App" : "Please install Plug Wallet"
+			);
+			if (!isMobile) {
+				window.open("https://www.plugwallet.ooo", "_blank");
+			}
 			return false;
 		}
-
+		plug.sessionManager.onConnectionUpdate = this.config.onConnectionUpdate;
 		if (await this.isConnected()) {
 			this.principal = (window as any).ic.plug.principalId;
 		} else {

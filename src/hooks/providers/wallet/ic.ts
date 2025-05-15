@@ -164,8 +164,14 @@ export const useInitialConnect = () => {
 
 export function useIcWallet() {
 	const [connecting, setConnecting] = useState(false);
+	const disconnect = useDisconnect();
+	const plugOnConnectionUpdate = useCallback(() => {
+		void disconnect();
+	}, [disconnect]);
+
 	const connect = useCallback(
 		async (connector: Connector, connectorOutside?: null | WalletConnector) => {
+			const isPlug = connector === "PLUG";
 			setConnecting(true);
 			try {
 				// Fix pop-up window was blocked when there is a asynchronous call before connecting the wallet
@@ -180,7 +186,10 @@ export function useIcWallet() {
 						"Some unknown error happened. Please refresh the page to reconnect."
 					);
 				}
-				await connectManager.init(connector);
+				await connectManager.init(
+					connector,
+					isPlug ? plugOnConnectionUpdate : undefined
+				);
 				return await connectManager.connect();
 			} catch (error) {
 				console.debug("🚀 ~ error:", error);
@@ -189,10 +198,8 @@ export function useIcWallet() {
 				setConnecting(false);
 			}
 		},
-		[]
+		[plugOnConnectionUpdate]
 	);
-
-	const disconnect = useDisconnect();
 
 	return useMemo(
 		() => ({
