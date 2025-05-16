@@ -52,7 +52,7 @@ export const getMemeToken = async (canisterId: string, id: bigint) => {
 		creator: r.creator,
 		completed: r.completed,
 		available_token: r.available_token,
-		ledger_canister: unwrapOption(r.ledger_canister),
+		canister_id: unwrapOption(r.ledger_canister),
 		liquidity: r.market_cap_token,
 		created_at: r.created_at,
 		bc: r.bc, // no use

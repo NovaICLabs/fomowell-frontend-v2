@@ -9,6 +9,7 @@ interface ImportMetaEnv {
 	readonly VITE_COINGECKO_API_BASE_URL: string;
 	readonly VITE_IMG_UPLOADER_URL: string;
 	readonly VITE_INDEXER_BASE_URL: string;
+	readonly VITE_ICPEX_SWAP: string;
 }
 
 interface ImportMeta {

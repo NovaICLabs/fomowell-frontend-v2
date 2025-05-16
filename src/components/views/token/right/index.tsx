@@ -3,10 +3,12 @@ import { useMemo, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
 
+import { getICPCanisterId } from "@/canisters/icrc3";
 import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { showToast } from "@/components/utils/toast";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useSingleTokenInfo } from "@/hooks/apis/indexer";
 import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
@@ -16,6 +18,7 @@ import {
 	isNullOrUndefined,
 } from "@/lib/common/number";
 import { fromNow } from "@/lib/common/time";
+import { getSwapUrlByCanisterId } from "@/lib/swap/icpex";
 import { cn } from "@/lib/utils";
 
 import Holders from "./holders";
@@ -135,7 +138,6 @@ export default function Bottom() {
 		priceChangeRate6H,
 		priceChangeRate24H,
 	} = tokenInfo ?? {};
-
 	return (
 		<div className="no-scrollbar flex w-[390px] flex-shrink-0 flex-col gap-7.5 overflow-auto">
 			<div className="flex items-center gap-[30px]">
@@ -184,7 +186,23 @@ export default function Bottom() {
 							className="w-50"
 							src="/svgs/common/launched.svg"
 						/>
-						<Button className="-mt-9.5 h-9 w-88 rounded-full text-base font-bold">
+						<Button
+							className="-mt-9.5 h-9 w-88 rounded-full text-base font-bold"
+							onClick={() => {
+								const canister_id = memeTokenInfo.canister_id;
+								if (!canister_id) {
+									showToast("error", "Canister ID not found");
+									return;
+								}
+								window.open(
+									getSwapUrlByCanisterId({
+										input: canister_id.toText(),
+										output: getICPCanisterId().toText(),
+									}),
+									"_blank"
+								);
+							}}
+						>
 							Go to Dex
 						</Button>
 					</div>

@@ -419,3 +419,17 @@ export const getUserInfo = async (userid: string) => {
 	}
 	return response.data;
 };
+
+export const getLaunchedTokenList = async () => {
+	const response = await request<{
+		data: PaginatedDataWithData<TokenInfo>;
+		statusCode: number;
+		message: string;
+	}>(
+		`${getIndexerBaseUrl()}/api/v1/token_info/list?page=1&pageSize=99999&market=ICP&sort=completed&sortDirection=desc`
+	);
+	if (response.statusCode !== 200) {
+		throw new Error(response.message);
+	}
+	return response.data.data;
+};

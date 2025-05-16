@@ -11,6 +11,7 @@ import {
 	type CandleParameters,
 	favoriteToken,
 	getFavoriteTokenList,
+	getLaunchedTokenList,
 	getTokenList,
 	getTokenPriceCandle,
 	getTokenTransactionList,
@@ -20,7 +21,7 @@ import {
 	type TokenListParameters,
 } from "@/apis/indexer";
 import { updateUserInfo } from "@/apis/user-login";
-import { getICPCanisterId } from "@/canisters/icrc3";
+import { getICPCanisterId, getIcrcTokenBalance } from "@/canisters/icrc3";
 import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore } from "@/store/ic";
 
@@ -272,5 +273,34 @@ export const useFavoriteToken = (listParameters?: TokenListParameters) => {
 				throw error;
 			}
 		},
+	});
+};
+
+export const useLinkedWalletTokensBalance = (principal?: string) => {
+	const { principal: connectedPrincipal } = useConnectedIdentity();
+	const finalPrincipal = principal ?? connectedPrincipal;
+	return useQuery({
+		queryKey: ["ic-core", "linkedWalletTokenBalance", finalPrincipal],
+		queryFn: async () => {
+			if (!finalPrincipal) {
+				throw new Error("No principal");
+			}
+			const launchedTokenList = await getLaunchedTokenList();
+			console.debug("🚀 ~ queryFn: ~ launchedTokenList:", launchedTokenList);
+			const tokenBalances = await Promise.all(
+				launchedTokenList.map(async (token) => {
+					const balance = await getIcrcTokenBalance({
+						canisterId: token.tokenAddress,
+						principal: finalPrincipal,
+					});
+					return {
+						...token,
+						balance,
+					};
+				})
+			);
+			return tokenBalances;
+		},
+		enabled: !!finalPrincipal,
 	});
 };
