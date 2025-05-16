@@ -35,14 +35,17 @@ const getTokenListKey = (parameters: TokenListParameters) => {
 		parameters.principal,
 	];
 };
+const getSearchTokenListKey = (parameters: TokenListParameters) => {
+	return [
+		"ic-core",
+		"searchTokenList",
+		parameters.principal,
+		parameters.search,
+	];
+};
 export const useSearchTokenList = (parameters: TokenListParameters) => {
 	return useQuery({
-		queryKey: [
-			"ic-core",
-			"searchTokenList",
-			parameters.search,
-			parameters.principal,
-		],
+		queryKey: getSearchTokenListKey(parameters),
 		queryFn: () =>
 			getTokenList({
 				...parameters,
@@ -242,20 +245,40 @@ export const useFavoriteToken = (listParameters?: TokenListParameters) => {
 			try {
 				// optimistic update
 				if (listParameters) {
-					queryClient.setQueryData(
+					const queryKeys = [
 						getTokenListKey(listParameters),
-						(oldData: { pages: Array<PaginatedDataWithData<TokenInfo>> }) => {
-							return produce(oldData, (old) => {
-								old.pages.forEach((page) => {
-									page.data.forEach((token) => {
-										if (token.memeTokenId === Number(args.tokenId)) {
-											token.isFollow = !token.isFollow;
-										}
-									});
+						getSearchTokenListKey(listParameters),
+					];
+					queryKeys.forEach((queryKey) => {
+						queryClient.setQueryData(
+							queryKey,
+							(
+								oldData:
+									| {
+											pages: Array<PaginatedDataWithData<TokenInfo>>;
+									  }
+									| { data: Array<TokenInfo> }
+							) => {
+								return produce(oldData, (old) => {
+									if ("pages" in old) {
+										old.pages.forEach((page) => {
+											page.data.forEach((token) => {
+												if (token.memeTokenId === Number(args.tokenId)) {
+													token.isFollow = !token.isFollow;
+												}
+											});
+										});
+									} else {
+										old.data.forEach((token) => {
+											if (token.memeTokenId === Number(args.tokenId)) {
+												token.isFollow = !token.isFollow;
+											}
+										});
+									}
 								});
-							});
-						}
-					);
+							}
+						);
+					});
 				} else {
 					queryClient.setQueryData(
 						getSingleTokenInfoKey(args.tokenId, principal),

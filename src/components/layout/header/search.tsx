@@ -22,6 +22,7 @@ import { useDebounce } from "use-debounce";
 
 import { Star } from "@/components/icons/star";
 import { CommandInput, CommandList } from "@/components/ui/command";
+import { Empty } from "@/components/ui/empty";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import {
 	useFavoriteToken,
@@ -57,7 +58,7 @@ export default function Search() {
 	const { recentSearch, addRecentSearch, clearRecentSearch } = useSearchStore();
 	// Fetch trending tokens (24h)
 	const { principal } = useConnectedIdentity();
-
+	const isSearch = debouncedSearchTerm !== "";
 	const queryParameters = useMemo(
 		() => ({
 			sort: "popularity_24h" as const,
@@ -76,7 +77,7 @@ export default function Search() {
 			search: debouncedSearchTerm,
 			principal,
 		});
-	const isSearch = debouncedSearchTerm !== "";
+
 	const items = useMemo(
 		() =>
 			isSearch
@@ -87,7 +88,10 @@ export default function Search() {
 
 	// Setup react-table for trending tokens
 	const columnHelper = useMemo(() => createColumnHelper<TokenInfo>(), []);
-	const { mutateAsync: favoriteToken } = useFavoriteToken(queryParameters);
+	const { mutateAsync: favoriteToken } = useFavoriteToken({
+		...queryParameters,
+		...(isSearch ? { search: debouncedSearchTerm } : {}),
+	});
 	const columns = useMemo(
 		() => [
 			columnHelper.accessor("ticker", {
@@ -270,11 +274,15 @@ export default function Search() {
 			<CommandInput
 				ref={inputRef}
 				placeholder="Search by symbol or address"
+				showClear={searchTerm !== ""}
 				value={searchTerm}
 				className={cn(
 					"h-full rounded-xl bg-gray-800 text-xs placeholder:text-xs placeholder:text-white/30"
 				)}
 				onValueChange={setSearchTerm}
+				onClear={() => {
+					setSearchTerm("");
+				}}
 				onFocus={() => {
 					setIsOpen(true);
 				}}
@@ -359,6 +367,10 @@ export default function Search() {
 									{isSearch && isSearchLoading ? (
 										<div className="flex h-full items-center justify-center">
 											<Loader2 className="h-4 w-4 animate-spin" />
+										</div>
+									) : items.length === 0 ? (
+										<div className="flex h-full items-center justify-center">
+											<Empty />
 										</div>
 									) : (
 										<table className="w-full">

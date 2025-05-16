@@ -104,6 +104,7 @@ export type TokenListParameters = {
 	sort?: TokenListSortOption;
 	sortDirection?: "asc" | "desc";
 	search?: string;
+	filters?: Record<string, boolean>;
 	// single token info
 	tokenId?: string;
 	principal?: string;
@@ -118,6 +119,8 @@ export const getTokenList = async (parameters: TokenListParameters) => {
 		sortDirection = "desc",
 		tokenId,
 		principal,
+		filters,
+		search,
 	} = parameters;
 	const queryParameters = new URLSearchParams({
 		page: page.toString(),
@@ -125,6 +128,8 @@ export const getTokenList = async (parameters: TokenListParameters) => {
 		market,
 		sort,
 		sortDirection,
+		...(filters ?? {}),
+		...(search ? { search } : {}),
 	});
 	if (principal) {
 		queryParameters.set("principal", principal);

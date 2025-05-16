@@ -53,8 +53,11 @@ function CommandDialog({
 
 const CommandInput = React.forwardRef<
 	React.ElementRef<typeof CommandPrimitive.Input>,
-	React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => {
+	React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
+		showClear?: boolean;
+		onClear?: () => void;
+	}
+>(({ className, showClear = false, onClear, ...props }, ref) => {
 	return (
 		<div
 			className="flex h-9 items-center gap-2 rounded-xl border border-transparent bg-gray-800 px-3 focus-within:border-yellow-500"
@@ -70,6 +73,22 @@ const CommandInput = React.forwardRef<
 				{...props}
 				ref={ref}
 			/>
+			{showClear && (
+				<img
+					alt="close"
+					className="cursor-pointer"
+					src="/svgs/common/delete.svg"
+					onClick={(event) => {
+						event.stopPropagation();
+						event.preventDefault();
+						onClear?.();
+						// Keep focus on input after clearing
+						if (ref && typeof ref !== "function" && ref.current) {
+							ref.current.focus();
+						}
+					}}
+				/>
+			)}
 		</div>
 	);
 });
