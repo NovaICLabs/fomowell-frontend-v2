@@ -180,7 +180,7 @@ export default function Bottom() {
 						<Skeleton className="h-[426px] w-[390px]" />
 					</div>
 				) : memeTokenInfo.completed ? (
-					<div className="flex flex-col items-center justify-center gap-2">
+					<div className="flex flex-shrink-0 flex-col items-center justify-center gap-2">
 						<img
 							alt="completed"
 							className="w-50"
