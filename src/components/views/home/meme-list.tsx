@@ -262,7 +262,7 @@ export default function MemeList() {
 				"loading",
 				`Buying token($${info.row.original.ticker.toLocaleUpperCase()})...`,
 				{
-					duration: 60000,
+					duration: Infinity,
 				}
 			);
 			void buyToken({

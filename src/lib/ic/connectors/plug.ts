@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/require-await */
+
 import { isMobile } from "react-device-detect";
 
 import { showToast } from "@/components/utils/toast";
@@ -62,15 +63,15 @@ export class PlugConnector implements ConnectorAbstract {
 	}
 
 	public async isConnected() {
+		// Mobile's always return false
+		if (isMobile) {
+			return false;
+		}
+
 		const plug = (window as any).ic.plug;
 		const isUnLocked = plug.isWalletLocked; // Replace with proper implementation
 		// Mobile's isUnlocked is incorrect
-		if (
-			typeof isUnLocked === "boolean" &&
-			plug.principalId &&
-			!isUnLocked &&
-			!isMobile
-		) {
+		if (typeof isUnLocked === "boolean" && plug.principalId && !isUnLocked) {
 			this.principal = plug.principalId;
 			return true;
 		}
@@ -103,7 +104,7 @@ export class PlugConnector implements ConnectorAbstract {
 			console.error("Plug is not installed");
 			showToast(
 				"error",
-				isMobile ? "Open in Plug App" : "Please install Plug Wallet"
+				isMobile ? "Please open in Plug App" : "Please install Plug Wallet"
 			);
 			if (!isMobile) {
 				window.open("https://www.plugwallet.ooo", "_blank");
