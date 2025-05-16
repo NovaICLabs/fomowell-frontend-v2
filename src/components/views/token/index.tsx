@@ -4,17 +4,22 @@ import { useCanGoBack, useParams, useRouter } from "@tanstack/react-router";
 import { ChevronLeft } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
+import { getICPCanisterId } from "@/canisters/icrc3";
 import { Star } from "@/components/icons/star";
 import BitcoinWalletConnect from "@/components/layout/header/connect-button/bitcoin";
 import IcpWalletConnect from "@/components/layout/header/connect-button/icp";
 import { Button } from "@/components/ui/button";
+import { showToast } from "@/components/utils/toast";
 import Bottom from "@/components/views/token/bottom";
 import HeadInfo from "@/components/views/token/head-info";
 import Right from "@/components/views/token/right";
 import TradingView from "@/components/views/token/tradingview";
 import Trending from "@/components/views/token/trending";
 import { useFavoriteToken, useSingleTokenInfo } from "@/hooks/apis/indexer";
+import { useMemeTokenInfo } from "@/hooks/ic/core";
 import { withStopPropagation } from "@/lib/common/react-event";
+import { validatePrincipalText } from "@/lib/ic/principal";
+import { getSwapUrlByCanisterId } from "@/lib/swap/icpex";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
@@ -36,7 +41,7 @@ const MobileToken = () => {
 	const { id } = useParams({ from: "/icp/token/$id" });
 	const { data: tokenInfo } = useSingleTokenInfo({ id });
 	const { mutateAsync: favoriteToken } = useFavoriteToken();
-
+	const { data: memeTokenInfo } = useMemeTokenInfo(Number(id));
 	const [activeTopTab, setActiveTopTab] = useState(MobileTabsTop[0]);
 	const [activeBottomTab, setActiveBottomTab] = useState(MobileTabsBottom[0]);
 	const router = useRouter();
@@ -45,6 +50,7 @@ const MobileToken = () => {
 	const { connected } = useIcIdentityStore();
 	const { setIcpConnectOpen } = useDialogStore();
 	const [tradeType, setTradeType] = useState<TradeTab>("Buy");
+	const isCompleted = memeTokenInfo?.completed;
 	return (
 		<div className="flex h-dvh flex-col gap-4 pt-2">
 			<InfoSheet />
@@ -163,38 +169,63 @@ const MobileToken = () => {
 					<img alt="info" className="h-6 w-6" src="/svgs/common/info.svg" />
 					<span className="text-xs text-white/60">Info</span>
 				</div>
-				<Button
-					key={"buy"}
-					className={cn(
-						"bg-price-positive hover:bg-price-positive/80 h-9.5 w-37 rounded-[19px] px-2.5 py-1.5 text-sm font-medium text-white"
-					)}
-					onClick={() => {
-						if (!connected) {
-							setIcpConnectOpen(true);
-							return;
-						}
-						setTradeOpen(true);
-						setTradeType("Buy");
-					}}
-				>
-					Buy
-				</Button>
-				<Button
-					key={"sell"}
-					className={cn(
-						"bg-price-negative hover:bg-price-negative/80 h-9.5 w-37 rounded-[19px] px-2.5 py-1.5 text-sm font-medium text-white"
-					)}
-					onClick={() => {
-						if (!connected) {
-							setIcpConnectOpen(true);
-							return;
-						}
-						setTradeOpen(true);
-						setTradeType("Sell");
-					}}
-				>
-					Sell
-				</Button>
+				{isCompleted ? (
+					<Button
+						className="h-9.5 w-37 rounded-[19px] px-2.5 py-1.5 text-sm font-semibold text-black"
+						onClick={() => {
+							const canister_id = memeTokenInfo.canister_id;
+							if (!canister_id) {
+								showToast("error", "Canister ID not found!");
+								return;
+							}
+							const input = validatePrincipalText(canister_id.toText());
+							window.open(
+								`${getSwapUrlByCanisterId({
+									input: input.toText(),
+									output: getICPCanisterId().toText(),
+								})}`,
+								"_blank"
+							);
+						}}
+					>
+						Go to Dex
+					</Button>
+				) : (
+					<>
+						<Button
+							key={"buy"}
+							className={cn(
+								"bg-price-positive hover:bg-price-positive/80 h-9.5 w-37 rounded-[19px] px-2.5 py-1.5 text-sm font-medium text-white"
+							)}
+							onClick={() => {
+								if (!connected) {
+									setIcpConnectOpen(true);
+									return;
+								}
+								setTradeOpen(true);
+								setTradeType("Buy");
+							}}
+						>
+							Buy
+						</Button>
+						<Button
+							key={"sell"}
+							className={cn(
+								"bg-price-negative hover:bg-price-negative/80 h-9.5 w-37 rounded-[19px] px-2.5 py-1.5 text-sm font-medium text-white"
+							)}
+							onClick={() => {
+								if (!connected) {
+									setIcpConnectOpen(true);
+									return;
+								}
+								setTradeOpen(true);
+								setTradeType("Sell");
+							}}
+						>
+							Sell
+						</Button>
+					</>
+				)}
 			</div>
 		</div>
 	);
