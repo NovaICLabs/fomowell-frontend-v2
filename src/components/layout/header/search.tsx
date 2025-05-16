@@ -295,7 +295,7 @@ export default function Search() {
 						isOpen ? "block" : "hidden"
 					)}
 				>
-					<CommandList className="bg-gray-750 max-h-[400px] overflow-y-auto rounded-2xl p-3 pb-2">
+					<CommandList className="bg-gray-750 flex max-h-[600px] flex-col overflow-y-auto rounded-2xl p-3 pb-2">
 						<>
 							{recentSearch[chain].length > 0 && (
 								<>
@@ -346,7 +346,7 @@ export default function Search() {
 								</>
 							)}
 
-							<div>
+							<div className="flex h-[400px] flex-col">
 								<div className="mb-2 flex items-center">
 									<div className="flex h-4.5 items-end gap-x-1">
 										<img
@@ -362,7 +362,7 @@ export default function Search() {
 								{/* Trending tokens table with virtualization */}
 								<div
 									ref={tableParentRef}
-									className="no-scrollbar mb-3 h-[200px] w-full overflow-auto"
+									className="no-scrollbar w-full flex-1 overflow-auto"
 								>
 									{isSearch && isSearchLoading ? (
 										<div className="flex h-full items-center justify-center">

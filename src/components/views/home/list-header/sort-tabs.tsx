@@ -43,8 +43,8 @@ export default function SortFiltersTabs() {
 											])
 										),
 										[value]: true,
-										sort: undefined,
-										direction: undefined,
+										sort: value as TokenListSortOption,
+										direction: "desc",
 									}
 								: {
 										sort: value as TokenListSortOption,
