@@ -33,6 +33,7 @@ const getTokenListKey = (parameters: TokenListParameters) => {
 		parameters.sort,
 		parameters.sortDirection,
 		parameters.principal,
+		parameters.filters,
 	];
 };
 const getSearchTokenListKey = (parameters: TokenListParameters) => {
@@ -259,6 +260,7 @@ export const useFavoriteToken = (listParameters?: TokenListParameters) => {
 									  }
 									| { data: Array<TokenInfo> }
 							) => {
+								if (!oldData) return;
 								return produce(oldData, (old) => {
 									if ("pages" in old) {
 										old.pages.forEach((page) => {

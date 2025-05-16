@@ -7,7 +7,7 @@ import { z } from "zod";
 import { tokenListSortOptions } from "@/apis/indexer";
 import FavoriteTab from "@/components/views/home/list-header/favorite";
 import Slippage from "@/components/views/home/list-header/slippage";
-import SortTabs from "@/components/views/home/list-header/sort-tabs";
+import SortFiltersTabs from "@/components/views/home/list-header/sort-tabs";
 import TrendingSort from "@/components/views/home/list-header/trending";
 import MemeList from "@/components/views/home/meme-list";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,8 @@ const SearchSchema = z.object({
 	sort: z.enum(tokenListSortOptions).optional(),
 	direction: z.enum(directionOptions).optional(),
 	tab: z.string().optional(),
+	completed: z.boolean().optional(),
+	completing: z.boolean().optional(),
 });
 
 function Home() {
@@ -49,7 +51,7 @@ function Home() {
 					)}
 				>
 					<div className="no-scrollbar flex w-full gap-2 overflow-auto">
-						<SortTabs />
+						<SortFiltersTabs />
 						<FavoriteTab />
 					</div>
 					<div className="flex">
@@ -60,7 +62,7 @@ function Home() {
 			) : (
 				<div className={cn("sticky top-0 z-10 flex gap-4 text-white")}>
 					<TrendingSort />
-					<SortTabs />
+					<SortFiltersTabs />
 					<FavoriteTab />
 					<Slippage />
 				</div>

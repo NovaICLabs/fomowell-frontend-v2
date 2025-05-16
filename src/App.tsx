@@ -33,7 +33,10 @@ const App = () => {
 							<ReactQueryDevtools initialIsOpen={false} />
 						</>
 					)}
-					<Toaster expand position={isMobile ? "top-right" : "bottom-right"} />
+					<Toaster
+						expand={!isMobile}
+						position={isMobile ? "top-right" : "bottom-right"}
+					/>
 					<HowItWorksDialog />
 				</WalletProvider>
 			</QueryClientProvider>

@@ -1,27 +1,63 @@
 import { useRouter, useSearch } from "@tanstack/react-router";
 
-import { type TokenListSortOption, tokenListSortOptions } from "@/apis/indexer";
+import {
+	tokenListFiltersOptions,
+	type TokenListSortOption,
+	tokenListSortOptions,
+} from "@/apis/indexer";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-export default function SortTabs() {
-	const { sort, direction } = useSearch({
+export default function SortFiltersTabs() {
+	const { sort, direction, completed, completing } = useSearch({
 		from: "/",
 	});
 	const router = useRouter();
+	const value =
+		completed !== undefined
+			? "completed"
+			: completing !== undefined
+				? "completing"
+				: direction === "desc"
+					? sort
+					: "";
 	return (
 		<Tabs
 			className=""
-			value={direction === "desc" ? sort : ""}
+			value={value}
 			onValueChange={(value) => {
 				const direction = "desc";
+				const isFilter = tokenListFiltersOptions.includes(value);
+
 				void router.navigate({
 					to: "/",
-					search: (previous) => ({
-						...previous,
-						tab: undefined,
-						sort: value as TokenListSortOption,
-						direction,
-					}),
+					search: (previous) => {
+						return {
+							...previous,
+							tab: undefined,
+							...(isFilter
+								? {
+										...Object.fromEntries(
+											tokenListFiltersOptions.map((option) => [
+												option,
+												undefined,
+											])
+										),
+										[value]: true,
+										sort: undefined,
+										direction: undefined,
+									}
+								: {
+										sort: value as TokenListSortOption,
+										direction,
+										...Object.fromEntries(
+											tokenListFiltersOptions.map((option) => [
+												option,
+												undefined,
+											])
+										),
+									}),
+						};
+					},
 				});
 			}}
 		>

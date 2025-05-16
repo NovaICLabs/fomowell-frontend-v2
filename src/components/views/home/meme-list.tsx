@@ -63,7 +63,7 @@ const TableItemsSkeleton = () => {
 
 export default function MemeList() {
 	const { setIcpConnectOpen } = useDialogStore();
-	const { sort, direction, tab } = useSearch({
+	const { sort, completed, completing, direction, tab } = useSearch({
 		from: "/",
 	});
 
@@ -80,8 +80,12 @@ export default function MemeList() {
 			sortDirection: direction,
 			pageSize: 16,
 			principal,
+			filters: {
+				completed,
+				completing,
+			},
 		}),
-		[sort, direction, principal]
+		[sort, direction, principal, completed, completing]
 	);
 	const {
 		data: allTokenList,
@@ -695,7 +699,7 @@ export default function MemeList() {
 				},
 				size: 100,
 			}),
-			columnHelper.accessor("volume24H", {
+			columnHelper.accessor("volumeAll", {
 				id: "volume",
 				header: () => (
 					<div

@@ -65,6 +65,7 @@ export type TokenInfo = {
 	volume6H: string;
 	volume8H: string;
 	volume24H: string;
+	volumeAll: string;
 	token_reserve: string;
 	meme_token_reserve: string;
 	market_cap_token: string | null;
@@ -93,6 +94,10 @@ export const tokenListSortOptions = [
 	"price_change_24h",
 ] as const;
 
+export const tokenListFiltersOptions = ["completed", "completing"] as const;
+
+export type TokenListFiltersOption = (typeof tokenListFiltersOptions)[number];
+
 export type TokenListSortOption = (typeof tokenListSortOptions)[number];
 
 export type TokenListParameters = {
@@ -104,7 +109,7 @@ export type TokenListParameters = {
 	sort?: TokenListSortOption;
 	sortDirection?: "asc" | "desc";
 	search?: string;
-	filters?: Record<string, boolean>;
+	filters?: Record<string, boolean | undefined>;
 	// single token info
 	tokenId?: string;
 	principal?: string;
@@ -128,7 +133,12 @@ export const getTokenList = async (parameters: TokenListParameters) => {
 		market,
 		sort,
 		sortDirection,
-		...(filters ?? {}),
+		...(filters
+			? Object.fromEntries(
+					// eslint-disable-next-line @typescript-eslint/no-unused-vars
+					Object.entries(filters).filter(([_, value]) => value !== undefined)
+				)
+			: {}),
 		...(search ? { search } : {}),
 	});
 	if (principal) {
