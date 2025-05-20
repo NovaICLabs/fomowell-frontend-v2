@@ -3,17 +3,19 @@ import { cn } from "@/lib/utils";
 export const CopyIcon = ({
 	className,
 	onClick,
+	size = 12,
 }: {
 	className?: string;
 	onClick?: () => void;
+	size?: number;
 }) => {
 	return (
 		<svg
 			className={cn(className, "cursor-pointer opacity-40 hover:opacity-100")}
 			fill="currentColor"
-			height="12"
+			height={size}
 			viewBox="0 0 12 12"
-			width="12"
+			width={size}
 			xmlns="http://www.w3.org/2000/svg"
 			onClick={onClick}
 		>
@@ -31,9 +33,9 @@ export const CopyIcon = ({
 				<clipPath id="clip0_187_33136">
 					<rect
 						fill="currentColor"
-						height="12"
+						height={12}
 						transform="matrix(-1 0 0 1 12 0)"
-						width="12"
+						width={12}
 					/>
 				</clipPath>
 			</defs>

@@ -17,9 +17,11 @@ import {
 import { useVirtualizer } from "@tanstack/react-virtual";
 import BigNumber from "bignumber.js";
 import { Command as CommandPrimitive } from "cmdk";
-import { Loader2 } from "lucide-react";
+import copy from "copy-to-clipboard";
+import { Check, Loader2 } from "lucide-react";
 import { useDebounce } from "use-debounce";
 
+import { CopyIcon } from "@/components/icons/common/copy";
 import { Star } from "@/components/icons/star";
 import { CommandInput, CommandList } from "@/components/ui/command";
 import { Empty } from "@/components/ui/empty";
@@ -37,12 +39,72 @@ import {
 	isNullOrUndefined,
 } from "@/lib/common/number";
 import { withStopPropagation } from "@/lib/common/react-event";
+import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
 import { useSearchStore } from "@/store/search";
 
 import type { TokenInfo } from "@/apis/indexer";
-
+const TokenInfoRow = ({
+	token,
+	favoriteToken,
+}: {
+	token: TokenInfo;
+	favoriteToken: (args: { tokenId: string }) => Promise<void>;
+}) => {
+	const [copied, setCopied] = useState(false);
+	return (
+		<div className="flex items-center gap-2">
+			<Star
+				className="h-4 w-4 shrink-0 cursor-pointer text-white/40"
+				isActive={token.isFollow}
+				onClick={withStopPropagation(() => {
+					void favoriteToken({
+						tokenId: token.memeTokenId.toString(),
+					});
+				})}
+			/>
+			<div className="relative h-8 w-8 overflow-hidden rounded-full">
+				<img
+					alt={token.ticker}
+					className="h-full w-full object-cover"
+					src={token.logo}
+				/>
+			</div>
+			<div className="flex flex-col">
+				<span className="text-sm font-medium text-white uppercase">
+					{token.ticker}
+				</span>
+				{token.tokenAddress ? (
+					<div className="flex items-center gap-0.5">
+						<span className="max-w-[100px] truncate text-xs text-white/60">
+							{truncatePrincipal(token.tokenAddress)}
+						</span>
+						{copied ? (
+							<Check className="ml-1 opacity-40" size={12} strokeWidth={4} />
+						) : (
+							<CopyIcon
+								className="ml-1"
+								size={12}
+								onClick={withStopPropagation(() => {
+									setCopied(true);
+									copy(token.tokenAddress ?? "");
+									setTimeout(() => {
+										setCopied(false);
+									}, 2000);
+								})}
+							/>
+						)}
+					</div>
+				) : (
+					<span className="max-w-[100px] truncate text-xs text-white/60">
+						{token.name}
+					</span>
+				)}
+			</div>
+		</div>
+	);
+};
 export default function Search() {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
@@ -97,32 +159,10 @@ export default function Search() {
 			columnHelper.accessor("ticker", {
 				id: "token",
 				cell: (info) => (
-					<div className="flex items-center gap-2">
-						<Star
-							className="h-4 w-4 shrink-0 cursor-pointer text-white/40"
-							isActive={info.row.original.isFollow}
-							onClick={withStopPropagation(() => {
-								void favoriteToken({
-									tokenId: info.row.original.memeTokenId.toString(),
-								});
-							})}
-						/>
-						<div className="relative h-8 w-8 overflow-hidden rounded-full">
-							<img
-								alt={info.row.original.ticker}
-								className="h-full w-full object-cover"
-								src={info.row.original.logo}
-							/>
-						</div>
-						<div className="flex flex-col">
-							<span className="text-sm font-medium text-white uppercase">
-								{info.row.original.ticker}
-							</span>
-							<span className="max-w-[100px] truncate text-xs text-white/60">
-								{info.row.original.name}
-							</span>
-						</div>
-					</div>
+					<TokenInfoRow
+						favoriteToken={favoriteToken}
+						token={info.row.original}
+					/>
 				),
 				size: 180,
 			}),

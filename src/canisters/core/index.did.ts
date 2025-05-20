@@ -9,6 +9,23 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		token: IDL.Principal,
 		amount: IDL.Nat,
 	});
+	const InitArchiveArg = IDL.Record({
+		maxRecordsToArchive: IDL.Nat,
+		maxArchivePages: IDL.Nat,
+		settleToRecords: IDL.Nat,
+		archiveCycles: IDL.Nat,
+		maxActiveRecords: IDL.Nat,
+		maxRecordsInArchiveInstance: IDL.Nat,
+		archiveControllers: IDL.Opt(IDL.Opt(IDL.Vec(IDL.Principal))),
+	});
+	const InitArg = IDL.Record({
+		fee_receiver: Account,
+		create_token_fee: IDL.Vec(TokenAmount),
+		archive_init: IDL.Opt(InitArchiveArg),
+		token_launch_threshold: IDL.Vec(TokenAmount),
+		maintenance: IDL.Bool,
+		fee_percentage: IDL.Opt(IDL.Float32),
+	});
 	const BuyArgs = IDL.Record({
 		amount_out_min: IDL.Opt(IDL.Nat),
 		memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
@@ -16,7 +33,12 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		amount_in: IDL.Nat,
 		meme_token_id: IDL.Nat64,
 	});
-	const Result = IDL.Variant({ Ok: IDL.Nat, Err: IDL.Text });
+	const BuyResponse = IDL.Record({
+		amount_out: IDL.Nat,
+		is_completed: IDL.Bool,
+	});
+	const Result = IDL.Variant({ Ok: BuyResponse, Err: IDL.Text });
+	const Result_1 = IDL.Variant({ Ok: IDL.Nat, Err: IDL.Text });
 	const StableToken = IDL.Record({
 		fee: IDL.Nat,
 		decimals: IDL.Nat8,
@@ -68,7 +90,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		telegram: IDL.Opt(IDL.Text),
 		process: IDL.Float64,
 	});
-	const Result_1 = IDL.Variant({ Ok: MemeToken, Err: IDL.Text });
+	const Result_2 = IDL.Variant({ Ok: MemeToken, Err: IDL.Text });
 	const DepositArgs = IDL.Record({
 		token: StableToken,
 		memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
@@ -176,7 +198,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		logs: IDL.Opt(CanisterLogResponse),
 		version: IDL.Opt(IDL.Nat),
 	});
-	const GetBlocksRequest = IDL.Record({
+	const TransactionRange = IDL.Record({
 		start: IDL.Nat,
 		length: IDL.Nat,
 	});
@@ -305,11 +327,11 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		timestamp: IDL.Nat64,
 		transfer: IDL.Opt(Transfer_1),
 	});
-	const TransactionRange = IDL.Record({
+	const TransactionRange_1 = IDL.Record({
 		transactions: IDL.Vec(Transaction_1),
 	});
 	const ArchivedRange = IDL.Record({
-		callback: IDL.Func([GetBlocksRequest], [TransactionRange], ["query"]),
+		callback: IDL.Func([TransactionRange], [TransactionRange_1], ["query"]),
 		start: IDL.Nat,
 		length: IDL.Nat,
 	});
@@ -350,7 +372,16 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		consent_message: ConsentMessage,
 	});
 	const ErrorInfo = IDL.Record({ description: IDL.Text });
-	const Result_2 = IDL.Variant({ Ok: ConsentInfo, Err: ErrorInfo });
+	const Icrc21Error = IDL.Variant({
+		GenericError: IDL.Record({
+			description: IDL.Text,
+			error_code: IDL.Nat,
+		}),
+		InsufficientPayment: ErrorInfo,
+		UnsupportedCanisterCall: ErrorInfo,
+		ConsentMessageUnavailable: ErrorInfo,
+	});
+	const Result_3 = IDL.Variant({ Ok: ConsentInfo, Err: Icrc21Error });
 	const Icrc28TrustedOrigins = IDL.Record({
 		trusted_origins: IDL.Vec(IDL.Text),
 	});
@@ -384,7 +415,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		txn_count: IDL.Nat,
 		archive_txn_count: IDL.Nat,
 		is_cleaning: IDL.Bool,
-		archives: IDL.Vec(IDL.Tuple(IDL.Principal, GetBlocksRequest)),
+		archives: IDL.Vec(IDL.Tuple(IDL.Principal, TransactionRange)),
 	});
 	const State = IDL.Record({
 		archive_ledger_info: ArchiveLedgerInfo,
@@ -400,7 +431,6 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		token: MemeToken,
 		balance: IDL.Nat,
 	});
-	const Result_3 = IDL.Variant({ Ok: IDL.Null, Err: IDL.Text });
 	const WithdrawArgs = IDL.Record({
 		to: Account,
 		token: StableToken,
@@ -411,11 +441,11 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 	return IDL.Service({
 		__get_candid_interface_tmp_hack: IDL.Func([], [IDL.Text], ["query"]),
 		buy: IDL.Func([BuyArgs], [Result], []),
-		calculate_buy: IDL.Func([IDL.Nat64, IDL.Nat], [Result], ["query"]),
-		calculate_sell: IDL.Func([IDL.Nat64, IDL.Nat], [Result], ["query"]),
-		claim: IDL.Func([ClaimArg], [Result], []),
-		create_token: IDL.Func([CreateMemeTokenArg], [Result_1], []),
-		deposit: IDL.Func([DepositArgs], [Result], []),
+		calculate_buy: IDL.Func([IDL.Nat64, IDL.Nat], [Result_1], ["query"]),
+		calculate_sell: IDL.Func([IDL.Nat64, IDL.Nat], [Result_1], ["query"]),
+		claim: IDL.Func([ClaimArg], [Result_1], []),
+		create_token: IDL.Func([CreateMemeTokenArg], [Result_2], []),
+		deposit: IDL.Func([DepositArgs], [Result_1], []),
 		generate_random: IDL.Func([], [IDL.Nat64], []),
 		getCanistergeekInformation: IDL.Func(
 			[GetInformationRequest],
@@ -423,7 +453,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			["query"]
 		),
 		get_transactions: IDL.Func(
-			[GetBlocksRequest],
+			[TransactionRange],
 			[GetTransactionsResponse],
 			["query"]
 		),
@@ -435,12 +465,12 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		icrc1_balance_of: IDL.Func([LedgerType, Account], [IDL.Nat], ["query"]),
 		icrc21_canister_call_consent_message: IDL.Func(
 			[ConsentMessageRequest],
-			[Result_2],
+			[Result_3],
 			[]
 		),
 		icrc28_trusted_origins: IDL.Func([], [Icrc28TrustedOrigins], []),
 		query_meme_token: IDL.Func([IDL.Nat64], [IDL.Opt(MemeToken)], ["query"]),
-		query_meme_token_price: IDL.Func([IDL.Nat64], [Result], ["query"]),
+		query_meme_token_price: IDL.Func([IDL.Nat64], [Result_1], ["query"]),
 		query_meme_tokens: IDL.Func(
 			[QueryMemeTokenArgs],
 			[QueryMemeTokenResponse],
@@ -468,9 +498,8 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			[IDL.Vec(MemeTokenBalance)],
 			["query"]
 		),
-		sell: IDL.Func([BuyArgs], [Result], []),
-		test_launch: IDL.Func([IDL.Nat64], [Result_3], []),
-		withdraw: IDL.Func([WithdrawArgs], [Result], []),
+		sell: IDL.Func([BuyArgs], [Result_1], []),
+		withdraw: IDL.Func([WithdrawArgs], [Result_1], []),
 	});
 };
 export const init = ({ IDL }: { IDL: any }) => {

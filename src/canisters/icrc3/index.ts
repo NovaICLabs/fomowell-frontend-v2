@@ -18,9 +18,12 @@ export const getIcrcTokenBalance = async ({
 	canisterId,
 	principal,
 }: {
-	canisterId: string | Principal;
+	canisterId?: string | Principal;
 	principal: string;
 }) => {
+	if (!canisterId) {
+		throw new Error("Canister ID is required");
+	}
 	const creator = getAnonymousActorCreator();
 	const actor = await creator<_SERVICE>({
 		idlFactory: icrc3IdlFactory,

@@ -22,6 +22,8 @@ export default function FavoriteTab() {
 						sort: undefined,
 						direction: undefined,
 						tab: "favorite",
+						completed: undefined,
+						completed_at: undefined,
 					}),
 				});
 			}}

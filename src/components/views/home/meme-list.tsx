@@ -11,11 +11,14 @@ import {
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import BigNumber from "bignumber.js";
+import copy from "copy-to-clipboard";
 import { motion } from "framer-motion";
+import { Check } from "lucide-react";
 import { isMobile } from "react-device-detect";
 import { toast } from "sonner";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
+import { CopyIcon } from "@/components/icons/common/copy";
 import SortsIcon from "@/components/icons/common/sorts";
 import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
@@ -46,6 +49,7 @@ import {
 } from "@/lib/common/number";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { fromNow } from "@/lib/common/time";
+import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
@@ -60,7 +64,122 @@ const TableItemsSkeleton = () => {
 		</div>
 	);
 };
-
+const TokenInfoRow = ({
+	token,
+	favoriteToken,
+}: {
+	token: TokenInfo;
+	favoriteToken: (args: { tokenId: string }) => void;
+}) => {
+	const process = token.process * 100;
+	const [copied, setCopied] = useState(false);
+	return (
+		<div className="flex w-full items-center gap-2">
+			<Star
+				className="h-4 w-4 shrink-0 cursor-pointer text-white/40"
+				isActive={token.isFollow}
+				onClick={withStopPropagation(() => {
+					favoriteToken({
+						tokenId: token.memeTokenId.toString(),
+					});
+				})}
+			/>
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<div className="relative flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full">
+							<div className="absolute inset-0 rounded-full border-[2px] border-gray-500"></div>
+							<div
+								className="absolute inset-0 rounded-full"
+								style={{
+									background: `conic-gradient(#F7B406 ${process}%, transparent ${process}%)`,
+									clipPath: "circle(50% at center)",
+								}}
+							></div>
+							<div className="bg-gray-710 absolute h-9 w-9 rounded-full p-[2px]"></div>
+							<div
+								className="absolute h-9 w-9 rounded-full p-[2px]"
+								style={{
+									backgroundImage: `url(${token.logo})`,
+									backgroundSize: "cover",
+									backgroundPosition: "center",
+								}}
+							/>
+						</div>
+					</TooltipTrigger>
+					<TooltipContent className="bg-white px-1 py-1 text-xs font-semibold text-black">
+						{process.toFixed(2)}%
+					</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
+			<div className="flex flex-col gap-1.5">
+				<div className="flex items-center gap-1">
+					<span className="text-sm leading-4 font-medium text-white uppercase">
+						{token.ticker}
+					</span>
+					<div className="ml-3 flex cursor-pointer items-center gap-x-2.5">
+						{token.twitter && (
+							<X
+								className="h-2.5 text-white/40 hover:text-white"
+								onClick={withStopPropagation(() => {
+									if (token.twitter) {
+										window.open(token.twitter, "_blank");
+									}
+								})}
+							/>
+						)}
+						{token.telegram && (
+							<Telegram
+								className="h-2.5 text-white/40 hover:text-white"
+								onClick={withStopPropagation(() => {
+									if (token.telegram) {
+										window.open(token.telegram, "_blank");
+									}
+								})}
+							/>
+						)}
+						{token.website && (
+							<Website
+								className="h-2.5 text-white/40 hover:text-white"
+								onClick={withStopPropagation(() => {
+									if (token.website) {
+										window.open(token.website, "_blank");
+									}
+								})}
+							/>
+						)}
+					</div>
+				</div>
+				{token.tokenAddress ? (
+					<div className="flex items-center gap-0.5">
+						<span className="max-w-[100px] truncate text-xs text-white/60">
+							{truncatePrincipal(token.tokenAddress)}
+						</span>
+						{copied ? (
+							<Check className="ml-1 opacity-40" size={12} strokeWidth={4} />
+						) : (
+							<CopyIcon
+								className="ml-1"
+								size={12}
+								onClick={withStopPropagation(() => {
+									setCopied(true);
+									copy(token.tokenAddress ?? "");
+									setTimeout(() => {
+										setCopied(false);
+									}, 2000);
+								})}
+							/>
+						)}
+					</div>
+				) : (
+					<div className="w-20 truncate text-xs leading-4 font-light text-white/60">
+						{token.name}
+					</div>
+				)}
+			</div>
+		</div>
+	);
+};
 export default function MemeList() {
 	const { setIcpConnectOpen } = useDialogStore();
 	const { sort, completed, completing, direction, tab } = useSearch({
@@ -275,9 +394,10 @@ export default function MemeList() {
 				amount_out_min: BigInt(0),
 			})
 				.then((receivedAmount) => {
+					const { amount_out } = receivedAmount;
 					showToast(
 						"success",
-						`${formatNumberSmart(formatUnits(receivedAmount, info.row.original.decimals))} $${info.row.original.ticker.toLocaleUpperCase()} received!`
+						`${amount_out} $${info.row.original.ticker.toLocaleUpperCase()} received!`
 					);
 				})
 				.catch((error: Error) => {
@@ -303,92 +423,9 @@ export default function MemeList() {
 						<span className="">Token</span>
 					</div>
 				),
-				cell: ({ row }) => {
-					const process = row.original.process * 100;
-					return (
-						<div className="flex w-full items-center gap-2">
-							<Star
-								className="h-4 w-4 shrink-0 cursor-pointer text-white/40"
-								isActive={row.original.isFollow}
-								onClick={withStopPropagation(() => {
-									void favoriteToken({
-										tokenId: row.original.memeTokenId.toString(),
-									});
-								})}
-							/>
-							<TooltipProvider>
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<div className="relative flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full">
-											<div className="absolute inset-0 rounded-full border-[2px] border-gray-500"></div>
-											<div
-												className="absolute inset-0 rounded-full"
-												style={{
-													background: `conic-gradient(#F7B406 ${process}%, transparent ${process}%)`,
-													clipPath: "circle(50% at center)",
-												}}
-											></div>
-											<div className="bg-gray-710 absolute h-9 w-9 rounded-full p-[2px]"></div>
-											<div
-												className="absolute h-9 w-9 rounded-full p-[2px]"
-												style={{
-													backgroundImage: `url(${row.original.logo})`,
-													backgroundSize: "cover",
-													backgroundPosition: "center",
-												}}
-											/>
-										</div>
-									</TooltipTrigger>
-									<TooltipContent className="bg-white px-1 py-1 text-xs font-semibold text-black">
-										{process.toFixed(2)}%
-									</TooltipContent>
-								</Tooltip>
-							</TooltipProvider>
-							<div className="flex flex-col gap-1.5">
-								<div className="flex items-center gap-1">
-									<span className="text-sm leading-4 font-medium text-white uppercase">
-										{row.original.ticker}
-									</span>
-									<div className="ml-3 flex cursor-pointer items-center gap-x-2.5">
-										{row.original.twitter && (
-											<X
-												className="h-2.5 text-white/40 hover:text-white"
-												onClick={withStopPropagation(() => {
-													if (row.original.twitter) {
-														window.open(row.original.twitter, "_blank");
-													}
-												})}
-											/>
-										)}
-										{row.original.telegram && (
-											<Telegram
-												className="h-2.5 text-white/40 hover:text-white"
-												onClick={withStopPropagation(() => {
-													if (row.original.telegram) {
-														window.open(row.original.telegram, "_blank");
-													}
-												})}
-											/>
-										)}
-										{row.original.website && (
-											<Website
-												className="h-2.5 text-white/40 hover:text-white"
-												onClick={withStopPropagation(() => {
-													if (row.original.website) {
-														window.open(row.original.website, "_blank");
-													}
-												})}
-											/>
-										)}
-									</div>
-								</div>
-								<div className="w-20 truncate text-xs leading-4 font-light text-white/60">
-									{row.original.name}
-								</div>
-							</div>
-						</div>
-					);
-				},
+				cell: ({ row }) => (
+					<TokenInfoRow favoriteToken={favoriteToken} token={row.original} />
+				),
 				size: isMobile ? 150 : 250,
 				enablePinning: true,
 			}),
@@ -826,7 +863,11 @@ export default function MemeList() {
 
 	// enable the infinite query
 	// sort by recent is not supported by the infinite query because the data is update frequently
-	const infiniteQueryEnabled = useMemo(() => sort && sort !== "recent", [sort]);
+	const infiniteQueryEnabled = useMemo(
+		() => sort && sort !== "recent" && sort.indexOf("popularity") === -1,
+		[sort]
+	);
+	console.debug("🚀 ~ MemeList ~ sort:", sort);
 
 	useEffect(() => {
 		if (!virtualItems || virtualItems.length === 0) return;

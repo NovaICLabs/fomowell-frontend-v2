@@ -53,6 +53,8 @@ export default function TrendingSort() {
 					tab: undefined,
 					sort: option.value,
 					direction,
+					completed: undefined,
+					completing: undefined,
 				}),
 			});
 		},

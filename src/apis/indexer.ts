@@ -40,7 +40,7 @@ export type TokenInfo = {
 	creator: string;
 	timestamp: string;
 	market: "ICP";
-	tokenAddress: string;
+	tokenAddress?: string;
 	decimals: number;
 	holders: string;
 	fee: string;
@@ -446,5 +446,5 @@ export const getLaunchedTokenList = async () => {
 	if (response.statusCode !== 200) {
 		throw new Error(response.message);
 	}
-	return response.data.data;
+	return response.data.data.filter((token) => token.tokenAddress);
 };

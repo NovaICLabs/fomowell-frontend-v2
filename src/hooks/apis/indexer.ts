@@ -311,18 +311,19 @@ export const useLinkedWalletTokensBalance = (principal?: string) => {
 				throw new Error("No principal");
 			}
 			const launchedTokenList = await getLaunchedTokenList();
-			console.debug("🚀 ~ queryFn: ~ launchedTokenList:", launchedTokenList);
 			const tokenBalances = await Promise.all(
-				launchedTokenList.map(async (token) => {
-					const balance = await getIcrcTokenBalance({
-						canisterId: token.tokenAddress,
-						principal: finalPrincipal,
-					});
-					return {
-						...token,
-						balance,
-					};
-				})
+				launchedTokenList
+					.filter((token) => token.tokenAddress)
+					.map(async (token) => {
+						const balance = await getIcrcTokenBalance({
+							canisterId: token.tokenAddress,
+							principal: finalPrincipal,
+						});
+						return {
+							...token,
+							balance,
+						};
+					})
 			);
 			return tokenBalances;
 		},

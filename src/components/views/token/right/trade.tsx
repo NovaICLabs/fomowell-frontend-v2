@@ -60,7 +60,8 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 	const [activeTab, setActiveTab] = useState<TradeTab>(initialTab ?? "Buy");
 
 	// meme token
-	const { data: memeTokenInfo } = useMemeTokenInfo(Number(id));
+	const { data: memeTokenInfo, refetch: refetchMemeTokenInfo } =
+		useMemeTokenInfo(Number(id));
 	const { data: memeTokenBalance, refetch: refetchMemeTokenBalance } =
 		useCoreTokenBalance({
 			owner: principal,
@@ -222,15 +223,19 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 			switch (activeTab) {
 				case "Buy":
 					if (debouncedBuyAmountBigInt) {
-						const result = await buy({
+						const { is_completed, amount_out } = await buy({
 							amount: debouncedBuyAmountBigInt,
 							id: BigInt(id),
 							amount_out_min: minTokenReceived,
 						});
 						showToast(
 							"success",
-							`${formatNumberSmart(formatUnits(result.toString(), memeTokenInfo?.decimals))} ${memeTokenInfo?.ticker.toUpperCase()} received`
+							`${formatNumberSmart(formatUnits(amount_out, memeTokenInfo?.decimals))} ${memeTokenInfo?.ticker.toUpperCase()} received`
 						);
+						// refetch meme token info
+						if (is_completed) {
+							void refetchMemeTokenInfo();
+						}
 						refetchBalance();
 						void refetchCurrentTokenPrice();
 						setBuyAmount("");
@@ -277,6 +282,7 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 		memeTokenInfo?.ticker,
 		refetchBalance,
 		refetchCurrentTokenPrice,
+		refetchMemeTokenInfo,
 		sell,
 	]);
 	const setPercentage = useCallback(
