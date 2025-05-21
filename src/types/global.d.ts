@@ -43,3 +43,18 @@ interface Window {
 		expired: () => Promise<boolean>;
 	};
 }
+
+// 为缺少类型定义的库添加声明
+declare module "bn.js";
+declare module "chai";
+declare module "chai-as-promised";
+declare module "concat-stream";
+declare module "deep-eql";
+declare module "form-data";
+declare module "glob";
+declare module "lru-cache";
+declare module "minimatch";
+declare module "mocha";
+declare module "pbkdf2";
+declare module "qs";
+declare module "secp256k1";

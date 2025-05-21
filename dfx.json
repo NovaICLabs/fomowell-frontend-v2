@@ -1,0 +1,28 @@
+{
+	"canisters": {
+		"fomowell_frontend_v2": {
+			"frontend": {
+				"entrypoint": "index.html"
+			},
+			"source": ["dist"],
+			"type": "assets"
+		}
+	},
+	"defaults": {
+		"build": {
+			"packtool": ""
+		}
+	},
+	"networks": {
+		"local": {
+			"bind": "127.0.0.1:8000",
+			"type": "ephemeral"
+		},
+		"ic": {
+			"providers": ["https://ic0.app"],
+			"type": "persistent"
+		}
+	},
+	"version": 1,
+	"dfx": "0.24.3"
+}
