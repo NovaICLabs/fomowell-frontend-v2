@@ -34,7 +34,7 @@ storybook-static
 # tests
 /coverage/
 
-.env.production
+# .env.production
 
 # Local Netlify folder
 .netlify
