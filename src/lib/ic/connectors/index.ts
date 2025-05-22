@@ -68,17 +68,17 @@ export class WalletConnector {
 		connector: Connector,
 		plugOnConnectionUpdate?: () => void
 	) {
-		const customDomain = getConnectDerivationOrigin();
+		const derivationOrigin = getConnectDerivationOrigin();
 		const config = {
 			host: import.meta.env.VITE_IC_HOST,
 			whitelist: [getChainICCoreCanisterId().toText()],
 			plugOnConnectionUpdate,
-			customDomain: customDomain,
+			customDomain: derivationOrigin,
 		};
 
 		switch (connector) {
 			case "II":
-				return new InternetIdentityConnector(config);
+				return new InternetIdentityConnector(config, derivationOrigin);
 			case "PLUG":
 				return new PlugConnector(config, plugOnConnectionUpdate);
 			case "OISY":

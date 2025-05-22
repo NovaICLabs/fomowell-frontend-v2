@@ -27,6 +27,6 @@ pnpm run build
 
 # deploy
 echo "deploy -> $NETWORK network..."
-dfx deploy --network $NETWORK fomowell_frontend_v2
+dfx deploy --network $NETWORK --mode reinstall fomowell_frontend_v2
 
 echo "deploy done!"

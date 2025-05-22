@@ -15,7 +15,7 @@ export const getConnectDerivationOrigin = (): string | undefined => {
 
 	switch (getBuildMode()) {
 		case "production":
-			return "https://f77dm-vaaaa-aaaah-arekq-cai.icp0.io/";
+			return "https://f77dm-vaaaa-aaaah-arekq-cai.icp0.io";
 		case "development":
 			return undefined;
 		default:

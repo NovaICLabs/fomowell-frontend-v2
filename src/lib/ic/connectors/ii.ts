@@ -23,7 +23,7 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 		dev: boolean;
 		verifyQuerySignatures: boolean;
 		retryTimes: number;
-		customDomain?: string;
+		derivationOrigin?: string;
 	};
 
 	private identity?: Identity;
@@ -38,11 +38,14 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 		return this.principal;
 	};
 
-	public constructor(config: WalletConnectorConfig) {
+	public constructor(
+		config: WalletConnectorConfig,
+		derivationOrigin: string | undefined
+	) {
 		this.config = {
 			whitelist: config.whitelist,
 			host: config.host,
-			customDomain: config.customDomain,
+			derivationOrigin: derivationOrigin,
 			providerUrl: "https://identity.ic0.app",
 			dev: false,
 			verifyQuerySignatures: false,
@@ -51,7 +54,7 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 	}
 
 	public init = async () => {
-		// console.log("this.config", this.config);
+		console.log("this.config", this.config);
 		this.client = await AuthClient.create({
 			idleOptions: {
 				disableIdle: true,
@@ -103,6 +106,7 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 		await new Promise((resolve, reject) => {
 			void this.client?.login({
 				identityProvider: this.config.providerUrl,
+				derivationOrigin: this.config.derivationOrigin,
 				onSuccess: () => {
 					resolve(true);
 				},
