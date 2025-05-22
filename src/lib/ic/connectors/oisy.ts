@@ -19,6 +19,7 @@ export class OisyConnector implements ConnectorAbstract {
 		host: string;
 		providerUrl: string;
 		dev: boolean;
+		customDomain?: string;
 	};
 	private signer: Signer | null = null;
 
@@ -40,6 +41,7 @@ export class OisyConnector implements ConnectorAbstract {
 			host: config.host,
 			providerUrl: "https://oisy.com/sign",
 			dev: false,
+			customDomain: config.customDomain,
 		};
 	}
 

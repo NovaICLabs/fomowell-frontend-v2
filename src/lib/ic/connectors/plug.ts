@@ -24,6 +24,7 @@ export class PlugConnector implements ConnectorAbstract {
 		providerUrl: string;
 		host: string;
 		dev: boolean;
+		customDomain?: string;
 		onConnectionUpdate?: () => void;
 	};
 
@@ -44,6 +45,7 @@ export class PlugConnector implements ConnectorAbstract {
 			host: config.host,
 			providerUrl: "",
 			dev: false,
+			customDomain: config.customDomain,
 			onConnectionUpdate: plugOnConnectionUpdate,
 		};
 	}

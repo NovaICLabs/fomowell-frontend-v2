@@ -39,3 +39,5 @@ storybook-static
 # Local Netlify folder
 .netlify
 .dfx
+public/.well-known
+public/.ic-assets.json

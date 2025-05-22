@@ -11,6 +11,7 @@ export interface WalletConnectorConfig {
 	whitelist: Array<string>;
 	host: string;
 	plugOnConnectionUpdate?: () => void;
+	customDomain: string | undefined;
 }
 
 export type ConnectCallback = () => Promise<void>;
@@ -32,6 +33,7 @@ export type ConnectorAbstract = {
 };
 
 import { getChainICCoreCanisterId } from "@/canisters/core";
+import { getConnectDerivationOrigin } from "@/common/env";
 
 import { InternetIdentityConnector } from "./ii";
 import { OisyConnector } from "./oisy";
@@ -66,10 +68,12 @@ export class WalletConnector {
 		connector: Connector,
 		plugOnConnectionUpdate?: () => void
 	) {
+		const customDomain = getConnectDerivationOrigin();
 		const config = {
 			host: import.meta.env.VITE_IC_HOST,
 			whitelist: [getChainICCoreCanisterId().toText()],
 			plugOnConnectionUpdate,
+			customDomain: customDomain,
 		};
 
 		switch (connector) {

@@ -23,6 +23,7 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 		dev: boolean;
 		verifyQuerySignatures: boolean;
 		retryTimes: number;
+		customDomain?: string;
 	};
 
 	private identity?: Identity;
@@ -41,6 +42,7 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 		this.config = {
 			whitelist: config.whitelist,
 			host: config.host,
+			customDomain: config.customDomain,
 			providerUrl: "https://identity.ic0.app",
 			dev: false,
 			verifyQuerySignatures: false,
@@ -49,6 +51,7 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 	}
 
 	public init = async () => {
+		console.log("this.config", this.config);
 		this.client = await AuthClient.create({
 			idleOptions: {
 				disableIdle: true,
