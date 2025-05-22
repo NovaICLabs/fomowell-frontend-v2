@@ -16,7 +16,7 @@ import WalletOption from "../header/wallet-option";
 
 export default function IcpConnectDialog() {
 	// todo ref code
-	const { connect, isLoading } = useIcWallet();
+	const { connect, isLoading, setConnecting } = useIcWallet();
 	const { setPrincipal, connectByPrincipal } = useIcIdentityStore();
 	const { setLastConnectedWallet } = useIcLastConnectedWalletStore();
 	const { icpConnectOpen, setIcpConnectOpen } = useDialogStore();
@@ -45,7 +45,15 @@ export default function IcpConnectDialog() {
 	};
 
 	return (
-		<Dialog open={icpConnectOpen} onOpenChange={setIcpConnectOpen}>
+		<Dialog
+			open={icpConnectOpen}
+			onOpenChange={(show) => {
+				setIcpConnectOpen(show);
+				if (!show) {
+					setConnecting(false);
+				}
+			}}
+		>
 			<DialogContent
 				className={cn(
 					"border-gray-755 bg-gray-755 transition-height flex w-[360px] flex-col rounded-3xl px-5 py-6 text-white duration-300",

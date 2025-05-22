@@ -207,6 +207,7 @@ export function useIcWallet() {
 			connect,
 			disconnect,
 			isLoading: connecting,
+			setConnecting,
 		}),
 		[connect, disconnect, connecting]
 	);

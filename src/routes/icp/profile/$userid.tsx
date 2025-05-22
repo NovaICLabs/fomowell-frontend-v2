@@ -13,13 +13,16 @@ import WithdrawIcon from "@/components/icons/common/withdraw";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { showToast } from "@/components/utils/toast";
+// import { showToast } from "@/components/utils/toast";
 import ProfileActivity from "@/components/views/icp/profile/activity";
 import ProfileCreatedTokens from "@/components/views/icp/profile/create-list";
 import EditInfoModal from "@/components/views/icp/profile/edit-info-modal";
 import ProfileHoldings from "@/components/views/icp/profile/holdings";
 import { useUserInfo } from "@/hooks/apis/user";
-import { useClaimFaucet, useCoreTokenBalance } from "@/hooks/ic/core";
+import {
+	// useClaimFaucet,
+	useCoreTokenBalance,
+} from "@/hooks/ic/core";
 import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
@@ -121,8 +124,8 @@ function UserId() {
 	//         : "--";
 
 	const { setDepositWithdrawOpen } = useDialogStore();
-	const { mutateAsync: claimFaucet, isPending: isClaimingFaucet } =
-		useClaimFaucet();
+	// const { mutateAsync: claimFaucet, isPending: isClaimingFaucet } =
+	// 	useClaimFaucet();
 	const router = useRouter();
 	// is self
 	const isSelf = userid === identityProfile?.principal;
@@ -147,7 +150,7 @@ function UserId() {
 							isSelf ? "flex" : "hidden"
 						)}
 					>
-						<div className="relative flex h-9 w-[102px] items-center justify-center rounded-full p-[2px]">
+						{/* <div className="relative flex h-9 w-[102px] items-center justify-center rounded-full p-[2px]">
 							<Button
 								className="disabled:bg-gray-710 dark:hover:bg-gray-710 dark:bg-background z-1 h-full w-full rounded-full bg-transparent text-xs text-white disabled:opacity-100"
 								disabled={isClaimingFaucet}
@@ -164,7 +167,7 @@ function UserId() {
 								{isClaimingFaucet ? "Claiming..." : "Get 100 tICP"}
 							</Button>
 							<div className="absolute inset-0 top-px right-px bottom-px left-px z-0 rounded-full bg-gradient-to-r from-yellow-500 to-blue-500"></div>
-						</div>
+						</div> */}
 						<Button className={cn("rounded-full", isMobile && "hidden")}>
 							<ReferIcon className="text-black" />
 							Refer to earn
