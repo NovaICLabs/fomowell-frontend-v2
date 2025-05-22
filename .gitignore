@@ -34,10 +34,7 @@ storybook-static
 # tests
 /coverage/
 
-# .env.production
-
 # Local Netlify folder
 .netlify
+# .dfx
 .dfx
-public/.well-known
-public/.ic-assets.json
