@@ -9,6 +9,13 @@ const getIndexerBaseUrl = () => {
 };
 
 // ================== comment ==================
+export type CommentUser = {
+	avatar: string | undefined;
+	btc_account?: string | null;
+	email?: string | null;
+	eth_account?: string | null;
+	name?: string | null;
+};
 export type CommentInfo = {
 	id: number;
 	principal: string;
@@ -16,6 +23,7 @@ export type CommentInfo = {
 	memeTokenId: number;
 	photo: string | undefined;
 	content: string;
+	user?: CommentUser;
 	createdAt: string;
 };
 

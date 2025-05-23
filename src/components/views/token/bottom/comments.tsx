@@ -15,6 +15,8 @@ import { truncatePrincipal } from "@/lib/ic/principal";
 
 import { FileUploader, type FileUploaderRef } from "./file-uploader";
 
+import type { CommentUser } from "@/apis/comment";
+
 interface CommentProps {
 	username?: string;
 	comment?: string;
@@ -22,9 +24,11 @@ interface CommentProps {
 	photo?: string;
 	id?: string;
 	likes?: number;
+	commentUser?: CommentUser;
 }
 
 const Comment = ({
+	commentUser,
 	username = "",
 	comment = "",
 	photo = "",
@@ -42,9 +46,17 @@ const Comment = ({
 				<img
 					alt="avatar"
 					className="h-6 w-6 rounded-full"
-					src={getAvatar(id)}
+					src={
+						commentUser && commentUser.avatar
+							? commentUser.avatar
+							: getAvatar(id)
+					}
 				/>
-				<span className="ml-1.5 text-sm">{truncatePrincipal(username)}</span>
+				<span className="ml-1.5 text-sm">
+					{commentUser && commentUser.name
+						? commentUser.name
+						: truncatePrincipal(username)}
+				</span>
 				<span className="text-gray-280 ml-1.5 text-xs">{formattedTime}</span>
 				{/* <div className="ml-[18px] flex cursor-pointer items-center">
 					<Like className="text-gray-280" likes={likes} />
@@ -180,6 +192,7 @@ export default function Comments() {
 					<Comment
 						key={item.id}
 						comment={item.content}
+						commentUser={item.user}
 						id={`${item.id}`}
 						photo={item.photo}
 						timestamp={item.createdAt}
