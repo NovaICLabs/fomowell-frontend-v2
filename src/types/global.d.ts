@@ -27,6 +27,7 @@ interface Window {
 			getPrincipal: () => Promise<Principal>;
 			onExternalDisconnect: (callback: () => void) => void;
 			onLockStateChange: (callback: (isLocked: boolean) => void) => void;
+			onIdleDisconnect: (callback: () => void) => void;
 		};
 	};
 	icConnector: {

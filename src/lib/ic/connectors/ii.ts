@@ -54,7 +54,7 @@ export class InternetIdentityConnector implements ConnectorAbstract {
 	}
 
 	public init = async () => {
-		console.log("this.config", this.config);
+		// console.log("this.config", this.config);
 		this.client = await AuthClient.create({
 			idleOptions: {
 				disableIdle: true,

@@ -24,18 +24,26 @@ const useDisconnect = () => {
 		setConnecting,
 		setIdentityProfile,
 	} = useIcIdentityStore();
+
+	const isDisconnecting = useRef(false);
+
 	const disconnect = useCallback(async () => {
-		if ((window as any).icConnector) {
-			setLastConnectedWallet(undefined);
-			setConnected(false);
-			setConnecting(false);
-			setPrincipal(undefined);
-			clearToken();
-			setIdentityProfile(undefined);
+		if ((window as any).icConnector && !isDisconnecting.current) {
+			isDisconnecting.current = true;
+
 			try {
+				setLastConnectedWallet(undefined);
+				setConnected(false);
+				setConnecting(false);
+				setPrincipal(undefined);
+				clearToken();
+				setIdentityProfile(undefined);
 				await (window as any).icConnector.disconnect();
 			} catch (error) {
 				console.error("Failed to disconnect wallet:", error);
+			} finally {
+				// eslint-disable-next-line require-atomic-updates
+				isDisconnecting.current = false;
 			}
 		}
 	}, [
@@ -60,9 +68,45 @@ export const useInitialConnect = () => {
 		checkLogin,
 		reloadIdentityProfile,
 		handleIIBug,
+		connected,
 	} = useIcIdentityStore();
 	const { lastConnectedWallet } = useIcLastConnectedWalletStore();
 	const lastLoginRef = useRef<Connector | undefined>();
+
+	// plug Change account and lock disconnect
+	useEffect(() => {
+		if (!lastConnectedWallet || !connected) return;
+
+		if (window.ic && window.ic.plug) {
+			if (window.ic.plug.onExternalDisconnect) {
+				window.ic.plug.onExternalDisconnect(() => {
+					if (lastConnectedWallet && lastConnectedWallet === "PLUG") {
+						// Do not use useUserLogout, logout will exec window.ic.plug.onExternalDisconnect, and case a Loop execution
+						void disconnect();
+					}
+				});
+			}
+
+			if (window.ic.plug.onLockStateChange)
+				window.ic.plug.onLockStateChange((isLocked) => {
+					if (lastConnectedWallet && lastConnectedWallet === "PLUG") {
+						if (isLocked) {
+							void disconnect();
+						}
+					}
+				});
+
+			// Handle auto-lock after idle timeout
+			if (window.ic.plug.onIdleDisconnect) {
+				window.ic.plug.onIdleDisconnect(() => {
+					if (lastConnectedWallet && lastConnectedWallet === "PLUG") {
+						void disconnect();
+					}
+				});
+			}
+		}
+		// setIdentityProfile
+	}, [lastConnectedWallet, disconnect, connected]);
 
 	// Handle disconnected state
 	const handleNotConnected = useCallback(async () => {
