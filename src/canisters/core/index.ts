@@ -499,6 +499,7 @@ export const buy = async (
 		memo: wrapOption(string2array((Math.random() * 100).toString())),
 	});
 	return unwrapRustResult(result, (error) => {
+		console.debug("🚀 ~ return unwrap RustResult ~ error:", error);
 		throw new Error(error);
 	});
 };

@@ -256,12 +256,16 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			console.debug("error", error);
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-			if (error.message.indexOf("Failed to fetch") !== -1) {
+			if (
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+				error.message.indexOf("Failed to fetch") !== -1 ||
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+				error.message.indexOf("response could not be found") !== -1
+			) {
 				// Plug error
 				showToast(
 					"error",
-					`Plug wallet connection error, Please check your network or reconnect your wallet.`
+					`Network error. Please refresh the page or reconnect your wallet.`
 				);
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 			} else if (error.message.indexOf("Slippage exceeded") !== -1) {
