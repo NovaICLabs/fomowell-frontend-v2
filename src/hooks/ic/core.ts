@@ -96,6 +96,7 @@ export const useCalculateBuy = (args: {
 				decimals,
 			};
 		},
+		refetchInterval: 1000 * 2,
 		enabled: args.amount !== undefined && args.enabled,
 	});
 };
@@ -127,6 +128,7 @@ export const useCalculateSell = (args: {
 				decimals,
 			};
 		},
+		refetchInterval: 1000 * 2,
 		enabled: args.amount !== undefined && args.enabled,
 	});
 };

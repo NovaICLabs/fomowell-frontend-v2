@@ -94,14 +94,14 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 		useCalculateBuy({
 			amount: debouncedBuyAmountBigInt,
 			id: Number(id),
-			enabled: activeTab === "Buy",
+			enabled: activeTab === "Buy" && debouncedBuyAmountBigInt !== undefined,
 		});
 
 	const { data: calculatedSellReceived, isFetching: isCalculatingSell } =
 		useCalculateSell({
 			amount: debouncedSellAmountBigInt,
 			id: Number(id),
-			enabled: activeTab === "Sell",
+			enabled: activeTab === "Sell" && debouncedSellAmountBigInt !== undefined,
 		});
 
 	// slippage
