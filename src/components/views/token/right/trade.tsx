@@ -236,9 +236,6 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 						if (is_completed) {
 							void refetchMemeTokenInfo();
 						}
-						refetchBalance();
-						void refetchCurrentTokenPrice();
-						setBuyAmount("");
 					} else {
 						throw new Error("Invalid amount");
 					}
@@ -254,19 +251,32 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 							"success",
 							`${formatNumberSmart(formatUnits(result))} ${"ICP"} received`
 						);
-						refetchBalance();
-						void refetchCurrentTokenPrice();
-						setSellAmount("");
 					}
 			}
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
+			console.debug("error", error);
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-			if (error.message.indexOf("is out of cycles") !== -1) {
+			if (error.message.indexOf("Failed to fetch") !== -1) {
+				// Plug error
+				showToast(
+					"error",
+					`Plug wallet connection error, Please check your network or reconnect your wallet.`
+				);
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+			} else if (error.message.indexOf("Slippage exceeded") !== -1) {
+				showToast("error", `Slippage exceeded`);
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+			} else if (error.message.indexOf("is out of cycles") !== -1) {
 				showToast("error", `Cycles insufficient`);
 			} else {
 				showToast("error", `Failed to ${activeTab.toLowerCase()} token`);
 			}
+		} finally {
+			refetchBalance();
+			void refetchCurrentTokenPrice();
+			setBuyAmount("");
+			setSellAmount("");
 		}
 	}, [
 		isCalculatingBuy,
