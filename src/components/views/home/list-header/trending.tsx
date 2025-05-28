@@ -95,7 +95,7 @@ export default function TrendingSort() {
 				{trendingTimeOptions.map((option) => (
 					<SelectItem
 						key={option.label}
-						className="flex h-[42px] cursor-pointer items-center gap-x-1.5 rounded-[14px] text-sm font-semibold hover:bg-gray-700 data-[state=checked]:bg-gray-700"
+						className="flex h-[42px] cursor-pointer items-center gap-x-1 rounded-[14px] text-sm font-semibold hover:bg-gray-700 data-[state=checked]:bg-gray-700"
 						value={option.label}
 					>
 						{option.label}
