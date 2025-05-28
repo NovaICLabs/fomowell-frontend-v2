@@ -159,7 +159,7 @@ const MobileToken = () => {
 				</div>
 			</div>
 
-			<div className="fixed right-0 bottom-0 left-0 z-10 flex h-14 items-center justify-between bg-gray-800 px-2.5 shadow">
+			<div className="fixed right-0 bottom-0 left-0 z-10 flex h-14 items-center justify-between gap-x-5 bg-gray-800 px-2.5 shadow">
 				<div
 					className="flex flex-col items-center"
 					onClick={() => {
@@ -171,7 +171,7 @@ const MobileToken = () => {
 				</div>
 				{isCompleted ? (
 					<Button
-						className="h-9.5 w-37 rounded-[19px] px-2.5 py-1.5 text-sm font-semibold text-black"
+						className="h-9.5 w-37 flex-1 rounded-[19px] px-2.5 py-1.5 text-sm font-semibold text-black"
 						onClick={() => {
 							const canister_id = memeTokenInfo.canister_id;
 							if (!canister_id) {
