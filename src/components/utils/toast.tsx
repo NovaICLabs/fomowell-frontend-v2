@@ -18,9 +18,9 @@ export const showToast = (
 		() => {
 			return (
 				<div className="flex h-full w-full items-center justify-end">
-					<div className="bg-gray-710 relative flex h-[78px] w-[302px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl pt-[17px] pb-4.5 shadow-[0px_4px_18px_2px_rgba(0,0,0,0.25)]">
+					<div className="bg-gray-710 relative flex min-h-[78px] w-[302px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl pt-[17px] pb-4.5 shadow-[0px_4px_18px_2px_rgba(0,0,0,0.25)]">
 						<div className="relative flex h-full w-full items-start justify-start gap-3 px-4">
-							<div className="flex items-center gap-2">
+							<div className="flex items-center gap-2 pb-3">
 								{type === "loading" ? (
 									<img
 										alt="loading"

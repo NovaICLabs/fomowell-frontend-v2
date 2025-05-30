@@ -867,7 +867,7 @@ export default function MemeList() {
 		() => sort && sort !== "recent" && sort.indexOf("popularity") === -1,
 		[sort]
 	);
-	console.debug("🚀 ~ MemeList ~ sort:", sort);
+	// console.debug("🚀 ~ MemeList ~ sort:", sort);
 
 	useEffect(() => {
 		if (!virtualItems || virtualItems.length === 0) return;
