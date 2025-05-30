@@ -8,7 +8,10 @@ import {
 	UNISAT,
 } from "@omnisat/lasereyes-core";
 import copy from "copy-to-clipboard";
-import { useSiwbIdentity } from "ic-siwb-lasereyes-connector";
+import {
+	type LaserEyesContextType,
+	useSiwbIdentity,
+} from "ic-siwb-lasereyes-connector";
 import { Check } from "lucide-react";
 
 import { CopyIcon } from "@/components/icons/common/copy";
@@ -54,7 +57,7 @@ const BitcoinWalletConnect: React.FC = () => {
 			setConnectError(null);
 			setLoading(true);
 			setManually(true);
-			await setLaserEyes(p, provider);
+			await setLaserEyes(p as LaserEyesContextType, provider);
 		} catch (error_) {
 			console.error("Failed to connect wallet:", error_);
 			if (error_ instanceof Error) {
