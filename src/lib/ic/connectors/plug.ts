@@ -114,7 +114,24 @@ export class PlugConnector implements ConnectorAbstract {
 			return false;
 		}
 		plug.sessionManager.onConnectionUpdate = this.config.onConnectionUpdate;
-		if (await this.isConnected()) {
+
+		const previousPrincipal = this.principal;
+
+		const isConnected = await this.isConnected();
+
+		if (isConnected) {
+			const currentPrincipal = (window as any).ic.plug.principalId;
+
+			if (!previousPrincipal || previousPrincipal !== currentPrincipal) {
+				await (window as any).ic.plug.requestConnect({
+					whitelist:
+						this.config.whitelist.length > MAX_PLUG_WHITELIST_NUMBER
+							? this.config.whitelist.slice(0, MAX_PLUG_WHITELIST_NUMBER)
+							: this.config.whitelist,
+					host: this.config.host,
+				});
+			}
+
 			this.principal = (window as any).ic.plug.principalId;
 		} else {
 			await (window as any).ic.plug.requestConnect({

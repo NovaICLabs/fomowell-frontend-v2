@@ -11,7 +11,7 @@ export const useQuickBuyStore = create(
 		setSlippage: (slippage: string) => void;
 	}>(
 		(set) => ({
-			amount: "0.001",
+			amount: "0.5",
 			setAmount: (amount) => {
 				set({ amount });
 			},

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useRouter } from "@tanstack/react-router";
 import copy from "copy-to-clipboard";
@@ -25,16 +25,16 @@ import { withStopPropagation } from "@/lib/common/react-event";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
-import { useIcIdentityStore } from "@/store/ic";
+import { useIcIdentityStore, useIcLastConnectedWalletStore } from "@/store/ic";
 import { useMobileSheetStore } from "@/store/mobile/sheet";
 export const IcpAccountInfo = () => {
 	const { disconnect } = useIcWallet();
-	const { principal, identityProfile } = useIcIdentityStore();
+	const { principal, identityProfile, connected } = useIcIdentityStore();
 	const router = useRouter();
 	// mobile
 	const { setMenuOpen } = useMobileSheetStore();
 
-	const handleDisconnect = async () => {
+	const handleDisconnect = useCallback(async () => {
 		void disconnect();
 		if (isMobile) {
 			setMenuOpen(false);
@@ -44,7 +44,44 @@ export const IcpAccountInfo = () => {
 				replace: true,
 			});
 		}
-	};
+	}, [disconnect, router, setMenuOpen]);
+
+	const { lastConnectedWallet } = useIcLastConnectedWalletStore();
+
+	// plug Change account and lock disconnect
+	useEffect(() => {
+		if (!lastConnectedWallet || !connected) return;
+
+		if (window.ic && window.ic.plug) {
+			if (window.ic.plug.onExternalDisconnect) {
+				window.ic.plug.onExternalDisconnect(() => {
+					if (lastConnectedWallet && lastConnectedWallet === "PLUG") {
+						// Do not use useUserLogout, logout will exec window.ic.plug.onExternalDisconnect, and case a Loop execution
+						void handleDisconnect();
+					}
+				});
+			}
+
+			if (window.ic.plug.onLockStateChange)
+				window.ic.plug.onLockStateChange((isLocked) => {
+					if (lastConnectedWallet && lastConnectedWallet === "PLUG") {
+						if (isLocked) {
+							void handleDisconnect();
+						}
+					}
+				});
+
+			// Handle auto-lock after idle timeout
+			if (window.ic.plug.onIdleDisconnect) {
+				window.ic.plug.onIdleDisconnect(() => {
+					if (lastConnectedWallet && lastConnectedWallet === "PLUG") {
+						void handleDisconnect();
+					}
+				});
+			}
+		}
+		// setIdentityProfile
+	}, [lastConnectedWallet, disconnect, connected, handleDisconnect]);
 
 	const [copied, setCopied] = useState(false);
 

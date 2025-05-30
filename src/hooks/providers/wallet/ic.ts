@@ -68,45 +68,48 @@ export const useInitialConnect = () => {
 		checkLogin,
 		reloadIdentityProfile,
 		handleIIBug,
-		connected,
+		// connected,
 	} = useIcIdentityStore();
 	const { lastConnectedWallet } = useIcLastConnectedWalletStore();
 	const lastLoginRef = useRef<Connector | undefined>();
 
-	// plug Change account and lock disconnect
-	useEffect(() => {
-		if (!lastConnectedWallet || !connected) return;
+	// // plug Change account and lock disconnect
+	// useEffect(() => {
+	// 	if (!lastConnectedWallet || !connected) return;
 
-		if (window.ic && window.ic.plug) {
-			if (window.ic.plug.onExternalDisconnect) {
-				window.ic.plug.onExternalDisconnect(() => {
-					if (lastConnectedWallet && lastConnectedWallet === "PLUG") {
-						// Do not use useUserLogout, logout will exec window.ic.plug.onExternalDisconnect, and case a Loop execution
-						void disconnect();
-					}
-				});
-			}
+	// 	if (window.ic && window.ic.plug) {
+	// 		if (window.ic.plug.onExternalDisconnect) {
+	// 			window.ic.plug.onExternalDisconnect(() => {
+	// 				if (lastConnectedWallet && lastConnectedWallet === "PLUG") {
+	// 					// Do not use useUserLogout, logout will exec window.ic.plug.onExternalDisconnect, and case a Loop execution
+	// 					// void disconnect();
+	// 					void handleDisconnect();
+	// 				}
+	// 			});
+	// 		}
 
-			if (window.ic.plug.onLockStateChange)
-				window.ic.plug.onLockStateChange((isLocked) => {
-					if (lastConnectedWallet && lastConnectedWallet === "PLUG") {
-						if (isLocked) {
-							void disconnect();
-						}
-					}
-				});
+	// 		if (window.ic.plug.onLockStateChange)
+	// 			window.ic.plug.onLockStateChange((isLocked) => {
+	// 				if (lastConnectedWallet && lastConnectedWallet === "PLUG") {
+	// 					if (isLocked) {
+	// 						// void disconnect();
+	// 						void handleDisconnect();
+	// 					}
+	// 				}
+	// 			});
 
-			// Handle auto-lock after idle timeout
-			if (window.ic.plug.onIdleDisconnect) {
-				window.ic.plug.onIdleDisconnect(() => {
-					if (lastConnectedWallet && lastConnectedWallet === "PLUG") {
-						void disconnect();
-					}
-				});
-			}
-		}
-		// setIdentityProfile
-	}, [lastConnectedWallet, disconnect, connected]);
+	// 		// Handle auto-lock after idle timeout
+	// 		if (window.ic.plug.onIdleDisconnect) {
+	// 			window.ic.plug.onIdleDisconnect(() => {
+	// 				if (lastConnectedWallet && lastConnectedWallet === "PLUG") {
+	// 					// void disconnect();
+	// 					void handleDisconnect();
+	// 				}
+	// 			});
+	// 		}
+	// 	}
+	// 	// setIdentityProfile
+	// }, [lastConnectedWallet, disconnect, connected, handleDisconnect]);
 
 	// Handle disconnected state
 	const handleNotConnected = useCallback(async () => {
