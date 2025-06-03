@@ -10,6 +10,7 @@ interface ImportMetaEnv {
 	readonly VITE_IMG_UPLOADER_URL: string;
 	readonly VITE_INDEXER_BASE_URL: string;
 	readonly VITE_ICPEX_SWAP: string;
+	readonly VITE_CKBTC_MINTER_CANISTER_ID: string;
 }
 
 interface ImportMeta {
