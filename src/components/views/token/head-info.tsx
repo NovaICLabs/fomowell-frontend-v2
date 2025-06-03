@@ -5,6 +5,11 @@ import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
 import X from "@/components/icons/media/x";
 import { Star } from "@/components/icons/star";
+import {
+	HoverCard,
+	HoverCardContent,
+	HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFavoriteToken, useSingleTokenInfo } from "@/hooks/apis/indexer";
@@ -13,11 +18,6 @@ import { formatNumberSmart, isNullOrUndefined } from "@/lib/common/number";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
-import {
-	HoverCard,
-	HoverCardContent,
-	HoverCardTrigger,
-} from "@/components/ui/hover-card";
 
 export default function HeadInfo() {
 	const { id } = useParams({ from: "/icp/token/$id" });
