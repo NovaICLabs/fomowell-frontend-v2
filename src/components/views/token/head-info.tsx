@@ -13,6 +13,11 @@ import { formatNumberSmart, isNullOrUndefined } from "@/lib/common/number";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
+import {
+	HoverCard,
+	HoverCardContent,
+	HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 export default function HeadInfo() {
 	const { id } = useParams({ from: "/icp/token/$id" });
@@ -42,11 +47,24 @@ export default function HeadInfo() {
 						{isLoadingMemeToken ? (
 							<Skeleton className="h-full w-full" />
 						) : (
-							<img
-								alt="logo"
-								className="h-full w-full object-cover"
-								src={memeToken?.logo}
-							/>
+							<HoverCard>
+								<HoverCardTrigger asChild>
+									<img
+										alt="logo"
+										className="h-full w-full object-cover"
+										src={memeToken?.logo}
+									/>
+								</HoverCardTrigger>
+								<HoverCardContent className="mt-3 w-40 rounded-2xl p-0">
+									<div className="flex w-full items-center justify-between overflow-hidden rounded-2xl">
+										<img
+											alt="logo"
+											className="h-full w-full object-cover"
+											src={memeToken?.logo}
+										/>
+									</div>
+								</HoverCardContent>
+							</HoverCard>
 						)}
 					</div>
 					<div className="ml-2.5 flex flex-col gap-1">
