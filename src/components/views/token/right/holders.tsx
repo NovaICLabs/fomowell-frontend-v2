@@ -1,11 +1,12 @@
 import { useState } from "react";
 
-import { Link, useParams } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
 import { isMobile } from "react-device-detect";
 import ReactPaginate from "react-paginate";
 
 import { getChainICCoreCanisterId } from "@/canisters/core";
+import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
 import { useTokenHolders } from "@/hooks/ic/core";
 import {
 	formatNumberSmart,
@@ -15,7 +16,7 @@ import {
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 export default function Holders() {
-	const { id } = useParams({ from: "/icp/token/$id" });
+	const { id } = useTokenChainAndId();
 	const [page, setPage] = useState(1);
 	const handlePageClick = ({ selected }: { selected: number }) => {
 		setPage(selected);

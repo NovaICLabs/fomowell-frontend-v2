@@ -16,7 +16,7 @@ import { Check } from "lucide-react";
 
 import { CopyIcon } from "@/components/icons/common/copy";
 import { DisconnectIcon } from "@/components/icons/common/disconnect";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -28,9 +28,9 @@ import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
 
-import WalletOption from "../wallet-option";
+import WalletOption from "../header/wallet-option";
 
-const BitcoinWalletConnect: React.FC = () => {
+const BtcConnectDialog: React.FC = () => {
 	// const [open, setOpen] = useState(false);
 
 	const { btcConnectOpen, setBtcConnectOpen } = useDialogStore();
@@ -148,10 +148,10 @@ const BitcoinWalletConnect: React.FC = () => {
 	return (
 		<>
 			<Dialog open={btcConnectOpen} onOpenChange={setBtcConnectOpen}>
-				{principal ? (
-					<div className="flex items-center justify-center gap-x-2">
-						<div className="bg-gray-750 inline-flex h-[38px] items-center justify-start rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700">
-							<div className="flex items-center">
+				{
+					principal ? (
+						<div className="flex items-center justify-center gap-x-2">
+							<div className="bg-gray-750 inline-flex h-[38px] items-center justify-start rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700">
 								<img
 									alt="avatar"
 									className="h-6 w-6 rounded-full"
@@ -176,33 +176,32 @@ const BitcoinWalletConnect: React.FC = () => {
 										}}
 									/>
 								)}
+								<div className="ml-2.5 h-6 w-px bg-white/20"></div>
+								<DisconnectIcon
+									className="ml-2.25 h-4 w-4"
+									onClick={handleDisconnect}
+								/>
 							</div>
-							<div className="ml-2.5 h-6 w-px bg-white/20"></div>
-							<DisconnectIcon
-								className="ml-2.25 h-4 w-4"
-								onClick={handleDisconnect}
-							/>
+							<div className="bg-gray-750 inline-flex h-[38px] items-center justify-start gap-0.5 rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700">
+								<img
+									alt="flash"
+									className="h-4.5 w-4.5 rounded-full"
+									src={"/svgs/coins/bitcoin.svg"}
+								/>
+								<span className="text-xs font-medium">0.01366000</span>
+							</div>
 						</div>
-						<div className="bg-gray-750 inline-flex h-[38px] items-center justify-start gap-0.5 rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700">
-							<img
-								alt="flash"
-								className="h-4.5 w-4.5 rounded-full"
-								src={"/svgs/coins/bitcoin.svg"}
-							/>
-							<span className="text-xs font-medium">0.01366000</span>
-						</div>
-					</div>
-				) : (
-					<Button
-						className="h-[38px] w-[111px] rounded-full text-xs font-bold"
-						disabled={loading}
-						onClick={() => {
-							setBtcConnectOpen(true);
-						}}
-					>
-						{loading ? "Connecting..." : "Connect Wallet"}
-					</Button>
-				)}
+					) : null
+					// <Button
+					// 	className="h-[38px] w-[111px] rounded-full text-xs font-bold"
+					// 	disabled={loading}
+					// 	onClick={() => {
+					// 		setBtcConnectOpen(true);
+					// 	}}
+					// >
+					// 	{loading ? "Connecting..." : "Connect Wallet"}
+					// </Button>
+				}
 
 				<DialogContent
 					className={cn(
@@ -294,11 +293,11 @@ const BitcoinWalletConnect: React.FC = () => {
 
 							{/* TODO: plug connect */}
 							{/* <WalletOption
-                                disabled={loading}
-                                icon={<img alt="Plug" src="/svgs/wallet/plug.svg" />}
-                                name="Plug"
-                                onClick={() => {}}
-                            /> */}
+								disabled={loading}
+								icon={<img alt="Plug" src="/svgs/wallet/plug.svg" />}
+								name="Plug"
+								onClick={() => {}}
+							/> */}
 						</div>
 					)}
 				</DialogContent>
@@ -307,4 +306,4 @@ const BitcoinWalletConnect: React.FC = () => {
 	);
 };
 
-export default BitcoinWalletConnect;
+export default BtcConnectDialog;

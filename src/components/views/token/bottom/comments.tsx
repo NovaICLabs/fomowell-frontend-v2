@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { useParams } from "@tanstack/react-router";
+// import { useParams } from "@tanstack/react-router";
 import dayjs from "dayjs";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { showToast } from "@/components/utils/toast";
 import { useCreateTokenComment, useTokenComments } from "@/hooks/apis/indexer";
 import { useControllableState } from "@/hooks/common/controllable-state";
+import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
 import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
 
@@ -78,7 +79,8 @@ const Comment = ({
 	);
 };
 export default function Comments() {
-	const { id } = useParams({ from: "/icp/token/$id" });
+	const { id } = useTokenChainAndId();
+
 	const { mutateAsync: createComment, isPending } = useCreateTokenComment({
 		tokenId: id,
 	});

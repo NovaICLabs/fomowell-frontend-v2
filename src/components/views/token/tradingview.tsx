@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 // import { useThrottleCallback } from "@react-hook/throttle";
-import { useParams } from "@tanstack/react-router";
+// import { useParams } from "@tanstack/react-router";
 import { BigNumber } from "bignumber.js";
 import {
 	CandlestickSeries,
@@ -19,10 +19,12 @@ import {
 import { isMobile } from "react-device-detect";
 
 import { useSingleTokenInfo, useTokenPriceCandle } from "@/hooks/apis/indexer";
+import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
 import { formatNumberSmart, isNullOrUndefined } from "@/lib/common/number";
 import { cn } from "@/lib/utils";
 
 import type { CandleParameters } from "@/apis/indexer";
+
 type ChartInterval = "1m" | "5m" | "15m" | "30m" | "1h" | "1d";
 type HookInterval = CandleParameters["interval"];
 
@@ -48,7 +50,8 @@ const intervals: Array<{
 	{ value: "1d", label: "1D", seconds: 86400 },
 ];
 export default function TradingView() {
-	const { id } = useParams({ from: "/icp/token/$id" });
+	const { id } = useTokenChainAndId();
+
 	const [selectedInterval, setSelectedInterval] = useState<ChartInterval>("1h");
 
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -255,7 +258,8 @@ export default function TradingView() {
 }
 
 const MobileTradingViewIntervals = () => {
-	const { id } = useParams({ from: "/icp/token/$id" });
+	const { id } = useTokenChainAndId();
+
 	const { data: tokenInfo } = useSingleTokenInfo({ id });
 	const {
 		priceChangeRate5M,

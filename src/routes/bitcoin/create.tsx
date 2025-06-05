@@ -138,7 +138,7 @@ function TokenCreationPage() {
 	const router = useRouter();
 	// Form submission handler
 	const [logoBase64String, setLogoBase64String] = useState<string>("");
-	async function onSubmit(values: z.infer<typeof formSchema>) {
+	function onSubmit(values: z.infer<typeof formSchema>) {
 		if (!logoBase64String) {
 			throw new Error("Logo is required");
 		}
@@ -193,9 +193,9 @@ function TokenCreationPage() {
 
 			console.log("Creating token with args:", createArgs); // Log arguments before sending
 
-			const token = await createMemeToken(createArgs);
+			// const token = await createMemeToken(createArgs);
 
-			void router.navigate({ to: `/icp/token/${token.id}` });
+			// void router.navigate({ to: `/icp/token/${token.id}` });
 			showToast("success", "Token created successfully");
 		} catch (error) {
 			console.error("Failed to create token:", error);
@@ -205,7 +205,7 @@ function TokenCreationPage() {
 		}
 	}
 	const { connected, principal } = useConnectedIdentity();
-	const { setIcpConnectOpen } = useDialogStore();
+	// const { setIcpConnectOpen } = useDialogStore();
 
 	const { data: coreTokenBalance } = useCoreTokenBalance({
 		owner: principal,
@@ -444,9 +444,9 @@ function TokenCreationPage() {
 																	}}
 																/>
 																<img
-																	alt="ICP"
+																	alt="BTC"
 																	className="absolute top-1/2 right-2 h-6 w-6 -translate-y-1/2"
-																	src="/svgs/chains/icp.svg"
+																	src="/svgs/chains/bitcoin.svg"
 																/>
 															</div>
 														</FormControl>
@@ -460,7 +460,7 @@ function TokenCreationPage() {
 												<span className="text-sm text-white/40">
 													Launch Fee
 												</span>
-												<span className="text-sm text-white">0.5 ICP</span>
+												<span className="text-sm text-white">0.5 BTC</span>
 											</div>
 											<div className="flex items-center justify-between">
 												<span className="text-sm text-white/40">
@@ -479,7 +479,7 @@ function TokenCreationPage() {
 													Total Payment
 												</span>
 												<span className="text-sm text-white">
-													{totalPayment} ICP
+													{totalPayment} BTC
 												</span>
 											</div>
 										</div>
@@ -495,7 +495,7 @@ function TokenCreationPage() {
 							<div className="flex flex-col items-center">
 								<span className="text-sm text-white/60">
 									Balance:{" "}
-									{coreTokenBalance ? coreTokenBalance?.formatted : "0"} ICP
+									{coreTokenBalance ? coreTokenBalance?.formatted : "0"} BTC
 								</span>
 							</div>
 						}
@@ -516,7 +516,8 @@ function TokenCreationPage() {
 								className="w-full max-w-md rounded-full py-6 text-base font-bold text-black"
 								type="button"
 								onClick={() => {
-									setIcpConnectOpen(true);
+									// todo connect btc wallet
+									// setIcpConnectOpen(true);
 								}}
 							>
 								Connect Wallet

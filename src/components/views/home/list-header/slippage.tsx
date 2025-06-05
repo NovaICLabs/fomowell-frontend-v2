@@ -1,10 +1,11 @@
+import { isMobile } from "react-device-detect";
+
 import SlippageSetting from "@/components/icons/common/slippage-setting";
 import { Input } from "@/components/ui/input";
 import { slippageRange, validateInputNumber } from "@/lib/common/validate";
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
 import { useQuickBuyStore } from "@/store/quick-buy";
-import { isMobile } from "react-device-detect";
 
 export default function Slippage() {
 	const {

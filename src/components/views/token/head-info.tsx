@@ -1,4 +1,4 @@
-import { Link, useParams } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { isMobile } from "react-device-detect";
 
 import Telegram from "@/components/icons/media/telegram";
@@ -13,6 +13,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFavoriteToken, useSingleTokenInfo } from "@/hooks/apis/indexer";
+import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
 import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
 import { formatNumberSmart, isNullOrUndefined } from "@/lib/common/number";
 import { withStopPropagation } from "@/lib/common/react-event";
@@ -20,7 +21,7 @@ import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 
 export default function HeadInfo() {
-	const { id } = useParams({ from: "/icp/token/$id" });
+	const { id } = useTokenChainAndId();
 	const { data: memeToken, isLoading: isLoadingMemeToken } = useMemeTokenInfo(
 		Number(id)
 	);

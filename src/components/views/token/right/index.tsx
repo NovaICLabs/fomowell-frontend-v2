@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 
-import { useParams } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
@@ -11,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { showToast } from "@/components/utils/toast";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useSingleTokenInfo } from "@/hooks/apis/indexer";
+import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
 import { useCurrentPrice, useMemeTokenInfo } from "@/hooks/ic/core";
 import {
 	formatNumberSmart,
@@ -24,13 +24,15 @@ import { cn } from "@/lib/utils";
 import Holders from "./holders";
 import Liquidity from "./liquidity";
 import Trade from "./trade";
+
 const tabs = ["Trade", "Liquidity"];
 
 const isNegative = (value: number) => {
 	return value < 0;
 };
 export const InfoDetail = () => {
-	const { id } = useParams({ from: "/icp/token/$id" });
+	const { id } = useTokenChainAndId();
+
 	const { data: currentTokenPrice } = useCurrentPrice({ id: Number(id) });
 	const { data: memeTokenInfo } = useMemeTokenInfo(Number(id));
 
@@ -127,7 +129,9 @@ export const InfoDetail = () => {
 };
 export default function Bottom() {
 	const [activeTab, setActiveTab] = useState(tabs[0]);
-	const { id } = useParams({ from: "/icp/token/$id" });
+
+	const { chain, id } = useTokenChainAndId();
+
 	const { data: memeTokenInfo } = useMemeTokenInfo(Number(id));
 
 	const { data: tokenInfo } = useSingleTokenInfo({ id });
@@ -138,11 +142,16 @@ export default function Bottom() {
 		priceChangeRate6H,
 		priceChangeRate24H,
 	} = tokenInfo ?? {};
+
+	const currentTabs = useMemo(() => {
+		return chain !== "icp" ? tabs : tabs.filter((tab) => tab !== "Liquidity");
+	}, [chain]);
+
 	return (
 		<div className="no-scrollbar flex w-[390px] flex-shrink-0 flex-col gap-7.5 overflow-auto">
 			<div className="flex items-center gap-[30px]">
-				{tabs
-					.filter((tab) => tab !== "Liquidity")
+				{currentTabs
+					// .filter((tab) => tab !== "Liquidity")
 					.map((tab) => {
 						const isActive = activeTab === tab;
 						return (
@@ -150,13 +159,13 @@ export default function Bottom() {
 								key={tab}
 								className={cn(
 									`relative cursor-pointer text-base font-semibold`,
-									isActive ? "text-white" : "text-white/60 hover:text-white",
-									tab === "Liquidity" && "cursor-not-allowed"
+									isActive ? "text-white" : "text-white/60 hover:text-white"
+									// tab === "Liquidity" && "cursor-not-allowed"
 								)}
 								onClick={() => {
-									if (tab === "Liquidity") {
-										return;
-									}
+									// if (tab === "Liquidity") {
+									// 	return;
+									// }
 									setActiveTab(tab);
 								}}
 							>

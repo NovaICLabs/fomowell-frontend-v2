@@ -25,6 +25,9 @@ export const useDialogStore = create<{
 	icpConnectOpen: boolean;
 	setIcpConnectOpen: (icpConnectOpen: boolean) => void;
 
+	btcConnectOpen: boolean;
+	setBtcConnectOpen: (btcConnectOpen: boolean) => void;
+
 	// how it works
 	howItWorksOpen: boolean;
 	setHowItWorksOpen: (howItWorksOpen: boolean) => void;
@@ -46,6 +49,10 @@ export const useDialogStore = create<{
 	icpConnectOpen: false,
 	setIcpConnectOpen: (icpConnectOpen) => {
 		set({ icpConnectOpen });
+	},
+	btcConnectOpen: false,
+	setBtcConnectOpen: (btcConnectOpen) => {
+		set({ btcConnectOpen });
 	},
 	howItWorksOpen: false,
 	setHowItWorksOpen: (howItWorksOpen) => {

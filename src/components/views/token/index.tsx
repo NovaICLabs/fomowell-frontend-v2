@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useCanGoBack, useParams, useRouter } from "@tanstack/react-router";
+import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import { ChevronLeft } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
@@ -16,6 +16,7 @@ import Right from "@/components/views/token/right";
 import TradingView from "@/components/views/token/tradingview";
 import Trending from "@/components/views/token/trending";
 import { useFavoriteToken, useSingleTokenInfo } from "@/hooks/apis/indexer";
+import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
 import { useMemeTokenInfo } from "@/hooks/ic/core";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { validatePrincipalText } from "@/lib/ic/principal";
@@ -38,7 +39,9 @@ const MobileTabsBottom = ["Transactions", "Holders"];
 
 const MobileToken = () => {
 	const { chain } = useChainStore();
-	const { id } = useParams({ from: "/icp/token/$id" });
+
+	const { id } = useTokenChainAndId();
+
 	const { data: tokenInfo } = useSingleTokenInfo({ id });
 	const { mutateAsync: favoriteToken } = useFavoriteToken();
 	const { data: memeTokenInfo } = useMemeTokenInfo(Number(id));

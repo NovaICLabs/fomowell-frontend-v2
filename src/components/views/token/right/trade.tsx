@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { useParams } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
 import { isMobile } from "react-device-detect";
 import { useDebounce } from "use-debounce";
@@ -14,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { showToast } from "@/components/utils/toast";
 import { useICPPrice } from "@/hooks/apis/coingecko";
+import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
 import {
 	useBuy,
 	useCalculateBuy,
@@ -35,6 +35,7 @@ import { slippageRange, validateInputNumber } from "@/lib/common/validate";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
+
 const percentages = [25, 50, 75, 100];
 const tabs = ["Buy", "Sell"] as const;
 export type TradeTab = (typeof tabs)[number];
@@ -43,7 +44,8 @@ const buyRange = [0.0001, Infinity] as const;
 const sellRange = [0.1, Infinity] as const;
 
 export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
-	const { id } = useParams({ from: "/icp/token/$id" });
+	const { id } = useTokenChainAndId();
+
 	const { principal } = useConnectedIdentity();
 	const { data: coreTokenBalance, refetch: refetchCoreTokenBalance } =
 		useCoreTokenBalance({

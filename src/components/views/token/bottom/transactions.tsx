@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 
-import { Link, useParams } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
 	createColumnHelper,
 	flexRender,
@@ -15,6 +15,7 @@ import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useICPPrice } from "@/hooks/apis/coingecko";
 import { useInfiniteTokenTransactionsHistory } from "@/hooks/apis/indexer";
+import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
 import { getAvatar } from "@/lib/common/avatar";
 import {
 	formatNumberSmart,
@@ -36,7 +37,8 @@ const TableItemsSkeleton = () => {
 };
 
 export default function Transactions() {
-	const { id } = useParams({ from: "/icp/token/$id" });
+	const { id } = useTokenChainAndId();
+
 	const {
 		data,
 		hasNextPage,
