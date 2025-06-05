@@ -7,6 +7,10 @@ const links = [
 		label: "Tokens",
 		to: "/",
 	},
+	{
+		label: "Liquidity",
+		to: "/liquidity",
+	},
 ];
 
 export default function Links() {

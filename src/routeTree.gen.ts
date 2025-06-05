@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as HowImport } from './routes/how'
 import { Route as IndexImport } from './routes/index'
+import { Route as LiquidityIndexImport } from './routes/liquidity/index'
 import { Route as IcpCreateImport } from './routes/icp/create'
 import { Route as BitcoinCreateImport } from './routes/bitcoin/create'
 import { Route as MobileIcpDepositWithdrawImport } from './routes/mobile/icp/deposit-withdraw'
@@ -34,6 +35,12 @@ const HowRoute = HowImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LiquidityIndexRoute = LiquidityIndexImport.update({
+  id: '/liquidity/',
+  path: '/liquidity/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -123,6 +130,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IcpCreateImport
       parentRoute: typeof rootRoute
     }
+    '/liquidity/': {
+      id: '/liquidity/'
+      path: '/liquidity'
+      fullPath: '/liquidity'
+      preLoaderRoute: typeof LiquidityIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/bitcoin/profile/$userid': {
       id: '/bitcoin/profile/$userid'
       path: '/bitcoin/profile/$userid'
@@ -182,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/how': typeof HowRoute
   '/bitcoin/create': typeof BitcoinCreateRoute
   '/icp/create': typeof IcpCreateRoute
+  '/liquidity': typeof LiquidityIndexRoute
   '/bitcoin/profile/$userid': typeof BitcoinProfileUseridRoute
   '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
   '/bitcoin/wallet/$pid': typeof BitcoinWalletPidRoute
@@ -196,6 +211,7 @@ export interface FileRoutesByTo {
   '/how': typeof HowRoute
   '/bitcoin/create': typeof BitcoinCreateRoute
   '/icp/create': typeof IcpCreateRoute
+  '/liquidity': typeof LiquidityIndexRoute
   '/bitcoin/profile/$userid': typeof BitcoinProfileUseridRoute
   '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
   '/bitcoin/wallet/$pid': typeof BitcoinWalletPidRoute
@@ -211,6 +227,7 @@ export interface FileRoutesById {
   '/how': typeof HowRoute
   '/bitcoin/create': typeof BitcoinCreateRoute
   '/icp/create': typeof IcpCreateRoute
+  '/liquidity/': typeof LiquidityIndexRoute
   '/bitcoin/profile/$userid': typeof BitcoinProfileUseridRoute
   '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
   '/bitcoin/wallet/$pid': typeof BitcoinWalletPidRoute
@@ -227,6 +244,7 @@ export interface FileRouteTypes {
     | '/how'
     | '/bitcoin/create'
     | '/icp/create'
+    | '/liquidity'
     | '/bitcoin/profile/$userid'
     | '/bitcoin/token/$id'
     | '/bitcoin/wallet/$pid'
@@ -240,6 +258,7 @@ export interface FileRouteTypes {
     | '/how'
     | '/bitcoin/create'
     | '/icp/create'
+    | '/liquidity'
     | '/bitcoin/profile/$userid'
     | '/bitcoin/token/$id'
     | '/bitcoin/wallet/$pid'
@@ -253,6 +272,7 @@ export interface FileRouteTypes {
     | '/how'
     | '/bitcoin/create'
     | '/icp/create'
+    | '/liquidity/'
     | '/bitcoin/profile/$userid'
     | '/bitcoin/token/$id'
     | '/bitcoin/wallet/$pid'
@@ -268,6 +288,7 @@ export interface RootRouteChildren {
   HowRoute: typeof HowRoute
   BitcoinCreateRoute: typeof BitcoinCreateRoute
   IcpCreateRoute: typeof IcpCreateRoute
+  LiquidityIndexRoute: typeof LiquidityIndexRoute
   BitcoinProfileUseridRoute: typeof BitcoinProfileUseridRoute
   BitcoinTokenIdRoute: typeof BitcoinTokenIdRoute
   BitcoinWalletPidRoute: typeof BitcoinWalletPidRoute
@@ -282,6 +303,7 @@ const rootRouteChildren: RootRouteChildren = {
   HowRoute: HowRoute,
   BitcoinCreateRoute: BitcoinCreateRoute,
   IcpCreateRoute: IcpCreateRoute,
+  LiquidityIndexRoute: LiquidityIndexRoute,
   BitcoinProfileUseridRoute: BitcoinProfileUseridRoute,
   BitcoinTokenIdRoute: BitcoinTokenIdRoute,
   BitcoinWalletPidRoute: BitcoinWalletPidRoute,
@@ -305,6 +327,7 @@ export const routeTree = rootRoute
         "/how",
         "/bitcoin/create",
         "/icp/create",
+        "/liquidity/",
         "/bitcoin/profile/$userid",
         "/bitcoin/token/$id",
         "/bitcoin/wallet/$pid",
@@ -325,6 +348,9 @@ export const routeTree = rootRoute
     },
     "/icp/create": {
       "filePath": "icp/create.tsx"
+    },
+    "/liquidity/": {
+      "filePath": "liquidity/index.tsx"
     },
     "/bitcoin/profile/$userid": {
       "filePath": "bitcoin/profile/$userid.tsx"
