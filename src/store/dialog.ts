@@ -20,6 +20,16 @@ export const useDialogStore = create<{
 		open: boolean;
 		type: "deposit" | "withdraw";
 	}) => void;
+
+	btcDepositWithdrawOpen: {
+		open: boolean;
+		type: "deposit" | "withdraw";
+	};
+	setBtcDepositWithdrawOpen: (depositWithdrawOpen: {
+		open: boolean;
+		type: "deposit" | "withdraw";
+	}) => void;
+
 	slippageOpen: SlippageOpen;
 	setSlippageOpen: (slippageOpen: SlippageOpen) => void;
 	icpConnectOpen: boolean;
@@ -38,6 +48,13 @@ export const useDialogStore = create<{
 	},
 	setDepositWithdrawOpen: (depositWithdrawOpen) => {
 		set({ depositWithdrawOpen });
+	},
+	btcDepositWithdrawOpen: {
+		open: false,
+		type: "deposit",
+	},
+	setBtcDepositWithdrawOpen: (btcDepositWithdrawOpen) => {
+		set({ btcDepositWithdrawOpen });
 	},
 	slippageOpen: {
 		open: false,

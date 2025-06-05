@@ -21,7 +21,9 @@ import {
 	type TokenListParameters,
 } from "@/apis/indexer";
 import { updateUserInfo } from "@/apis/user-login";
+import { getIcrcCkbtcTokenBalance } from "@/canisters/ckbtc_ledger";
 import { getICPCanisterId, getIcrcTokenBalance } from "@/canisters/icrc3";
+import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore } from "@/store/ic";
 
@@ -328,5 +330,26 @@ export const useLinkedWalletTokensBalance = (principal?: string) => {
 			return tokenBalances;
 		},
 		enabled: !!finalPrincipal,
+	});
+};
+
+// ==================btc wallet ckbtc or other token balance===========================
+export const useBtcChainLinkedWalTokenBalance = (tokenAddress: string) => {
+	const { principal } = useBtcIdentityStore();
+
+	return useQuery({
+		queryKey: ["btc-core", "linkedWalletTokenBalance", principal, tokenAddress],
+		queryFn: async () => {
+			if (!principal) {
+				throw new Error("No principal");
+			}
+			const balance = await getIcrcCkbtcTokenBalance({
+				canisterId: tokenAddress,
+				principal,
+			});
+			console.log("🚀 ~ queryFn: ~ balance:", balance);
+			return balance;
+		},
+		enabled: !!principal,
 	});
 };

@@ -8,6 +8,8 @@ import { idlFactory as ckBTCMinterIdlFactory } from "./index.did";
 
 import type { _SERVICE } from "./index.did.d";
 import type { ActorCreator } from "@/lib/ic/connectors";
+import { bigint2string } from "@/lib/common/data/bigint";
+import { getChainICCoreCanisterId } from "../core";
 
 // ckBTC Minter Canister ID
 export const getCkBTCMinterCanisterId = () => {
@@ -21,7 +23,7 @@ export const getCkBTCLedgerCanisterId = () => {
 	return validatePrincipalText(import.meta.env["VITE_ICP_CANISTER_ID"]);
 };
 
-export const getBTCDepositAddress = async (principal: string) => {
+export const getBTCDepositAddress = async () => {
 	const createActor = getAnonymousActorCreator();
 	if (!createActor) {
 		throw new Error("Failed to create actor");
@@ -36,14 +38,38 @@ export const getBTCDepositAddress = async (principal: string) => {
 		throw new Error("Failed to create ckBTC minter actor");
 	}
 
-	const defaultSubaccount = new Uint8Array(32).fill(0);
+	// const defaultSubaccount = new Uint8Array(32).fill(0);
 
+	console.log(
+		"getChainICCoreCanisterId()======getBTCDepositAddress========",
+		getChainICCoreCanisterId().toString()
+	);
 	const address = await actor.get_btc_address({
-		owner: [validatePrincipalText(principal)],
-		subaccount: [defaultSubaccount],
+		owner: [getChainICCoreCanisterId()],
+		subaccount: [],
 	});
 
 	return address;
+};
+
+export const getDepositFee = async () => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+
+	const actor = await createActor<_SERVICE>({
+		idlFactory: ckBTCMinterIdlFactory,
+		canisterId: getCkBTCMinterCanisterId().toText(),
+	});
+
+	if (!actor) {
+		throw new Error("Failed to create ckBTC minter actor");
+	}
+
+	const result = await actor.get_deposit_fee();
+
+	return bigint2string(result);
 };
 
 export const estimateWithdrawalFee = async (amount?: bigint) => {

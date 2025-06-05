@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Actor, HttpAgent } from "@dfinity/agent";
+import { Actor, HttpAgent, type Identity } from "@dfinity/agent";
 
 import {
 	connectManager,
@@ -279,6 +279,27 @@ export const getAnonymousActorCreator = (fetchRootKey: boolean = false) => {
 			host: import.meta.env.VITE_IC_HOST,
 			retryTimes: 1,
 			verifyQuerySignatures: false,
+		});
+
+		if (fetchRootKey) await agent.fetchRootKey();
+		return Actor.createActor<T>(idlFactory, { agent, canisterId });
+	};
+};
+
+export const createActorCreatorFromIdentity = (
+	identity: Identity,
+	fetchRootKey: boolean = false
+) => {
+	return async <T>(args: {
+		idlFactory: IDL.InterfaceFactory;
+		canisterId: string | Principal;
+	}) => {
+		const { idlFactory, canisterId } = args;
+		const agent = await HttpAgent.create({
+			host: import.meta.env.VITE_IC_HOST,
+			identity: identity,
+			verifyQuerySignatures: false,
+			retryTimes: 1,
 		});
 
 		if (fetchRootKey) await agent.fetchRootKey();

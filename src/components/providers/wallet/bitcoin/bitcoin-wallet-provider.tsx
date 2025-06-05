@@ -11,7 +11,7 @@ import { isMobile } from "react-device-detect";
 import { getSIWBCanisterId } from "@/canisters/siwb";
 import { idlFactory as siwbIdlFactory } from "@/canisters/siwb/index.did";
 import BtcConnectDialog from "@/components/layout/dialog/bitcoin-connect";
-import DepositWithdrawDialog from "@/components/layout/dialog/deposit-withdraw";
+import BtcDepositWithdrawDialog from "@/components/layout/dialog/deposit-withdraw";
 import SlippageDialog from "@/components/layout/dialog/slippage";
 
 export const BitcoinWalletProvider = ({
@@ -35,7 +35,7 @@ export const BitcoinWalletProvider = ({
 	return (
 		<LaserEyesProvider
 			config={{
-				network: MAINNET,
+				network: TESTNET4,
 			}}
 		>
 			<SiwbIdentityProvider
@@ -45,7 +45,7 @@ export const BitcoinWalletProvider = ({
 					host: import.meta.env.VITE_IC_HOST,
 				}}
 			>
-				{!isMobile && <DepositWithdrawDialog />}
+				{!isMobile && <BtcDepositWithdrawDialog />}
 				<SlippageDialog />
 				<BtcConnectDialog />
 				{children}

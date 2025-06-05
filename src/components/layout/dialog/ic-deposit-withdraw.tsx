@@ -1,11 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-import { useSiwbIdentity } from "ic-siwb-lasereyes-connector";
 import { isMobile } from "react-device-detect";
 
-import { getCkBTCLedgerCanisterId } from "@/canisters/ckbtc_ledger";
-// import { getBTCDepositAddress } from "@/canisters/ckbtc_minter";
-import { getFastBtcAddress } from "@/canisters/rune";
+import { getICPCanisterId } from "@/canisters/icrc3";
+import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -24,9 +22,9 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { showToast } from "@/components/utils/toast";
-import { useBtcChainLinkedWalTokenBalance } from "@/hooks/apis/indexer";
-import { useWithdraw } from "@/hooks/ic/core";
-import { useBtcBalance, useBtcDeposit } from "@/hooks/ic/tokens/btc";
+import { useCoreTokenBalance, useDeposit, useWithdraw } from "@/hooks/ic/core";
+import { useICPBalance } from "@/hooks/ic/tokens/icp";
+import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
 import { getAvatar } from "@/lib/common/avatar";
 import {
 	formatNumberSmart,
@@ -36,94 +34,55 @@ import {
 import { validateInputNumber } from "@/lib/common/validate";
 import { truncatePrincipal, validatePrincipalText } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
-import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
-
-import type { Identity } from "@dfinity/agent";
-// import { useLaserEyes } from "@omnisat/lasereyes-react";
-
 const tabs = ["deposit", "withdraw"] as const;
 const innerTabs = ["Linked Wallet", "External Wallet"] as const;
 type InnerTab = (typeof innerTabs)[number];
-const tokens = ["BTC"] as const;
+const tokens = ["ICP"] as const;
 type Token = (typeof tokens)[number];
-
 const Deposit = () => {
-	const { identity } = useSiwbIdentity();
-	// wallet btc balance
-	const { data: balance, refetch: refetchBtcBalance } = useBtcBalance();
-	// console.debug("🚀 ~ data:==========", balance);
-
+	const { data: icpBalance, refetch: refetchICPBalance } = useICPBalance();
 	const [amount, setAmount] = useState<string>("");
-	// console.debug("🚀 ~ Deposit ~ amount:", amount);
-	const [btcAddress, setBtcAddress] = useState<string | null>(null);
+	console.debug("🚀 ~ Deposit ~ amount:", amount);
 
 	const fees = useMemo(() => {
-		// todo get btc deposit fee and minter fee
-		return 0;
+		return 2n * getICPCanisterToken().fee;
 	}, []);
 
 	const maxAmount = useMemo(() => {
-		return balance?.raw ? Number(balance.raw) - fees : 0n;
-	}, [balance, fees]);
-
-	const { principal } = useBtcIdentityStore();
+		return icpBalance?.raw ? icpBalance.raw - fees : 0n;
+	}, [icpBalance, fees]);
+	const { principal } = useConnectedIdentity();
 	const { data: coreTokenBalance, refetch: refetchCoreTokenBalance } =
-		useBtcChainLinkedWalTokenBalance(getCkBTCLedgerCanisterId().toString());
-
+		useCoreTokenBalance({
+			owner: principal,
+			token: { ICRCToken: getICPCanisterId() },
+		});
 	const isEnough = useMemo(() => {
 		if (amount === "") return false;
 
-		return balance && Number(balance.raw) - fees >= BigInt(parseUnits(amount));
-	}, [balance, fees, amount]);
+		return icpBalance && icpBalance.raw - fees >= BigInt(parseUnits(amount));
+	}, [icpBalance, fees, amount]);
 
-	const { mutateAsync: btcDeposit, isPending } = useBtcDeposit();
+	const { mutateAsync: deposit, isPending } = useDeposit();
 
 	const buttonDisabled = useMemo(() => {
 		return !isEnough || !amount || amount === "0" || amount === "" || isPending;
 	}, [isEnough, amount, isPending]);
 
-	useEffect(() => {
-		const fetchBtcAddress = async () => {
-			if (!principal) return;
-
-			console.log("🚀 ~ fetchBtcAddress ~ principal:", principal);
-
-			try {
-				// get fast btc address
-				const address = await getFastBtcAddress(identity as Identity);
-				console.log("🚀 ~ fetchBtcAddress ~ address:", address);
-
-				setBtcAddress(address);
-			} catch (error) {
-				console.error("Failed to get BTC deposit address:", error);
-				showToast("error", "Failed to get BTC deposit address");
-			}
-		};
-
-		void fetchBtcAddress();
-	}, [identity, principal]);
-
 	const refetch = useCallback(() => {
-		void refetchBtcBalance();
+		void refetchICPBalance();
 		void refetchCoreTokenBalance();
-	}, [refetchBtcBalance, refetchCoreTokenBalance]);
+	}, [refetchICPBalance, refetchCoreTokenBalance]);
 
 	const handleDeposit = useCallback(async () => {
-		// todo deposite
-		if (!btcAddress) return;
-
-		console.log("dss--------------", btcAddress, Number(amount) * 1e8);
-
-		await btcDeposit({ btcAddress, amount: Number(amount) * 1e8 });
-
+		await deposit({
+			amount: BigInt(parseUnits(amount)),
+			token: getICPCanisterToken(),
+		});
 		refetch();
-		showToast(
-			"info",
-			`${formatNumberSmart(amount)} BTC deposited, please wait!`
-		);
-	}, [btcAddress, btcDeposit, amount, refetch]);
-
+		showToast("success", `${formatNumberSmart(amount)} ICP deposited!`);
+	}, [deposit, amount, refetch]);
 	return (
 		<div className="flex w-full flex-1 flex-col">
 			<Tabs className="mx-auto" defaultValue="Linked Wallet">
@@ -148,7 +107,7 @@ const Deposit = () => {
 				</span>
 				<span className="mt-4 mb-2 pl-1.5 text-sm text-white/60">Token</span>
 				<Select
-					value={"BTC"}
+					value={"ICP"}
 					onValueChange={(value: Token) => {
 						console.log(value);
 					}}
@@ -162,7 +121,7 @@ const Deposit = () => {
 									value={token}
 								>
 									<div className="flex items-center gap-x-1.5">
-										<img alt={"btc-logo"} src={`/svgs/chains/bitcoin.svg`} />
+										<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 										{token}
 									</div>
 								</SelectItem>
@@ -182,7 +141,7 @@ const Deposit = () => {
 						<div className="flex items-center gap-x-1">
 							<span className="text-sm text-white/60">Balance: </span>
 							<span className="text-sm font-medium text-white">
-								{balance?.formatted} BTC
+								{icpBalance?.formatted} ICP
 							</span>
 						</div>
 					</div>
@@ -211,14 +170,12 @@ const Deposit = () => {
 							<span className="text-base font-medium text-yellow-500">
 								(Max)
 							</span>
-							<span className="text-sm font-medium text-white">BTC</span>
+							<span className="text-sm font-medium text-white">ICP</span>
 						</div>
 					</div>
 					<div className="mt-2 flex w-full items-center justify-between px-1.5">
 						<span className="text-sm text-white/60">Network fee</span>
-						<span className="text-sm font-medium text-white">
-							0.00002010 BTC
-						</span>
+						<span className="text-sm font-medium text-white">0.0002 ICP</span>
 					</div>
 				</div>
 				<img alt="to" className="mx-auto mt-7.5" src="/svgs/common/to.svg" />
@@ -233,9 +190,9 @@ const Deposit = () => {
 							{truncatePrincipal(principal ?? "")}
 						</span>
 						<div className="ml-auto flex h-full items-center gap-x-1">
-							<img alt={"btc-logo"} src={`/svgs/chains/bitcoin.svg`} />
+							<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 							{coreTokenBalance?.formatted}
-							{/* <span className="text-sm font-medium text-white">BTC</span> */}
+							{/* <span className="text-sm font-medium text-white">ICP</span> */}
 						</div>
 					</div>
 					<Button
@@ -258,17 +215,18 @@ const Deposit = () => {
 	);
 };
 const Withdraw = () => {
+	const { refetch: refetchICPBalance } = useICPBalance();
 	const [amount, setAmount] = useState<string>("");
 
-	const { principal } = useBtcIdentityStore();
-
+	const { principal } = useConnectedIdentity();
 	const { data: coreTokenBalance, refetch: refetchCoreTokenBalance } =
-		useBtcChainLinkedWalTokenBalance(getCkBTCLedgerCanisterId().toString());
-
+		useCoreTokenBalance({
+			owner: principal,
+			token: { ICRCToken: getICPCanisterId() },
+		});
 	const maxAmount = useMemo(() => {
 		return coreTokenBalance?.raw ? coreTokenBalance.raw : 0n;
 	}, [coreTokenBalance]);
-
 	const isEnough = useMemo(() => {
 		if (amount === "") return false;
 		return (
@@ -279,8 +237,9 @@ const Withdraw = () => {
 	const { mutateAsync: withdraw, isPending: isWithdrawing } = useWithdraw();
 
 	const refetch = useCallback(() => {
+		void refetchICPBalance();
 		void refetchCoreTokenBalance();
-	}, [refetchCoreTokenBalance]);
+	}, [refetchICPBalance, refetchCoreTokenBalance]);
 
 	const [selectedToType, setSelectedToType] =
 		useState<InnerTab>("Linked Wallet");
@@ -308,16 +267,13 @@ const Withdraw = () => {
 			if (!selectedToPrincipal) {
 				throw new Error("Principal is not valid");
 			}
-			// todo withdraw
-			await new Promise(() => {}).then(() => {});
-
-			// await withdraw({
-			// 	amount: BigInt(parseUnits(amount)),
-			// 	to: selectedToPrincipal,
-			// 	token: getICPCanisterToken(),
-			// });
+			await withdraw({
+				amount: BigInt(parseUnits(amount)),
+				to: selectedToPrincipal,
+				token: getICPCanisterToken(),
+			});
 			refetch();
-			showToast("success", `${formatNumberSmart(amount)} BTC withdrawn!`);
+			showToast("success", `${formatNumberSmart(amount)} ICP withdrawn!`);
 		} catch (error) {
 			console.debug("🚀 ~ handleWithdraw ~ error:", error);
 		}
@@ -358,14 +314,14 @@ const Withdraw = () => {
 						{truncatePrincipal(principal ?? "")}
 					</span>
 					<div className="ml-auto flex h-full items-center gap-x-1">
-						<img alt={"btc-logo"} src={`/svgs/chains/bitcoin.svg`} />
+						<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 						{coreTokenBalance?.formatted}
-						{/* <span className="text-sm font-medium text-white">BTC</span> */}
+						{/* <span className="text-sm font-medium text-white">ICP</span> */}
 					</div>
 				</div>
 				<span className="mt-4 mb-2 pl-1.5 text-sm text-white/60">Token</span>
 				<Select
-					value={"BTC"}
+					value={"ICP"}
 					onValueChange={(value: Token) => {
 						console.log(value);
 					}}
@@ -379,7 +335,7 @@ const Withdraw = () => {
 									value={token}
 								>
 									<div className="flex items-center gap-x-1.5">
-										<img alt={"btc-logo"} src={`/svgs/chains/bitcoin.svg`} />
+										<img alt={"icp-logo"} src={`/svgs/chains/icp.svg`} />
 										{token}
 									</div>
 								</SelectItem>
@@ -397,7 +353,7 @@ const Withdraw = () => {
 					<div className="flex w-full justify-between px-1.5">
 						<span className="text-sm text-white/60">Amount</span>
 						<span className="text-sm font-medium text-white">
-							Balance: {coreTokenBalance?.formatted} BTC
+							Balance: {coreTokenBalance?.formatted} ICP
 						</span>
 					</div>
 					<div className="relative mt-2 flex h-10.5 w-full items-center justify-center">
@@ -425,12 +381,12 @@ const Withdraw = () => {
 							<span className="text-base font-medium text-yellow-500">
 								(Max)
 							</span>
-							<span className="text-sm font-medium text-white">BTC</span>
+							<span className="text-sm font-medium text-white">ICP</span>
 						</div>
 					</div>
 					<div className="mt-2 flex w-full items-center justify-between px-1.5">
 						<span className="text-sm text-white/60">Network fee</span>
-						<span className="text-sm font-medium text-white">0.0002 BTC</span>
+						<span className="text-sm font-medium text-white">0.0002 ICP</span>
 					</div>
 				</div>
 
@@ -495,12 +451,11 @@ const Withdraw = () => {
 };
 
 export const DepositWithdrawHeader = () => {
-	const { btcDepositWithdrawOpen, setBtcDepositWithdrawOpen } =
-		useDialogStore();
+	const { depositWithdrawOpen, setDepositWithdrawOpen } = useDialogStore();
 	return (
 		<>
 			{tabs.map((tab) => {
-				const isActive = btcDepositWithdrawOpen.type === tab;
+				const isActive = depositWithdrawOpen.type === tab;
 				return (
 					<div
 						key={tab}
@@ -508,7 +463,7 @@ export const DepositWithdrawHeader = () => {
 							isActive ? "text-white" : "text-white/60 hover:text-white"
 						}`}
 						onClick={() => {
-							setBtcDepositWithdrawOpen({
+							setDepositWithdrawOpen({
 								open: true,
 								type: tab,
 							});
@@ -531,7 +486,7 @@ export const DepositWithdrawHeader = () => {
 	);
 };
 export const DepositWithdrawContent = () => {
-	const { btcDepositWithdrawOpen } = useDialogStore();
+	const { depositWithdrawOpen } = useDialogStore();
 	return (
 		<div
 			className={cn(
@@ -539,21 +494,20 @@ export const DepositWithdrawContent = () => {
 				isMobile && "h-[561] flex-0"
 			)}
 		>
-			{btcDepositWithdrawOpen.type === "deposit" && <Deposit />}
-			{btcDepositWithdrawOpen.type === "withdraw" && <Withdraw />}
+			{depositWithdrawOpen.type === "deposit" && <Deposit />}
+			{depositWithdrawOpen.type === "withdraw" && <Withdraw />}
 		</div>
 	);
 };
-export default function BtcDepositWithdrawDialog() {
-	const { btcDepositWithdrawOpen, setBtcDepositWithdrawOpen } =
-		useDialogStore();
+export default function IcDepositWithdrawDialog() {
+	const { depositWithdrawOpen, setDepositWithdrawOpen } = useDialogStore();
 	return (
 		<Dialog
-			open={btcDepositWithdrawOpen.open}
+			open={depositWithdrawOpen.open}
 			onOpenChange={(open) => {
-				setBtcDepositWithdrawOpen({
+				setDepositWithdrawOpen({
 					open,
-					type: btcDepositWithdrawOpen.type,
+					type: depositWithdrawOpen.type,
 				});
 			}}
 		>

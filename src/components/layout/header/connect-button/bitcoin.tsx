@@ -7,6 +7,7 @@ import { Check } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
 // import { getICPCanisterId } from "@/canisters/icrc3";
+import { getCkBTCLedgerCanisterId } from "@/canisters/ckbtc_ledger";
 import { CopyIcon } from "@/components/icons/common/copy";
 import { DisconnectIcon } from "@/components/icons/common/disconnect";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/popover";
 // import { Skeleton } from "@/components/ui/skeleton";
 // import { useCoreTokenBalance } from "@/hooks/ic/core";
+import { useBtcChainLinkedWalTokenBalance } from "@/hooks/apis/indexer";
 import { useIcWallet } from "@/hooks/providers/wallet/ic";
 import { getAvatar } from "@/lib/common/avatar";
 import { withStopPropagation } from "@/lib/common/react-event";
@@ -28,6 +30,8 @@ import { cn } from "@/lib/utils";
 import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
 import { useMobileSheetStore } from "@/store/mobile/sheet";
+// import { useBtcBalance } from "@/hooks/ic/tokens/btc";
+
 export const BtcAccountInfo = () => {
 	const {
 		principal,
@@ -94,7 +98,7 @@ export const BtcAccountInfo = () => {
 	const [copied, setCopied] = useState(false);
 
 	const [openPopover, setOpenPopover] = useState(false);
-	const { setDepositWithdrawOpen } = useDialogStore();
+	const { setBtcDepositWithdrawOpen } = useDialogStore();
 	const popoverLinks = [
 		{
 			label: "Profile",
@@ -106,7 +110,7 @@ export const BtcAccountInfo = () => {
 		{
 			label: "Deposit",
 			action: withStopPropagation(() => {
-				setDepositWithdrawOpen({
+				setBtcDepositWithdrawOpen({
 					open: true,
 					type: "deposit",
 				});
@@ -219,14 +223,12 @@ export const BtcAccountInfo = () => {
 const BtcWalletConnect: React.FC = () => {
 	const { setBtcConnectOpen } = useDialogStore();
 	const { isLoading } = useIcWallet();
-	const { principal, connected, connecting } = useBtcIdentityStore();
-	const { setDepositWithdrawOpen } = useDialogStore();
+	const { principal, connecting } = useBtcIdentityStore();
+	const { setBtcDepositWithdrawOpen } = useDialogStore();
 
-	// todo btc balance
-	// const { data: coreTokenBalance } = useCoreTokenBalance({
-	// 	owner: principal,
-	// 	token: { ICRCToken: getICPCanisterId() },
-	// });
+	const { data: coreTokenBalance } = useBtcChainLinkedWalTokenBalance(
+		getCkBTCLedgerCanisterId().toString()
+	);
 
 	const router = useRouter();
 	return (
@@ -247,7 +249,7 @@ const BtcWalletConnect: React.FC = () => {
 									replace: true,
 								});
 							} else {
-								setDepositWithdrawOpen({
+								setBtcDepositWithdrawOpen({
 									open: true,
 									type: "deposit",
 								});
@@ -256,7 +258,7 @@ const BtcWalletConnect: React.FC = () => {
 					>
 						<img alt={"bitcoin-logo"} src={`/svgs/chains/bitcoin.svg`} />
 						<span className="text-center text-xs font-medium">
-							{connected ? "---" : "---"}
+							{coreTokenBalance?.formatted ?? "---"}
 						</span>
 					</div>
 				</div>

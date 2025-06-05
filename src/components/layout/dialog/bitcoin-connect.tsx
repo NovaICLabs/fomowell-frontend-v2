@@ -81,19 +81,19 @@ const BtcConnectDialog: React.FC = () => {
 	useEffect(() => {
 		if (!isPrepareLoginIdle) return;
 		const btcAddress = getAddress();
-		const pubkey = getPublicKey();
-		console.debug("=====btc login======", {
-			btcAddress,
-			pubkey,
-			identityPublicKey,
-			connectedBtcAddress,
-		});
+		// const pubkey = getPublicKey();
+		// console.debug("=====btc login======", {
+		// 	btcAddress,
+		// 	pubkey,
+		// 	identityPublicKey,
+		// 	connectedBtcAddress,
+		// });
 
 		if (btcAddress) {
-			console.log({
-				btcAddress,
-				// canisterId: process.env.
-			});
+			// console.log({
+			// 	btcAddress,
+			// 	// canisterId: process.env.
+			// });
 			prepareLogin();
 			if (connectedBtcAddress && !identity && manually) {
 				void (async () => {
