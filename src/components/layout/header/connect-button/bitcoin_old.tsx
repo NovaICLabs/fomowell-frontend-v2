@@ -7,34 +7,32 @@ import {
 	type ProviderType,
 	UNISAT,
 } from "@omnisat/lasereyes-core";
-// import copy from "copy-to-clipboard";
+import copy from "copy-to-clipboard";
 import {
 	type LaserEyesContextType,
 	useSiwbIdentity,
 } from "ic-siwb-lasereyes-connector";
-// import { Check } from "lucide-react";
+import { Check } from "lucide-react";
 
-// import { CopyIcon } from "@/components/icons/common/copy";
-// import { DisconnectIcon } from "@/components/icons/common/disconnect";
-// import { Button } from "@/components/ui/button";
+import { CopyIcon } from "@/components/icons/common/copy";
+import { DisconnectIcon } from "@/components/icons/common/disconnect";
+import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-// import { getAvatar } from "@/lib/common/avatar";
-// import { truncatePrincipal } from "@/lib/ic/principal";
+import { getAvatar } from "@/lib/common/avatar";
+import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
-import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
 
-import WalletOption from "../header/wallet-option";
+import WalletOption from "../wallet-option";
 
-const BtcConnectDialog: React.FC = () => {
+const BitcoinWalletConnect: React.FC = () => {
 	// const [open, setOpen] = useState(false);
 
-	const { setPrincipal, connectByPrincipal } = useBtcIdentityStore();
 	const { btcConnectOpen, setBtcConnectOpen } = useDialogStore();
 	const [connectError, setConnectError] = useState<string | null>(null);
 	const [loading, setLoading] = useState<boolean>(false);
@@ -54,9 +52,9 @@ const BtcConnectDialog: React.FC = () => {
 		connectedBtcAddress,
 		identity,
 		identityPublicKey,
-		// clear,
+		clear,
 	} = useSiwbIdentity();
-	const principal = identity?.getPrincipal().toText();
+	// console.log("🚀 ~ isInitializing:", isInitializing, identity);
 
 	const handleConnectWallet = async (provider: ProviderType) => {
 		try {
@@ -75,6 +73,10 @@ const BtcConnectDialog: React.FC = () => {
 		}
 	};
 
+	const handleDisconnect = () => {
+		clear();
+	};
+
 	/**
 	 * Preload a Siwb message on every address change.
 	 */
@@ -82,12 +84,7 @@ const BtcConnectDialog: React.FC = () => {
 		if (!isPrepareLoginIdle) return;
 		const btcAddress = getAddress();
 		const pubkey = getPublicKey();
-		console.debug("=====btc login======", {
-			btcAddress,
-			pubkey,
-			identityPublicKey,
-			connectedBtcAddress,
-		});
+		console.log({ btcAddress, pubkey, identityPublicKey, connectedBtcAddress });
 
 		if (btcAddress) {
 			console.log({
@@ -99,11 +96,7 @@ const BtcConnectDialog: React.FC = () => {
 				void (async () => {
 					try {
 						const response = await login();
-						console.log("🚀 ~ void ~ response:", response);
 						if (response) {
-							setPrincipal(response.getPrincipal().toText());
-							// void connectByPrincipal();
-
 							setManually(false);
 							setBtcConnectOpen(false);
 						}
@@ -129,9 +122,6 @@ const BtcConnectDialog: React.FC = () => {
 		identityPublicKey,
 		getAddress,
 		setBtcConnectOpen,
-		setPrincipal,
-		principal,
-		connectByPrincipal,
 	]);
 
 	/**
@@ -153,15 +143,16 @@ const BtcConnectDialog: React.FC = () => {
 			setLoading(false);
 		}
 	}, [loginError]);
-
-	// const [copied, setCopied] = useState(false);
+	const principal = identity?.getPrincipal().toText();
+	// console.log("🚀 ~ principal:", identity, principal);
+	const [copied, setCopied] = useState(false);
 	return (
 		<>
 			<Dialog open={btcConnectOpen} onOpenChange={setBtcConnectOpen}>
-				{/* {
-					principal ? (
-						<div className="flex items-center justify-center gap-x-2">
-							<div className="bg-gray-750 inline-flex h-[38px] items-center justify-start rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700">
+				{principal ? (
+					<div className="flex items-center justify-center gap-x-2">
+						<div className="bg-gray-750 inline-flex h-[38px] items-center justify-start rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700">
+							<div className="flex items-center">
 								<img
 									alt="avatar"
 									className="h-6 w-6 rounded-full"
@@ -186,32 +177,33 @@ const BtcConnectDialog: React.FC = () => {
 										}}
 									/>
 								)}
-								<div className="ml-2.5 h-6 w-px bg-white/20"></div>
-								<DisconnectIcon
-									className="ml-2.25 h-4 w-4"
-									onClick={handleDisconnect}
-								/>
 							</div>
-							<div className="bg-gray-750 inline-flex h-[38px] items-center justify-start gap-0.5 rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700">
-								<img
-									alt="flash"
-									className="h-4.5 w-4.5 rounded-full"
-									src={"/svgs/coins/bitcoin.svg"}
-								/>
-								<span className="text-xs font-medium">0.01366000</span>
-							</div>
+							<div className="ml-2.5 h-6 w-px bg-white/20"></div>
+							<DisconnectIcon
+								className="ml-2.25 h-4 w-4"
+								onClick={handleDisconnect}
+							/>
 						</div>
-					) : null
-					// <Button
-					// 	className="h-[38px] w-[111px] rounded-full text-xs font-bold"
-					// 	disabled={loading}
-					// 	onClick={() => {
-					// 		setBtcConnectOpen(true);
-					// 	}}
-					// >
-					// 	{loading ? "Connecting..." : "Connect Wallet"}
-					// </Button>
-				} */}
+						<div className="bg-gray-750 inline-flex h-[38px] items-center justify-start gap-0.5 rounded-full px-2 text-xs leading-4 font-medium text-white hover:bg-gray-700">
+							<img
+								alt="flash"
+								className="h-4.5 w-4.5 rounded-full"
+								src={"/svgs/coins/bitcoin.svg"}
+							/>
+							<span className="text-xs font-medium">0.01366000</span>
+						</div>
+					</div>
+				) : (
+					<Button
+						className="h-[38px] w-[111px] rounded-full text-xs font-bold"
+						disabled={loading}
+						onClick={() => {
+							setBtcConnectOpen(true);
+						}}
+					>
+						{loading ? "Connecting..." : "Connect Wallet"}
+					</Button>
+				)}
 
 				<DialogContent
 					className={cn(
@@ -303,11 +295,11 @@ const BtcConnectDialog: React.FC = () => {
 
 							{/* TODO: plug connect */}
 							{/* <WalletOption
-								disabled={loading}
-								icon={<img alt="Plug" src="/svgs/wallet/plug.svg" />}
-								name="Plug"
-								onClick={() => {}}
-							/> */}
+                                disabled={loading}
+                                icon={<img alt="Plug" src="/svgs/wallet/plug.svg" />}
+                                name="Plug"
+                                onClick={() => {}}
+                            /> */}
 						</div>
 					)}
 				</DialogContent>
@@ -316,4 +308,4 @@ const BtcConnectDialog: React.FC = () => {
 	);
 };
 
-export default BtcConnectDialog;
+export default BitcoinWalletConnect;

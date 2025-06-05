@@ -20,6 +20,7 @@ export const Header = () => {
 		select: (location) => location.pathname,
 	});
 	const { setMenuOpen } = useMobileSheetStore();
+
 	return (
 		<>
 			{isMobile ? (

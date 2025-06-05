@@ -33,7 +33,7 @@ type BtcIdentity = {
 	setIdentityProfile: (identityProfile?: UserInfo) => void;
 };
 
-export const useIcIdentityStore = create<BtcIdentity>()(
+export const useBtcIdentityStore = create<BtcIdentity>()(
 	persist(
 		(set, get) => ({
 			principal: undefined,
@@ -160,7 +160,7 @@ export const useIcIdentityStore = create<BtcIdentity>()(
 	)
 );
 
-export const useIcLastConnectedWalletStore = create(
+export const useBtcLastConnectedWalletStore = create(
 	persist<{
 		lastConnectedWallet?: Connector | undefined;
 		setLastConnectedWallet: (lastConnectedWallet?: Connector) => void;
