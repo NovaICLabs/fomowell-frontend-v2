@@ -30,7 +30,7 @@ import { useCoreTokenBalance, useCreateMemeToken } from "@/hooks/ic/core";
 import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
 import { fileToBase64 } from "@/lib/common/file";
 import { parseUnits } from "@/lib/common/number";
-import { useDialogStore } from "@/store/dialog";
+// import { useDialogStore } from "@/store/dialog";
 // Create form validation schema with Zod
 const formSchema = z.object({
 	name: z
@@ -135,7 +135,9 @@ function TokenCreationPage() {
 
 	const { mutateAsync: createMemeToken, isPending: isCreating } =
 		useCreateMemeToken();
+	console.log("🚀 ~ TokenCreationPage ~ createMemeToken:", createMemeToken);
 	const router = useRouter();
+	console.log("🚀 ~ TokenCreationPage ~ router:", router);
 	// Form submission handler
 	const [logoBase64String, setLogoBase64String] = useState<string>("");
 	function onSubmit(values: z.infer<typeof formSchema>) {
