@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useLaserEyes } from "@omnisat/lasereyes";
 import {
@@ -46,6 +46,7 @@ const BtcConnectDialog: React.FC = () => {
 		prepareLogin,
 		isPrepareLoginIdle,
 		prepareLoginError,
+		prepareLoginStatus,
 		loginError,
 		setLaserEyes,
 		login,
@@ -54,8 +55,11 @@ const BtcConnectDialog: React.FC = () => {
 		connectedBtcAddress,
 		identity,
 		identityPublicKey,
+		signMessageError,
+		// signMessageStatus,
 		// clear,
 	} = useSiwbIdentity();
+
 	const principal = identity?.getPrincipal().toText();
 
 	const handleConnectWallet = async (provider: ProviderType) => {
@@ -78,44 +82,42 @@ const BtcConnectDialog: React.FC = () => {
 	/**
 	 * Preload a Siwb message on every address change.
 	 */
+
+	const onLogin = useCallback(async () => {
+		try {
+			setLoading(true);
+			const response = await login();
+			setLoading(false);
+			console.debug("🚀 ~ void ~ response:", response);
+			if (response) {
+				setPrincipal(response.getPrincipal().toText());
+				// void connectByPrincipal();
+
+				setManually(false);
+				setBtcConnectOpen(false);
+			}
+		} catch (error) {
+			console.error("Login failed:", error);
+			if (error instanceof Error) {
+				setConnectError(error.message);
+			}
+		} finally {
+			setLoading(false);
+		}
+	}, [login, setBtcConnectOpen, setPrincipal]);
+
 	useEffect(() => {
-		if (!isPrepareLoginIdle) return;
+		// if (!isPrepareLoginIdle) return;
 		const btcAddress = getAddress();
 		// const pubkey = getPublicKey();
-		// console.debug("=====btc login======", {
-		// 	btcAddress,
-		// 	pubkey,
-		// 	identityPublicKey,
-		// 	connectedBtcAddress,
-		// });
 
 		if (btcAddress) {
-			// console.log({
-			// 	btcAddress,
-			// 	// canisterId: process.env.
-			// });
-			prepareLogin();
-			if (connectedBtcAddress && !identity && manually) {
-				void (async () => {
-					try {
-						const response = await login();
-						console.log("🚀 ~ void ~ response:", response);
-						if (response) {
-							setPrincipal(response.getPrincipal().toText());
-							// void connectByPrincipal();
+			if (prepareLoginStatus !== "success") {
+				prepareLogin();
+			}
 
-							setManually(false);
-							setBtcConnectOpen(false);
-						}
-					} catch (error) {
-						console.error("Login failed:", error);
-						if (error instanceof Error) {
-							setConnectError(error.message);
-						}
-					} finally {
-						setLoading(false);
-					}
-				})();
+			if (connectedBtcAddress && !identity && manually) {
+				void onLogin();
 			}
 		}
 	}, [
@@ -132,6 +134,8 @@ const BtcConnectDialog: React.FC = () => {
 		setPrincipal,
 		principal,
 		connectByPrincipal,
+		onLogin,
+		prepareLoginStatus,
 	]);
 
 	/**
@@ -154,10 +158,29 @@ const BtcConnectDialog: React.FC = () => {
 		}
 	}, [loginError]);
 
-	// const [copied, setCopied] = useState(false);
+	/**
+	 * Show an error toast if the sign message call fails.
+	 */
+	useEffect(() => {
+		if (signMessageError) {
+			setConnectError(signMessageError.message);
+			setLoading(false);
+		}
+	}, [signMessageError]);
+
 	return (
 		<>
-			<Dialog open={btcConnectOpen} onOpenChange={setBtcConnectOpen}>
+			<Dialog
+				open={btcConnectOpen}
+				onOpenChange={(show: boolean) => {
+					setBtcConnectOpen(show);
+					if (!show) {
+						setLoading(false);
+						setConnectError(null);
+						setManually(false);
+					}
+				}}
+			>
 				{/* {
 					principal ? (
 						<div className="flex items-center justify-center gap-x-2">

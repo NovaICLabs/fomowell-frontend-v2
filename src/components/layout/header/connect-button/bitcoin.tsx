@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 
+import { useLaserEyes } from "@omnisat/lasereyes-react";
 import { useRouter } from "@tanstack/react-router";
 import copy from "copy-to-clipboard";
 import { useSiwbIdentity } from "ic-siwb-lasereyes-connector";
@@ -43,6 +44,7 @@ export const BtcAccountInfo = () => {
 		setIdentityProfile,
 	} = useBtcIdentityStore();
 
+	const { disconnect } = useLaserEyes();
 	const {
 		// isInitializing,
 		// prepareLogin,
@@ -72,9 +74,11 @@ export const BtcAccountInfo = () => {
 		clearToken();
 		setIdentityProfile(undefined);
 		clear();
+		disconnect();
 	}, [
 		clear,
 		clearToken,
+		disconnect,
 		setConnected,
 		setConnecting,
 		setIdentityProfile,

@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { validate } from "bitcoin-address-validation";
+import copy from "copy-to-clipboard";
 import { useSiwbIdentity } from "ic-siwb-lasereyes-connector";
+import { Check, Info } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { isMobile } from "react-device-detect";
 
 import { getCkBTCLedgerCanisterId } from "@/canisters/ckbtc_ledger";
 // import { getBTCDepositAddress } from "@/canisters/ckbtc_minter";
 import { getFastBtcAddress } from "@/canisters/rune";
+import { CopyIcon } from "@/components/icons/common/copy";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -33,8 +38,9 @@ import {
 	formatUnits,
 	parseUnits,
 } from "@/lib/common/number";
+import { withStopPropagation } from "@/lib/common/react-event";
 import { validateInputNumber } from "@/lib/common/validate";
-import { truncatePrincipal, validatePrincipalText } from "@/lib/ic/principal";
+import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
@@ -57,6 +63,8 @@ const Deposit = () => {
 	const [amount, setAmount] = useState<string>("");
 	// console.debug("🚀 ~ Deposit ~ amount:", amount);
 	const [btcAddress, setBtcAddress] = useState<string | null>(null);
+	const [loading, setLoading] = useState<boolean>(false);
+	const [selectedType, setSelectedType] = useState<InnerTab>("Linked Wallet");
 
 	const fees = useMemo(() => {
 		// todo get btc deposit fee and minter fee
@@ -88,7 +96,7 @@ const Deposit = () => {
 			if (!principal) return;
 
 			console.log("🚀 ~ fetchBtcAddress ~ principal:", principal);
-
+			setLoading(true);
 			try {
 				// get fast btc address
 				const address = await getFastBtcAddress(identity as Identity);
@@ -98,6 +106,8 @@ const Deposit = () => {
 			} catch (error) {
 				console.error("Failed to get BTC deposit address:", error);
 				showToast("error", "Failed to get BTC deposit address");
+			} finally {
+				setLoading(false);
 			}
 		};
 
@@ -124,14 +134,23 @@ const Deposit = () => {
 		);
 	}, [btcAddress, btcDeposit, amount, refetch]);
 
+	const [copied, setCopied] = useState(false);
+
 	return (
 		<div className="flex w-full flex-1 flex-col">
-			<Tabs className="mx-auto" defaultValue="Linked Wallet">
+			<Tabs
+				className="mx-auto"
+				defaultValue="Linked Wallet"
+				value={selectedType}
+				onValueChange={(value: string) => {
+					setSelectedType(value as InnerTab);
+				}}
+			>
 				<TabsList className="border-gray-650 h-[38px] rounded-full border bg-transparent">
 					{innerTabs.map((tabName) => (
 						<TabsTrigger
 							key={tabName}
-							disabled={tabName === "External Wallet"}
+							// disabled={tabName === "External Wallet"}
 							value={tabName}
 							className={cn(
 								"rounded-full px-4 py-2 text-white/60 capitalize dark:data-[state=active]:bg-white dark:data-[state=active]:text-black"
@@ -142,118 +161,172 @@ const Deposit = () => {
 					))}
 				</TabsList>
 			</Tabs>
-			<div className="mt-5 flex w-full flex-1 flex-col items-start justify-between">
-				<span className="text-md font-medium text-white">
-					From linked wallet
-				</span>
-				<span className="mt-4 mb-2 pl-1.5 text-sm text-white/60">Token</span>
-				<Select
-					value={"BTC"}
-					onValueChange={(value: Token) => {
-						console.log(value);
-					}}
-				>
-					<SelectContent className="rounded-xl border-none bg-gray-800 px-[2px] py-[2px]">
-						<SelectGroup className="bg-gray-800">
-							{tokens.map((token) => (
-								<SelectItem
-									key={token}
-									className="hover:bg-gray-750 data-[state=checked]:bg-gray-750 flex h-10.5 cursor-pointer items-center gap-x-1.5 rounded-xl text-sm font-semibold"
-									value={token}
-								>
-									<div className="flex items-center gap-x-1.5">
-										<img alt={"btc-logo"} src={`/svgs/chains/bitcoin.svg`} />
-										{token}
-									</div>
-								</SelectItem>
-							))}
-						</SelectGroup>
-					</SelectContent>
-					<SelectTrigger className="!h-10.5 w-full rounded-xl border border-white/10 px-4 text-sm font-semibold focus-visible:ring-0 dark:bg-gray-800 dark:hover:bg-gray-800/80">
-						<div className="flex items-center gap-x-1.5">
-							<SelectValue className="text-white/60" placeholder="" />
-						</div>
-					</SelectTrigger>
-				</Select>
-
-				<div className="mt-6.25 flex w-full flex-col items-start justify-between">
-					<div className="flex w-full justify-between px-1.5">
-						<span className="text-sm text-white/60">Amount</span>
-						<div className="flex items-center gap-x-1">
-							<span className="text-sm text-white/60">Balance: </span>
-							<span className="text-sm font-medium text-white">
-								{balance?.formatted} BTC
-							</span>
-						</div>
-					</div>
-					<div className="relative mt-2 flex h-10.5 w-full items-center justify-center">
-						<Input
-							className="dark:bg-background h-full rounded-[10px] border-white/10 text-lg font-semibold placeholder:text-lg placeholder:leading-[14px] placeholder:font-bold placeholder:text-white/40 focus-visible:ring-0"
-							placeholder="0.00"
-							value={amount}
-							onBlur={() => {
-								setAmount(amount.endsWith(".") ? amount.slice(0, -1) : amount);
-							}}
-							onChange={(event) => {
-								const value = event.target.value.trim();
-								validateInputNumber({
-									value,
-									callback: setAmount,
-								});
-							}}
-						/>
-						<div
-							className="absolute top-1/2 right-0 flex h-full -translate-y-1/2 cursor-pointer items-center gap-x-2 pr-4"
-							onClick={() => {
-								setAmount(formatUnits(maxAmount));
-							}}
-						>
-							<span className="text-base font-medium text-yellow-500">
-								(Max)
-							</span>
-							<span className="text-sm font-medium text-white">BTC</span>
-						</div>
-					</div>
-					<div className="mt-2 flex w-full items-center justify-between px-1.5">
-						<span className="text-sm text-white/60">Network fee</span>
-						<span className="text-sm font-medium text-white">
-							0.00002010 BTC
-						</span>
-					</div>
-				</div>
-				<img alt="to" className="mx-auto mt-7.5" src="/svgs/common/to.svg" />
-				<div className="mt-auto flex w-full flex-col items-start justify-between">
-					<div className="bg-gray-710 mt-2 flex h-[38px] w-full items-center justify-start rounded-[12px] px-4">
-						<img
-							alt=""
-							className="h-6 w-6 rounded-full"
-							src={getAvatar(principal ?? "")}
-						/>
-						<span className="ml-1.5 text-sm font-medium text-white">
-							{truncatePrincipal(principal ?? "")}
-						</span>
-						<div className="ml-auto flex h-full items-center gap-x-1">
-							<img alt={"btc-logo"} src={`/svgs/chains/bitcoin.svg`} />
-							{coreTokenBalance?.formatted}
-							{/* <span className="text-sm font-medium text-white">BTC</span> */}
-						</div>
-					</div>
-					<Button
-						className="mt-10 h-[42px] w-full rounded-full text-base font-bold text-black"
-						disabled={buttonDisabled}
-						onClick={handleDeposit}
+			{selectedType === "Linked Wallet" && (
+				<div className="mt-5 flex w-full flex-1 flex-col items-start justify-between">
+					<span className="text-md font-medium text-white">
+						From linked wallet
+					</span>
+					<span className="mt-4 mb-2 pl-1.5 text-sm text-white/60">Token</span>
+					<Select
+						value={"BTC"}
+						onValueChange={(value: Token) => {
+							console.log(value);
+						}}
 					>
-						Confirm{" "}
-						{isPending && (
+						<SelectContent className="rounded-xl border-none bg-gray-800 px-[2px] py-[2px]">
+							<SelectGroup className="bg-gray-800">
+								{tokens.map((token) => (
+									<SelectItem
+										key={token}
+										className="hover:bg-gray-750 data-[state=checked]:bg-gray-750 flex h-10.5 cursor-pointer items-center gap-x-1.5 rounded-xl text-sm font-semibold"
+										value={token}
+									>
+										<div className="flex items-center gap-x-1.5">
+											<img alt={"btc-logo"} src={`/svgs/chains/bitcoin.svg`} />
+											{token}
+										</div>
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+						<SelectTrigger className="!h-10.5 w-full rounded-xl border border-white/10 px-4 text-sm font-semibold focus-visible:ring-0 dark:bg-gray-800 dark:hover:bg-gray-800/80">
+							<div className="flex items-center gap-x-1.5">
+								<SelectValue className="text-white/60" placeholder="" />
+							</div>
+						</SelectTrigger>
+					</Select>
+
+					<div className="mt-6.25 flex w-full flex-col items-start justify-between">
+						<div className="flex w-full justify-between px-1.5">
+							<span className="text-sm text-white/60">Amount</span>
+							<div className="flex items-center gap-x-1">
+								<span className="text-sm text-white/60">Balance: </span>
+								<span className="text-sm font-medium text-white">
+									{balance?.formatted} BTC
+								</span>
+							</div>
+						</div>
+						<div className="relative mt-2 flex h-10.5 w-full items-center justify-center">
+							<Input
+								className="dark:bg-background h-full rounded-[10px] border-white/10 text-lg font-semibold placeholder:text-lg placeholder:leading-[14px] placeholder:font-bold placeholder:text-white/40 focus-visible:ring-0"
+								placeholder="0.00"
+								value={amount}
+								onBlur={() => {
+									setAmount(
+										amount.endsWith(".") ? amount.slice(0, -1) : amount
+									);
+								}}
+								onChange={(event) => {
+									const value = event.target.value.trim();
+									validateInputNumber({
+										value,
+										callback: setAmount,
+									});
+								}}
+							/>
+							<div
+								className="absolute top-1/2 right-0 flex h-full -translate-y-1/2 cursor-pointer items-center gap-x-2 pr-4"
+								onClick={() => {
+									setAmount(formatUnits(maxAmount));
+								}}
+							>
+								<span className="text-base font-medium text-yellow-500">
+									(Max)
+								</span>
+								<span className="text-sm font-medium text-white">BTC</span>
+							</div>
+						</div>
+						<div className="mt-2 flex w-full items-center justify-between px-1.5">
+							<span className="text-sm text-white/60">Network fee</span>
+							<span className="text-sm font-medium text-white">
+								0.00002010 BTC
+							</span>
+						</div>
+					</div>
+					<img alt="to" className="mx-auto mt-7.5" src="/svgs/common/to.svg" />
+					<div className="mt-auto flex w-full flex-col items-start justify-between">
+						<div className="bg-gray-710 mt-2 flex h-[38px] w-full items-center justify-start rounded-[12px] px-4">
 							<img
 								alt=""
-								className="h-4 w-4 animate-spin"
-								src="/svgs/loading.svg"
+								className="h-6 w-6 rounded-full"
+								src={getAvatar(principal ?? "")}
 							/>
-						)}
-					</Button>
+							<span className="ml-1.5 text-sm font-medium text-white">
+								{truncatePrincipal(principal ?? "")}
+							</span>
+							<div className="ml-auto flex h-full items-center gap-x-1">
+								<img alt={"btc-logo"} src={`/svgs/chains/bitcoin.svg`} />
+								{coreTokenBalance?.formatted}
+								{/* <span className="text-sm font-medium text-white">BTC</span> */}
+							</div>
+						</div>
+						<Button
+							className="mt-10 h-[42px] w-full rounded-full text-base font-bold text-black"
+							disabled={buttonDisabled}
+							onClick={handleDeposit}
+						>
+							Confirm{" "}
+							{isPending && (
+								<img
+									alt=""
+									className="h-4 w-4 animate-spin"
+									src="/svgs/loading.svg"
+								/>
+							)}
+						</Button>
+					</div>
 				</div>
-			</div>
+			)}
+
+			{selectedType === "External Wallet" && (
+				<div className="mt-5 flex w-full flex-1 flex-col items-start justify-between">
+					<div className="mb-4 flex w-full flex-1 flex-col items-center justify-center">
+						<div className="flex h-46 w-46 items-center justify-center rounded-2xl bg-white p-4">
+							{loading && (
+								<img
+									alt=""
+									className="h-12 w-12 animate-spin"
+									src="/svgs/loading.svg"
+								/>
+							)}
+							{btcAddress && !loading && (
+								<QRCodeSVG size={184} value={btcAddress} />
+							)}
+						</div>
+						<div className="mt-4 flex w-full items-center justify-center text-center text-sm text-[#DBB75B]">
+							<Info className="mr-2 text-[#DBB75B]" size={20} />
+							Only supports receiving Bitcoin assets.
+						</div>
+					</div>
+					<div className="w-full pb-2">
+						<div className="mb-2 text-sm font-medium text-white/60">
+							Your address
+						</div>
+						<div className="flex w-full items-center justify-between">
+							<div className="flex-1 text-sm font-medium text-white">
+								{btcAddress}
+							</div>
+							<div>
+								{copied ? (
+									<Check className="opacity-40" size={16} strokeWidth={4} />
+								) : (
+									<CopyIcon
+										className="ml-1"
+										size={16}
+										onClick={withStopPropagation(() => {
+											setCopied(true);
+											copy(btcAddress ?? "");
+											setTimeout(() => {
+												setCopied(false);
+											}, 2000);
+										})}
+									/>
+								)}
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
@@ -284,13 +357,14 @@ const Withdraw = () => {
 
 	const [selectedToType, setSelectedToType] =
 		useState<InnerTab>("Linked Wallet");
-	const [inputPrincipal, setInputPrincipal] = useState<string>("");
-	const [isInputPrincipalValid, setIsInputPrincipalValid] =
+	const [inputAddress, setInputAddress] = useState<string>("");
+	const [isInputAddressValid, setIsInputAddressValid] =
 		useState<boolean>(false);
+
 	const selectedToPrincipal = useMemo(() => {
 		if (selectedToType === "Linked Wallet") return principal;
-		return inputPrincipal;
-	}, [selectedToType, principal, inputPrincipal]);
+		return inputAddress;
+	}, [selectedToType, principal, inputAddress]);
 
 	const buttonDisabled = useMemo(() => {
 		return (
@@ -299,15 +373,23 @@ const Withdraw = () => {
 			amount === "0" ||
 			amount === "" ||
 			isWithdrawing ||
-			(selectedToType === "External Wallet" && !isInputPrincipalValid)
+			(selectedToType === "External Wallet" && !isInputAddressValid)
 		);
-	}, [isEnough, amount, isWithdrawing, isInputPrincipalValid, selectedToType]);
+	}, [isEnough, amount, isWithdrawing, isInputAddressValid, selectedToType]);
 
 	const handleWithdraw = useCallback(async () => {
 		try {
 			if (!selectedToPrincipal) {
 				throw new Error("Principal is not valid");
 			}
+
+			const parameters = {
+				amount: BigInt(parseUnits(amount)),
+				to: selectedToPrincipal,
+				// token: getICPCanisterToken(),
+			};
+			console.log("🚀 ~ handleWithdraw ~ params:", parameters);
+
 			// todo withdraw
 			await new Promise(() => {}).then(() => {});
 
@@ -430,7 +512,9 @@ const Withdraw = () => {
 					</div>
 					<div className="mt-2 flex w-full items-center justify-between px-1.5">
 						<span className="text-sm text-white/60">Network fee</span>
-						<span className="text-sm font-medium text-white">0.0002 BTC</span>
+						<span className="text-sm font-medium text-white">
+							0.00002010 BTC
+						</span>
 					</div>
 				</div>
 
@@ -448,27 +532,21 @@ const Withdraw = () => {
 						</>
 					) : (
 						<div className="mt-6 flex w-full flex-col items-start justify-between">
-							<span className="pl-1.5 text-sm text-white/40">Principal ID</span>
+							<span className="pl-1.5 text-sm text-white/40">Address</span>
 							<Input
-								placeholder="Enter your principal id"
-								value={inputPrincipal}
+								placeholder="Enter your BTC address"
+								value={inputAddress}
 								className={cn(
 									"dark:bg-background mt-2 h-10.5 rounded-[10px] border-white/10 text-lg font-semibold placeholder:text-sm placeholder:leading-[14px] placeholder:font-normal placeholder:text-white/20 focus-visible:ring-0"
 								)}
 								onChange={(event) => {
-									setInputPrincipal(event.target.value);
-									try {
-										validatePrincipalText(event.target.value);
-										setIsInputPrincipalValid(true);
-									} catch (error) {
-										console.debug("🚀 ~ Withdraw ~ error:", error);
-										setIsInputPrincipalValid(false);
-									}
+									setInputAddress(event.target.value);
+									setIsInputAddressValid(validate(event.target.value));
 								}}
 							/>
-							{!isInputPrincipalValid && inputPrincipal !== "" && (
+							{!isInputAddressValid && inputAddress !== "" && (
 								<span className={cn("text-price-negative text-sm")}>
-									Invalid principal id
+									Invalid Address
 								</span>
 							)}
 						</div>
