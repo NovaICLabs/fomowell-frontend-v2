@@ -7,8 +7,7 @@ import { useSiwbIdentity } from "ic-siwb-lasereyes-connector";
 import { Check } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
-// import { getICPCanisterId } from "@/canisters/icrc3";
-import { getCkBTCLedgerCanisterId } from "@/canisters/ckbtc_ledger";
+import { getCkbtcCanisterId } from "@/canisters/core";
 import { CopyIcon } from "@/components/icons/common/copy";
 import { DisconnectIcon } from "@/components/icons/common/disconnect";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
@@ -22,7 +21,7 @@ import {
 } from "@/components/ui/popover";
 // import { Skeleton } from "@/components/ui/skeleton";
 // import { useCoreTokenBalance } from "@/hooks/ic/core";
-import { useBtcChainLinkedWalTokenBalance } from "@/hooks/apis/indexer";
+import { useCoreTokenBalance } from "@/hooks/ic/core";
 import { useIcWallet } from "@/hooks/providers/wallet/ic";
 import { getAvatar } from "@/lib/common/avatar";
 import { withStopPropagation } from "@/lib/common/react-event";
@@ -107,7 +106,7 @@ export const BtcAccountInfo = () => {
 		{
 			label: "Profile",
 			action: withStopPropagation(() => {
-				void router.navigate({ to: `/btc/profile/${principal}` });
+				void router.navigate({ to: `/bitcoin/profile/${principal}` });
 			}),
 			icon: <ProfileIcon />,
 		},
@@ -124,7 +123,7 @@ export const BtcAccountInfo = () => {
 		{
 			label: "Linked Wallet",
 			action: withStopPropagation(() => {
-				void router.navigate({ to: `/btc/wallet/${principal}` });
+				void router.navigate({ to: `/bitcoin/wallet/${principal}` });
 			}),
 			icon: <WalletIcon />,
 		},
@@ -230,9 +229,14 @@ const BtcWalletConnect: React.FC = () => {
 	const { principal, connecting } = useBtcIdentityStore();
 	const { setBtcDepositWithdrawOpen } = useDialogStore();
 
-	const { data: coreTokenBalance } = useBtcChainLinkedWalTokenBalance(
-		getCkBTCLedgerCanisterId().toString()
-	);
+	const { data: coreTokenBalance } = useCoreTokenBalance({
+		owner: principal,
+		token: {
+			ICRCToken: getCkbtcCanisterId(),
+		},
+	});
+
+	console.log("🚀 ~ coreTokenBalance:", coreTokenBalance);
 
 	const router = useRouter();
 	return (

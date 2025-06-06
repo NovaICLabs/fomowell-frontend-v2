@@ -5,29 +5,27 @@ import copy from "copy-to-clipboard";
 import { Check } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
-import { getICPCanisterId } from "@/canisters/icrc3";
+import { getCkbtcCanisterId } from "@/canisters/core";
 import { CopyIcon } from "@/components/icons/common/copy";
-import { EditIcon } from "@/components/icons/common/edit";
+// import { EditIcon } from "@/components/icons/common/edit";
 import ReferIcon from "@/components/icons/common/refer";
 import WithdrawIcon from "@/components/icons/common/withdraw";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-// import { showToast } from "@/components/utils/toast";
-import ProfileActivity from "@/components/views/icp/profile/activity";
-import ProfileCreatedTokens from "@/components/views/icp/profile/create-list";
 import EditInfoModal from "@/components/views/icp/profile/edit-info-modal";
-import ProfileHoldings from "@/components/views/icp/profile/holdings";
 import { useUserInfo } from "@/hooks/apis/user";
-import {
-	// useClaimFaucet,
-	useCoreTokenBalance,
-} from "@/hooks/ic/core";
+import { useCoreTokenBalance } from "@/hooks/ic/core";
 import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
+import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
-import { useIcIdentityStore } from "@/store/ic";
+
+// import { Skeleton } from "@/components/ui/skeleton";
+// import { showToast } from "@/components/utils/toast";
+// import ProfileActivity from "@/components/views/icp/profile/activity";
+// import ProfileCreatedTokens from "@/components/views/icp/profile/create-list";
+// import ProfileHoldings from "@/components/views/icp/profile/holdings";
 
 export const Route = createFileRoute("/bitcoin/profile/$userid")({
 	component: UserId,
@@ -36,14 +34,15 @@ const UserInfo = () => {
 	const { userid } = Route.useParams();
 
 	const [principalCopied, setPrincipalCopied] = useState(false);
-	const { identityProfile } = useIcIdentityStore();
+	const { principal } = useBtcIdentityStore();
 
 	const { data: userInfo, refetch: refetchUserInfo } = useUserInfo(userid);
 
 	const [isShow, setIsShow] = useState<boolean>(false);
 
 	// is self
-	const isSelf = userid === identityProfile?.principal;
+	const isSelf = userid === principal;
+
 	return (
 		<div className="flex items-center gap-2">
 			<EditInfoModal
@@ -56,27 +55,30 @@ const UserInfo = () => {
 					void refetchUserInfo();
 				}}
 			/>
-			{userInfo ? (
-				<div
-					className="h-16 w-16 rounded-full"
-					style={{
-						backgroundImage: `url(${userInfo.avatar ?? getAvatar(userid)})`,
-						backgroundSize: "cover",
-						backgroundPosition: "center",
-						backgroundRepeat: "no-repeat",
-					}}
-				></div>
-			) : (
+			{/* {userInfo ? ( */}
+			<div
+				className="h-16 w-16 rounded-full"
+				style={{
+					// userInfo.avatar ??
+					backgroundImage: `url(${getAvatar(userid)})`,
+					backgroundSize: "cover",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+				}}
+			></div>
+			{/* ) : (
 				<Skeleton className="h-16 w-16 rounded-full"></Skeleton>
-			)}
+			)} */}
 
 			<div className="flex flex-col gap-1">
 				<div className="flex items-center gap-1">
-					{userInfo ? (
-						<span className="text-lg font-semibold">{userInfo.name}</span>
-					) : (
+					{/* {userInfo ? ( userInfo.name */}
+					<span className="text-lg font-semibold">
+						{truncatePrincipal(principal ?? "")}
+					</span>
+					{/* ) : (
 						<Skeleton className="h-7 w-20"></Skeleton>
-					)}
+					)} */}
 
 					{isSelf && (
 						<span
@@ -84,7 +86,7 @@ const UserInfo = () => {
 								setIsShow(true);
 							}}
 						>
-							<EditIcon />
+							{/* <EditIcon /> */}
 						</span>
 					)}
 				</div>
@@ -112,10 +114,13 @@ const UserInfo = () => {
 function UserId() {
 	const { userid } = Route.useParams();
 	const [activeTab, setActiveTab] = useState("Created");
-	const { identityProfile } = useIcIdentityStore();
+	const { principal } = useBtcIdentityStore();
+
 	const { data: coreTokenBalance } = useCoreTokenBalance({
-		owner: userid,
-		token: { ICRCToken: getICPCanisterId() },
+		owner: principal,
+		token: {
+			ICRCToken: getCkbtcCanisterId(),
+		},
 	});
 	// const { data: icpPrice } = useICPPrice();
 	// const usdValue =
@@ -123,12 +128,12 @@ function UserId() {
 	// 		? getTokenUsdValueTotal({ amount: coreTokenBalance.raw }, icpPrice)
 	//         : "--";
 
-	const { setDepositWithdrawOpen } = useDialogStore();
+	const { setBtcDepositWithdrawOpen } = useDialogStore();
 	// const { mutateAsync: claimFaucet, isPending: isClaimingFaucet } =
 	// 	useClaimFaucet();
 	const router = useRouter();
 	// is self
-	const isSelf = userid === identityProfile?.principal;
+	const isSelf = userid === principal;
 	return (
 		<div className="flex h-full w-full flex-1 flex-col overflow-auto pt-5">
 			<div
@@ -189,14 +194,14 @@ function UserId() {
 							</span>
 							<span className="ml-1.5 text-xl leading-tight font-semibold text-gray-300">
 								{" "}
-								ICP
+								BTC
 							</span>
 						</div>
 						<div className={cn("mt-4 flex gap-4", isSelf ? "flex" : "hidden")}>
 							<Button
 								className="h-[38px] w-[103px] rounded-full bg-white text-sm font-semibold hover:bg-white/80"
 								onClick={() => {
-									setDepositWithdrawOpen({ open: true, type: "deposit" });
+									setBtcDepositWithdrawOpen({ open: true, type: "deposit" });
 								}}
 							>
 								<DepositWithdrawIcon className="text-black" />
@@ -205,7 +210,7 @@ function UserId() {
 							<Button
 								className="bg-gray-710 hover:bg-gray-710/80 h-[38px] w-[103px] rounded-full text-sm font-semibold text-white"
 								onClick={() => {
-									setDepositWithdrawOpen({ open: true, type: "withdraw" });
+									setBtcDepositWithdrawOpen({ open: true, type: "withdraw" });
 								}}
 							>
 								<WithdrawIcon />
@@ -224,7 +229,7 @@ function UserId() {
 				<div
 					className="flex flex-col items-center gap-y-1.5"
 					onClick={() => {
-						setDepositWithdrawOpen({
+						setBtcDepositWithdrawOpen({
 							open: true,
 							type: "deposit",
 						});
@@ -239,7 +244,7 @@ function UserId() {
 				<div
 					className="flex flex-col items-center gap-y-1.5"
 					onClick={() => {
-						setDepositWithdrawOpen({ open: true, type: "withdraw" });
+						setBtcDepositWithdrawOpen({ open: true, type: "withdraw" });
 						void router.navigate({
 							to: "/mobile/icp/deposit-withdraw",
 						});
@@ -289,7 +294,7 @@ function UserId() {
 
 			<div className="no-scrollbar flex-1 flex-col overflow-auto rounded-2xl pb-5">
 				<div className="h-max">
-					{activeTab === "Holdings" && (
+					{/* {activeTab === "Holdings" && (
 						<div className="bg-gray-760 h-full overflow-auto rounded-2xl p-5 text-white/60">
 							<ProfileHoldings />
 						</div>
@@ -303,7 +308,7 @@ function UserId() {
 						<div className="bg-gray-760 h-full overflow-auto rounded-2xl p-5 text-white/60">
 							<ProfileActivity />
 						</div>
-					)}
+					)} */}
 				</div>
 			</div>
 		</div>

@@ -7,8 +7,9 @@ import { Check, Info } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { isMobile } from "react-device-detect";
 
-import { getCkBTCLedgerCanisterId } from "@/canisters/ckbtc_ledger";
+// import { getCkBTCLedgerCanisterId } from "@/canisters/ckbtc_ledger";
 // import { getBTCDepositAddress } from "@/canisters/ckbtc_minter";
+import { getCkbtcCanisterId } from "@/canisters/core";
 import { getFastBtcAddress } from "@/canisters/rune";
 import { CopyIcon } from "@/components/icons/common/copy";
 import { Button } from "@/components/ui/button";
@@ -29,8 +30,8 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { showToast } from "@/components/utils/toast";
-import { useBtcChainLinkedWalTokenBalance } from "@/hooks/apis/indexer";
-import { useWithdraw } from "@/hooks/ic/core";
+import { useBtcFees } from "@/hooks/btc/core";
+import { useCoreTokenBalance, useWithdraw } from "@/hooks/ic/core";
 import { useBtcBalance, useBtcDeposit } from "@/hooks/ic/tokens/btc";
 import { getAvatar } from "@/lib/common/avatar";
 import {
@@ -46,6 +47,7 @@ import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
 
 import type { Identity } from "@dfinity/agent";
+
 // import { useLaserEyes } from "@omnisat/lasereyes-react";
 
 const tabs = ["deposit", "withdraw"] as const;
@@ -66,23 +68,29 @@ const Deposit = () => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [selectedType, setSelectedType] = useState<InnerTab>("Linked Wallet");
 
-	const fees = useMemo(() => {
-		// todo get btc deposit fee and minter fee
-		return 0;
-	}, []);
+	const fees = useBtcFees();
 
 	const maxAmount = useMemo(() => {
-		return balance?.raw ? Number(balance.raw) - fees : 0n;
+		return balance?.raw ? BigInt(balance.raw) - BigInt(fees.row) : 0n;
 	}, [balance, fees]);
 
 	const { principal } = useBtcIdentityStore();
+
 	const { data: coreTokenBalance, refetch: refetchCoreTokenBalance } =
-		useBtcChainLinkedWalTokenBalance(getCkBTCLedgerCanisterId().toString());
+		useCoreTokenBalance({
+			owner: principal,
+			token: {
+				ICRCToken: getCkbtcCanisterId(),
+			},
+		});
 
 	const isEnough = useMemo(() => {
 		if (amount === "") return false;
 
-		return balance && Number(balance.raw) - fees >= BigInt(parseUnits(amount));
+		return (
+			balance &&
+			BigInt(balance.raw) - BigInt(fees.row) >= BigInt(parseUnits(amount))
+		);
 	}, [balance, fees, amount]);
 
 	const { mutateAsync: btcDeposit, isPending } = useBtcDeposit();
@@ -120,13 +128,17 @@ const Deposit = () => {
 	}, [refetchBtcBalance, refetchCoreTokenBalance]);
 
 	const handleDeposit = useCallback(async () => {
-		// todo deposite
+		// deposit
 		if (!btcAddress) return;
 
 		console.log("dss--------------", btcAddress, Number(amount) * 1e8);
 
-		await btcDeposit({ btcAddress, amount: Number(amount) * 1e8 });
+		const result = await btcDeposit({
+			btcAddress,
+			amount: Number(amount) * 1e8,
+		});
 
+		console.log("🚀 ~ handleDeposit ~ result:", result);
 		refetch();
 		showToast(
 			"info",
@@ -239,7 +251,7 @@ const Deposit = () => {
 						<div className="mt-2 flex w-full items-center justify-between px-1.5">
 							<span className="text-sm text-white/60">Network fee</span>
 							<span className="text-sm font-medium text-white">
-								0.00002010 BTC
+								{fees.formatted} BTC
 							</span>
 						</div>
 					</div>
@@ -336,18 +348,26 @@ const Withdraw = () => {
 	const { principal } = useBtcIdentityStore();
 
 	const { data: coreTokenBalance, refetch: refetchCoreTokenBalance } =
-		useBtcChainLinkedWalTokenBalance(getCkBTCLedgerCanisterId().toString());
+		useCoreTokenBalance({
+			owner: principal,
+			token: {
+				ICRCToken: getCkbtcCanisterId(),
+			},
+		});
+
+	const fees = useBtcFees();
 
 	const maxAmount = useMemo(() => {
-		return coreTokenBalance?.raw ? coreTokenBalance.raw : 0n;
-	}, [coreTokenBalance]);
+		return coreTokenBalance?.raw ? coreTokenBalance.raw - fees.row : 0n;
+	}, [coreTokenBalance, fees]);
 
 	const isEnough = useMemo(() => {
 		if (amount === "") return false;
 		return (
-			coreTokenBalance && coreTokenBalance.raw >= BigInt(parseUnits(amount))
+			coreTokenBalance &&
+			coreTokenBalance.raw - fees.row >= BigInt(parseUnits(amount))
 		);
-	}, [coreTokenBalance, amount]);
+	}, [amount, coreTokenBalance, fees]);
 
 	const { mutateAsync: withdraw, isPending: isWithdrawing } = useWithdraw();
 
@@ -513,7 +533,7 @@ const Withdraw = () => {
 					<div className="mt-2 flex w-full items-center justify-between px-1.5">
 						<span className="text-sm text-white/60">Network fee</span>
 						<span className="text-sm font-medium text-white">
-							0.00002010 BTC
+							{fees.formatted} BTC
 						</span>
 					</div>
 				</div>

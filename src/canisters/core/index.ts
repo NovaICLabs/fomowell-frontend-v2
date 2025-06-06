@@ -21,13 +21,14 @@ import type { ActorCreator } from "@/lib/ic/connectors";
 import type { Principal } from "@dfinity/principal";
 
 export const getChainICCoreCanisterId = () => {
-	console.log(
-		"import.meta.env",
-		import.meta.env["VITE_CHAIN_IC_CORE_CANISTER_ID"]
-	);
 	return validateCanisterIdText(
 		import.meta.env["VITE_CHAIN_IC_CORE_CANISTER_ID"]
 	);
+};
+
+export const getCkbtcCanisterId = () => {
+	const value = import.meta.env["VITE_CKBTC_RUN_WALLET_CANISTER_ID"];
+	return validatePrincipalText(value);
 };
 
 // ================================ read ================================

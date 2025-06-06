@@ -13,6 +13,8 @@ interface ImportMetaEnv {
 	readonly VITE_CKBTC_MINTER_CANISTER_ID: string;
 	readonly VITE_CKBTC_LEDGER_CANISTER_ID: string;
 	readonly VITE_RUNE_WALLET_CANISTER_ID: string;
+	readonly VITE_CKBTC_RUN_WALLET_CANISTER_ID: string;
+	readonly VITE_INDEXER_BTC_BASE_URL: string;
 }
 
 interface ImportMeta {
