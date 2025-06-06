@@ -4,6 +4,7 @@ import SlippageSetting from "@/components/icons/common/slippage-setting";
 import { Input } from "@/components/ui/input";
 import { slippageRange, validateInputNumber } from "@/lib/common/validate";
 import { cn } from "@/lib/utils";
+import { useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
 import { useQuickBuyStore } from "@/store/quick-buy";
 
@@ -15,6 +16,8 @@ export default function Slippage() {
 		setSlippage,
 	} = useQuickBuyStore();
 	const { setSlippageOpen } = useDialogStore();
+	const { chain } = useChainStore();
+
 	return (
 		<div className="bg-gray-710 ml-auto flex h-[38px] items-center rounded-full px-4 text-white">
 			<img alt="flash" src="/svgs/flash.svg" />
@@ -27,11 +30,21 @@ export default function Slippage() {
 				Buy
 			</span>
 			<div className="ml-2 flex h-8 items-center rounded-full bg-gray-800 px-2">
-				<img
-					alt={"icp-logo"}
-					className={cn(isMobile && "h-5 w-5")}
-					src={`/svgs/chains/icp.svg`}
-				/>
+				{chain === "icp" && (
+					<img
+						alt={"icp-logo"}
+						className={cn(isMobile && "h-5 w-5")}
+						src={`/svgs/chains/icp.svg`}
+					/>
+				)}
+
+				{chain === "bitcoin" && (
+					<img
+						alt={"btc-logo"}
+						className={cn(isMobile && "h-5 w-5")}
+						src={`/svgs/chains/bitcoin.svg`}
+					/>
+				)}
 				<Input
 					className="h-8 w-15 rounded-full border-none px-1 text-sm font-medium text-white focus-visible:ring-0 sm:w-24 dark:bg-gray-800"
 					placeholder="0"
