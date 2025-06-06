@@ -2,13 +2,16 @@ import { ChevronLeft } from "lucide-react";
 
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore } from "@/store/ic";
 import { useMobileSheetStore } from "@/store/mobile/sheet";
 
+import { BtcAccountInfo } from "../header/connect-button/bitcoin";
 import { IcpAccountInfo } from "../header/connect-button/icp";
 export default function MenuSheet() {
 	const { menuOpen, setMenuOpen } = useMobileSheetStore();
+	const { chain } = useChainStore();
 	const { connected } = useIcIdentityStore();
 	const { setHowItWorksOpen } = useDialogStore();
 	return (
@@ -25,7 +28,8 @@ export default function MenuSheet() {
 						)}
 					>
 						<div className={cn("w-[171px]")}>
-							<IcpAccountInfo />
+							{chain === "icp" && <IcpAccountInfo />}
+							{chain === "bitcoin" && <BtcAccountInfo />}
 						</div>
 						<div
 							className="bg-gray-760 inline-flex h-10 w-10 flex-shrink-0 rotate-180 items-center justify-center rounded-r-full text-gray-400"

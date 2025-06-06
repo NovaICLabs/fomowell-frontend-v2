@@ -135,7 +135,7 @@ export const BtcAccountInfo = () => {
 			<PopoverTrigger
 				asChild
 				onClick={() => {
-					void router.navigate({ to: `/btc/profile/${principal}` });
+					void router.navigate({ to: `/bitcoin/profile/${principal}` });
 				}}
 			>
 				<div
@@ -253,7 +253,7 @@ const BtcWalletConnect: React.FC = () => {
 						onClick={() => {
 							if (isMobile) {
 								void router.navigate({
-									to: `/btc/profile/${principal}`,
+									to: `/bitcoin/profile/${principal}`,
 									replace: true,
 								});
 							} else {

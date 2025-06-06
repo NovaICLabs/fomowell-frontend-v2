@@ -10,19 +10,52 @@ import WalletIcon from "@/components/icons/links-popover/linked-wallet";
 import ProfileIcon from "@/components/icons/links-popover/profile";
 import Telegram from "@/components/icons/media/telegram";
 import X from "@/components/icons/media/x";
+import { useCurrentChain } from "@/hooks/common/useTokenRouter";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { cn } from "@/lib/utils";
+import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore } from "@/store/ic";
 
 const MobileFooter = () => {
-	const { principal, connected } = useIcIdentityStore();
+	const { principal: icPrincipal, connected: icConnected } =
+		useIcIdentityStore();
+	const { principal: btcPrincipal, connected: btcConnected } =
+		useBtcIdentityStore();
 	const { setIcpConnectOpen } = useDialogStore();
+	const chain = useCurrentChain();
+
 	const router = useRouter();
 	const pathname = useLocation({
 		select: (location) => location.pathname,
 	});
+
+	const connected = useMemo(() => {
+		if (chain === "icp") {
+			return icConnected;
+		}
+		if (chain === "bitcoin") {
+			return btcConnected;
+		}
+		return icConnected;
+	}, [chain, icConnected, btcConnected]);
+
+	const principal = useMemo(() => {
+		if (chain === "icp") {
+			return icPrincipal;
+		}
+		if (chain === "bitcoin") {
+			return btcPrincipal;
+		}
+		return icPrincipal;
+	}, [chain, icPrincipal, btcPrincipal]);
+
 	const isHome = pathname === "/";
+
+	const commonPath = useMemo(() => {
+		return `/mobile/${chain}`;
+	}, [chain]);
+
 	const bottomBar = useMemo(
 		() => [
 			{
@@ -51,7 +84,7 @@ const MobileFooter = () => {
 				label: "Deposit",
 				action: withStopPropagation(() => {
 					if (connected) {
-						void router.navigate({ to: "/mobile/icp/deposit-withdraw" });
+						void router.navigate({ to: `${commonPath}/deposit-withdraw` });
 					} else {
 						setIcpConnectOpen(true);
 					}
@@ -60,30 +93,30 @@ const MobileFooter = () => {
 					<DepositWithdrawIcon
 						className={cn(
 							"h-6.5 w-6.5",
-							pathname.includes("/mobile/icp/deposit-withdraw") &&
+							pathname.includes(`${commonPath}/deposit-withdraw`) &&
 								"text-yellow-500"
 						)}
 					/>
 				),
-				active: pathname.includes("/mobile/icp/deposit-withdraw"),
+				active: pathname.includes(`${commonPath}/deposit-withdraw`),
 			},
 			{
 				label: "Create",
 				action: withStopPropagation(() => {
 					if (connected) {
-						void router.navigate({ to: "/icp/create" });
+						void router.navigate({ to: `/${chain}/create` });
 					} else {
 						setIcpConnectOpen(true);
 					}
 				}),
 				icon: <div className="h-6.5 w-6.5"></div>,
-				active: pathname === "/icp/create",
+				active: pathname === `/${chain}/create`,
 			},
 			{
 				label: "Wallet",
 				action: withStopPropagation(() => {
 					if (connected) {
-						void router.navigate({ to: `/icp/wallet/${principal}` });
+						void router.navigate({ to: `/${chain}/wallet/${principal}` });
 					} else {
 						setIcpConnectOpen(true);
 					}
@@ -92,17 +125,17 @@ const MobileFooter = () => {
 					<WalletIcon
 						className={cn(
 							"h-6.5 w-6.5",
-							pathname === `/icp/wallet/${principal}` && "text-yellow-500"
+							pathname === `/${chain}/wallet/${principal}` && "text-yellow-500"
 						)}
 					/>
 				),
-				active: pathname === `/icp/wallet/${principal}`,
+				active: pathname === `/${chain}/wallet/${principal}`,
 			},
 			{
 				label: "Profile",
 				action: withStopPropagation(() => {
 					if (connected) {
-						void router.navigate({ to: `/icp/profile/${principal}` });
+						void router.navigate({ to: `/${chain}/profile/${principal}` });
 					} else {
 						setIcpConnectOpen(true);
 					}
@@ -111,21 +144,30 @@ const MobileFooter = () => {
 					<ProfileIcon
 						className={cn(
 							"h-6.5 w-6.5",
-							pathname === `/icp/profile/${principal}` && "text-yellow-500"
+							pathname === `/${chain}/profile/${principal}` && "text-yellow-500"
 						)}
 					/>
 				),
-				active: pathname === `/icp/profile/${principal}`,
+				active: pathname === `/${chain}/profile/${principal}`,
 			},
 		],
-		[connected, isHome, pathname, principal, router, setIcpConnectOpen]
+		[
+			chain,
+			commonPath,
+			connected,
+			isHome,
+			pathname,
+			principal,
+			router,
+			setIcpConnectOpen,
+		]
 	);
 
 	return (
 		<div
 			className={cn(
 				"fixed right-0 bottom-0 left-0 grid h-[55px] grid-cols-5 items-center justify-between bg-gray-800",
-				pathname.includes("/icp/token") && "hidden"
+				pathname.includes(`/${chain}/token`) && "hidden"
 			)}
 		>
 			{bottomBar.map((item) => (
