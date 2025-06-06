@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 
 import { Star } from "@/components/icons/star";
 import { Empty } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fromNow } from "@/lib/common/time";
+import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 
 const LiquidityHeader = ({
@@ -20,7 +23,7 @@ const LiquidityHeader = ({
 			label: "Token",
 			sortable: false,
 			className:
-				"w-[150px] pl-[50px] md:w-[400px] sticky left-0 bg-[#1E1E1E] z-[1]",
+				"w-[180px] pr-[10px] pl-[50px] md:w-[400px] sticky left-0 bg-[#1E1E1E] z-[1]",
 		},
 		{
 			id: "create",
@@ -56,7 +59,8 @@ const LiquidityHeader = ({
 			id: "add-liquidity",
 			label: "Add Liquidity",
 			sortable: false,
-			className: "w-[120px] md:w-[220px] sticky right-0 bg-[#1E1E1E] z-[1]",
+			className:
+				"w-[100px] pl-[10px] md:w-[220px] sticky right-0 bg-[#1E1E1E] z-[1]",
 		},
 	];
 
@@ -132,6 +136,14 @@ const LiquidityListItemSkeleton = () => {
 type TypeLiquidityListItem = {
 	id: number;
 	isFollow?: boolean | undefined;
+	logo: string;
+	chain: "ic" | "btc";
+	symbol: string;
+	address: string;
+	twitterLink?: string | undefined;
+	telegramLink?: string | undefined;
+	websiteLink?: string | undefined;
+	createAt: bigint;
 };
 const LiquidityListItem = ({
 	itemData,
@@ -162,6 +174,10 @@ const LiquidityListItem = ({
 		normal: { backgroundColor: transparentBg },
 	};
 
+	const onFavoriteLiquidity = () => {};
+
+	const onAddLiquidity = () => {};
+
 	return (
 		<motion.tr
 			key={itemData.id}
@@ -175,15 +191,126 @@ const LiquidityListItem = ({
 				// });
 			}}
 		>
-			<Star
-				className="ml-[20px] h-4 w-4 shrink-0 cursor-pointer text-white/40"
-				isActive={itemData.isFollow}
-				// onClick={withStopPropagation(() => {
-				// 	favoriteToken({
-				// 		tokenId: token.memeTokenId.toString(),
-				// 	});
-				// })}
-			/>
+			<div className="sticky left-0 z-[1] flex h-full w-[180px] items-center bg-[#1E1E1E] pr-[10px] text-left text-xs leading-none font-medium text-white/40 duration-300 group-hover:!bg-[#262626] md:w-[400px]">
+				<Star
+					className="ml-[20px] h-4 w-4 shrink-0 cursor-pointer text-white/40"
+					isActive={itemData.isFollow}
+					onClick={() => {
+						onFavoriteLiquidity();
+					}}
+				/>
+				<div className="relative ml-[10px] flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+					<div className="absolute inset-0 rounded-full border-[2px] border-gray-500"></div>
+					<div className="bg-gray-710 absolute h-9 w-9 rounded-full p-[2px]"></div>
+					<div
+						className="absolute h-9 w-9 rounded-full p-[2px]"
+						style={{
+							backgroundImage: `url(${itemData.logo})`,
+							backgroundSize: "cover",
+							backgroundPosition: "center",
+						}}
+					/>
+					{itemData.chain === "ic" && (
+						<img
+							alt="ic-logo"
+							className="absolute right-0 bottom-0 flex h-3 w-3 items-center justify-center rounded-full bg-[#ffffff]"
+							src={`/svgs/chains/icp.svg`}
+						/>
+					)}
+					{itemData.chain === "btc" && (
+						<img
+							alt="ic-logo"
+							className="absolute right-0 bottom-0 flex h-3 w-3 items-center justify-center rounded-full"
+							src={`/svgs/chains/bitcoin.svg`}
+						/>
+					)}
+				</div>
+				<div className="ml-[10px] flex flex-col justify-center">
+					<div className="flex items-center gap-x-[10px]">
+						<p className="text-sm leading-none font-medium text-white">
+							{itemData.symbol}
+						</p>
+						{itemData.twitterLink && (
+							<Link
+								className="hidden flex-shrink-0 md:flex"
+								target="_black"
+								to={itemData.twitterLink}
+							>
+								<img alt="" src="/svgs/links/twitter.svg" />
+							</Link>
+						)}
+						{itemData.telegramLink && (
+							<Link
+								className="hidden flex-shrink-0 md:flex"
+								target="_black"
+								to={itemData.telegramLink}
+							>
+								<img alt="" src="/svgs/links/telegram.svg" />
+							</Link>
+						)}
+						{itemData.websiteLink && (
+							<Link
+								className="hidden flex-shrink-0 md:flex"
+								target="_black"
+								to={itemData.websiteLink}
+							>
+								<img alt="" src="/svgs/links/website.svg" />
+							</Link>
+						)}
+					</div>
+					<p className="mt-[6px] text-xs leading-none font-light text-white/60">
+						{truncatePrincipal(itemData.address)}
+					</p>
+				</div>
+			</div>
+			<div className="flex h-full w-[120px] items-center text-left text-xs leading-none font-medium text-white/40 md:w-[220px]">
+				{fromNow(itemData.createAt)}
+			</div>
+			<div className="flex h-full w-[120px] flex-col justify-center text-left md:w-[220px]">
+				<p className="text-xs leading-none font-medium text-white">
+					${"416,000.00"}
+				</p>
+				<p className="mt-1 text-xs leading-none font-normal text-white/60">
+					0.024 BTC
+				</p>
+			</div>
+			<div className="flex h-full w-[120px] items-center text-left text-xs leading-none font-medium text-white md:w-[220px]">
+				${"416,000.00"}
+			</div>
+			<div className="flex h-full w-[120px] flex-col justify-center text-left text-xs leading-none font-medium text-white/40 md:w-[220px]">
+				<p className="text-xs leading-none font-medium text-white/60">
+					$116.79
+				</p>
+				<p className="mt-1 text-xs leading-none font-normal text-white/60">
+					APR: 6.09%
+				</p>
+			</div>
+			<div className="flex h-full w-[120px] flex-col justify-center text-left md:w-[220px]">
+				<p className="text-xs leading-none font-medium text-white">0.06 BTC</p>
+				<p className="mt-1 text-xs leading-none font-normal text-white/60">
+					$0.324
+				</p>
+			</div>
+			<div className="sticky right-0 z-[1] flex h-full w-[100px] items-center bg-[#1E1E1E] pl-[10px] text-left text-xs leading-none font-medium text-white/40 duration-300 group-hover:!bg-[#262626] md:w-[220px]">
+				<div
+					className="flex h-9 w-[84px] cursor-pointer items-center justify-center rounded-[19px] border border-[#f7b406] bg-[#111111] text-sm font-medium text-white"
+					style={{
+						backgroundImage: `url(svgs/liquidity/add-border.png)`,
+						backgroundSize: "cover",
+						backgroundPosition: "center",
+					}}
+					onClick={() => {
+						onAddLiquidity();
+					}}
+				>
+					<img
+						alt=""
+						className="mr-[6px] h-4 w-4"
+						src="/svgs/liquidity/lightning.svg"
+					/>
+					Add
+				</div>
+			</div>
 		</motion.tr>
 	);
 };
@@ -203,10 +330,46 @@ export default function LiquidityPage() {
 	}, [list]);
 
 	useEffect(() => {
-		const data = [
-			{ id: 1, isFollow: true },
-			{ id: 2, isFollow: false },
-			{ id: 3, isFollow: true },
+		const data: Array<TypeLiquidityListItem> = [
+			{
+				id: 1,
+				isFollow: true,
+				logo: "https://image-uploader.sophiamoon231.workers.dev/1747409754481-o1baf9bquf.gif",
+				chain: "ic",
+				symbol: "Symbol1",
+				address:
+					"aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaa",
+				twitterLink: "test link",
+				telegramLink: "test link",
+				websiteLink: "test link",
+				createAt: 1749191039000000000n,
+			},
+			{
+				id: 2,
+				isFollow: false,
+				logo: "https://image-uploader.sophiamoon231.workers.dev/1747409754481-o1baf9bquf.gif",
+				chain: "btc",
+				symbol: "Symbol2",
+				address:
+					"aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaa",
+				twitterLink: "test link",
+				telegramLink: "",
+				websiteLink: "test link",
+				createAt: 1749191039000000000n,
+			},
+			{
+				id: 3,
+				isFollow: true,
+				logo: "https://image-uploader.sophiamoon231.workers.dev/1747409754481-o1baf9bquf.gif",
+				chain: "ic",
+				symbol: "Symbol3",
+				address:
+					"aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaaaa-aaa",
+				twitterLink: "test link",
+				telegramLink: "test link",
+				websiteLink: "",
+				createAt: 1749191039000000000n,
+			},
 		];
 		setTimeout(() => {
 			setList(data);
