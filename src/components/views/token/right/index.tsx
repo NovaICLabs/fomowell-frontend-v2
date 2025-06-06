@@ -148,7 +148,7 @@ export default function Bottom() {
 	}, [chain]);
 
 	return (
-		<div className="no-scrollbar flex w-[390px] flex-shrink-0 flex-col gap-7.5 overflow-auto">
+		<div className="no-scrollbar flex w-[390px] flex-shrink-0 flex-col gap-y-[14px] overflow-auto">
 			<div className="flex items-center gap-[30px]">
 				{currentTabs
 					// .filter((tab) => tab !== "Liquidity")
