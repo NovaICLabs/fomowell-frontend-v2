@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import { isMobile } from "react-device-detect";
 
 import SlippageSetting from "@/components/icons/common/slippage-setting";
@@ -10,13 +12,57 @@ import { useQuickBuyStore } from "@/store/quick-buy";
 
 export default function Slippage() {
 	const {
-		amount: flashAmount,
-		setAmount: setFlashAmount,
-		slippage,
-		setSlippage,
+		amount,
+		setAmount,
+		slippage: icSlippage,
+		setSlippage: setIcSlippage,
+
+		btcAmount,
+		setBtcAmount,
+		btcSlippage,
+		setBtcSlippage,
 	} = useQuickBuyStore();
 	const { setSlippageOpen } = useDialogStore();
 	const { chain } = useChainStore();
+
+	const flashAmount = useMemo(() => {
+		if (chain === "icp") {
+			return amount;
+		}
+		if (chain === "bitcoin") {
+			return btcAmount;
+		}
+
+		return amount;
+	}, [amount, btcAmount, chain]);
+
+	const slippage = useMemo(() => {
+		if (chain === "icp") {
+			return icSlippage;
+		}
+		if (chain === "bitcoin") {
+			return btcSlippage;
+		}
+		return icSlippage;
+	}, [icSlippage, btcSlippage, chain]);
+
+	const setSlippage = (value: string) => {
+		if (chain === "icp") {
+			setIcSlippage(value);
+		}
+		if (chain === "bitcoin") {
+			setBtcSlippage(value);
+		}
+	};
+
+	const setFlashAmount = (value: string) => {
+		if (chain === "icp") {
+			setAmount(value);
+		}
+		if (chain === "bitcoin") {
+			setBtcAmount(value);
+		}
+	};
 
 	return (
 		<div className="bg-gray-710 ml-auto flex h-[38px] items-center rounded-full px-4 text-white">

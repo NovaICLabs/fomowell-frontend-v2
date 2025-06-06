@@ -9,6 +9,13 @@ export const useQuickBuyStore = create(
 		setAutoSlippage: (autoSlippage: boolean) => void;
 		slippage: string;
 		setSlippage: (slippage: string) => void;
+
+		btcAmount: string;
+		setBtcAmount: (amount: string) => void;
+		autoBtcSlippage: boolean;
+		setAutoBtcSlippage: (autoBtcSlippage: boolean) => void;
+		btcSlippage: string;
+		setBtcSlippage: (btcSlippage: string) => void;
 	}>(
 		(set) => ({
 			amount: "0.5",
@@ -22,6 +29,19 @@ export const useQuickBuyStore = create(
 			slippage: "0.2",
 			setSlippage: (slippage) => {
 				set({ slippage });
+			},
+
+			btcAmount: "0.0002",
+			setBtcAmount: (btcAmount) => {
+				set({ btcAmount });
+			},
+			autoBtcSlippage: false,
+			setAutoBtcSlippage: (autoBtcSlippage) => {
+				set({ autoBtcSlippage });
+			},
+			btcSlippage: "1",
+			setBtcSlippage: (btcSlippage) => {
+				set({ btcSlippage });
 			},
 		}),
 		{
