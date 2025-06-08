@@ -366,6 +366,7 @@ const Deposit = () => {
 	);
 };
 const Withdraw = () => {
+	const { identity } = useSiwbIdentity();
 	const [amount, setAmount] = useState<string>("");
 
 	const { principal } = useBtcIdentityStore();
@@ -392,6 +393,30 @@ const Withdraw = () => {
 		);
 	}, [amount, coreTokenBalance, fees]);
 
+	const [btcAddress, setBtcAddress] = useState<string | null>(null);
+	const [loading, setLoading] = useState<boolean>(false);
+	useEffect(() => {
+		const fetchBtcAddress = async () => {
+			if (!principal) return;
+
+			setLoading(true);
+			try {
+				// get fast btc address
+				const address = await getFastBtcAddress(identity as Identity);
+				console.debug("🚀 ~ fetchBtcAddress ~ address:", address);
+
+				setBtcAddress(address);
+			} catch (error) {
+				console.error("Failed to get BTC Withdraw address:", error);
+				showToast("error", "Failed to get BTC Withdraw address");
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		void fetchBtcAddress();
+	}, [identity, principal]);
+
 	const { mutateAsync: withdraw, isPending: isWithdrawing } = useBtcWithdraw();
 
 	const refetch = useCallback(() => {
@@ -404,10 +429,10 @@ const Withdraw = () => {
 	const [isInputAddressValid, setIsInputAddressValid] =
 		useState<boolean>(false);
 
-	const selectedToPrincipal = useMemo(() => {
-		if (selectedToType === "Linked Wallet") return principal;
+	const selectedToAddress = useMemo(() => {
+		if (selectedToType === "Linked Wallet") return btcAddress;
 		return inputAddress;
-	}, [selectedToType, principal, inputAddress]);
+	}, [selectedToType, btcAddress, inputAddress]);
 
 	const buttonDisabled = useMemo(() => {
 		return (
@@ -425,17 +450,21 @@ const Withdraw = () => {
 			if (!principal) {
 				throw new Error("Principal is not valid");
 			}
-			if (!selectedToPrincipal) {
-				throw new Error("Principal is not valid");
+			if (!selectedToAddress) {
+				throw new Error("Address is not valid");
+			}
+
+			if (loading) {
+				return;
 			}
 
 			const parameters = {
 				amount: BigInt(parseUnits(amount)),
-				to: selectedToPrincipal,
+				to: selectedToAddress,
 				from: principal,
 				token: getCkbtcCanisterToken(),
 			};
-			console.log("🚀 ~ handleWithdraw ~ params:", parameters);
+			console.debug("🚀 ~ handleWithdraw ~ params:", parameters);
 
 			// todo withdraw
 			const result = await withdraw(parameters);
@@ -446,7 +475,7 @@ const Withdraw = () => {
 		} catch (error) {
 			console.debug("🚀 ~ handleWithdraw ~ error:", error);
 		}
-	}, [principal, selectedToPrincipal, amount, withdraw, refetch]);
+	}, [principal, selectedToAddress, loading, amount, withdraw, refetch]);
 
 	return (
 		<div className="flex w-full flex-1 flex-col">
