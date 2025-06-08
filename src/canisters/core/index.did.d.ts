@@ -6,6 +6,15 @@ export interface Account {
 	owner: Principal;
 	subaccount: [] | [Uint8Array | number[]];
 }
+export interface AddLiquidity {
+	token: Principal;
+	from: Account;
+	reserve_runes: bigint;
+	input_runes: bigint;
+	reserve_sats: bigint;
+	meme_token_id: bigint;
+	input_sats: bigint;
+}
 export interface Approve {
 	fee: [] | [bigint];
 	from: Account;
@@ -115,10 +124,6 @@ export interface CanisterMetrics {
 export type CanisterMetricsData =
 	| { hourly: Array<HourlyMetricsData> }
 	| { daily: Array<DailyMetricsData> };
-export interface ClaimArg {
-	token: StableToken;
-	claimer: [] | [Principal];
-}
 export interface ConsentInfo {
 	metadata: ConsentMessageMetadata;
 	consent_message: ConsentMessage;
@@ -170,6 +175,7 @@ export interface Deposit {
 	spender: Account;
 }
 export interface DepositArgs {
+	to: [] | [Account];
 	token: StableToken;
 	memo: [] | [Uint8Array | number[]];
 	subaccount: [] | [Uint8Array | number[]];
@@ -256,15 +262,32 @@ export interface InitArchiveArg {
 }
 export interface InitArg {
 	fee_receiver: Account;
+	rune_fee_rate: [] | [bigint];
 	create_token_fee: Array<TokenAmount>;
 	archive_init: [] | [InitArchiveArg];
+	ckbtc_minter: Principal;
+	swap_fee: bigint;
 	token_launch_threshold: Array<TokenAmount>;
+	ckbtc_ledger: Principal;
 	maintenance: boolean;
 	fee_percentage: [] | [number];
+	swap_burn: bigint;
+	btc_custody_canister: Principal;
 }
 export type LedgerType = { MemeToken: bigint } | { ICRCToken: Principal };
 export interface LineDisplayPage {
 	lines: Array<string>;
+}
+export interface LiquidityAddArg {
+	id: bigint;
+	sats: bigint;
+	nonce: bigint;
+	runes: bigint;
+}
+export interface LiquidityRemoveArg {
+	id: bigint;
+	liquidity: bigint;
+	nonce: bigint;
 }
 export interface LogMessageData {
 	timeNanos: bigint;
@@ -281,6 +304,7 @@ export interface MemeToken {
 	name: string;
 	market_cap_token: bigint;
 	completed: boolean;
+	rune_name: string;
 	description: string;
 	lp_canister: [] | [Principal];
 	created_at: bigint;
@@ -322,6 +346,38 @@ export interface NumericEntity {
 	first: bigint;
 	last: bigint;
 }
+export interface PoolView {
+	k: bigint;
+	id: bigint;
+	sats: bigint;
+	runes: bigint;
+}
+export interface PreLiquidityAddArg {
+	id: bigint;
+	sats: [] | [bigint];
+	runes: [] | [bigint];
+}
+export interface PreLiquidityRemoveArg {
+	id: bigint;
+	liquidity: bigint;
+}
+export interface PreRunesSwapSatsArg {
+	id: bigint;
+	runes: bigint;
+}
+export interface PreRunesSwapSatsResponse {
+	sats: bigint;
+	nonce: bigint;
+}
+export interface PreSatsSwapRunesArg {
+	id: bigint;
+	sats: bigint;
+	nonce: bigint;
+}
+export interface PreSatsSwapRunesResponse {
+	nonce: bigint;
+	runes: bigint;
+}
 export interface QueryMemeTokenArgs {
 	sort: [] | [Sort];
 	start: bigint;
@@ -331,10 +387,51 @@ export interface QueryMemeTokenResponse {
 	meme_tokens: Array<MemeToken>;
 	count: bigint;
 }
-export type Result = { Ok: BuyResponse } | { Err: string };
-export type Result_1 = { Ok: bigint } | { Err: string };
-export type Result_2 = { Ok: MemeToken } | { Err: string };
-export type Result_3 = { Ok: ConsentInfo } | { Err: Icrc21Error };
+export type Result = { Ok: PoolView } | { Err: string };
+export type Result_1 = { Ok: BuyResponse } | { Err: string };
+export type Result_2 = { Ok: bigint } | { Err: string };
+export type Result_3 = { Ok: MemeToken } | { Err: string };
+export type Result_4 = { Ok: ConsentInfo } | { Err: Icrc21Error };
+export type Result_5 = { Ok: LiquidityAddArg } | { Err: string };
+export type Result_6 = { Ok: PreRunesSwapSatsResponse } | { Err: string };
+export type Result_7 = { Ok: PreSatsSwapRunesResponse } | { Err: string };
+export type Result_8 = { Ok: bigint } | { Err: string };
+export interface RunesSwapSats {
+	fee: bigint;
+	token: Principal;
+	burn: bigint;
+	from: Account;
+	reserve_runes: bigint;
+	nonce: bigint;
+	input_runes: bigint;
+	reserve_sats: bigint;
+	output_sats: bigint;
+	meme_token_id: bigint;
+}
+export interface RunesSwapSatsArg {
+	id: bigint;
+	sats_min: [] | [bigint];
+	nonce: bigint;
+	runes: bigint;
+}
+export interface SatsSwapRunes {
+	fee: bigint;
+	token: Principal;
+	burn: bigint;
+	from: Account;
+	reserve_runes: bigint;
+	nonce: bigint;
+	output_runes: bigint;
+	reserve_sats: bigint;
+	meme_token_id: bigint;
+	input_sats: bigint;
+}
+export interface SatsSwapRunesArg {
+	id: bigint;
+	sats: bigint;
+	nonce: bigint;
+	runes_min: [] | [bigint];
+}
 export type Sort = { CreateTimeDsc: null } | { MarketCapDsc: null };
 export interface StableToken {
 	fee: bigint;
@@ -346,11 +443,17 @@ export interface StableToken {
 export interface State {
 	archive_ledger_info: ArchiveLedgerInfo;
 	fee_receiver: Account;
+	rune_fee_rate: [] | [bigint];
 	create_token_fee: Array<TokenAmount>;
+	ckbtc_minter: Principal;
+	swap_fee: bigint;
 	token_launch_threshold: Array<TokenAmount>;
+	ckbtc_ledger: Principal;
 	maintainer: Account;
 	maintenance: boolean;
 	fee_percentage: [] | [number];
+	swap_burn: bigint;
+	btc_custody_canister: Principal;
 }
 export interface StatusRequest {
 	memory_size: boolean;
@@ -366,30 +469,25 @@ export interface SupportedStandard {
 	url: string;
 	name: string;
 }
-export interface Swap {
-	from: Account;
-	reserve0: bigint;
-	reserve1: bigint;
-	amount0: bigint;
-	amount1: bigint;
-	token0: Principal;
-	token1: Principal;
-}
 export interface TokenAmount {
 	token: Principal;
 	amount: bigint;
 }
 export interface Transaction {
 	buy: [] | [Buy];
+	add_liquidity: [] | [AddLiquidity];
 	withdraw: [] | [Deposit];
 	kind: string;
 	mint: [] | [Mint];
 	sell: [] | [Buy];
-	swap: [] | [Swap];
+	runes_swap_sats: [] | [RunesSwapSats];
 	deposit: [] | [Deposit];
+	withdraw_ckbtc: [] | [WithdrawCkbtc];
+	withdraw_liquidity: [] | [WithdrawLiquidity];
 	timestamp: bigint;
 	index: bigint;
 	transfer: [] | [Transfer];
+	sats_swap_runes: [] | [SatsSwapRunes];
 }
 export interface TransactionRange {
 	start: bigint;
@@ -433,18 +531,45 @@ export type Value =
 export interface WithdrawArgs {
 	to: Account;
 	token: StableToken;
+	from: Account;
 	memo: [] | [Uint8Array | number[]];
 	subaccount: [] | [Uint8Array | number[]];
 	amount: bigint;
 }
+export interface WithdrawByCkbtcArgs {
+	to: string;
+	token: StableToken;
+	from: Account;
+	memo: [] | [Uint8Array | number[]];
+	subaccount: [] | [Uint8Array | number[]];
+	amount: bigint;
+}
+export interface WithdrawCkbtc {
+	to: string;
+	token: Principal;
+	block_index: bigint;
+	memo: [] | [Uint8Array | number[]];
+	amount: bigint;
+	spender: Account;
+}
+export interface WithdrawLiquidity {
+	to: Account;
+	token: Principal;
+	out_put_liquidity: bigint;
+	reserve_runes: bigint;
+	output_runes: bigint;
+	reserve_sats: bigint;
+	output_sats: bigint;
+	meme_token_id: bigint;
+}
 export interface _SERVICE {
 	__get_candid_interface_tmp_hack: ActorMethod<[], string>;
-	buy: ActorMethod<[BuyArgs], Result>;
-	calculate_buy: ActorMethod<[bigint, bigint], Result_1>;
-	calculate_sell: ActorMethod<[bigint, bigint], Result_1>;
-	claim: ActorMethod<[ClaimArg], Result_1>;
-	create_token: ActorMethod<[CreateMemeTokenArg], Result_2>;
-	deposit: ActorMethod<[DepositArgs], Result_1>;
+	add_liquidity: ActorMethod<[LiquidityAddArg], Result>;
+	buy: ActorMethod<[BuyArgs], Result_1>;
+	calculate_buy: ActorMethod<[bigint, bigint], Result_2>;
+	calculate_sell: ActorMethod<[bigint, bigint], Result_2>;
+	create_token: ActorMethod<[CreateMemeTokenArg], Result_3>;
+	deposit: ActorMethod<[DepositArgs], Result_2>;
 	generate_random: ActorMethod<[], bigint>;
 	getCanistergeekInformation: ActorMethod<
 		[GetInformationRequest],
@@ -455,26 +580,33 @@ export interface _SERVICE {
 	icrc1_balance_of: ActorMethod<[LedgerType, Account], bigint>;
 	icrc21_canister_call_consent_message: ActorMethod<
 		[ConsentMessageRequest],
-		Result_3
+		Result_4
 	>;
 	icrc28_trusted_origins: ActorMethod<[], Icrc28TrustedOrigins>;
+	pre_add_liquidity: ActorMethod<[PreLiquidityAddArg], Result_5>;
+	pre_runes_swap_sats: ActorMethod<[PreRunesSwapSatsArg], Result_6>;
+	pre_sats_swap_runes: ActorMethod<[PreSatsSwapRunesArg], Result_7>;
+	pre_withdraw_liquidity: ActorMethod<[PreLiquidityRemoveArg], Result_5>;
 	query_meme_token: ActorMethod<[bigint], [] | [MemeToken]>;
-	query_meme_token_price: ActorMethod<[bigint], Result_1>;
+	query_meme_token_price: ActorMethod<[bigint], Result_2>;
 	query_meme_tokens: ActorMethod<[QueryMemeTokenArgs], QueryMemeTokenResponse>;
 	query_state: ActorMethod<[], State>;
 	query_token_holders: ActorMethod<
 		[bigint, bigint, bigint],
 		[Array<Holder>, bigint]
 	>;
-	query_txn_size: ActorMethod<[], bigint>;
 	query_user_by_random: ActorMethod<[bigint], [] | [Principal]>;
 	query_user_create_meme_tokens: ActorMethod<
 		[[] | [Principal]],
 		Array<MemeToken>
 	>;
 	query_user_tokens: ActorMethod<[[] | [Account]], Array<MemeTokenBalance>>;
-	sell: ActorMethod<[BuyArgs], Result_1>;
-	withdraw: ActorMethod<[WithdrawArgs], Result_1>;
+	runes_swap_sats: ActorMethod<[RunesSwapSatsArg], Result>;
+	sats_swap_runes: ActorMethod<[SatsSwapRunesArg], Result>;
+	sell: ActorMethod<[BuyArgs], Result_2>;
+	withdraw: ActorMethod<[WithdrawArgs], Result_2>;
+	withdraw_ckbtc: ActorMethod<[WithdrawByCkbtcArgs], Result_8>;
+	withdraw_liquidity: ActorMethod<[LiquidityRemoveArg], Result>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];

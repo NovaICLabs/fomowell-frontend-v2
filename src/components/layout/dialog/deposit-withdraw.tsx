@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import BigNumber from "bignumber.js";
 import { validate } from "bitcoin-address-validation";
 import copy from "copy-to-clipboard";
 import { useSiwbIdentity } from "ic-siwb-lasereyes-connector";
@@ -10,6 +11,7 @@ import { isMobile } from "react-device-detect";
 // import { getCkBTCLedgerCanisterId } from "@/canisters/ckbtc_ledger";
 // import { getBTCDepositAddress } from "@/canisters/ckbtc_minter";
 import { getCkbtcCanisterId } from "@/canisters/core";
+import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { getFastBtcAddress } from "@/canisters/rune";
 import { CopyIcon } from "@/components/icons/common/copy";
 import { Button } from "@/components/ui/button";
@@ -31,8 +33,12 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { showToast } from "@/components/utils/toast";
 import { useBtcFees } from "@/hooks/btc/core";
-import { useCoreTokenBalance, useWithdraw } from "@/hooks/ic/core";
-import { useBtcBalance, useBtcDeposit } from "@/hooks/ic/tokens/btc";
+import { useCoreTokenBalance } from "@/hooks/ic/core";
+import {
+	useBtcBalance,
+	useBtcDeposit,
+	useBtcWithdraw,
+} from "@/hooks/ic/tokens/btc";
 import { getAvatar } from "@/lib/common/avatar";
 import {
 	formatNumberSmart,
@@ -44,6 +50,7 @@ import { validateInputNumber } from "@/lib/common/validate";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useBtcIdentityStore } from "@/store/btc";
+// import { useDepositWithdrawStore } from "@/store/depositWithdraw";
 import { useDialogStore } from "@/store/dialog";
 
 import type { Identity } from "@dfinity/agent";
@@ -127,24 +134,40 @@ const Deposit = () => {
 		void refetchCoreTokenBalance();
 	}, [refetchBtcBalance, refetchCoreTokenBalance]);
 
+	// const { addPaddingList, setHasPadding } = useDepositWithdrawStore();
+
 	const handleDeposit = useCallback(async () => {
 		// deposit
 		if (!btcAddress) return;
 
 		console.log("dss--------------", btcAddress, Number(amount) * 1e8);
-
-		const result = await btcDeposit({
+		const parameters = {
 			btcAddress,
-			amount: Number(amount) * 1e8,
-		});
+			amount: BigNumber(Number(amount) * 1e8).toNumber(),
+		};
 
-		console.log("🚀 ~ handleDeposit ~ result:", result);
+		const result = await btcDeposit(parameters);
+
+		// todo
+		// if (result) {
+		// 	setHasPadding(true);
+		// 	addPaddingList({
+		// 		...parameters,
+		// 		txid: result,
+		// 		status: "pending",
+		// 		type: "deposit",
+		// 	});
+		// }
+
+		console.debug("🚀 ~ handleDeposit ~ result:", result);
 		refetch();
 		showToast(
-			"info",
+			"success",
 			`${formatNumberSmart(amount)} BTC deposited, please wait!`
 		);
-	}, [btcAddress, btcDeposit, amount, refetch]);
+
+		// , setHasPadding, addPaddingList
+	}, [btcAddress, amount, btcDeposit, refetch]);
 
 	const [copied, setCopied] = useState(false);
 
@@ -369,7 +392,7 @@ const Withdraw = () => {
 		);
 	}, [amount, coreTokenBalance, fees]);
 
-	const { mutateAsync: withdraw, isPending: isWithdrawing } = useWithdraw();
+	const { mutateAsync: withdraw, isPending: isWithdrawing } = useBtcWithdraw();
 
 	const refetch = useCallback(() => {
 		void refetchCoreTokenBalance();
@@ -399,6 +422,9 @@ const Withdraw = () => {
 
 	const handleWithdraw = useCallback(async () => {
 		try {
+			if (!principal) {
+				throw new Error("Principal is not valid");
+			}
 			if (!selectedToPrincipal) {
 				throw new Error("Principal is not valid");
 			}
@@ -406,24 +432,22 @@ const Withdraw = () => {
 			const parameters = {
 				amount: BigInt(parseUnits(amount)),
 				to: selectedToPrincipal,
-				// token: getICPCanisterToken(),
+				from: principal,
+				token: getCkbtcCanisterToken(),
 			};
 			console.log("🚀 ~ handleWithdraw ~ params:", parameters);
 
 			// todo withdraw
-			await new Promise(() => {}).then(() => {});
+			const result = await withdraw(parameters);
 
-			// await withdraw({
-			// 	amount: BigInt(parseUnits(amount)),
-			// 	to: selectedToPrincipal,
-			// 	token: getICPCanisterToken(),
-			// });
+			console.debug("🚀 ~ handleWithdraw ~ result:", result);
 			refetch();
 			showToast("success", `${formatNumberSmart(amount)} BTC withdrawn!`);
 		} catch (error) {
 			console.debug("🚀 ~ handleWithdraw ~ error:", error);
 		}
-	}, [withdraw, amount, selectedToPrincipal, refetch]);
+	}, [principal, selectedToPrincipal, amount, withdraw, refetch]);
+
 	return (
 		<div className="flex w-full flex-1 flex-col">
 			<Tabs

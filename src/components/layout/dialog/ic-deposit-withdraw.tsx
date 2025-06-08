@@ -264,20 +264,21 @@ const Withdraw = () => {
 
 	const handleWithdraw = useCallback(async () => {
 		try {
-			if (!selectedToPrincipal) {
+			if (!selectedToPrincipal || !principal) {
 				throw new Error("Principal is not valid");
 			}
 			await withdraw({
 				amount: BigInt(parseUnits(amount)),
 				to: selectedToPrincipal,
 				token: getICPCanisterToken(),
+				from: principal,
 			});
 			refetch();
 			showToast("success", `${formatNumberSmart(amount)} ICP withdrawn!`);
 		} catch (error) {
 			console.debug("🚀 ~ handleWithdraw ~ error:", error);
 		}
-	}, [withdraw, amount, selectedToPrincipal, refetch]);
+	}, [selectedToPrincipal, withdraw, amount, principal, refetch]);
 	return (
 		<div className="flex w-full flex-1 flex-col">
 			<Tabs
