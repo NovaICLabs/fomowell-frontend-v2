@@ -110,12 +110,11 @@ const Deposit = () => {
 		const fetchBtcAddress = async () => {
 			if (!principal) return;
 
-			console.log("🚀 ~ fetchBtcAddress ~ principal:", principal);
 			setLoading(true);
 			try {
 				// get fast btc address
 				const address = await getFastBtcAddress(identity as Identity);
-				console.log("🚀 ~ fetchBtcAddress ~ address:", address);
+				console.debug("🚀 ~ fetchBtcAddress ~ address:", address);
 
 				setBtcAddress(address);
 			} catch (error) {
@@ -140,11 +139,13 @@ const Deposit = () => {
 		// deposit
 		if (!btcAddress) return;
 
-		console.log("dss--------------", btcAddress, Number(amount) * 1e8);
 		const parameters = {
 			btcAddress,
-			amount: BigNumber(Number(amount) * 1e8).toNumber(),
+			amount: BigNumber(Number(amount) * 1e8)
+				.toNumber()
+				.toFixed(0),
 		};
+		console.debug("🚀 ~ handleDeposit ~ parameters:", parameters);
 
 		const result = await btcDeposit(parameters);
 
