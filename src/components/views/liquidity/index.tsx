@@ -23,44 +23,44 @@ const LiquidityHeader = ({
 			label: "Token",
 			sortable: false,
 			className:
-				"w-[180px] pr-[10px] pl-[50px] md:w-[400px] sticky left-0 bg-[#1E1E1E] z-[1]",
+				"min-w-[18%] w-[180px] pr-[10px] pl-[50px] md:w-[400px] sticky left-0 bg-[#1E1E1E] z-[1]",
 		},
 		{
 			id: "create",
 			label: "Create",
 			sortable: true,
-			className: "w-[120px] md:w-[220px]",
+			className: "min-w-[14%] w-[120px] md:w-[220px]",
 		},
 		{
 			id: "mkt-cap",
 			label: "Mkt cap",
 			sortable: true,
-			className: "w-[120px] md:w-[220px]",
+			className: "min-w-[14%] w-[120px] md:w-[220px]",
 		},
 		{
 			id: "total-liq",
 			label: "Total liq",
 			sortable: true,
-			className: "w-[120px] md:w-[220px]",
+			className: "min-w-[14%] w-[120px] md:w-[220px]",
 		},
 		{
 			id: "fees",
 			label: "Fees",
 			sortable: true,
-			className: "w-[120px] md:w-[220px]",
+			className: "min-w-[14%] w-[120px] md:w-[220px]",
 		},
 		{
 			id: "total-swap",
 			label: "Total swap",
 			sortable: true,
-			className: "w-[120px] md:w-[220px]",
+			className: "min-w-[14%] w-[120px] md:w-[220px]",
 		},
 		{
 			id: "add-liquidity",
 			label: "Add Liquidity",
 			sortable: false,
 			className:
-				"w-[100px] pl-[10px] md:w-[220px] sticky right-0 bg-[#1E1E1E] z-[1]",
+				"min-w-[10%] w-[100px] pl-[10px] md:w-[220px] sticky right-0 bg-[#1E1E1E] z-[1]",
 		},
 	];
 
@@ -191,7 +191,7 @@ const LiquidityListItem = ({
 				// });
 			}}
 		>
-			<div className="sticky left-0 z-[1] flex h-full w-[180px] items-center bg-[#1E1E1E] pr-[10px] text-left text-xs leading-none font-medium text-white/40 duration-300 group-hover:!bg-[#262626] md:w-[400px]">
+			<div className="sticky left-0 z-[1] flex h-full w-[180px] min-w-[18%] items-center bg-[#1E1E1E] pr-[10px] text-left text-xs leading-none font-medium text-white/60 duration-300 group-hover:!bg-[#262626] md:w-[400px]">
 				<Star
 					className="ml-[20px] h-4 w-4 shrink-0 cursor-pointer text-white/40"
 					isActive={itemData.isFollow}
@@ -263,35 +263,33 @@ const LiquidityListItem = ({
 					</p>
 				</div>
 			</div>
-			<div className="flex h-full w-[120px] items-center text-left text-xs leading-none font-medium text-white/40 md:w-[220px]">
+			<div className="flex h-full w-[120px] min-w-[14%] items-center text-left text-sm leading-4 font-medium text-white/60 md:w-[220px]">
 				{fromNow(itemData.createAt)}
 			</div>
-			<div className="flex h-full w-[120px] flex-col justify-center text-left md:w-[220px]">
-				<p className="text-xs leading-none font-medium text-white">
+			<div className="flex h-full w-[120px] min-w-[14%] flex-col justify-center text-left md:w-[220px]">
+				<p className="text-sm leading-4 font-medium text-white">
 					${"416,000.00"}
 				</p>
-				<p className="mt-1 text-xs leading-none font-normal text-white/60">
+				<p className="mt-1 text-xs leading-4 font-medium text-white/60">
 					0.024 BTC
 				</p>
 			</div>
-			<div className="flex h-full w-[120px] items-center text-left text-xs leading-none font-medium text-white md:w-[220px]">
+			<div className="flex h-full w-[120px] min-w-[14%] items-center text-left text-sm leading-4 font-medium text-white md:w-[220px]">
 				${"416,000.00"}
 			</div>
-			<div className="flex h-full w-[120px] flex-col justify-center text-left text-xs leading-none font-medium text-white/40 md:w-[220px]">
-				<p className="text-xs leading-none font-medium text-white/60">
-					$116.79
-				</p>
-				<p className="mt-1 text-xs leading-none font-normal text-white/60">
+			<div className="flex h-full w-[120px] min-w-[14%] flex-col justify-center text-left text-sm leading-4 font-medium text-white/60 md:w-[220px]">
+				<p className="text-sm leading-4 font-medium text-white/60">$116.79</p>
+				<p className="mt-1 text-xs leading-4 font-medium text-white/60">
 					APR: 6.09%
 				</p>
 			</div>
-			<div className="flex h-full w-[120px] flex-col justify-center text-left md:w-[220px]">
-				<p className="text-xs leading-none font-medium text-white">0.06 BTC</p>
-				<p className="mt-1 text-xs leading-none font-normal text-white/60">
+			<div className="flex h-full w-[120px] min-w-[14%] flex-col justify-center text-left md:w-[220px]">
+				<p className="text-sm leading-4 font-medium text-white">0.06 BTC</p>
+				<p className="mt-1 text-xs leading-4 font-medium text-white/60">
 					$0.324
 				</p>
 			</div>
-			<div className="sticky right-0 z-[1] flex h-full w-[100px] items-center bg-[#1E1E1E] pl-[10px] text-left text-xs leading-none font-medium text-white/40 duration-300 group-hover:!bg-[#262626] md:w-[220px]">
+			<div className="sticky right-0 z-[1] flex h-full w-[100px] min-w-[10%] items-center bg-[#1E1E1E] pl-[10px] text-left text-sm leading-4 font-medium text-white/60 duration-300 group-hover:!bg-[#262626] md:w-[220px]">
 				<div
 					className="flex h-9 w-[84px] cursor-pointer items-center justify-center rounded-[19px] border border-[#f7b406] bg-[#111111] text-sm font-medium text-white"
 					style={{
