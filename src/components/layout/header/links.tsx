@@ -22,7 +22,7 @@ export default function Links() {
 	const { setHowItWorksOpen } = useDialogStore();
 
 	return (
-		<div className="flex items-center gap-[30px]">
+		<div className="flex items-center gap-[20px]">
 			{menuLinks.map((link) => {
 				const isActive = location.pathname === link.to;
 				return (

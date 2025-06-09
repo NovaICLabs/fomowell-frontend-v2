@@ -9,7 +9,6 @@ import {
 import { showToast } from "@/components/utils/toast";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { cn } from "@/lib/utils";
-import { useDialogStore } from "@/store/dialog";
 
 type ReferralProps = {
 	referralLink: string;
@@ -89,20 +88,22 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 	);
 };
 
-const ReferralDialog: React.FC<ReferralProps> = ({
+const ReferralDialog: React.FC<
+	ReferralProps & { open: boolean; setOpen: (open: boolean) => void }
+> = ({
+	open,
+	setOpen,
 	referralLink,
 	referralText,
 	referralsTotal,
 	earnedTotal,
 }) => {
-	const { referralOpen, setReferralOpen } = useDialogStore();
-
 	return (
 		<>
 			<Dialog
-				open={referralOpen}
+				open={open}
 				onOpenChange={(show: boolean) => {
-					setReferralOpen(show);
+					setOpen(show);
 				}}
 			>
 				<DialogContent

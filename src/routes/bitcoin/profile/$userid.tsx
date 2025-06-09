@@ -11,6 +11,7 @@ import { CopyIcon } from "@/components/icons/common/copy";
 import ReferIcon from "@/components/icons/common/refer";
 import WithdrawIcon from "@/components/icons/common/withdraw";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
+import ReferralDialog from "@/components/layout/dialog/referral";
 import { Button } from "@/components/ui/button";
 import EditInfoModal from "@/components/views/icp/profile/edit-info-modal";
 import { useUserInfo } from "@/hooks/apis/user";
@@ -20,7 +21,6 @@ import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
-import ReferralDialog from "@/components/layout/dialog/referral";
 
 // import { Skeleton } from "@/components/ui/skeleton";
 // import { showToast } from "@/components/utils/toast";
@@ -117,7 +117,7 @@ function UserId() {
 	const { userid } = Route.useParams();
 	const [activeTab, setActiveTab] = useState("Created");
 	const { principal } = useBtcIdentityStore();
-	const { setReferralOpen } = useDialogStore();
+	const { referral2BTCOpen, setReferral2BTCOpen } = useDialogStore();
 
 	const { data: coreTokenBalance } = useCoreTokenBalance({
 		owner: principal,
@@ -160,7 +160,7 @@ function UserId() {
 								isSelf ? "flex" : "hidden"
 							)}
 							onClick={() => {
-								setReferralOpen(true);
+								setReferral2BTCOpen(true);
 							}}
 						>
 							<Button className={cn("rounded-full", isMobile && "hidden")}>
@@ -249,7 +249,12 @@ function UserId() {
 						</div>
 						<span className="text-sm">Withdraw</span>
 					</div>
-					<div className="flex flex-col items-center gap-y-1.5">
+					<div
+						className="flex flex-col items-center gap-y-1.5"
+						onClick={() => {
+							setReferral2BTCOpen(true);
+						}}
+					>
 						<div className="bg-gray-710 flex h-14 w-14 items-center justify-center rounded-full">
 							<ReferIcon className="text-yellow-500" size={28} />
 						</div>
@@ -308,8 +313,10 @@ function UserId() {
 			</div>
 			<ReferralDialog
 				earnedTotal={0}
-				referralLink={"test link"}
+				open={referral2BTCOpen}
+				referralLink={"test link btc"}
 				referralsTotal={1}
+				setOpen={setReferral2BTCOpen}
 				referralText={[
 					"Inviting friends to log in will earn you 0.5 ICPS.",
 					"First-level commission rebate: 10%",

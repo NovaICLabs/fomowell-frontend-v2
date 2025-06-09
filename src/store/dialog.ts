@@ -42,8 +42,10 @@ export const useDialogStore = create<{
 	howItWorksOpen: boolean;
 	setHowItWorksOpen: (howItWorksOpen: boolean) => void;
 
-	referralOpen: boolean;
-	setReferralOpen: (referralOpen: boolean) => void;
+	referral2BTCOpen: boolean;
+	setReferral2BTCOpen: (referralOpen: boolean) => void;
+	referral2ICPOpen: boolean;
+	setReferral2ICPOpen: (referralOpen: boolean) => void;
 }>((set) => ({
 	depositWithdrawOpen: {
 		open: false,
@@ -78,8 +80,12 @@ export const useDialogStore = create<{
 	setHowItWorksOpen: (howItWorksOpen) => {
 		set({ howItWorksOpen });
 	},
-	referralOpen: false,
-	setReferralOpen: (referralOpen) => {
-		set({ referralOpen });
+	referral2BTCOpen: false,
+	setReferral2BTCOpen: (referral2BTCOpen) => {
+		set({ referral2BTCOpen });
+	},
+	referral2ICPOpen: false,
+	setReferral2ICPOpen: (referral2ICPOpen) => {
+		set({ referral2ICPOpen });
 	},
 }));
