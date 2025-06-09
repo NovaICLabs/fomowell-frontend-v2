@@ -45,7 +45,7 @@ export const useBtcBalance = () => {
 			}
 		},
 		enabled: !!laserEyes,
-		// refetchInterval: 30000,
+		refetchInterval: 3 * 1000,
 	});
 };
 

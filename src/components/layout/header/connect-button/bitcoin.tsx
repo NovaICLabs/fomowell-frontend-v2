@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
 import { useMobileSheetStore } from "@/store/mobile/sheet";
+import { useCheckBtcWalletConnected } from "@/hooks/providers/wallet/bitcoin";
 // import { useBtcBalance } from "@/hooks/ic/tokens/btc";
 
 export const BtcAccountInfo = () => {
@@ -236,9 +237,12 @@ const BtcWalletConnect: React.FC = () => {
 		},
 	});
 
-	console.log("🚀 ~ coreTokenBalance:", coreTokenBalance);
+	// console.log("🚀 ~ coreTokenBalance:", coreTokenBalance);
 
 	const router = useRouter();
+
+	useCheckBtcWalletConnected();
+
 	return (
 		<>
 			{principal ? (

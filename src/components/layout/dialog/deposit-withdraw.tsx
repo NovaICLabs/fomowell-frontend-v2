@@ -55,7 +55,7 @@ import { useDialogStore } from "@/store/dialog";
 
 import type { Identity } from "@dfinity/agent";
 
-// import { useLaserEyes } from "@omnisat/lasereyes-react";
+// import { useLaserEyes } from "@omnisat/lasereyes";
 
 const tabs = ["deposit", "withdraw"] as const;
 const innerTabs = ["Linked Wallet", "External Wallet"] as const;
