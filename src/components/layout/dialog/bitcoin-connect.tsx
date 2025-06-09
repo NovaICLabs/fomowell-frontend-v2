@@ -36,6 +36,8 @@ import { useDialogStore } from "@/store/dialog";
 
 import WalletOption from "../header/wallet-option";
 
+import type { Identity } from "@dfinity/agent";
+
 const BtcConnectDialog: React.FC = () => {
 	// const [open, setOpen] = useState(false);
 
@@ -103,7 +105,8 @@ const BtcConnectDialog: React.FC = () => {
 				setConnected(true);
 				setLastConnectedNetwork(p.network);
 				setLastConnectedWallet(p.provider as ProviderType);
-				// void connectByPrincipal();
+
+				void connectByPrincipal(response as Identity);
 
 				setManually(false);
 				setBtcConnectOpen(false);
@@ -117,6 +120,7 @@ const BtcConnectDialog: React.FC = () => {
 			setLoading(false);
 		}
 	}, [
+		connectByPrincipal,
 		login,
 		p.address,
 		p.network,

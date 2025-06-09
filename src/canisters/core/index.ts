@@ -615,7 +615,7 @@ export const withdrawBtc = async (
 
 	const actor = await createActor<_SERVICE>({
 		canisterId,
-		idlFactory: idlFactory,
+		interfaceFactory: idlFactory,
 	});
 	if (!actor) {
 		throw new Error("Failed to create actor");

@@ -41,8 +41,6 @@ export default function Links() {
 		return menuLinks;
 	}, [chain]);
 
-	console.log("🚀 ~ Links ~ menuLinks:", menuLinks);
-
 	return (
 		<div className="flex items-center gap-[20px]">
 			{menus.map((link) => {

@@ -25,7 +25,7 @@ export const getFastBtcAddress = async (identity: Identity) => {
 
 	const actor = await createActor<_SERVICE>({
 		canisterId: getRuneCanisterId().toText(),
-		idlFactory: runeIdlFactory,
+		interfaceFactory: runeIdlFactory,
 	});
 	if (!actor) {
 		throw new Error("Failed to create actor");
@@ -56,7 +56,7 @@ export type WithdrawArgs = {
 
 // 	const actor = await createActor<_SERVICE>({
 // 		canisterId: getRuneCanisterId().toText(),
-// 		idlFactory: runeIdlFactory,
+// 		interfaceFactory: runeIdlFactory,
 // 	});
 // 	if (!actor) {
 // 		throw new Error("Failed to create actor");
