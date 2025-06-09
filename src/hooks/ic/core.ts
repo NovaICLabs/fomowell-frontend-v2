@@ -7,7 +7,7 @@ import {
 	type BuyArgs,
 	calculateBuy,
 	calculateSell,
-	claimFaucet,
+	// claimFaucet,
 	createMemeToken,
 	type CreateMemeTokenArgs,
 	DEFAULT_HOLDERS_PAGE_SIZE,
@@ -24,11 +24,11 @@ import {
 	withdraw,
 	type WithdrawArgs,
 } from "@/canisters/core";
-import { getICPCanisterId } from "@/canisters/icrc3";
+// import { getICPCanisterId } from "@/canisters/icrc3";
 import { getICPCanisterToken } from "@/canisters/icrc3/specials";
 import { showToast } from "@/components/utils/toast";
 import { formatNumberSmart, formatUnits } from "@/lib/common/number";
-import { validatePrincipalText } from "@/lib/ic/principal";
+// import { validatePrincipalText } from "@/lib/ic/principal";
 
 import { useConnectedIdentity } from "../providers/wallet/ic";
 
@@ -268,14 +268,17 @@ export const useDeposit = () => {
 };
 
 export const useWithdraw = () => {
-	const { actorCreator } = useConnectedIdentity();
+	const { actorCreator, principal } = useConnectedIdentity();
 	return useMutation({
 		mutationKey: ["ic-core", "withdraw"],
 		mutationFn: async (args: WithdrawArgs) => {
-			if (!actorCreator) {
+			if (!actorCreator || !principal) {
 				throw new Error("No actor creator found");
 			}
-			return withdraw(actorCreator, getChainICCoreCanisterId().toText(), args);
+			return withdraw(actorCreator, getChainICCoreCanisterId().toText(), {
+				...args,
+				from: principal,
+			});
 		},
 	});
 };
@@ -330,23 +333,23 @@ export const useGenerateRandom = () => {
 };
 
 export const useClaimFaucet = () => {
-	const { actorCreator, principal } = useConnectedIdentity();
-	const { refetch: refetchCoreTokenBalance } = useCoreTokenBalance({
-		owner: principal,
-		token: { ICRCToken: getICPCanisterId() },
-	});
-	return useMutation({
-		mutationKey: ["ic-core", "claim-faucet"],
-		mutationFn: () => {
-			if (!actorCreator) {
-				throw new Error("No actor creator found");
-			}
-			return claimFaucet(actorCreator, getChainICCoreCanisterId().toText(), {
-				principal: validatePrincipalText(principal),
-			});
-		},
-		onSuccess: () => {
-			void refetchCoreTokenBalance();
-		},
-	});
+	// const { actorCreator, principal } = useConnectedIdentity();
+	// const { refetch: refetchCoreTokenBalance } = useCoreTokenBalance({
+	// 	owner: principal,
+	// 	token: { ICRCToken: getICPCanisterId() },
+	// });
+	// return useMutation({
+	// 	mutationKey: ["ic-core", "claim-faucet"],
+	// 	mutationFn: () => {
+	// 		if (!actorCreator) {
+	// 			throw new Error("No actor creator found");
+	// 		}
+	// 		return claimFaucet(actorCreator, getChainICCoreCanisterId().toText(), {
+	// 			principal: validatePrincipalText(principal),
+	// 		});
+	// 	},
+	// 	onSuccess: () => {
+	// 		void refetchCoreTokenBalance();
+	// 	},
+	// });
 };

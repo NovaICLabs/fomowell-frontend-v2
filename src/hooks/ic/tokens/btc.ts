@@ -3,7 +3,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import BigNumber from "bignumber.js";
 import { useSiwbIdentity } from "ic-siwb-lasereyes-connector";
 
-import { btcWithdraw, type WithdrawArgs } from "@/canisters/rune";
+// import { btcWithdraw, type WithdrawArgs } from "@/canisters/rune";
+import {
+	getChainICCoreCanisterId,
+	withdrawBtc,
+	type WithdrawBtcArgs,
+} from "@/canisters/core";
 import { useBtcIdentityStore } from "@/store/btc";
 
 import type { Identity } from "@dfinity/agent";
@@ -68,11 +73,16 @@ export const useBtcWithdraw = () => {
 
 	return useMutation({
 		mutationKey: ["ic-core", "withdraw"],
-		mutationFn: async (args: WithdrawArgs) => {
+		mutationFn: async (args: WithdrawBtcArgs) => {
 			if (!identity) {
 				return new Error("No identity found");
 			}
-			return btcWithdraw(identity as Identity, args);
+
+			return withdrawBtc(
+				identity as Identity,
+				getChainICCoreCanisterId().toText(),
+				args
+			);
 		},
 	});
 };

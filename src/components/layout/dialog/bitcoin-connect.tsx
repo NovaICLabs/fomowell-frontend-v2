@@ -34,7 +34,8 @@ import WalletOption from "../header/wallet-option";
 const BtcConnectDialog: React.FC = () => {
 	// const [open, setOpen] = useState(false);
 
-	const { setPrincipal, connectByPrincipal } = useBtcIdentityStore();
+	const { setPrincipal, connectByPrincipal, setConnected } =
+		useBtcIdentityStore();
 	const { btcConnectOpen, setBtcConnectOpen } = useDialogStore();
 	const [connectError, setConnectError] = useState<string | null>(null);
 	const [loading, setLoading] = useState<boolean>(false);
@@ -91,6 +92,7 @@ const BtcConnectDialog: React.FC = () => {
 			console.debug("🚀 ~ void ~ response:", response);
 			if (response) {
 				setPrincipal(response.getPrincipal().toText());
+				setConnected(true);
 				// void connectByPrincipal();
 
 				setManually(false);
@@ -104,7 +106,7 @@ const BtcConnectDialog: React.FC = () => {
 		} finally {
 			setLoading(false);
 		}
-	}, [login, setBtcConnectOpen, setPrincipal]);
+	}, [login, setBtcConnectOpen, setConnected, setPrincipal]);
 
 	useEffect(() => {
 		// if (!isPrepareLoginIdle) return;

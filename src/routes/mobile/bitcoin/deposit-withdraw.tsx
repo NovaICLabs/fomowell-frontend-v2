@@ -4,8 +4,8 @@ import { isMobile } from "react-device-detect";
 import {
 	DepositWithdrawContent,
 	DepositWithdrawHeader,
-} from "@/components/layout/dialog/ic-deposit-withdraw";
-export const Route = createFileRoute("/mobile/icp/deposit-withdraw")({
+} from "@/components/layout/dialog/deposit-withdraw";
+export const Route = createFileRoute("/mobile/bitcoin/deposit-withdraw")({
 	component: RouteComponent,
 	loader: () => {
 		if (!isMobile) {

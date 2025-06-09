@@ -233,7 +233,7 @@ function UserId() {
 							open: true,
 							type: "deposit",
 						});
-						void router.navigate({ to: "/mobile/icp/deposit-withdraw" });
+						void router.navigate({ to: "/mobile/bitcoin/deposit-withdraw" });
 					}}
 				>
 					<div className="bg-gray-710 flex h-14 w-14 items-center justify-center rounded-full">
@@ -246,7 +246,7 @@ function UserId() {
 					onClick={() => {
 						setBtcDepositWithdrawOpen({ open: true, type: "withdraw" });
 						void router.navigate({
-							to: "/mobile/icp/deposit-withdraw",
+							to: "/mobile/bitcoin/deposit-withdraw",
 						});
 					}}
 				>

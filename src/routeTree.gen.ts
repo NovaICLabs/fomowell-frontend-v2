@@ -17,6 +17,7 @@ import { Route as LiquidityIndexImport } from './routes/liquidity/index'
 import { Route as IcpCreateImport } from './routes/icp/create'
 import { Route as BitcoinCreateImport } from './routes/bitcoin/create'
 import { Route as MobileIcpDepositWithdrawImport } from './routes/mobile/icp/deposit-withdraw'
+import { Route as MobileBitcoinDepositWithdrawImport } from './routes/mobile/bitcoin/deposit-withdraw'
 import { Route as IcpWalletPidImport } from './routes/icp/wallet/$pid'
 import { Route as IcpTokenIdImport } from './routes/icp/token/$id'
 import { Route as IcpProfileUseridImport } from './routes/icp/profile/$userid'
@@ -61,6 +62,13 @@ const MobileIcpDepositWithdrawRoute = MobileIcpDepositWithdrawImport.update({
   path: '/mobile/icp/deposit-withdraw',
   getParentRoute: () => rootRoute,
 } as any)
+
+const MobileBitcoinDepositWithdrawRoute =
+  MobileBitcoinDepositWithdrawImport.update({
+    id: '/mobile/bitcoin/deposit-withdraw',
+    path: '/mobile/bitcoin/deposit-withdraw',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 const IcpWalletPidRoute = IcpWalletPidImport.update({
   id: '/icp/wallet/$pid',
@@ -179,6 +187,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IcpWalletPidImport
       parentRoute: typeof rootRoute
     }
+    '/mobile/bitcoin/deposit-withdraw': {
+      id: '/mobile/bitcoin/deposit-withdraw'
+      path: '/mobile/bitcoin/deposit-withdraw'
+      fullPath: '/mobile/bitcoin/deposit-withdraw'
+      preLoaderRoute: typeof MobileBitcoinDepositWithdrawImport
+      parentRoute: typeof rootRoute
+    }
     '/mobile/icp/deposit-withdraw': {
       id: '/mobile/icp/deposit-withdraw'
       path: '/mobile/icp/deposit-withdraw'
@@ -203,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/icp/profile/$userid': typeof IcpProfileUseridRoute
   '/icp/token/$id': typeof IcpTokenIdRoute
   '/icp/wallet/$pid': typeof IcpWalletPidRoute
+  '/mobile/bitcoin/deposit-withdraw': typeof MobileBitcoinDepositWithdrawRoute
   '/mobile/icp/deposit-withdraw': typeof MobileIcpDepositWithdrawRoute
 }
 
@@ -218,6 +234,7 @@ export interface FileRoutesByTo {
   '/icp/profile/$userid': typeof IcpProfileUseridRoute
   '/icp/token/$id': typeof IcpTokenIdRoute
   '/icp/wallet/$pid': typeof IcpWalletPidRoute
+  '/mobile/bitcoin/deposit-withdraw': typeof MobileBitcoinDepositWithdrawRoute
   '/mobile/icp/deposit-withdraw': typeof MobileIcpDepositWithdrawRoute
 }
 
@@ -234,6 +251,7 @@ export interface FileRoutesById {
   '/icp/profile/$userid': typeof IcpProfileUseridRoute
   '/icp/token/$id': typeof IcpTokenIdRoute
   '/icp/wallet/$pid': typeof IcpWalletPidRoute
+  '/mobile/bitcoin/deposit-withdraw': typeof MobileBitcoinDepositWithdrawRoute
   '/mobile/icp/deposit-withdraw': typeof MobileIcpDepositWithdrawRoute
 }
 
@@ -251,6 +269,7 @@ export interface FileRouteTypes {
     | '/icp/profile/$userid'
     | '/icp/token/$id'
     | '/icp/wallet/$pid'
+    | '/mobile/bitcoin/deposit-withdraw'
     | '/mobile/icp/deposit-withdraw'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -265,6 +284,7 @@ export interface FileRouteTypes {
     | '/icp/profile/$userid'
     | '/icp/token/$id'
     | '/icp/wallet/$pid'
+    | '/mobile/bitcoin/deposit-withdraw'
     | '/mobile/icp/deposit-withdraw'
   id:
     | '__root__'
@@ -279,6 +299,7 @@ export interface FileRouteTypes {
     | '/icp/profile/$userid'
     | '/icp/token/$id'
     | '/icp/wallet/$pid'
+    | '/mobile/bitcoin/deposit-withdraw'
     | '/mobile/icp/deposit-withdraw'
   fileRoutesById: FileRoutesById
 }
@@ -295,6 +316,7 @@ export interface RootRouteChildren {
   IcpProfileUseridRoute: typeof IcpProfileUseridRoute
   IcpTokenIdRoute: typeof IcpTokenIdRoute
   IcpWalletPidRoute: typeof IcpWalletPidRoute
+  MobileBitcoinDepositWithdrawRoute: typeof MobileBitcoinDepositWithdrawRoute
   MobileIcpDepositWithdrawRoute: typeof MobileIcpDepositWithdrawRoute
 }
 
@@ -310,6 +332,7 @@ const rootRouteChildren: RootRouteChildren = {
   IcpProfileUseridRoute: IcpProfileUseridRoute,
   IcpTokenIdRoute: IcpTokenIdRoute,
   IcpWalletPidRoute: IcpWalletPidRoute,
+  MobileBitcoinDepositWithdrawRoute: MobileBitcoinDepositWithdrawRoute,
   MobileIcpDepositWithdrawRoute: MobileIcpDepositWithdrawRoute,
 }
 
@@ -334,6 +357,7 @@ export const routeTree = rootRoute
         "/icp/profile/$userid",
         "/icp/token/$id",
         "/icp/wallet/$pid",
+        "/mobile/bitcoin/deposit-withdraw",
         "/mobile/icp/deposit-withdraw"
       ]
     },
@@ -369,6 +393,9 @@ export const routeTree = rootRoute
     },
     "/icp/wallet/$pid": {
       "filePath": "icp/wallet/$pid.tsx"
+    },
+    "/mobile/bitcoin/deposit-withdraw": {
+      "filePath": "mobile/bitcoin/deposit-withdraw.tsx"
     },
     "/mobile/icp/deposit-withdraw": {
       "filePath": "mobile/icp/deposit-withdraw.tsx"
