@@ -22,6 +22,7 @@ import {
 // import { Skeleton } from "@/components/ui/skeleton";
 // import { useCoreTokenBalance } from "@/hooks/ic/core";
 import { useCoreTokenBalance } from "@/hooks/ic/core";
+import { useCheckBtcWalletConnected } from "@/hooks/providers/wallet/bitcoin";
 import { useIcWallet } from "@/hooks/providers/wallet/ic";
 import { getAvatar } from "@/lib/common/avatar";
 import { withStopPropagation } from "@/lib/common/react-event";
@@ -30,7 +31,6 @@ import { cn } from "@/lib/utils";
 import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
 import { useMobileSheetStore } from "@/store/mobile/sheet";
-import { useCheckBtcWalletConnected } from "@/hooks/providers/wallet/bitcoin";
 // import { useBtcBalance } from "@/hooks/ic/tokens/btc";
 
 export const BtcAccountInfo = () => {
@@ -236,8 +236,6 @@ const BtcWalletConnect: React.FC = () => {
 			ICRCToken: getCkbtcCanisterId(),
 		},
 	});
-
-	// console.log("🚀 ~ coreTokenBalance:", coreTokenBalance);
 
 	const router = useRouter();
 

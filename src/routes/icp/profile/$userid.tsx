@@ -27,6 +27,7 @@ import {
 import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
+import { useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore } from "@/store/ic";
 
@@ -131,6 +132,10 @@ function UserId() {
 	const router = useRouter();
 	// is self
 	const isSelf = userid === identityProfile?.principal;
+
+	const domain = window.location.origin;
+	const { chain } = useChainStore();
+
 	return (
 		<>
 			<div className="flex h-full w-full flex-1 flex-col overflow-auto pt-5">
@@ -325,7 +330,7 @@ function UserId() {
 			<ReferralDialog
 				earnedTotal={0}
 				open={referral2ICPOpen}
-				referralLink={"test link icp"}
+				referralLink={`${domain}?chain=${chain}&ref=${"123123"}`}
 				referralsTotal={1}
 				setOpen={setReferral2ICPOpen}
 				referralText={[
