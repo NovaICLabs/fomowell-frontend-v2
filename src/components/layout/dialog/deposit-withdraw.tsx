@@ -367,10 +367,11 @@ const Deposit = () => {
 	);
 };
 const Withdraw = () => {
-	const { identity } = useSiwbIdentity();
+	// const { identity } = useSiwbIdentity();
+
 	const [amount, setAmount] = useState<string>("");
 
-	const { principal } = useBtcIdentityStore();
+	const { principal, btcAddress: storeBtcAddress } = useBtcIdentityStore();
 
 	const { data: coreTokenBalance, refetch: refetchCoreTokenBalance } =
 		useCoreTokenBalance({
@@ -394,29 +395,29 @@ const Withdraw = () => {
 		);
 	}, [amount, coreTokenBalance, fees]);
 
-	const [btcAddress, setBtcAddress] = useState<string | null>(null);
-	const [loading, setLoading] = useState<boolean>(false);
-	useEffect(() => {
-		const fetchBtcAddress = async () => {
-			if (!principal) return;
+	// const [btcAddress, setBtcAddress] = useState<string | null>(null);
+	const [loading] = useState<boolean>(false);
+	// useEffect(() => {
+	// 	const fetchBtcAddress = async () => {
+	// 		if (!principal) return;
 
-			setLoading(true);
-			try {
-				// get fast btc address
-				const address = await getFastBtcAddress(identity as Identity);
-				console.debug("🚀 ~ fetchBtcAddress ~ address:", address);
+	// 		setLoading(true);
+	// 		try {
+	// 			// get fast btc address
+	// 			const address = await getFastBtcAddress(identity as Identity);
+	// 			console.debug("🚀 ~ fetchBtcAddress ~ address:", address);
 
-				setBtcAddress(address);
-			} catch (error) {
-				console.error("Failed to get BTC Withdraw address:", error);
-				showToast("error", "Failed to get BTC Withdraw address");
-			} finally {
-				setLoading(false);
-			}
-		};
+	// 			setBtcAddress(address);
+	// 		} catch (error) {
+	// 			console.error("Failed to get BTC Withdraw address:", error);
+	// 			showToast("error", "Failed to get BTC Withdraw address");
+	// 		} finally {
+	// 			setLoading(false);
+	// 		}
+	// 	};
 
-		void fetchBtcAddress();
-	}, [identity, principal]);
+	// 	void fetchBtcAddress();
+	// }, [identity, principal]);
 
 	const { mutateAsync: withdraw, isPending: isWithdrawing } = useBtcWithdraw();
 
@@ -431,9 +432,9 @@ const Withdraw = () => {
 		useState<boolean>(false);
 
 	const selectedToAddress = useMemo(() => {
-		if (selectedToType === "Linked Wallet") return btcAddress;
+		if (selectedToType === "Linked Wallet") return storeBtcAddress;
 		return inputAddress;
-	}, [selectedToType, btcAddress, inputAddress]);
+	}, [selectedToType, storeBtcAddress, inputAddress]);
 
 	const buttonDisabled = useMemo(() => {
 		return (

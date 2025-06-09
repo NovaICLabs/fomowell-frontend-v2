@@ -31,6 +31,8 @@ type BtcIdentity = {
 	checkLogin: () => Promise<boolean>;
 	clearToken: () => void;
 	setIdentityProfile: (identityProfile?: UserInfo) => void;
+	btcAddress: string;
+	setBtcAddress: (address: string) => void;
 };
 
 export const useBtcIdentityStore = create<BtcIdentity>()(
@@ -49,6 +51,10 @@ export const useBtcIdentityStore = create<BtcIdentity>()(
 			jwt_token: "",
 			clearToken: () => {
 				set({ jwt_token: "" });
+			},
+			btcAddress: "",
+			setBtcAddress(address) {
+				set({ btcAddress: address });
 			},
 			connectByPrincipal: async (
 				randomValue?: string

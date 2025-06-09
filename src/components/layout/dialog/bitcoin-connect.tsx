@@ -34,7 +34,7 @@ import WalletOption from "../header/wallet-option";
 const BtcConnectDialog: React.FC = () => {
 	// const [open, setOpen] = useState(false);
 
-	const { setPrincipal, connectByPrincipal, setConnected } =
+	const { setPrincipal, connectByPrincipal, setConnected, setBtcAddress } =
 		useBtcIdentityStore();
 	const { btcConnectOpen, setBtcConnectOpen } = useDialogStore();
 	const [connectError, setConnectError] = useState<string | null>(null);
@@ -119,6 +119,7 @@ const BtcConnectDialog: React.FC = () => {
 			}
 
 			if (connectedBtcAddress && !identity && manually) {
+				setBtcAddress(connectedBtcAddress);
 				void onLogin();
 			}
 		}
@@ -138,6 +139,7 @@ const BtcConnectDialog: React.FC = () => {
 		connectByPrincipal,
 		onLogin,
 		prepareLoginStatus,
+		setBtcAddress,
 	]);
 
 	/**
