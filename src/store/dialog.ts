@@ -41,6 +41,9 @@ export const useDialogStore = create<{
 	// how it works
 	howItWorksOpen: boolean;
 	setHowItWorksOpen: (howItWorksOpen: boolean) => void;
+
+	referralOpen: boolean;
+	setReferralOpen: (referralOpen: boolean) => void;
 }>((set) => ({
 	depositWithdrawOpen: {
 		open: false,
@@ -74,5 +77,9 @@ export const useDialogStore = create<{
 	howItWorksOpen: false,
 	setHowItWorksOpen: (howItWorksOpen) => {
 		set({ howItWorksOpen });
+	},
+	referralOpen: false,
+	setReferralOpen: (referralOpen) => {
+		set({ referralOpen });
 	},
 }));

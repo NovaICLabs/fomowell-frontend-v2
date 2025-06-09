@@ -170,7 +170,7 @@ function UserId() {
 						</div> */}
 						<Button className={cn("rounded-full", isMobile && "hidden")}>
 							<ReferIcon className="text-black" />
-							Refer to earn
+							Refer to Earn
 						</Button>
 					</div>
 				</div>
@@ -254,7 +254,7 @@ function UserId() {
 					<div className="bg-gray-710 flex h-14 w-14 items-center justify-center rounded-full">
 						<ReferIcon className="text-yellow-500" size={28} />
 					</div>
-					<span className="text-sm">Refer to earn</span>
+					<span className="text-sm">Refer to Earn</span>
 				</div>
 			</div>
 			<div className="sticky mb-4 flex items-center gap-[30px] px-4">
