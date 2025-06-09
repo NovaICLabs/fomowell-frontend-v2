@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import LiquidityPage from "@/components/views/liquidity";
 
-export const Route = createFileRoute("/liquidity/")({
+export const Route = createFileRoute("/bitcoin/liquidity/")({
 	component: Liquidity,
 });
 

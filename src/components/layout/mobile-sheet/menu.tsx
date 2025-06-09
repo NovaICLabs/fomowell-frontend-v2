@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import { Link, useLocation } from "@tanstack/react-router";
 import { ChevronLeft } from "lucide-react";
 
@@ -18,6 +20,21 @@ export default function MenuSheet() {
 	const { chain } = useChainStore();
 	const { connected } = useIcIdentityStore();
 	const { setHowItWorksOpen } = useDialogStore();
+
+	const menus = useMemo(() => {
+		if (chain === "bitcoin") {
+			const newMenus = [
+				...menuLinks,
+				{
+					label: "Liquidity",
+					to: "/bitcoin/liquidity",
+				},
+			];
+			return newMenus;
+		}
+
+		return menuLinks;
+	}, [chain]);
 
 	return (
 		<Sheet open={menuOpen} onOpenChange={setMenuOpen}>
@@ -46,7 +63,7 @@ export default function MenuSheet() {
 						</div>
 					</div>
 
-					{menuLinks.map((link) => {
+					{menus.map((link) => {
 						const isActive = location.pathname === link.to;
 						return (
 							<Link
