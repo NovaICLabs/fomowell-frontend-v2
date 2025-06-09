@@ -26,8 +26,13 @@ import {
 // import { getAvatar } from "@/lib/common/avatar";
 // import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
-import { useBtcIdentityStore } from "@/store/btc";
+import {
+	useBtcIdentityStore,
+	useBtcLastConnectedWalletStore,
+} from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
+
+// import { useLaserEyes as useLaserEyesReact } from "@omnisat/lasereyes-react";
 
 import WalletOption from "../header/wallet-option";
 
@@ -42,6 +47,7 @@ const BtcConnectDialog: React.FC = () => {
 	const [manually, setManually] = useState<boolean>(false);
 
 	const p = useLaserEyes();
+	// console.log("🚀 ~ p:", p);
 	const {
 		// isInitializing,
 		prepareLogin,
@@ -60,7 +66,8 @@ const BtcConnectDialog: React.FC = () => {
 		// signMessageStatus,
 		// clear,
 	} = useSiwbIdentity();
-
+	const { setLastConnectedWallet, setLastConnectedNetwork } =
+		useBtcLastConnectedWalletStore();
 	const principal = identity?.getPrincipal().toText();
 
 	const handleConnectWallet = async (provider: ProviderType) => {
@@ -91,8 +98,11 @@ const BtcConnectDialog: React.FC = () => {
 			setLoading(false);
 			console.debug("🚀 ~ void ~ response:", response);
 			if (response) {
+				setBtcAddress(p.address);
 				setPrincipal(response.getPrincipal().toText());
 				setConnected(true);
+				setLastConnectedNetwork(p.network);
+				setLastConnectedWallet(p.provider as ProviderType);
 				// void connectByPrincipal();
 
 				setManually(false);
@@ -106,7 +116,18 @@ const BtcConnectDialog: React.FC = () => {
 		} finally {
 			setLoading(false);
 		}
-	}, [login, setBtcConnectOpen, setConnected, setPrincipal]);
+	}, [
+		login,
+		p.address,
+		p.network,
+		p.provider,
+		setBtcAddress,
+		setBtcConnectOpen,
+		setConnected,
+		setLastConnectedNetwork,
+		setLastConnectedWallet,
+		setPrincipal,
+	]);
 
 	useEffect(() => {
 		// if (!isPrepareLoginIdle) return;
@@ -119,7 +140,6 @@ const BtcConnectDialog: React.FC = () => {
 			}
 
 			if (connectedBtcAddress && !identity && manually) {
-				setBtcAddress(connectedBtcAddress);
 				void onLogin();
 			}
 		}
@@ -139,7 +159,6 @@ const BtcConnectDialog: React.FC = () => {
 		connectByPrincipal,
 		onLogin,
 		prepareLoginStatus,
-		setBtcAddress,
 	]);
 
 	/**

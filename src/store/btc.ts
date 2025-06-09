@@ -13,7 +13,7 @@ import {
 } from "@/canisters/core";
 
 import type { UserInfo } from "@/apis/indexer";
-import type { Connector } from "@/lib/ic/connectors";
+import type { NetworkType, ProviderType } from "@omnisat/lasereyes-core";
 
 type BtcIdentity = {
 	jwt_token?: string;
@@ -160,25 +160,35 @@ export const useBtcIdentityStore = create<BtcIdentity>()(
 				jwt_token: state.jwt_token,
 				principal: state.principal,
 				connected: state.connected,
+				btcAddress: state.btcAddress,
 				identityProfile: state.identityProfile,
 			}),
 		}
 	)
 );
 
+export type BtcConnector = ProviderType;
+export type BtcNetwork = NetworkType;
+
 export const useBtcLastConnectedWalletStore = create(
 	persist<{
-		lastConnectedWallet?: Connector | undefined;
-		setLastConnectedWallet: (lastConnectedWallet?: Connector) => void;
+		network: BtcNetwork;
+		setLastConnectedNetwork: (network: BtcNetwork) => void;
+		lastConnectedWallet?: BtcConnector | undefined;
+		setLastConnectedWallet: (lastConnectedWallet?: BtcConnector) => void;
 	}>(
 		(set) => ({
+			network: "testnet4",
+			setLastConnectedNetwork: (network: BtcNetwork) => {
+				set({ network });
+			},
 			lastConnectedWallet: undefined,
-			setLastConnectedWallet: (lastConnectedWallet?: Connector) => {
+			setLastConnectedWallet: (lastConnectedWallet?: BtcConnector) => {
 				set({ lastConnectedWallet });
 			},
 		}),
 		{
-			name: "ic-last-connected-wallet-storage",
+			name: "btc-last-connected-wallet-storage",
 			storage: createJSONStorage(() => localStorage),
 		}
 	)
