@@ -11,9 +11,19 @@ import { withStopPropagation } from "@/lib/common/react-event";
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
 
-export const ReferralContent: React.FC<{
+type ReferralProps = {
 	referralLink: string;
-}> = ({ referralLink }) => {
+	referralText: Array<string>;
+	referralsTotal: number;
+	earnedTotal: number;
+};
+
+export const ReferralContent: React.FC<ReferralProps> = ({
+	referralLink,
+	referralText,
+	referralsTotal,
+	earnedTotal,
+}) => {
 	return (
 		<div className="relative flex w-full">
 			<img
@@ -37,30 +47,14 @@ export const ReferralContent: React.FC<{
 						</p>
 					</div>
 					<div className="mt-[64px] flex flex-col gap-y-5">
-						<div className="flex w-full items-center">
-							<div className="h-1 w-1 flex-shrink-0 rounded-full bg-[#ebcf85]" />
-							<p className="ml-[6px] text-xs leading-[100%] font-normal text-[#eace85]">
-								Inviting friends to log in will earn you 0.5 ICPS.
-							</p>
-						</div>
-						<div className="flex w-full items-center">
-							<div className="h-1 w-1 flex-shrink-0 rounded-full bg-[#ebcf85]" />
-							<p className="ml-[6px] text-xs leading-[100%] font-normal text-[#eace85]">
-								First-level commission rebate: 10%
-							</p>
-						</div>
-						<div className="flex w-full items-center">
-							<div className="h-1 w-1 flex-shrink-0 rounded-full bg-[#ebcf85]" />
-							<p className="ml-[6px] text-xs leading-[100%] font-normal text-[#eace85]">
-								Secondary commission rebate: 5%
-							</p>
-						</div>
-						<div className="flex w-full items-center">
-							<div className="h-1 w-1 flex-shrink-0 rounded-full bg-[#ebcf85]" />
-							<p className="ml-[6px] text-xs leading-[100%] font-normal text-[#eace85]">
-								Third-level anti-bribery: 3%
-							</p>
-						</div>
+						{referralText.map((item, index) => (
+							<div key={index} className="flex w-full items-center">
+								<div className="h-1 w-1 flex-shrink-0 rounded-full bg-[#ebcf85]" />
+								<p className="ml-[6px] text-xs leading-[100%] font-normal text-[#eace85]">
+									{item}
+								</p>
+							</div>
+						))}
 					</div>
 				</div>
 				<div className="flex w-full flex-col">
@@ -83,10 +77,10 @@ export const ReferralContent: React.FC<{
 					</div>
 					<div className="mt-[16px] flex w-full justify-between">
 						<p className="text-sm font-medium text-[#101010]">
-							Referrals: 0 users
+							Referrals: {referralsTotal} users
 						</p>
 						<p className="text-sm font-medium text-[#101010]">
-							Sats earned: 0 sats
+							Sats earned: {earnedTotal} sats
 						</p>
 					</div>
 				</div>
@@ -95,11 +89,12 @@ export const ReferralContent: React.FC<{
 	);
 };
 
-const ReferralDialog: React.FC<{
-	referralLink: string;
-}> = ({ referralLink }) => {
-	// const [open, setOpen] = useState(false);
-
+const ReferralDialog: React.FC<ReferralProps> = ({
+	referralLink,
+	referralText,
+	referralsTotal,
+	earnedTotal,
+}) => {
 	const { referralOpen, setReferralOpen } = useDialogStore();
 
 	return (
@@ -121,7 +116,12 @@ const ReferralDialog: React.FC<{
 						</DialogTitle>
 					</DialogHeader>
 
-					<ReferralContent referralLink={referralLink} />
+					<ReferralContent
+						earnedTotal={earnedTotal}
+						referralLink={referralLink}
+						referralText={referralText}
+						referralsTotal={referralsTotal}
+					/>
 				</DialogContent>
 			</Dialog>
 		</>

@@ -57,7 +57,7 @@ export const Header = () => {
 						<Links />
 						<CreateToken />
 					</div>
-					<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+					<div className="absolute top-1/2 left-4/7 -translate-x-1/2 -translate-y-1/2">
 						<Search />
 					</div>
 					<div className="flex items-center gap-7.5">

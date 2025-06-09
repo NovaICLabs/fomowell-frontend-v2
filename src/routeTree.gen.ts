@@ -10,335 +10,357 @@
 
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as HowImport } from './routes/how'
-import { Route as IndexImport } from './routes/index'
-import { Route as LiquidityIndexImport } from './routes/liquidity/index'
-import { Route as IcpCreateImport } from './routes/icp/create'
-import { Route as BitcoinCreateImport } from './routes/bitcoin/create'
-import { Route as MobileIcpDepositWithdrawImport } from './routes/mobile/icp/deposit-withdraw'
-import { Route as MobileBitcoinDepositWithdrawImport } from './routes/mobile/bitcoin/deposit-withdraw'
-import { Route as IcpWalletPidImport } from './routes/icp/wallet/$pid'
-import { Route as IcpTokenIdImport } from './routes/icp/token/$id'
-import { Route as IcpProfileUseridImport } from './routes/icp/profile/$userid'
-import { Route as BitcoinWalletPidImport } from './routes/bitcoin/wallet/$pid'
-import { Route as BitcoinTokenIdImport } from './routes/bitcoin/token/$id'
-import { Route as BitcoinProfileUseridImport } from './routes/bitcoin/profile/$userid'
+import { Route as rootRoute } from "./routes/__root";
+import { Route as HowImport } from "./routes/how";
+import { Route as IndexImport } from "./routes/index";
+import { Route as ReferralIndexImport } from "./routes/referral/index";
+import { Route as LiquidityIndexImport } from "./routes/liquidity/index";
+import { Route as IcpCreateImport } from "./routes/icp/create";
+import { Route as BitcoinCreateImport } from "./routes/bitcoin/create";
+import { Route as MobileIcpDepositWithdrawImport } from "./routes/mobile/icp/deposit-withdraw";
+import { Route as MobileBitcoinDepositWithdrawImport } from "./routes/mobile/bitcoin/deposit-withdraw";
+import { Route as IcpWalletPidImport } from "./routes/icp/wallet/$pid";
+import { Route as IcpTokenIdImport } from "./routes/icp/token/$id";
+import { Route as IcpProfileUseridImport } from "./routes/icp/profile/$userid";
+import { Route as BitcoinWalletPidImport } from "./routes/bitcoin/wallet/$pid";
+import { Route as BitcoinTokenIdImport } from "./routes/bitcoin/token/$id";
+import { Route as BitcoinProfileUseridImport } from "./routes/bitcoin/profile/$userid";
 
 // Create/Update Routes
 
 const HowRoute = HowImport.update({
-  id: '/how',
-  path: '/how',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/how",
+	path: "/how",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const IndexRoute = IndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/",
+	path: "/",
+	getParentRoute: () => rootRoute,
+} as any);
+
+const ReferralIndexRoute = ReferralIndexImport.update({
+	id: "/referral/",
+	path: "/referral/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const LiquidityIndexRoute = LiquidityIndexImport.update({
-  id: '/liquidity/',
-  path: '/liquidity/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/liquidity/",
+	path: "/liquidity/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const IcpCreateRoute = IcpCreateImport.update({
-  id: '/icp/create',
-  path: '/icp/create',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/icp/create",
+	path: "/icp/create",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const BitcoinCreateRoute = BitcoinCreateImport.update({
-  id: '/bitcoin/create',
-  path: '/bitcoin/create',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/bitcoin/create",
+	path: "/bitcoin/create",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const MobileIcpDepositWithdrawRoute = MobileIcpDepositWithdrawImport.update({
-  id: '/mobile/icp/deposit-withdraw',
-  path: '/mobile/icp/deposit-withdraw',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/mobile/icp/deposit-withdraw",
+	path: "/mobile/icp/deposit-withdraw",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const MobileBitcoinDepositWithdrawRoute =
-  MobileBitcoinDepositWithdrawImport.update({
-    id: '/mobile/bitcoin/deposit-withdraw',
-    path: '/mobile/bitcoin/deposit-withdraw',
-    getParentRoute: () => rootRoute,
-  } as any)
+	MobileBitcoinDepositWithdrawImport.update({
+		id: "/mobile/bitcoin/deposit-withdraw",
+		path: "/mobile/bitcoin/deposit-withdraw",
+		getParentRoute: () => rootRoute,
+	} as any);
 
 const IcpWalletPidRoute = IcpWalletPidImport.update({
-  id: '/icp/wallet/$pid',
-  path: '/icp/wallet/$pid',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/icp/wallet/$pid",
+	path: "/icp/wallet/$pid",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const IcpTokenIdRoute = IcpTokenIdImport.update({
-  id: '/icp/token/$id',
-  path: '/icp/token/$id',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/icp/token/$id",
+	path: "/icp/token/$id",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const IcpProfileUseridRoute = IcpProfileUseridImport.update({
-  id: '/icp/profile/$userid',
-  path: '/icp/profile/$userid',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/icp/profile/$userid",
+	path: "/icp/profile/$userid",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const BitcoinWalletPidRoute = BitcoinWalletPidImport.update({
-  id: '/bitcoin/wallet/$pid',
-  path: '/bitcoin/wallet/$pid',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/bitcoin/wallet/$pid",
+	path: "/bitcoin/wallet/$pid",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const BitcoinTokenIdRoute = BitcoinTokenIdImport.update({
-  id: '/bitcoin/token/$id',
-  path: '/bitcoin/token/$id',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/bitcoin/token/$id",
+	path: "/bitcoin/token/$id",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const BitcoinProfileUseridRoute = BitcoinProfileUseridImport.update({
-  id: '/bitcoin/profile/$userid',
-  path: '/bitcoin/profile/$userid',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/bitcoin/profile/$userid",
+	path: "/bitcoin/profile/$userid",
+	getParentRoute: () => rootRoute,
+} as any);
 
 // Populate the FileRoutesByPath interface
 
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/how': {
-      id: '/how'
-      path: '/how'
-      fullPath: '/how'
-      preLoaderRoute: typeof HowImport
-      parentRoute: typeof rootRoute
-    }
-    '/bitcoin/create': {
-      id: '/bitcoin/create'
-      path: '/bitcoin/create'
-      fullPath: '/bitcoin/create'
-      preLoaderRoute: typeof BitcoinCreateImport
-      parentRoute: typeof rootRoute
-    }
-    '/icp/create': {
-      id: '/icp/create'
-      path: '/icp/create'
-      fullPath: '/icp/create'
-      preLoaderRoute: typeof IcpCreateImport
-      parentRoute: typeof rootRoute
-    }
-    '/liquidity/': {
-      id: '/liquidity/'
-      path: '/liquidity'
-      fullPath: '/liquidity'
-      preLoaderRoute: typeof LiquidityIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/bitcoin/profile/$userid': {
-      id: '/bitcoin/profile/$userid'
-      path: '/bitcoin/profile/$userid'
-      fullPath: '/bitcoin/profile/$userid'
-      preLoaderRoute: typeof BitcoinProfileUseridImport
-      parentRoute: typeof rootRoute
-    }
-    '/bitcoin/token/$id': {
-      id: '/bitcoin/token/$id'
-      path: '/bitcoin/token/$id'
-      fullPath: '/bitcoin/token/$id'
-      preLoaderRoute: typeof BitcoinTokenIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/bitcoin/wallet/$pid': {
-      id: '/bitcoin/wallet/$pid'
-      path: '/bitcoin/wallet/$pid'
-      fullPath: '/bitcoin/wallet/$pid'
-      preLoaderRoute: typeof BitcoinWalletPidImport
-      parentRoute: typeof rootRoute
-    }
-    '/icp/profile/$userid': {
-      id: '/icp/profile/$userid'
-      path: '/icp/profile/$userid'
-      fullPath: '/icp/profile/$userid'
-      preLoaderRoute: typeof IcpProfileUseridImport
-      parentRoute: typeof rootRoute
-    }
-    '/icp/token/$id': {
-      id: '/icp/token/$id'
-      path: '/icp/token/$id'
-      fullPath: '/icp/token/$id'
-      preLoaderRoute: typeof IcpTokenIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/icp/wallet/$pid': {
-      id: '/icp/wallet/$pid'
-      path: '/icp/wallet/$pid'
-      fullPath: '/icp/wallet/$pid'
-      preLoaderRoute: typeof IcpWalletPidImport
-      parentRoute: typeof rootRoute
-    }
-    '/mobile/bitcoin/deposit-withdraw': {
-      id: '/mobile/bitcoin/deposit-withdraw'
-      path: '/mobile/bitcoin/deposit-withdraw'
-      fullPath: '/mobile/bitcoin/deposit-withdraw'
-      preLoaderRoute: typeof MobileBitcoinDepositWithdrawImport
-      parentRoute: typeof rootRoute
-    }
-    '/mobile/icp/deposit-withdraw': {
-      id: '/mobile/icp/deposit-withdraw'
-      path: '/mobile/icp/deposit-withdraw'
-      fullPath: '/mobile/icp/deposit-withdraw'
-      preLoaderRoute: typeof MobileIcpDepositWithdrawImport
-      parentRoute: typeof rootRoute
-    }
-  }
+declare module "@tanstack/react-router" {
+	interface FileRoutesByPath {
+		"/": {
+			id: "/";
+			path: "/";
+			fullPath: "/";
+			preLoaderRoute: typeof IndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/how": {
+			id: "/how";
+			path: "/how";
+			fullPath: "/how";
+			preLoaderRoute: typeof HowImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/bitcoin/create": {
+			id: "/bitcoin/create";
+			path: "/bitcoin/create";
+			fullPath: "/bitcoin/create";
+			preLoaderRoute: typeof BitcoinCreateImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/icp/create": {
+			id: "/icp/create";
+			path: "/icp/create";
+			fullPath: "/icp/create";
+			preLoaderRoute: typeof IcpCreateImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/liquidity/": {
+			id: "/liquidity/";
+			path: "/liquidity";
+			fullPath: "/liquidity";
+			preLoaderRoute: typeof LiquidityIndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/referral/": {
+			id: "/referral/";
+			path: "/referral";
+			fullPath: "/referral";
+			preLoaderRoute: typeof ReferralIndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/bitcoin/profile/$userid": {
+			id: "/bitcoin/profile/$userid";
+			path: "/bitcoin/profile/$userid";
+			fullPath: "/bitcoin/profile/$userid";
+			preLoaderRoute: typeof BitcoinProfileUseridImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/bitcoin/token/$id": {
+			id: "/bitcoin/token/$id";
+			path: "/bitcoin/token/$id";
+			fullPath: "/bitcoin/token/$id";
+			preLoaderRoute: typeof BitcoinTokenIdImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/bitcoin/wallet/$pid": {
+			id: "/bitcoin/wallet/$pid";
+			path: "/bitcoin/wallet/$pid";
+			fullPath: "/bitcoin/wallet/$pid";
+			preLoaderRoute: typeof BitcoinWalletPidImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/icp/profile/$userid": {
+			id: "/icp/profile/$userid";
+			path: "/icp/profile/$userid";
+			fullPath: "/icp/profile/$userid";
+			preLoaderRoute: typeof IcpProfileUseridImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/icp/token/$id": {
+			id: "/icp/token/$id";
+			path: "/icp/token/$id";
+			fullPath: "/icp/token/$id";
+			preLoaderRoute: typeof IcpTokenIdImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/icp/wallet/$pid": {
+			id: "/icp/wallet/$pid";
+			path: "/icp/wallet/$pid";
+			fullPath: "/icp/wallet/$pid";
+			preLoaderRoute: typeof IcpWalletPidImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/mobile/bitcoin/deposit-withdraw": {
+			id: "/mobile/bitcoin/deposit-withdraw";
+			path: "/mobile/bitcoin/deposit-withdraw";
+			fullPath: "/mobile/bitcoin/deposit-withdraw";
+			preLoaderRoute: typeof MobileBitcoinDepositWithdrawImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/mobile/icp/deposit-withdraw": {
+			id: "/mobile/icp/deposit-withdraw";
+			path: "/mobile/icp/deposit-withdraw";
+			fullPath: "/mobile/icp/deposit-withdraw";
+			preLoaderRoute: typeof MobileIcpDepositWithdrawImport;
+			parentRoute: typeof rootRoute;
+		};
+	}
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/how': typeof HowRoute
-  '/bitcoin/create': typeof BitcoinCreateRoute
-  '/icp/create': typeof IcpCreateRoute
-  '/liquidity': typeof LiquidityIndexRoute
-  '/bitcoin/profile/$userid': typeof BitcoinProfileUseridRoute
-  '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
-  '/bitcoin/wallet/$pid': typeof BitcoinWalletPidRoute
-  '/icp/profile/$userid': typeof IcpProfileUseridRoute
-  '/icp/token/$id': typeof IcpTokenIdRoute
-  '/icp/wallet/$pid': typeof IcpWalletPidRoute
-  '/mobile/bitcoin/deposit-withdraw': typeof MobileBitcoinDepositWithdrawRoute
-  '/mobile/icp/deposit-withdraw': typeof MobileIcpDepositWithdrawRoute
+	"/": typeof IndexRoute;
+	"/how": typeof HowRoute;
+	"/bitcoin/create": typeof BitcoinCreateRoute;
+	"/icp/create": typeof IcpCreateRoute;
+	"/liquidity": typeof LiquidityIndexRoute;
+	"/referral": typeof ReferralIndexRoute;
+	"/bitcoin/profile/$userid": typeof BitcoinProfileUseridRoute;
+	"/bitcoin/token/$id": typeof BitcoinTokenIdRoute;
+	"/bitcoin/wallet/$pid": typeof BitcoinWalletPidRoute;
+	"/icp/profile/$userid": typeof IcpProfileUseridRoute;
+	"/icp/token/$id": typeof IcpTokenIdRoute;
+	"/icp/wallet/$pid": typeof IcpWalletPidRoute;
+	"/mobile/bitcoin/deposit-withdraw": typeof MobileBitcoinDepositWithdrawRoute;
+	"/mobile/icp/deposit-withdraw": typeof MobileIcpDepositWithdrawRoute;
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/how': typeof HowRoute
-  '/bitcoin/create': typeof BitcoinCreateRoute
-  '/icp/create': typeof IcpCreateRoute
-  '/liquidity': typeof LiquidityIndexRoute
-  '/bitcoin/profile/$userid': typeof BitcoinProfileUseridRoute
-  '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
-  '/bitcoin/wallet/$pid': typeof BitcoinWalletPidRoute
-  '/icp/profile/$userid': typeof IcpProfileUseridRoute
-  '/icp/token/$id': typeof IcpTokenIdRoute
-  '/icp/wallet/$pid': typeof IcpWalletPidRoute
-  '/mobile/bitcoin/deposit-withdraw': typeof MobileBitcoinDepositWithdrawRoute
-  '/mobile/icp/deposit-withdraw': typeof MobileIcpDepositWithdrawRoute
+	"/": typeof IndexRoute;
+	"/how": typeof HowRoute;
+	"/bitcoin/create": typeof BitcoinCreateRoute;
+	"/icp/create": typeof IcpCreateRoute;
+	"/liquidity": typeof LiquidityIndexRoute;
+	"/referral": typeof ReferralIndexRoute;
+	"/bitcoin/profile/$userid": typeof BitcoinProfileUseridRoute;
+	"/bitcoin/token/$id": typeof BitcoinTokenIdRoute;
+	"/bitcoin/wallet/$pid": typeof BitcoinWalletPidRoute;
+	"/icp/profile/$userid": typeof IcpProfileUseridRoute;
+	"/icp/token/$id": typeof IcpTokenIdRoute;
+	"/icp/wallet/$pid": typeof IcpWalletPidRoute;
+	"/mobile/bitcoin/deposit-withdraw": typeof MobileBitcoinDepositWithdrawRoute;
+	"/mobile/icp/deposit-withdraw": typeof MobileIcpDepositWithdrawRoute;
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/how': typeof HowRoute
-  '/bitcoin/create': typeof BitcoinCreateRoute
-  '/icp/create': typeof IcpCreateRoute
-  '/liquidity/': typeof LiquidityIndexRoute
-  '/bitcoin/profile/$userid': typeof BitcoinProfileUseridRoute
-  '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
-  '/bitcoin/wallet/$pid': typeof BitcoinWalletPidRoute
-  '/icp/profile/$userid': typeof IcpProfileUseridRoute
-  '/icp/token/$id': typeof IcpTokenIdRoute
-  '/icp/wallet/$pid': typeof IcpWalletPidRoute
-  '/mobile/bitcoin/deposit-withdraw': typeof MobileBitcoinDepositWithdrawRoute
-  '/mobile/icp/deposit-withdraw': typeof MobileIcpDepositWithdrawRoute
+	__root__: typeof rootRoute;
+	"/": typeof IndexRoute;
+	"/how": typeof HowRoute;
+	"/bitcoin/create": typeof BitcoinCreateRoute;
+	"/icp/create": typeof IcpCreateRoute;
+	"/liquidity/": typeof LiquidityIndexRoute;
+	"/referral/": typeof ReferralIndexRoute;
+	"/bitcoin/profile/$userid": typeof BitcoinProfileUseridRoute;
+	"/bitcoin/token/$id": typeof BitcoinTokenIdRoute;
+	"/bitcoin/wallet/$pid": typeof BitcoinWalletPidRoute;
+	"/icp/profile/$userid": typeof IcpProfileUseridRoute;
+	"/icp/token/$id": typeof IcpTokenIdRoute;
+	"/icp/wallet/$pid": typeof IcpWalletPidRoute;
+	"/mobile/bitcoin/deposit-withdraw": typeof MobileBitcoinDepositWithdrawRoute;
+	"/mobile/icp/deposit-withdraw": typeof MobileIcpDepositWithdrawRoute;
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/how'
-    | '/bitcoin/create'
-    | '/icp/create'
-    | '/liquidity'
-    | '/bitcoin/profile/$userid'
-    | '/bitcoin/token/$id'
-    | '/bitcoin/wallet/$pid'
-    | '/icp/profile/$userid'
-    | '/icp/token/$id'
-    | '/icp/wallet/$pid'
-    | '/mobile/bitcoin/deposit-withdraw'
-    | '/mobile/icp/deposit-withdraw'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/how'
-    | '/bitcoin/create'
-    | '/icp/create'
-    | '/liquidity'
-    | '/bitcoin/profile/$userid'
-    | '/bitcoin/token/$id'
-    | '/bitcoin/wallet/$pid'
-    | '/icp/profile/$userid'
-    | '/icp/token/$id'
-    | '/icp/wallet/$pid'
-    | '/mobile/bitcoin/deposit-withdraw'
-    | '/mobile/icp/deposit-withdraw'
-  id:
-    | '__root__'
-    | '/'
-    | '/how'
-    | '/bitcoin/create'
-    | '/icp/create'
-    | '/liquidity/'
-    | '/bitcoin/profile/$userid'
-    | '/bitcoin/token/$id'
-    | '/bitcoin/wallet/$pid'
-    | '/icp/profile/$userid'
-    | '/icp/token/$id'
-    | '/icp/wallet/$pid'
-    | '/mobile/bitcoin/deposit-withdraw'
-    | '/mobile/icp/deposit-withdraw'
-  fileRoutesById: FileRoutesById
+	fileRoutesByFullPath: FileRoutesByFullPath;
+	fullPaths:
+		| "/"
+		| "/how"
+		| "/bitcoin/create"
+		| "/icp/create"
+		| "/liquidity"
+		| "/referral"
+		| "/bitcoin/profile/$userid"
+		| "/bitcoin/token/$id"
+		| "/bitcoin/wallet/$pid"
+		| "/icp/profile/$userid"
+		| "/icp/token/$id"
+		| "/icp/wallet/$pid"
+		| "/mobile/bitcoin/deposit-withdraw"
+		| "/mobile/icp/deposit-withdraw";
+	fileRoutesByTo: FileRoutesByTo;
+	to:
+		| "/"
+		| "/how"
+		| "/bitcoin/create"
+		| "/icp/create"
+		| "/liquidity"
+		| "/referral"
+		| "/bitcoin/profile/$userid"
+		| "/bitcoin/token/$id"
+		| "/bitcoin/wallet/$pid"
+		| "/icp/profile/$userid"
+		| "/icp/token/$id"
+		| "/icp/wallet/$pid"
+		| "/mobile/bitcoin/deposit-withdraw"
+		| "/mobile/icp/deposit-withdraw";
+	id:
+		| "__root__"
+		| "/"
+		| "/how"
+		| "/bitcoin/create"
+		| "/icp/create"
+		| "/liquidity/"
+		| "/referral/"
+		| "/bitcoin/profile/$userid"
+		| "/bitcoin/token/$id"
+		| "/bitcoin/wallet/$pid"
+		| "/icp/profile/$userid"
+		| "/icp/token/$id"
+		| "/icp/wallet/$pid"
+		| "/mobile/bitcoin/deposit-withdraw"
+		| "/mobile/icp/deposit-withdraw";
+	fileRoutesById: FileRoutesById;
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  HowRoute: typeof HowRoute
-  BitcoinCreateRoute: typeof BitcoinCreateRoute
-  IcpCreateRoute: typeof IcpCreateRoute
-  LiquidityIndexRoute: typeof LiquidityIndexRoute
-  BitcoinProfileUseridRoute: typeof BitcoinProfileUseridRoute
-  BitcoinTokenIdRoute: typeof BitcoinTokenIdRoute
-  BitcoinWalletPidRoute: typeof BitcoinWalletPidRoute
-  IcpProfileUseridRoute: typeof IcpProfileUseridRoute
-  IcpTokenIdRoute: typeof IcpTokenIdRoute
-  IcpWalletPidRoute: typeof IcpWalletPidRoute
-  MobileBitcoinDepositWithdrawRoute: typeof MobileBitcoinDepositWithdrawRoute
-  MobileIcpDepositWithdrawRoute: typeof MobileIcpDepositWithdrawRoute
+	IndexRoute: typeof IndexRoute;
+	HowRoute: typeof HowRoute;
+	BitcoinCreateRoute: typeof BitcoinCreateRoute;
+	IcpCreateRoute: typeof IcpCreateRoute;
+	LiquidityIndexRoute: typeof LiquidityIndexRoute;
+	ReferralIndexRoute: typeof ReferralIndexRoute;
+	BitcoinProfileUseridRoute: typeof BitcoinProfileUseridRoute;
+	BitcoinTokenIdRoute: typeof BitcoinTokenIdRoute;
+	BitcoinWalletPidRoute: typeof BitcoinWalletPidRoute;
+	IcpProfileUseridRoute: typeof IcpProfileUseridRoute;
+	IcpTokenIdRoute: typeof IcpTokenIdRoute;
+	IcpWalletPidRoute: typeof IcpWalletPidRoute;
+	MobileBitcoinDepositWithdrawRoute: typeof MobileBitcoinDepositWithdrawRoute;
+	MobileIcpDepositWithdrawRoute: typeof MobileIcpDepositWithdrawRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  HowRoute: HowRoute,
-  BitcoinCreateRoute: BitcoinCreateRoute,
-  IcpCreateRoute: IcpCreateRoute,
-  LiquidityIndexRoute: LiquidityIndexRoute,
-  BitcoinProfileUseridRoute: BitcoinProfileUseridRoute,
-  BitcoinTokenIdRoute: BitcoinTokenIdRoute,
-  BitcoinWalletPidRoute: BitcoinWalletPidRoute,
-  IcpProfileUseridRoute: IcpProfileUseridRoute,
-  IcpTokenIdRoute: IcpTokenIdRoute,
-  IcpWalletPidRoute: IcpWalletPidRoute,
-  MobileBitcoinDepositWithdrawRoute: MobileBitcoinDepositWithdrawRoute,
-  MobileIcpDepositWithdrawRoute: MobileIcpDepositWithdrawRoute,
-}
+	IndexRoute: IndexRoute,
+	HowRoute: HowRoute,
+	BitcoinCreateRoute: BitcoinCreateRoute,
+	IcpCreateRoute: IcpCreateRoute,
+	LiquidityIndexRoute: LiquidityIndexRoute,
+	ReferralIndexRoute: ReferralIndexRoute,
+	BitcoinProfileUseridRoute: BitcoinProfileUseridRoute,
+	BitcoinTokenIdRoute: BitcoinTokenIdRoute,
+	BitcoinWalletPidRoute: BitcoinWalletPidRoute,
+	IcpProfileUseridRoute: IcpProfileUseridRoute,
+	IcpTokenIdRoute: IcpTokenIdRoute,
+	IcpWalletPidRoute: IcpWalletPidRoute,
+	MobileBitcoinDepositWithdrawRoute: MobileBitcoinDepositWithdrawRoute,
+	MobileIcpDepositWithdrawRoute: MobileIcpDepositWithdrawRoute,
+};
 
 export const routeTree = rootRoute
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+	._addFileChildren(rootRouteChildren)
+	._addFileTypes<FileRouteTypes>();
 
 /* ROUTE_MANIFEST_START
 {
@@ -351,6 +373,7 @@ export const routeTree = rootRoute
         "/bitcoin/create",
         "/icp/create",
         "/liquidity/",
+        "/referral/",
         "/bitcoin/profile/$userid",
         "/bitcoin/token/$id",
         "/bitcoin/wallet/$pid",
@@ -375,6 +398,9 @@ export const routeTree = rootRoute
     },
     "/liquidity/": {
       "filePath": "liquidity/index.tsx"
+    },
+    "/referral/": {
+      "filePath": "referral/index.tsx"
     },
     "/bitcoin/profile/$userid": {
       "filePath": "bitcoin/profile/$userid.tsx"

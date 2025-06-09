@@ -1,3 +1,4 @@
+import { Link, useLocation } from "@tanstack/react-router";
 import { ChevronLeft } from "lucide-react";
 
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -9,11 +10,15 @@ import { useMobileSheetStore } from "@/store/mobile/sheet";
 
 import { BtcAccountInfo } from "../header/connect-button/bitcoin";
 import { IcpAccountInfo } from "../header/connect-button/icp";
+import { menuLinks } from "../header/links";
+
 export default function MenuSheet() {
+	const location = useLocation();
 	const { menuOpen, setMenuOpen } = useMobileSheetStore();
 	const { chain } = useChainStore();
 	const { connected } = useIcIdentityStore();
 	const { setHowItWorksOpen } = useDialogStore();
+
 	return (
 		<Sheet open={menuOpen} onOpenChange={setMenuOpen}>
 			<SheetContent
@@ -23,7 +28,7 @@ export default function MenuSheet() {
 				<div className="flex flex-col justify-start">
 					<div
 						className={cn(
-							"flex w-full items-center justify-between pl-2.5",
+							"mb-2 flex w-full items-center justify-between pl-2.5",
 							connected && "mb-7.5"
 						)}
 					>
@@ -40,10 +45,29 @@ export default function MenuSheet() {
 							<ChevronLeft className="rotate-180" />
 						</div>
 					</div>
+
+					{menuLinks.map((link) => {
+						const isActive = location.pathname === link.to;
+						return (
+							<Link
+								key={link.to}
+								to={link.to}
+								className={`border-gray-710 flex h-12 w-full items-center border-t border-b text-sm font-medium text-white/60 ${
+									isActive ? "!text-white" : "text-white/60 hover:text-white"
+								}`}
+								onClick={() => {
+									setMenuOpen(false);
+								}}
+							>
+								<div className="px-2.5">{link.label}</div>
+							</Link>
+						);
+					})}
 					<div
 						className="border-gray-710 flex h-12 items-center border-t border-b text-sm font-medium text-white/60"
 						onClick={() => {
 							setHowItWorksOpen(true);
+							setMenuOpen(false);
 						}}
 					>
 						<div className="px-2.5">How it works</div>

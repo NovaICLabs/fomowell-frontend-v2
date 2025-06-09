@@ -306,7 +306,17 @@ function UserId() {
 					</div>
 				</div>
 			</div>
-			<ReferralDialog referralLink={"test link"} />
+			<ReferralDialog
+				earnedTotal={0}
+				referralLink={"test link"}
+				referralsTotal={1}
+				referralText={[
+					"Inviting friends to log in will earn you 0.5 ICPS.",
+					"First-level commission rebate: 10%",
+					"Secondary commission rebate: 5%",
+					"Third-level anti-bribery: 3%",
+				]}
+			/>
 		</>
 	);
 }

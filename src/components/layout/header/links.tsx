@@ -2,10 +2,14 @@ import { Link, useLocation } from "@tanstack/react-router";
 
 import { useDialogStore } from "@/store/dialog";
 
-const links = [
+export const menuLinks = [
 	{
 		label: "Tokens",
 		to: "/",
+	},
+	{
+		label: "Referral",
+		to: "/referral",
 	},
 	{
 		label: "Liquidity",
@@ -16,9 +20,10 @@ const links = [
 export default function Links() {
 	const location = useLocation();
 	const { setHowItWorksOpen } = useDialogStore();
+
 	return (
 		<div className="flex items-center gap-[30px]">
-			{links.map((link) => {
+			{menuLinks.map((link) => {
 				const isActive = location.pathname === link.to;
 				return (
 					<Link
