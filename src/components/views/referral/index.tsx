@@ -6,6 +6,7 @@ import { ReferralContent } from "@/components/layout/dialog/referral";
 import { Empty } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useChainStore } from "@/store/chain";
 
 const ReferralHeader = ({
 	sortBy,
@@ -160,7 +161,7 @@ const ReferralListItem = ({ itemData }: { itemData: TypeReferralListItem }) => {
 			variants={rowVariants}
 			onClick={() => {
 				// void router.navigate({
-				// 	to: `/${chain}/token/$id`,
+				// 	to: `/${chain === 'icp' ? 'icp':'btc'}/token/$id`,
 				// 	params: { id: row.original.memeTokenId.toString() },
 				// });
 			}}
@@ -193,6 +194,8 @@ const ReferralListItem = ({ itemData }: { itemData: TypeReferralListItem }) => {
 };
 
 export default function ReferralPage() {
+	const { chain } = useChainStore();
+
 	const [tab, setTab] = useState<"invitation" | "withdrawal">("invitation");
 	const [sortBy, setSortBy] = useState<string>("");
 	const [list, setList] = useState<Array<TypeReferralListItem> | undefined>(
@@ -270,7 +273,12 @@ export default function ReferralPage() {
 							<p className="text-sm font-normal text-white/50">
 								Claimed Rewards:
 							</p>
-							<p className="text-base font-medium text-white">250 ICP</p>
+							<p className="flex text-base font-medium text-white">
+								250{" "}
+								<p className="text ml-1 uppercase">
+									{chain === "icp" ? "icp" : "btc"}
+								</p>
+							</p>
 						</div>
 						<div className="flex flex-col gap-y-[13px]">
 							<p className="text-sm font-normal text-white/50">Invitee:</p>
@@ -282,7 +290,12 @@ export default function ReferralPage() {
 							<p className="text-sm font-normal text-white/50">
 								Claimed Rewards:
 							</p>
-							<p className="text-base font-medium text-white">150 ICP</p>
+							<p className="flex text-base font-medium text-white">
+								250{" "}
+								<p className="text ml-1 uppercase">
+									{chain === "icp" ? "icp" : "btc"}
+								</p>
+							</p>
 						</div>
 						<div className="flex flex-col gap-y-[13px]">
 							<p className="text-sm font-normal text-white/50">Invitee:</p>
@@ -294,7 +307,12 @@ export default function ReferralPage() {
 							<p className="text-sm font-normal text-white/50">
 								Claimed Rewards:
 							</p>
-							<p className="text-base font-medium text-white">250 ICP</p>
+							<p className="flex text-base font-medium text-white">
+								250{" "}
+								<p className="text ml-1 uppercase">
+									{chain === "icp" ? "icp" : "btc"}
+								</p>
+							</p>
 						</div>
 						<div className="flex flex-col gap-y-[13px]">
 							<p className="text-sm font-normal text-white/50">Invitee:</p>
@@ -308,8 +326,11 @@ export default function ReferralPage() {
 						<p className="text-sm leading-none font-normal text-white/50">
 							My total Rewards
 						</p>
-						<p className="mt-2 text-2xl leading-none font-medium text-white">
-							30 ICP
+						<p className="mt-2 flex text-2xl leading-none font-medium text-white">
+							30{" "}
+							<p className="text ml-1 uppercase">
+								{chain === "icp" ? "icp" : "btc"}
+							</p>
 						</p>
 						<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
 							$241.63
@@ -319,8 +340,11 @@ export default function ReferralPage() {
 						<p className="text-sm leading-none font-normal text-white/50">
 							Withdrawal completed
 						</p>
-						<p className="mt-2 text-2xl leading-none font-medium text-white">
-							30 ICP
+						<p className="mt-2 flex text-2xl leading-none font-medium text-white">
+							30{" "}
+							<p className="text ml-1 uppercase">
+								{chain === "icp" ? "icp" : "btc"}
+							</p>
 						</p>
 						<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
 							$241.63
@@ -331,8 +355,11 @@ export default function ReferralPage() {
 							<p className="text-sm leading-none font-normal text-white/50">
 								Can withdraw
 							</p>
-							<p className="mt-2 text-2xl leading-none font-medium text-white">
-								30 ICP
+							<p className="mt-2 flex text-2xl leading-none font-medium text-white">
+								30{" "}
+								<p className="text ml-1 uppercase">
+									{chain === "icp" ? "icp" : "btc"}
+								</p>
 							</p>
 							<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
 								$241.63
