@@ -7,7 +7,7 @@ import { useSiwbIdentity } from "ic-siwb-lasereyes-connector";
 import { Check } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
-import { getCkbtcCanisterId } from "@/canisters/core";
+import { getCkbtcCanisterId } from "@/canisters/btc_core";
 import { CopyIcon } from "@/components/icons/common/copy";
 import { DisconnectIcon } from "@/components/icons/common/disconnect";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";

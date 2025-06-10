@@ -5,7 +5,7 @@ import copy from "copy-to-clipboard";
 import { Check } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
-import { getCkbtcCanisterId } from "@/canisters/core";
+import { getCkbtcCanisterId } from "@/canisters/btc_core";
 import { CopyIcon } from "@/components/icons/common/copy";
 // import { EditIcon } from "@/components/icons/common/edit";
 import ReferIcon from "@/components/icons/common/refer";

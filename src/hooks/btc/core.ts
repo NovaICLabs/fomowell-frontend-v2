@@ -5,11 +5,16 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import superjson from "superjson";
 
 import {
+	btc_buy,
+	btc_sell,
+	type BuyArgs,
 	createMemeToken,
 	type CreateMemeTokenArgs,
 	getChainBTCCoreCanisterId,
 	getCoreTokenBalance,
+	type SellArgs,
 } from "@/canisters/btc_core";
+import { showToast } from "@/components/utils/toast";
 
 import { useBtcConnectedIdentity } from "../providers/wallet/bitcoin";
 
@@ -84,6 +89,39 @@ export const useCreateBtcMemeToken = () => {
 					logoBase64: args.logoBase64,
 				}
 			);
+		},
+	});
+};
+
+export const useBtcBuy = () => {
+	const { actorCreator } = useBtcConnectedIdentity();
+	return useMutation({
+		mutationKey: ["btc-core", "buy"],
+		mutationFn: async (args: BuyArgs) => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			return btc_buy(actorCreator, getChainBTCCoreCanisterId().toText(), args);
+		},
+	});
+};
+
+export const useBtcSell = () => {
+	const { actorCreator } = useBtcConnectedIdentity();
+	return useMutation({
+		mutationKey: ["btc-core", "sell"],
+		mutationFn: async (args: SellArgs) => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			return btc_sell(actorCreator, getChainBTCCoreCanisterId().toText(), args);
+		},
+		onError: (error) => {
+			if (error.message.indexOf("is out of cycles") !== -1) {
+				showToast("error", `Cycles insufficient`);
+			} else {
+				showToast("error", "Failed to sell token");
+			}
 		},
 	});
 };
