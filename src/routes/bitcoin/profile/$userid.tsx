@@ -15,11 +15,12 @@ import ReferralDialog from "@/components/layout/dialog/referral";
 import { Button } from "@/components/ui/button";
 import EditInfoModal from "@/components/views/icp/profile/edit-info-modal";
 import { useUserInfo } from "@/hooks/apis/user";
-import { useCoreTokenBalance } from "@/hooks/ic/core";
+import { useBtcCoreTokenBalance } from "@/hooks/btc/core";
 import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useBtcIdentityStore } from "@/store/btc";
+import { useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
 
 // import { Skeleton } from "@/components/ui/skeleton";
@@ -119,7 +120,7 @@ function UserId() {
 	const { principal } = useBtcIdentityStore();
 	const { referral2BTCOpen, setReferral2BTCOpen } = useDialogStore();
 
-	const { data: coreTokenBalance } = useCoreTokenBalance({
+	const { data: coreTokenBalance } = useBtcCoreTokenBalance({
 		owner: principal,
 		token: {
 			ICRCToken: getCkbtcCanisterId(),
@@ -137,6 +138,9 @@ function UserId() {
 	const router = useRouter();
 	// is self
 	const isSelf = userid === principal;
+
+	const domain = window.location.origin;
+	const { chain } = useChainStore();
 
 	return (
 		<>
@@ -314,7 +318,7 @@ function UserId() {
 			<ReferralDialog
 				earnedTotal={0}
 				open={referral2BTCOpen}
-				referralLink={"test link btc"}
+				referralLink={`${domain}?chain=${chain}&ref=${"123123"}`}
 				referralsTotal={1}
 				setOpen={setReferral2BTCOpen}
 				referralText={[

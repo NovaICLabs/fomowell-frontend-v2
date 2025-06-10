@@ -5,10 +5,10 @@ import { useSiwbIdentity } from "ic-siwb-lasereyes-connector";
 
 // import { btcWithdraw, type WithdrawArgs } from "@/canisters/rune";
 import {
-	getChainICCoreCanisterId,
+	getChainBTCCoreCanisterId,
 	withdrawBtc,
 	type WithdrawBtcArgs,
-} from "@/canisters/core";
+} from "@/canisters/btc_core";
 import { useBtcIdentityStore } from "@/store/btc";
 
 import type { Identity } from "@dfinity/agent";
@@ -80,7 +80,7 @@ export const useBtcWithdraw = () => {
 
 			return withdrawBtc(
 				identity as Identity,
-				getChainICCoreCanisterId().toText(),
+				getChainBTCCoreCanisterId().toText(),
 				args
 			);
 		},

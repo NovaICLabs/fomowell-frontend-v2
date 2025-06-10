@@ -6,13 +6,16 @@ import {
 	getUserInfoByToken,
 	loginOrRegisterByPrincipal,
 	refreshToken,
-} from "@/apis/user-login";
+} from "@/apis/user-login-btc";
 import {
 	get_generate_random,
-	getChainICCoreCanisterId,
-} from "@/canisters/core";
+	getChainBTCCoreCanisterId,
+} from "@/canisters/btc_core";
+import { createActorCreatorFromIdentity } from "@/hooks/providers/wallet/ic";
 
 import type { UserInfo } from "@/apis/indexer";
+import type { ActorCreator } from "@/lib/ic/connectors";
+import type { Identity } from "@dfinity/agent";
 import type { NetworkType, ProviderType } from "@omnisat/lasereyes-core";
 
 type BtcIdentity = {
@@ -23,7 +26,10 @@ type BtcIdentity = {
 	connected: boolean;
 	connecting: boolean;
 	setConnecting: (c: boolean) => void;
-	connectByPrincipal: (randomValue?: string) => Promise<string | undefined>;
+	connectByPrincipal: (
+		identity: Identity | undefined,
+		randomValue?: string
+	) => Promise<string | undefined>;
 	// handleIIBug: () => Promise<boolean>;
 	setPrincipal: (principal?: string) => void;
 	setConnected: (connected: boolean) => void;
@@ -57,6 +63,7 @@ export const useBtcIdentityStore = create<BtcIdentity>()(
 				set({ btcAddress: address });
 			},
 			connectByPrincipal: async (
+				identity: Identity | undefined,
 				randomValue?: string
 			): Promise<string | undefined> => {
 				const principal = get().principal;
@@ -92,7 +99,7 @@ export const useBtcIdentityStore = create<BtcIdentity>()(
 					}
 					set({ connecting: true });
 
-					const r = await login2ByPrincipal(principal, randomValue);
+					const r = await login2ByPrincipal(identity, principal, randomValue);
 
 					set({ jwt_token: r, connected: true });
 
@@ -195,22 +202,23 @@ export const useBtcLastConnectedWalletStore = create(
 );
 
 const login2ByPrincipal = async (
+	identity: Identity | undefined,
 	principal: string,
 	existingRandom?: string
 ): Promise<string | undefined> => {
-	if (!principal) return;
+	if (!principal || !identity) return;
 
 	let random = existingRandom;
 	if (!random) {
-		const actorCreator = window.icConnector?.createActor;
+		const actorCreator = createActorCreatorFromIdentity(identity);
 		if (!actorCreator) {
 			return undefined;
 		}
 
 		try {
 			random = await get_generate_random(
-				actorCreator,
-				getChainICCoreCanisterId().toText()
+				actorCreator as ActorCreator,
+				getChainBTCCoreCanisterId().toText()
 			);
 			if (!random) {
 				console.error("Failed to get random value");

@@ -1,4 +1,7 @@
-import { getAnonymousActorCreator } from "@/hooks/providers/wallet/ic";
+import {
+	createActorCreatorFromIdentity,
+	getAnonymousActorCreator,
+} from "@/hooks/providers/wallet/ic";
 import { string2array } from "@/lib/common/data/arrays";
 import { formatNumberSmart, formatUnits } from "@/lib/common/number";
 import {
@@ -18,11 +21,12 @@ import { getICPCanisterToken } from "../icrc3/specials";
 
 import type { _SERVICE, LedgerType, StableToken } from "./index.did.d";
 import type { ActorCreator } from "@/lib/ic/connectors";
+import type { Identity } from "@dfinity/agent";
 import type { Principal } from "@dfinity/principal";
 
-export const getChainICCoreCanisterId = () => {
+export const getChainBTCCoreCanisterId = () => {
 	return validateCanisterIdText(
-		import.meta.env["VITE_CHAIN_IC_CORE_CANISTER_ID"]
+		import.meta.env["VITE_CHAIN_BTC_CORE_CANISTER_ID"]
 	);
 };
 
@@ -431,6 +435,7 @@ export const deposit = async (
 	const { token, amount } = args;
 
 	const result = await actor.deposit({
+		to: [], // [] is current user
 		token,
 		amount,
 		subaccount: [],
@@ -445,6 +450,7 @@ export type WithdrawArgs = {
 	token: StableToken;
 	amount: bigint;
 	to: string;
+	from: string;
 };
 
 export const withdraw = async (
@@ -459,11 +465,15 @@ export const withdraw = async (
 	if (!actor) {
 		throw new Error("Failed to create actor");
 	}
-	const { token, amount, to } = args;
+	const { token, amount, to, from } = args;
 	const result = await actor.withdraw({
 		token,
 		amount,
 		subaccount: [],
+		from: {
+			owner: validatePrincipalText(from),
+			subaccount: [],
+		},
 		to: {
 			owner: validatePrincipalText(to),
 			subaccount: [],
@@ -582,3 +592,48 @@ export const get_generate_random = async (
 // 		throw new Error(error);
 // 	});
 // };
+
+// =================ck btc================
+
+// withdraw ckbtc
+export type WithdrawBtcArgs = {
+	token: StableToken;
+	amount: bigint;
+	to: string;
+	from: string;
+};
+
+export const withdrawBtc = async (
+	identity: Identity,
+	canisterId: string,
+	args: WithdrawBtcArgs
+) => {
+	const createActor = createActorCreatorFromIdentity(identity);
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		interfaceFactory: idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { token, amount, to, from } = args;
+	const result = await actor.withdraw_ckbtc({
+		to: to,
+		token,
+		from: {
+			owner: validatePrincipalText(from),
+			subaccount: [],
+		},
+		memo: wrapOption(string2array((Math.random() * 100).toString())),
+		amount,
+		subaccount: [],
+	});
+
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};

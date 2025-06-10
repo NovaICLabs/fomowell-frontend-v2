@@ -291,10 +291,10 @@ export const createActorCreatorFromIdentity = (
 	fetchRootKey: boolean = false
 ) => {
 	return async <T>(args: {
-		idlFactory: IDL.InterfaceFactory;
+		interfaceFactory: IDL.InterfaceFactory;
 		canisterId: string | Principal;
 	}) => {
-		const { idlFactory, canisterId } = args;
+		const { interfaceFactory, canisterId } = args;
 		const agent = await HttpAgent.create({
 			host: import.meta.env.VITE_IC_HOST,
 			identity: identity,
@@ -303,6 +303,6 @@ export const createActorCreatorFromIdentity = (
 		});
 
 		if (fetchRootKey) await agent.fetchRootKey();
-		return Actor.createActor<T>(idlFactory, { agent, canisterId });
+		return Actor.createActor<T>(interfaceFactory, { agent, canisterId });
 	};
 };

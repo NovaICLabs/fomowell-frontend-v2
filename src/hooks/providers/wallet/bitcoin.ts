@@ -11,6 +11,10 @@ import {
 } from "@/store/btc";
 import { useMobileSheetStore } from "@/store/mobile/sheet";
 
+import { createActorCreatorFromIdentity } from "./ic";
+
+import type { Identity } from "@dfinity/agent";
+
 export const useCheckBtcWalletConnected = () => {
 	const router = useRouter();
 	// mobile
@@ -122,4 +126,14 @@ export const useCheckBtcWalletConnected = () => {
 		isInitializing,
 		isConnecting,
 	]);
+};
+
+export const useBtcConnectedIdentity = () => {
+	const { identity } = useSiwbIdentity();
+	const { principal, connected } = useBtcIdentityStore();
+	const actorCreator = createActorCreatorFromIdentity(identity as Identity);
+	if (!connected) {
+		return { principal: undefined, connected, actorCreator: undefined };
+	}
+	return { principal, connected, actorCreator };
 };

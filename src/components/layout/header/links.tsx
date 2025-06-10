@@ -1,5 +1,8 @@
+import { useMemo } from "react";
+
 import { Link, useLocation } from "@tanstack/react-router";
 
+import { useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
 
 export const menuLinks = [
@@ -11,19 +14,36 @@ export const menuLinks = [
 		label: "Referral",
 		to: "/referral",
 	},
-	{
-		label: "Liquidity",
-		to: "/liquidity",
-	},
+	// {
+	// 	label: "Liquidity",
+	// 	to: "/liquidity",
+	// },
 ];
 
 export default function Links() {
 	const location = useLocation();
 	const { setHowItWorksOpen } = useDialogStore();
 
+	const { chain } = useChainStore();
+
+	const menus = useMemo(() => {
+		if (chain === "bitcoin") {
+			const newMenus = [
+				...menuLinks,
+				{
+					label: "Liquidity",
+					to: "/bitcoin/liquidity",
+				},
+			];
+			return newMenus;
+		}
+
+		return menuLinks;
+	}, [chain]);
+
 	return (
 		<div className="flex items-center gap-[20px]">
-			{menuLinks.map((link) => {
+			{menus.map((link) => {
 				const isActive = location.pathname === link.to;
 				return (
 					<Link
