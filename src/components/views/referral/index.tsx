@@ -284,55 +284,64 @@ export default function ReferralPage() {
 			</div>
 			<div className="ml-5 min-w-0 flex-1">
 				<div className="flex h-[212px] w-full gap-x-[13px] rounded-xl border border-[#f7b406] bg-[#111111] p-3">
-					<div className="flex h-[188px] flex-1 items-end justify-center gap-x-[80px] rounded-xl bg-[#191919] pb-[30px]">
-						<div className="flex flex-col gap-y-[13px]">
-							<p className="text-sm font-normal text-white/50">
-								Claimed Rewards:
-							</p>
-							<p className="flex text-base font-medium text-white">
-								250{" "}
-								<p className="text ml-1 uppercase">
-									{chain === "icp" ? "icp" : "btc"}
+					<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
+						<img alt="" className="w-[94px]" src="/images/gold.png" />
+						<div className="flex gap-x-[80px]">
+							<div className="flex flex-col gap-y-[13px]">
+								<p className="text-sm font-normal text-white/50">
+									Claimed Rewards:
 								</p>
-							</p>
-						</div>
-						<div className="flex flex-col gap-y-[13px]">
-							<p className="text-sm font-normal text-white/50">Invitee:</p>
-							<p className="text-base font-medium text-white">255</p>
+								<p className="flex text-base font-medium text-white">
+									250{" "}
+									<p className="text ml-1 uppercase">
+										{chain === "icp" ? "icp" : "btc"}
+									</p>
+								</p>
+							</div>
+							<div className="flex flex-col gap-y-[13px]">
+								<p className="text-sm font-normal text-white/50">Invitee:</p>
+								<p className="text-base font-medium text-white">255</p>
+							</div>
 						</div>
 					</div>
-					<div className="flex h-[188px] flex-1 items-end justify-center gap-x-[80px] rounded-xl bg-[#191919] pb-[30px]">
-						<div className="flex flex-col gap-y-[13px]">
-							<p className="text-sm font-normal text-white/50">
-								Claimed Rewards:
-							</p>
-							<p className="flex text-base font-medium text-white">
-								250{" "}
-								<p className="text ml-1 uppercase">
-									{chain === "icp" ? "icp" : "btc"}
+					<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
+						<img alt="" className="w-[94px]" src="/images/silver.png" />
+						<div className="flex gap-x-[80px]">
+							<div className="flex flex-col gap-y-[13px]">
+								<p className="text-sm font-normal text-white/50">
+									Claimed Rewards:
 								</p>
-							</p>
-						</div>
-						<div className="flex flex-col gap-y-[13px]">
-							<p className="text-sm font-normal text-white/50">Invitee:</p>
-							<p className="text-base font-medium text-white">255</p>
+								<p className="flex text-base font-medium text-white">
+									250{" "}
+									<p className="text ml-1 uppercase">
+										{chain === "icp" ? "icp" : "btc"}
+									</p>
+								</p>
+							</div>
+							<div className="flex flex-col gap-y-[13px]">
+								<p className="text-sm font-normal text-white/50">Invitee:</p>
+								<p className="text-base font-medium text-white">255</p>
+							</div>
 						</div>
 					</div>
-					<div className="flex h-[188px] flex-1 items-end justify-center gap-x-[80px] rounded-xl bg-[#191919] pb-[30px]">
-						<div className="flex flex-col gap-y-[13px]">
-							<p className="text-sm font-normal text-white/50">
-								Claimed Rewards:
-							</p>
-							<p className="flex text-base font-medium text-white">
-								250{" "}
-								<p className="text ml-1 uppercase">
-									{chain === "icp" ? "icp" : "btc"}
+					<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
+						<img alt="" className="w-[94px]" src="/images/copper.png" />
+						<div className="flex gap-x-[80px]">
+							<div className="flex flex-col gap-y-[13px]">
+								<p className="text-sm font-normal text-white/50">
+									Claimed Rewards:
 								</p>
-							</p>
-						</div>
-						<div className="flex flex-col gap-y-[13px]">
-							<p className="text-sm font-normal text-white/50">Invitee:</p>
-							<p className="text-base font-medium text-white">255</p>
+								<p className="flex text-base font-medium text-white">
+									250{" "}
+									<p className="text ml-1 uppercase">
+										{chain === "icp" ? "icp" : "btc"}
+									</p>
+								</p>
+							</div>
+							<div className="flex flex-col gap-y-[13px]">
+								<p className="text-sm font-normal text-white/50">Invitee:</p>
+								<p className="text-base font-medium text-white">255</p>
+							</div>
 						</div>
 					</div>
 				</div>
