@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
-import { getICPCanisterToken } from "@/canisters/icrc3/specials";
+import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { validatePrincipalText } from "@/lib/ic/principal";
 
 import { request } from ".";
@@ -291,7 +291,7 @@ export const getTokenPriceCandle = async (parameters: CandleParameters) => {
 			`Failed to fetch token ${interval} candles for ${tokenId}/${market}: ${response.message} (Status: ${response.statusCode})`
 		);
 	}
-	const decimals = getICPCanisterToken().decimals;
+	const decimals = getCkbtcCanisterToken().decimals;
 	return response.data.map((candle) => ({
 		time: Number(candle.wStart.substring(0, 10)) as UTCTimestamp,
 		...(candle.low === "NULL" ||

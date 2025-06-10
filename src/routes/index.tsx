@@ -5,6 +5,7 @@ import { isMobile } from "react-device-detect";
 import { z } from "zod";
 
 import { tokenListSortOptions } from "@/apis/indexer";
+import BtcMemeList from "@/components/views/home/btc-meme-list";
 import FavoriteTab from "@/components/views/home/list-header/favorite";
 import Slippage from "@/components/views/home/list-header/slippage";
 import SortFiltersTabs from "@/components/views/home/list-header/sort-tabs";
@@ -68,7 +69,8 @@ function Home() {
 				</div>
 			)}
 			<div className="mt-4 flex flex-col overflow-auto">
-				<MemeList />
+				{chain === "icp" && <MemeList />}
+				{chain === "bitcoin" && <BtcMemeList />}
 			</div>
 		</div>
 	);

@@ -88,7 +88,7 @@ export const useBtcInfiniteFavoriteTokenList = (parameters: {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},
 		initialPageParam: 1,
-		refetchInterval: 2000,
+		// refetchInterval: 2000,
 		enabled: !!principal && parameters.isEnabled,
 	});
 };
@@ -97,7 +97,7 @@ export const getBtcSingleTokenInfoKey = (id: string, principal?: string) => {
 	return ["btc-core", "tokenInfo", id, principal];
 };
 
-export const useSingleTokenInfo = (parameters: { id: string }) => {
+export const useBtcSingleTokenInfo = (parameters: { id: string }) => {
 	const { principal } = useBtcConnectedIdentity();
 	return useQuery({
 		queryKey: getBtcSingleTokenInfoKey(parameters.id, principal),
@@ -110,7 +110,7 @@ export const useSingleTokenInfo = (parameters: { id: string }) => {
 			});
 			return data[0];
 		},
-		refetchInterval: 5000,
+		// refetchInterval: 5000,
 	});
 };
 
@@ -129,11 +129,11 @@ export const useInfiniteTokenTransactionsHistory = (parameters: {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},
 		initialPageParam: 1,
-		refetchInterval: 2000,
+		// refetchInterval: 2000,
 	});
 };
 
-export const useTokenPriceCandle = (parameters: CandleParameters) => {
+export const useBtcTokenPriceCandle = (parameters: CandleParameters) => {
 	return useQuery({
 		queryKey: [
 			"btc-core",
@@ -142,7 +142,7 @@ export const useTokenPriceCandle = (parameters: CandleParameters) => {
 			parameters.interval,
 		],
 		queryFn: () => getTokenPriceCandle(parameters),
-		refetchInterval: 2000,
+		// refetchInterval: 2000,
 	});
 };
 

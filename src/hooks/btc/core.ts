@@ -1,20 +1,28 @@
 import { useMemo } from "react";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-// import BigNumber from "bignumber.js";
+import BigNumber from "bignumber.js";
 import superjson from "superjson";
 
 import {
 	btc_buy,
 	btc_sell,
 	type BuyArgs,
+	calculateBuy,
+	calculateSell,
 	createMemeToken,
 	type CreateMemeTokenArgs,
+	DEFAULT_HOLDERS_PAGE_SIZE,
 	getChainBTCCoreCanisterId,
 	getCoreTokenBalance,
+	getCurrentPrice,
+	getHolders,
+	getMemeToken,
 	type SellArgs,
 } from "@/canisters/btc_core";
+import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { showToast } from "@/components/utils/toast";
+import { formatNumberSmart, formatUnits } from "@/lib/common/number";
 
 import { useBtcConnectedIdentity } from "../providers/wallet/bitcoin";
 
@@ -40,6 +48,16 @@ export const useBtcFees = () => {
 	return fees;
 };
 
+// ================================ read ================================
+export const useBtcMemeTokenInfo = (id: number) => {
+	return useQuery({
+		queryKey: ["btc-core", "meme-token", id],
+		queryFn: () =>
+			getMemeToken(getChainBTCCoreCanisterId().toText(), BigInt(id)),
+		// refetchInterval: 1000 * 10,
+	});
+};
+
 export const useBtcCoreTokenBalance = (args: {
 	owner?: string;
 	token?: LedgerType;
@@ -62,6 +80,167 @@ export const useBtcCoreTokenBalance = (args: {
 		},
 		enabled: !!args.owner && !!args.token,
 		refetchInterval: 1000 * 10,
+	});
+};
+
+export const useBtcMemeCurrentPrice = (args: { id: number }) => {
+	return useQuery({
+		queryKey: ["btc-core", "current-price", args.id.toString()],
+		queryFn: async () => {
+			const result = await getCurrentPrice(
+				getChainBTCCoreCanisterId().toText(),
+				BigInt(args.id)
+			);
+
+			return {
+				raw: result,
+				formattedPerPayToken: BigNumber(1)
+					.times(10 ** getCkbtcCanisterToken().decimals)
+					.div(BigNumber(result))
+					.toString(),
+			};
+		},
+		// refetchInterval: 2000,
+	});
+};
+
+export const useBtcCalculateBuy = (args: {
+	amount?: bigint;
+	id: number;
+	enabled?: boolean;
+}) => {
+	return useQuery({
+		queryKey: [
+			"btc-core",
+			"calculate-buy",
+			args.id.toString(),
+			args.amount?.toString(),
+		],
+		queryFn: async () => {
+			if (args.amount === undefined) {
+				throw new Error("No amount provided");
+			}
+			const result = await calculateBuy(getChainBTCCoreCanisterId().toText(), {
+				amount: args.amount,
+				id: BigInt(args.id),
+			});
+			const decimals = 8;
+			return {
+				raw: result,
+				formatted: formatNumberSmart(formatUnits(result, decimals)),
+				decimals,
+			};
+		},
+		refetchInterval: 1000 * 2,
+		enabled: args.amount !== undefined && args.enabled,
+	});
+};
+
+export const useBtcCalculateSell = (args: {
+	amount?: bigint;
+	id: number;
+	enabled?: boolean;
+}) => {
+	return useQuery({
+		queryKey: [
+			"btc-core",
+			"calculate-sell",
+			args.id.toString(),
+			args.amount?.toString(),
+		],
+		queryFn: async () => {
+			if (args.amount === undefined) {
+				throw new Error("No amount provided");
+			}
+			const result = await calculateSell(getChainBTCCoreCanisterId().toText(), {
+				amount: args.amount,
+				id: BigInt(args.id),
+			});
+			const decimals = 8;
+			return {
+				raw: result,
+				formatted: formatNumberSmart(formatUnits(result, decimals)),
+				decimals,
+			};
+		},
+		refetchInterval: 1000 * 2,
+		enabled: args.amount !== undefined && args.enabled,
+	});
+};
+
+export const useBtcTokenHolders = (args: {
+	id: number;
+	page: number;
+	pageSize?: number;
+}) => {
+	const pageSize = args.pageSize ?? DEFAULT_HOLDERS_PAGE_SIZE;
+	return useQuery({
+		queryKey: [
+			"btc-core",
+			"holders",
+			args.id.toString(),
+			args.page.toString(),
+			pageSize.toString(),
+		],
+		queryFn: () =>
+			getHolders(getChainBTCCoreCanisterId().toText(), BigInt(args.id), {
+				page: args.page,
+				pageSize,
+			}),
+		enabled: !!args.id && !!args.page,
+	});
+};
+
+export const useBtcMultipleTokenHoldersCount = (args: {
+	ids: Array<string> | [];
+}) => {
+	return useQuery({
+		queryKey: ["btc-core", "multi-holders-count"],
+		queryFn: async () => {
+			if (args.ids.length === 0) {
+				throw new Error("No ids provided");
+			}
+			const result = await Promise.all(
+				args.ids.map((id) =>
+					getHolders(getChainBTCCoreCanisterId().toText(), BigInt(id), {
+						page: 1,
+						pageSize: 10,
+					})
+				)
+			);
+			return result.map((r, index) => ({
+				id: args.ids[index],
+				total: r.total.toString(),
+			}));
+		},
+		enabled: !!args.ids && args.ids.length > 0,
+	});
+};
+export const useBtcMultipleCurrentPrice = (args: {
+	ids: Array<string> | [];
+}) => {
+	return useQuery({
+		queryKey: ["btc-core", "multi-current-price"],
+		queryFn: async () => {
+			if (args.ids.length === 0) {
+				throw new Error("No ids provided");
+			}
+			const result = await Promise.all(
+				args.ids.map((id) =>
+					getCurrentPrice(getChainBTCCoreCanisterId().toText(), BigInt(id))
+				)
+			);
+			return result.map((r, index) => ({
+				id: args.ids[index],
+				raw: r,
+				formattedPerPayToken: formatNumberSmart(
+					BigNumber(1)
+						.multipliedBy(10 ** getCkbtcCanisterToken().decimals)
+						.div(BigNumber(r))
+				),
+			}));
+		},
+		enabled: !!args.ids && args.ids.length > 0,
 	});
 };
 
