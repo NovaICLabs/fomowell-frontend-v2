@@ -44,8 +44,13 @@ const formSchema = z.object({
 
 	symbol: z
 		.string()
-		.min(1, { message: "Token symbol is required" })
-		.max(10, { message: "Symbol must not exceed 10 characters" }),
+		.trim()
+		.toUpperCase()
+		.min(3, { message: "Symbol must have at least 3 characters" })
+		.max(10, { message: "Symbol must not exceed 10 characters" })
+		.regex(/^[A-Z]+$/, {
+			message: "Symbol must contain only uppercase letters A-Z",
+		}),
 
 	description: z
 		.string()
@@ -302,13 +307,14 @@ function TokenCreationPage() {
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel className="flex items-center text-gray-400">
-													Token Symbol{" "}
+													Token Symbol (3-10 chars)
 													<img alt="required" src="/svgs/required.svg" />
 												</FormLabel>
 												<FormControl>
 													<Input
 														className="border-gray-710 mt-1 h-10.5 rounded-xl bg-gray-800 focus-visible:ring-0"
 														{...field}
+														value={field.value?.toUpperCase()}
 													/>
 												</FormControl>
 												<FormMessage />
@@ -330,7 +336,7 @@ function TokenCreationPage() {
 														disabled
 														className="border-gray-710 mt-1 h-10.5 rounded-xl bg-gray-800 focus-visible:ring-0"
 														{...field}
-														value="[short_ticker]•ID•XXXX•WELL"
+														value={`[${field.value ? field.value?.toUpperCase() : "short_ticker"}]•ID•XXXX•WELL`}
 													/>
 												</FormControl>
 												<FormMessage />
