@@ -20,8 +20,7 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 // import { Skeleton } from "@/components/ui/skeleton";
-// import { useCoreTokenBalance } from "@/hooks/ic/core";
-import { useCoreTokenBalance } from "@/hooks/ic/core";
+import { useBtcCoreTokenBalance } from "@/hooks/btc/core";
 import { useCheckBtcWalletConnected } from "@/hooks/providers/wallet/bitcoin";
 import { useIcWallet } from "@/hooks/providers/wallet/ic";
 import { getAvatar } from "@/lib/common/avatar";
@@ -230,7 +229,7 @@ const BtcWalletConnect: React.FC = () => {
 	const { principal, connecting } = useBtcIdentityStore();
 	const { setBtcDepositWithdrawOpen } = useDialogStore();
 
-	const { data: coreTokenBalance } = useCoreTokenBalance({
+	const { data: coreTokenBalance } = useBtcCoreTokenBalance({
 		owner: principal,
 		token: {
 			ICRCToken: getCkbtcCanisterId(),

@@ -271,7 +271,7 @@ const Withdraw = () => {
 				amount: BigInt(parseUnits(amount)),
 				to: selectedToPrincipal,
 				token: getICPCanisterToken(),
-				from: principal,
+				// from: principal,
 			});
 			refetch();
 			showToast("success", `${formatNumberSmart(amount)} ICP withdrawn!`);

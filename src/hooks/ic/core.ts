@@ -277,7 +277,6 @@ export const useWithdraw = () => {
 			}
 			return withdraw(actorCreator, getChainICCoreCanisterId().toText(), {
 				...args,
-				from: principal,
 			});
 		},
 	});

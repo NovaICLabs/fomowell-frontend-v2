@@ -7,7 +7,7 @@ import { Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { getICPCanisterId } from "@/canisters/icrc3";
+import { getCkbtcCanisterId } from "@/canisters/core";
 import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
 import X from "@/components/icons/media/x";
@@ -26,10 +26,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { showToast } from "@/components/utils/toast";
 import { FileUploader } from "@/components/views/token/bottom/file-uploader";
-import { useCoreTokenBalance, useCreateMemeToken } from "@/hooks/ic/core";
-import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
+import {
+	useBtcCoreTokenBalance,
+	useCreateBtcMemeToken,
+} from "@/hooks/btc/core";
 import { fileToBase64 } from "@/lib/common/file";
 import { parseUnits } from "@/lib/common/number";
+import { useBtcIdentityStore } from "@/store/btc";
+import { useDialogStore } from "@/store/dialog";
 // import { useDialogStore } from "@/store/dialog";
 // Create form validation schema with Zod
 const formSchema = z.object({
@@ -118,6 +122,9 @@ const isHandle = (value: string): boolean => {
 };
 
 function TokenCreationPage() {
+	const launchFee = 0.000033;
+	const launchedBtc = 0.538671;
+
 	// Initialize form with React Hook Form
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -132,11 +139,13 @@ function TokenCreationPage() {
 			website: "",
 		},
 	});
+	const router = useRouter();
 
 	const { mutateAsync: createMemeToken, isPending: isCreating } =
-		useCreateMemeToken();
+		useCreateBtcMemeToken();
+
 	console.log("🚀 ~ TokenCreationPage ~ createMemeToken:", createMemeToken);
-	const router = useRouter();
+
 	console.log("🚀 ~ TokenCreationPage ~ router:", router);
 	// Form submission handler
 	const [logoBase64String, setLogoBase64String] = useState<string>("");
@@ -206,18 +215,18 @@ function TokenCreationPage() {
 			showToast("error", `Failed to create token: ${errorMessage}`);
 		}
 	}
-	const { connected, principal } = useConnectedIdentity();
-	// const { setIcpConnectOpen } = useDialogStore();
+	const { connected, principal } = useBtcIdentityStore();
+	const { setBtcConnectOpen } = useDialogStore();
 
-	const { data: coreTokenBalance } = useCoreTokenBalance({
+	const { data: coreTokenBalance } = useBtcCoreTokenBalance({
 		owner: principal,
 		token: {
-			ICRCToken: getICPCanisterId(),
+			ICRCToken: getCkbtcCanisterId(),
 		},
 	});
 
 	const totalPayment = BigNumber(parseFloat(form.watch("devBuy") || "0"))
-		.plus(0.5)
+		.plus(launchFee)
 		.toString();
 	const isBalanceEnough = BigNumber(coreTokenBalance?.raw || "0").gte(
 		parseUnits(totalPayment)
@@ -309,6 +318,28 @@ function TokenCreationPage() {
 										)}
 									/>
 
+									{/* Runes Ticker */}
+									<FormField
+										control={form.control}
+										name="symbol"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel className="flex items-center text-gray-400">
+													Runes Ticker <span>(Auto generated)</span>
+												</FormLabel>
+												<FormControl>
+													<Input
+														disabled
+														className="border-gray-710 mt-1 h-10.5 rounded-xl bg-gray-800 focus-visible:ring-0"
+														{...field}
+														value="[short_ticker]•ID•XXXX•WELL"
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
 									{/* Token Description Field */}
 									<FormField
 										control={form.control}
@@ -345,6 +376,80 @@ function TokenCreationPage() {
 
 						{/* Right Column - Additional Token Settings */}
 						<div className="flex flex-col gap-y-3.5">
+							<Card className="rounded-2xl border-gray-800 bg-gray-800">
+								<CardContent className="space-y-6 px-3 md:px-12.5">
+									<div className="flex flex-col gap-y-2">
+										<span className="text-sm text-white/60">
+											Dev buy (Optional)
+										</span>
+										<div className="relative">
+											<FormField
+												control={form.control}
+												name="devBuy"
+												render={({ field }) => (
+													<FormItem>
+														<FormControl>
+															<div className="relative h-10.5">
+																<Input
+																	className="border-gray-710 h-10.5 rounded-xl bg-gray-800 pl-2.5 focus-visible:ring-0"
+																	placeholder="0.00"
+																	{...field}
+																	onBlur={() => {
+																		if (field.value) {
+																			field.onChange(
+																				field.value.endsWith(".")
+																					? field.value.slice(0, -1)
+																					: field.value
+																			);
+																		}
+																	}}
+																/>
+																<img
+																	alt="BTC"
+																	className="absolute top-1/2 right-2 h-6 w-6 -translate-y-1/2"
+																	src="/svgs/chains/bitcoin.svg"
+																/>
+															</div>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+										</div>
+										<div className="border-gray-710 mt-2 flex flex-col gap-y-2.5 rounded-xl border p-2.5">
+											<div className="flex items-center justify-between">
+												<span className="text-sm text-white/40">
+													Launch Fee
+												</span>
+												<span className="text-sm text-white">
+													{launchFee} BTC
+												</span>
+											</div>
+											<div className="flex items-center justify-between">
+												<span className="text-sm text-white/40">
+													Percentage
+												</span>
+												<span className="text-sm text-white">
+													{BigNumber(parseFloat(form.watch("devBuy") || "0"))
+														.div(launchedBtc)
+														.times(100)
+														.toFixed(2)
+														.toString()}
+													%
+												</span>
+											</div>
+											<div className="flex items-center justify-between">
+												<span className="text-sm text-white/40">
+													Total Payment
+												</span>
+												<span className="text-sm text-white">
+													{totalPayment} BTC
+												</span>
+											</div>
+										</div>
+									</div>
+								</CardContent>
+							</Card>
 							<Card className="rounded-2xl border-gray-800 bg-gray-800">
 								<CardContent className="space-y-6 px-3 md:px-12.5">
 									{/* Social Media - Twitter Field */}
@@ -417,77 +522,6 @@ function TokenCreationPage() {
 									</div>
 								</CardContent>
 							</Card>
-							<Card className="rounded-2xl border-gray-800 bg-gray-800">
-								<CardContent className="space-y-6 px-3 md:px-12.5">
-									<div className="flex flex-col gap-y-2">
-										<span className="text-sm text-white/60">
-											Dev buy (Optional)
-										</span>
-										<div className="relative">
-											<FormField
-												control={form.control}
-												name="devBuy"
-												render={({ field }) => (
-													<FormItem>
-														<FormControl>
-															<div className="relative h-10.5">
-																<Input
-																	className="border-gray-710 h-10.5 rounded-xl bg-gray-800 pl-2.5 focus-visible:ring-0"
-																	placeholder="0.00"
-																	{...field}
-																	onBlur={() => {
-																		if (field.value) {
-																			field.onChange(
-																				field.value.endsWith(".")
-																					? field.value.slice(0, -1)
-																					: field.value
-																			);
-																		}
-																	}}
-																/>
-																<img
-																	alt="BTC"
-																	className="absolute top-1/2 right-2 h-6 w-6 -translate-y-1/2"
-																	src="/svgs/chains/bitcoin.svg"
-																/>
-															</div>
-														</FormControl>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-										</div>
-										<div className="border-gray-710 mt-2 flex flex-col gap-y-2.5 rounded-xl border p-2.5">
-											<div className="flex items-center justify-between">
-												<span className="text-sm text-white/40">
-													Launch Fee
-												</span>
-												<span className="text-sm text-white">0.5 BTC</span>
-											</div>
-											<div className="flex items-center justify-between">
-												<span className="text-sm text-white/40">
-													Percentage
-												</span>
-												<span className="text-sm text-white">
-													{BigNumber(parseFloat(form.watch("devBuy") || "0"))
-														.div(500)
-														.times(100)
-														.toString()}
-													%
-												</span>
-											</div>
-											<div className="flex items-center justify-between">
-												<span className="text-sm text-white/40">
-													Total Payment
-												</span>
-												<span className="text-sm text-white">
-													{totalPayment} BTC
-												</span>
-											</div>
-										</div>
-									</div>
-								</CardContent>
-							</Card>
 						</div>
 					</div>
 
@@ -519,7 +553,7 @@ function TokenCreationPage() {
 								type="button"
 								onClick={() => {
 									// todo connect btc wallet
-									// setIcpConnectOpen(true);
+									setBtcConnectOpen(true);
 								}}
 							>
 								Connect Wallet

@@ -32,13 +32,12 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { showToast } from "@/components/utils/toast";
-import { useBtcFees } from "@/hooks/btc/core";
-import { useCoreTokenBalance } from "@/hooks/ic/core";
+import { useBtcCoreTokenBalance, useBtcFees } from "@/hooks/btc/core";
 import {
 	useBtcBalance,
 	useBtcDeposit,
 	useBtcWithdraw,
-} from "@/hooks/ic/tokens/btc";
+} from "@/hooks/btc/tokens/btc";
 import { getAvatar } from "@/lib/common/avatar";
 import {
 	formatNumberSmart,
@@ -84,7 +83,7 @@ const Deposit = () => {
 	const { principal } = useBtcIdentityStore();
 
 	const { data: coreTokenBalance, refetch: refetchCoreTokenBalance } =
-		useCoreTokenBalance({
+		useBtcCoreTokenBalance({
 			owner: principal,
 			token: {
 				ICRCToken: getCkbtcCanisterId(),
@@ -374,7 +373,7 @@ const Withdraw = () => {
 	const { principal, btcAddress: storeBtcAddress } = useBtcIdentityStore();
 
 	const { data: coreTokenBalance, refetch: refetchCoreTokenBalance } =
-		useCoreTokenBalance({
+		useBtcCoreTokenBalance({
 			owner: principal,
 			token: {
 				ICRCToken: getCkbtcCanisterId(),

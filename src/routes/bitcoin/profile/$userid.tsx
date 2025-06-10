@@ -15,7 +15,7 @@ import ReferralDialog from "@/components/layout/dialog/referral";
 import { Button } from "@/components/ui/button";
 import EditInfoModal from "@/components/views/icp/profile/edit-info-modal";
 import { useUserInfo } from "@/hooks/apis/user";
-import { useCoreTokenBalance } from "@/hooks/ic/core";
+import { useBtcCoreTokenBalance } from "@/hooks/btc/core";
 import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
@@ -120,7 +120,7 @@ function UserId() {
 	const { principal } = useBtcIdentityStore();
 	const { referral2BTCOpen, setReferral2BTCOpen } = useDialogStore();
 
-	const { data: coreTokenBalance } = useCoreTokenBalance({
+	const { data: coreTokenBalance } = useBtcCoreTokenBalance({
 		owner: principal,
 		token: {
 			ICRCToken: getCkbtcCanisterId(),

@@ -9,8 +9,8 @@ import {
 } from "@/apis/user-login-btc";
 import {
 	get_generate_random,
-	getChainICCoreCanisterId,
-} from "@/canisters/core";
+	getChainBTCCoreCanisterId,
+} from "@/canisters/btc_core";
 import { createActorCreatorFromIdentity } from "@/hooks/providers/wallet/ic";
 
 import type { UserInfo } from "@/apis/indexer";
@@ -218,7 +218,7 @@ const login2ByPrincipal = async (
 		try {
 			random = await get_generate_random(
 				actorCreator as ActorCreator,
-				getChainICCoreCanisterId().toText()
+				getChainBTCCoreCanisterId().toText()
 			);
 			if (!random) {
 				console.error("Failed to get random value");
