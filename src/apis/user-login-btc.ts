@@ -113,6 +113,7 @@ export const createNewUser = async () => {
 			name: "John",
 		}),
 	});
+
 	if (response.statusCode === 409) {
 		throw new Error("User already exists");
 	}

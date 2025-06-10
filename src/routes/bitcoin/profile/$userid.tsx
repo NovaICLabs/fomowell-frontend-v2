@@ -117,7 +117,7 @@ const UserInfo = () => {
 function UserId() {
 	const { userid } = Route.useParams();
 	const [activeTab, setActiveTab] = useState("Created");
-	const { principal } = useBtcIdentityStore();
+	const { principal, identityProfile } = useBtcIdentityStore();
 	const { referral2BTCOpen, setReferral2BTCOpen } = useDialogStore();
 
 	const { data: coreTokenBalance } = useBtcCoreTokenBalance({
@@ -318,14 +318,12 @@ function UserId() {
 			<ReferralDialog
 				earnedTotal={0}
 				open={referral2BTCOpen}
-				referralLink={`${domain}?chain=${chain}&ref=${"123123"}`}
+				referralLink={`${domain}?chain=${chain}&ref=${identityProfile?.invite_code || ""}`}
 				referralsTotal={1}
 				setOpen={setReferral2BTCOpen}
 				referralText={[
-					"Inviting friends to log in will earn you 0.5 ICPS.",
 					"First-level commission rebate: 10%",
 					"Secondary commission rebate: 5%",
-					"Third-level anti-bribery: 3%",
 				]}
 			/>
 		</>

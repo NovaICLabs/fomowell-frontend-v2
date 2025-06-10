@@ -7,6 +7,8 @@ import { Empty } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
+import { useBtcIdentityStore } from "@/store/btc";
+import { useIcIdentityStore } from "@/store/ic";
 
 const ReferralHeader = ({
 	sortBy,
@@ -194,6 +196,9 @@ const ReferralListItem = ({ itemData }: { itemData: TypeReferralListItem }) => {
 };
 
 export default function ReferralPage() {
+	const { identityProfile: identityProfileBTC } = useBtcIdentityStore();
+	const { identityProfile: identityProfileIc } = useIcIdentityStore();
+
 	const { chain } = useChainStore();
 
 	const [tab, setTab] = useState<"invitation" | "withdrawal">("invitation");
@@ -231,17 +236,28 @@ export default function ReferralPage() {
 		}, 1000);
 	}, [sortBy]);
 
+	const domain = window.location.origin;
+
 	return (
 		<div className="flex h-full w-full">
 			<div className="flex w-[350px] flex-shrink-0 flex-col">
 				<ReferralContent
 					earnedTotal={0}
-					referralLink={"test link"}
+					referralLink={`${domain}?chain=${chain}&ref=${chain === "icp" ? identityProfileIc?.invite_code : identityProfileBTC?.invite_code}`}
 					referralsTotal={2}
-					referralText={[
-						"First-level commission rebate: 10%",
-						"Secondary commission rebate: 5%",
-					]}
+					referralText={
+						chain === "icp"
+							? [
+									"Inviting friends to log in will earn you 0.5 ICPS.",
+									"First-level commission rebate: 10%",
+									"Secondary commission rebate: 5%",
+									"Third-level anti-bribery: 3%",
+								]
+							: [
+									"First-level commission rebate: 10%",
+									"Secondary commission rebate: 5%",
+								]
+					}
 				/>
 				<div className="mt-5 w-full rounded-xl border border-[#f7b406]/40 bg-[#111111] px-4 py-7">
 					<div className="flex w-full items-center">

@@ -429,6 +429,7 @@ export const getUserInfo = async (userid: string) => {
 		statusCode: number;
 		message: string;
 	}>(`${getIndexerBaseUrl()}/api/v1/users/${userid}`);
+
 	if (response.statusCode !== 200) {
 		throw new Error(response.message);
 	}

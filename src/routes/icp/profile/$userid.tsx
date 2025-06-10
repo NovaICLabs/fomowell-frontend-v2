@@ -330,7 +330,7 @@ function UserId() {
 			<ReferralDialog
 				earnedTotal={0}
 				open={referral2ICPOpen}
-				referralLink={`${domain}?chain=${chain}&ref=${"123123"}`}
+				referralLink={`${domain}?chain=${chain}&ref=${identityProfile?.invite_code}`}
 				referralsTotal={1}
 				setOpen={setReferral2ICPOpen}
 				referralText={[
