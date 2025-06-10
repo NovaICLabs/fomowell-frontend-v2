@@ -16,8 +16,8 @@ import {
 import { unwrapRustResult } from "@/lib/ic/rust/result";
 
 import { idlFactory } from "./index.did";
-import { approve, getICPCanisterId } from "../icrc3";
-import { getICPCanisterToken } from "../icrc3/specials";
+// import { approve, getICPCanisterId } from "../icrc3";
+import { getCkbtcCanisterToken } from "../icrc3/specials";
 
 import type { _SERVICE, LedgerType, StableToken } from "./index.did.d";
 import type { ActorCreator } from "@/lib/ic/connectors";
@@ -372,6 +372,7 @@ export const createMemeToken = async (
 		canisterId,
 		interfaceFactory: idlFactory,
 	});
+
 	if (!actor) {
 		throw new Error("Failed to create actor");
 	}
@@ -387,9 +388,10 @@ export const createMemeToken = async (
 		devBuy,
 		logoBase64,
 	} = args;
+	console.log("🚀 ~ args:", args);
 
 	const result = await actor.create_token({
-		token: getICPCanisterToken(),
+		token: getCkbtcCanisterToken(),
 		name,
 		ticker,
 		description,
@@ -406,45 +408,45 @@ export const createMemeToken = async (
 	});
 };
 
-// deposit
-export type DepositArgs = {
-	token: StableToken;
-	amount: bigint;
-};
+// // deposit no use
+// export type DepositArgs = {
+// 	token: StableToken;
+// 	amount: bigint;
+// };
 
-export const deposit = async (
-	createActor: ActorCreator,
-	canisterId: string,
-	args: DepositArgs
-) => {
-	await approve({
-		creator: createActor,
-		canisterId: getICPCanisterId().toText(),
-		args: {
-			amount: args.amount + getICPCanisterToken().fee,
-			spender: canisterId,
-		},
-	});
-	const actor = await createActor<_SERVICE>({
-		canisterId,
-		interfaceFactory: idlFactory,
-	});
-	if (!actor) {
-		throw new Error("Failed to create actor");
-	}
-	const { token, amount } = args;
+// export const deposit = async (
+// 	createActor: ActorCreator,
+// 	canisterId: string,
+// 	args: DepositArgs
+// ) => {
+// 	await approve({
+// 		creator: createActor,
+// 		canisterId: getICPCanisterId().toText(),
+// 		args: {
+// 			amount: args.amount + getICPCanisterToken().fee,
+// 			spender: canisterId,
+// 		},
+// 	});
+// 	const actor = await createActor<_SERVICE>({
+// 		canisterId,
+// 		interfaceFactory: idlFactory,
+// 	});
+// 	if (!actor) {
+// 		throw new Error("Failed to create actor");
+// 	}
+// 	const { token, amount } = args;
 
-	const result = await actor.deposit({
-		to: [], // [] is current user
-		token,
-		amount,
-		subaccount: [],
-		memo: wrapOption(string2array((Math.random() * 100).toString())),
-	});
-	return unwrapRustResult(result, (error) => {
-		throw new Error(error);
-	});
-};
+// 	const result = await actor.deposit({
+// 		to: [], // [] is current user
+// 		token,
+// 		amount,
+// 		subaccount: [],
+// 		memo: wrapOption(string2array((Math.random() * 100).toString())),
+// 	});
+// 	return unwrapRustResult(result, (error) => {
+// 		throw new Error(error);
+// 	});
+// };
 // withdraw
 export type WithdrawArgs = {
 	token: StableToken;
@@ -491,7 +493,7 @@ export type BuyArgs = {
 	id: bigint;
 	amount: bigint;
 };
-export const buy = async (
+export const btc_buy = async (
 	createActor: ActorCreator,
 	canisterId: string,
 	args: BuyArgs
@@ -526,7 +528,7 @@ export type SellArgs = {
 	amount_out_min: bigint;
 };
 
-export const sell = async (
+export const btc_sell = async (
 	createActor: ActorCreator,
 	canisterId: string,
 	args: SellArgs

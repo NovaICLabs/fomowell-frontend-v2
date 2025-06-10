@@ -7,7 +7,7 @@ import { Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { getCkbtcCanisterId } from "@/canisters/core";
+import { getCkbtcCanisterId } from "@/canisters/btc_core";
 import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
 import X from "@/components/icons/media/x";
@@ -144,12 +144,9 @@ function TokenCreationPage() {
 	const { mutateAsync: createMemeToken, isPending: isCreating } =
 		useCreateBtcMemeToken();
 
-	console.log("🚀 ~ TokenCreationPage ~ createMemeToken:", createMemeToken);
-
-	console.log("🚀 ~ TokenCreationPage ~ router:", router);
 	// Form submission handler
 	const [logoBase64String, setLogoBase64String] = useState<string>("");
-	function onSubmit(values: z.infer<typeof formSchema>) {
+	async function onSubmit(values: z.infer<typeof formSchema>) {
 		if (!logoBase64String) {
 			throw new Error("Logo is required");
 		}
@@ -204,9 +201,9 @@ function TokenCreationPage() {
 
 			console.log("Creating token with args:", createArgs); // Log arguments before sending
 
-			// const token = await createMemeToken(createArgs);
+			const token = await createMemeToken(createArgs);
 
-			// void router.navigate({ to: `/icp/token/${token.id}` });
+			void router.navigate({ to: `/bitcoin/token/${token.id}` });
 			showToast("success", "Token created successfully");
 		} catch (error) {
 			console.error("Failed to create token:", error);
@@ -216,6 +213,7 @@ function TokenCreationPage() {
 		}
 	}
 	const { connected, principal } = useBtcIdentityStore();
+
 	const { setBtcConnectOpen } = useDialogStore();
 
 	const { data: coreTokenBalance } = useBtcCoreTokenBalance({

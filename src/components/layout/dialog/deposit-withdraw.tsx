@@ -10,7 +10,7 @@ import { isMobile } from "react-device-detect";
 
 // import { getCkBTCLedgerCanisterId } from "@/canisters/ckbtc_ledger";
 // import { getBTCDepositAddress } from "@/canisters/ckbtc_minter";
-import { getCkbtcCanisterId } from "@/canisters/core";
+import { getCkbtcCanisterId } from "@/canisters/btc_core";
 import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { getFastBtcAddress } from "@/canisters/rune";
 import { CopyIcon } from "@/components/icons/common/copy";

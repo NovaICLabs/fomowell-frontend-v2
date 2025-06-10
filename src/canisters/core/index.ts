@@ -26,11 +26,6 @@ export const getChainICCoreCanisterId = () => {
 	);
 };
 
-export const getCkbtcCanisterId = () => {
-	const value = import.meta.env["VITE_CKBTC_RUN_WALLET_CANISTER_ID"];
-	return validatePrincipalText(value);
-};
-
 // ================================ read ================================
 export const getMemeToken = async (canisterId: string, id: bigint) => {
 	const createActor = getAnonymousActorCreator();

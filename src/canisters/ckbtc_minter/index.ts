@@ -1,26 +1,21 @@
 // import { Principal } from "@dfinity/principal";
 
 import { getAnonymousActorCreator } from "@/hooks/providers/wallet/ic";
+import { bigint2string } from "@/lib/common/data/bigint";
 import { validatePrincipalText } from "@/lib/ic/principal";
 import { unwrapRustResult } from "@/lib/ic/rust/result";
 
 import { idlFactory as ckBTCMinterIdlFactory } from "./index.did";
+import { getChainBTCCoreCanisterId } from "../btc_core";
 
 import type { _SERVICE } from "./index.did.d";
 import type { ActorCreator } from "@/lib/ic/connectors";
-import { bigint2string } from "@/lib/common/data/bigint";
-import { getChainICCoreCanisterId } from "../core";
 
 // ckBTC Minter Canister ID
 export const getCkBTCMinterCanisterId = () => {
 	return validatePrincipalText(
 		import.meta.env["VITE_CKBTC_MINTER_CANISTER_ID"]
 	);
-};
-
-// ckBTC Ledger Canister ID
-export const getCkBTCLedgerCanisterId = () => {
-	return validatePrincipalText(import.meta.env["VITE_ICP_CANISTER_ID"]);
 };
 
 export const getBTCDepositAddress = async () => {
@@ -41,11 +36,11 @@ export const getBTCDepositAddress = async () => {
 	// const defaultSubaccount = new Uint8Array(32).fill(0);
 
 	console.log(
-		"getChainICCoreCanisterId()======getBTCDepositAddress========",
-		getChainICCoreCanisterId().toString()
+		"getChainBTCCoreCanisterId()======getBTCDepositAddress========",
+		getChainBTCCoreCanisterId().toString()
 	);
 	const address = await actor.get_btc_address({
-		owner: [getChainICCoreCanisterId()],
+		owner: [getChainBTCCoreCanisterId()],
 		subaccount: [],
 	});
 

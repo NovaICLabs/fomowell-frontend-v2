@@ -1,4 +1,4 @@
-import { getCkbtcCanisterId } from "@/canisters/core";
+import { getCkbtcCanisterId } from "../btc_core";
 
 import { getICPCanisterId } from ".";
 
