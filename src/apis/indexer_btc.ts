@@ -1,12 +1,12 @@
 import { BigNumber } from "bignumber.js";
 
+import { getCkbtcCanisterId } from "@/canisters/btc_core";
 import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { validatePrincipalText } from "@/lib/ic/principal";
 
 import { request } from ".";
 
 import type { UTCTimestamp } from "lightweight-charts";
-import { getCkbtcCanisterId } from "@/canisters/btc_core";
 
 const getIndexerBtcBaseUrl = () => {
 	const indexerBaseUrl = import.meta.env.VITE_INDEXER_BTC_BASE_URL;
