@@ -42,3 +42,54 @@ export const getBtcUserRewardStats = async (user_token: string) => {
 	}
 	return response.data;
 };
+
+export const getBtcUserRewardLeaderboard = async (
+	user_token: string,
+	limit: number
+) => {
+	if (!user_token) {
+		return undefined;
+	}
+	const response = await request<{
+		data: RewardStats;
+		statusCode: number;
+		message: string;
+	}>(`${getIndexerBtcBaseUrl()}/api/v1/users/reward-leaderboard`, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+			authorization: `Bearer ${user_token}`,
+		},
+	});
+
+	if (response.statusCode !== 200 || !response.data) {
+		throw new Error(
+			`Failed to fetch user: ${response.message} (Status: ${response.statusCode})`
+		);
+	}
+	return response.data;
+};
+
+export const getBtcUserRewardWithdraw = async (user_token: string) => {
+	if (!user_token) {
+		return undefined;
+	}
+	const response = await request<{
+		data: RewardStats;
+		statusCode: number;
+		message: string;
+	}>(`${getIndexerBtcBaseUrl()}/api/v1/users/reward-withdraw`, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+			authorization: `Bearer ${user_token}`,
+		},
+	});
+
+	if (response.statusCode !== 200) {
+		throw new Error(
+			`Failed to fetch user: ${response.message} (Status: ${response.statusCode})`
+		);
+	}
+	return response.data;
+};

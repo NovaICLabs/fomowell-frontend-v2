@@ -33,3 +33,27 @@ export const getIcUserRewardStats = async (user_token: string) => {
 	}
 	return response.data;
 };
+
+export const getIcUserRewardWithdraw = async (user_token: string) => {
+	if (!user_token) {
+		return undefined;
+	}
+	const response = await request<{
+		data: null;
+		statusCode: number;
+		message: string;
+	}>(`${getIndexerBaseUrl()}/api/v1/users/reward-withdraw`, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+			authorization: `Bearer ${user_token}`,
+		},
+	});
+
+	if (response.statusCode !== 200) {
+		throw new Error(
+			`Failed to fetch user: ${response.message} (Status: ${response.statusCode})`
+		);
+	}
+	return response.data;
+};

@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 
+import { Dialog } from "@radix-ui/react-dialog";
+
+import { getIcUserRewardStats, getIcUserRewardWithdraw } from "@/apis/reward";
+import {
+	getBtcUserRewardStats,
+	getBtcUserRewardWithdraw,
+	type RewardStats,
+} from "@/apis/reward-btc";
 import { ReferralContent } from "@/components/layout/dialog/referral";
+import { DialogContent } from "@/components/ui/dialog";
+import { showToast } from "@/components/utils/toast";
 import { cn } from "@/lib/utils";
 import { useBtcIdentityStore } from "@/store/btc";
 import { useChainStore } from "@/store/chain";
@@ -8,8 +18,6 @@ import { useIcIdentityStore } from "@/store/ic";
 
 import Invitation from "./components/Invitation";
 import WithdrawalTable from "./components/Withdrawal";
-import { Dialog } from "@radix-ui/react-dialog";
-import { DialogContent } from "@/components/ui/dialog";
 
 export type TypeReferralListItem = {
 	id: number;
@@ -36,26 +44,48 @@ export default function ReferralPage() {
 	const onWithdraw = () => {
 		setLoading(true);
 		if (chain === "icp" && icJwtToken) {
-			// icJwtToken;
+			void getIcUserRewardWithdraw(icJwtToken)
+				.then(() => {
+					showToast("success", "Withdrawal successfully");
+					setOpen(false);
+				})
+				.finally(() => {
+					setLoading(false);
+				});
 		}
 
 		if (chain === "bitcoin" && btcJwtToken) {
-			// btcJwtToken;
+			void getBtcUserRewardWithdraw(btcJwtToken)
+				.then(() => {
+					showToast("success", "Withdrawal successfully");
+					setOpen(false);
+				})
+				.finally(() => {
+					setLoading(false);
+				});
 		}
 	};
 
-	const init = async () => {
-		if (chain === "icp" && icJwtToken) {
-			// icJwtToken;
-		}
-
-		if (chain === "bitcoin" && btcJwtToken) {
-			// btcJwtToken;
-		}
-	};
+	const [rewardStats, setRewardStats] = useState<RewardStats>();
 
 	useEffect(() => {
-		init().catch(console.error);
+		if (chain === "icp" && icJwtToken) {
+			void getIcUserRewardStats(icJwtToken).then((result) => {
+				if (!result) {
+					return;
+				}
+				setRewardStats(result);
+			});
+		}
+
+		if (chain === "bitcoin" && btcJwtToken) {
+			void getBtcUserRewardStats(btcJwtToken).then((result) => {
+				if (!result) {
+					return;
+				}
+				setRewardStats(result);
+			});
+		}
 	}, []);
 
 	const domain = window.location.origin;
@@ -80,14 +110,14 @@ export default function ReferralPage() {
 							Should the entire amount of the reward be made available?
 						</div>
 						<div className="mt-[40px] flex w-full gap-x-4">
-							<div className="flex h-[42px] flex-1 cursor-pointer items-center justify-center rounded-[21px] border border-[#f7b406]">
-								<div
-									className="text-base leading-none font-semibold text-white"
-									onClick={() => {
-										if (loading) return;
-										setOpen(false);
-									}}
-								>
+							<div
+								className="flex h-[42px] flex-1 cursor-pointer items-center justify-center rounded-[21px] border border-[#f7b406]"
+								onClick={() => {
+									if (loading) return;
+									setOpen(false);
+								}}
+							>
+								<div className="text-base leading-none font-semibold text-white">
 									Cancel
 								</div>
 							</div>
@@ -118,6 +148,7 @@ export default function ReferralPage() {
 			<div className="flex h-full w-full">
 				<div className="flex w-[350px] flex-shrink-0 flex-col">
 					<ReferralContent
+						earned={rewardStats?.reward.total || ""}
 						referralLink={`${domain}?chain=${chain}&ref=${chain === "icp" ? identityProfileIc?.invite_code : identityProfileBTC?.invite_code}`}
 						referralText={
 							chain === "icp"
@@ -131,6 +162,9 @@ export default function ReferralPage() {
 										"First-level commission rebate: 20%",
 										"Secondary commission rebate: 5%",
 									]
+						}
+						referrals={
+							(rewardStats?.level1Count || 0) + (rewardStats?.level2Count || 0)
 						}
 					/>
 					<div className="mt-5 w-full rounded-xl border border-[#f7b406]/40 bg-[#111111] px-4 py-7">
@@ -168,7 +202,7 @@ export default function ReferralPage() {
 									<p className="flex text-base font-medium text-white">
 										250{" "}
 										<p className="text ml-1 uppercase">
-											{chain === "icp" ? "icp" : "btc"}
+											{chain === "icp" ? "ICP" : "Sats"}
 										</p>
 									</p>
 								</div>
@@ -188,7 +222,7 @@ export default function ReferralPage() {
 									<p className="flex text-base font-medium text-white">
 										250{" "}
 										<p className="text ml-1 uppercase">
-											{chain === "icp" ? "icp" : "btc"}
+											{chain === "icp" ? "ICP" : "Sats"}
 										</p>
 									</p>
 								</div>
@@ -208,7 +242,7 @@ export default function ReferralPage() {
 									<p className="flex text-base font-medium text-white">
 										250{" "}
 										<p className="text ml-1 uppercase">
-											{chain === "icp" ? "icp" : "btc"}
+											{chain === "icp" ? "ICP" : "Sats"}
 										</p>
 									</p>
 								</div>
@@ -226,9 +260,9 @@ export default function ReferralPage() {
 								My total Rewards
 							</p>
 							<p className="mt-2 flex text-2xl leading-none font-medium text-white">
-								30{" "}
+								{rewardStats?.reward?.total || "0"}{" "}
 								<p className="text ml-1 uppercase">
-									{chain === "icp" ? "icp" : "btc"}
+									{chain === "icp" ? "ICP" : "Sats"}
 								</p>
 							</p>
 							<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
@@ -240,9 +274,9 @@ export default function ReferralPage() {
 								Withdrawal completed
 							</p>
 							<p className="mt-2 flex text-2xl leading-none font-medium text-white">
-								30{" "}
+								{rewardStats?.reward?.withdrawn || "0"}{" "}
 								<p className="text ml-1 uppercase">
-									{chain === "icp" ? "icp" : "btc"}
+									{chain === "icp" ? "ICP" : "Sats"}
 								</p>
 							</p>
 							<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
@@ -255,9 +289,9 @@ export default function ReferralPage() {
 									Can withdraw
 								</p>
 								<p className="mt-2 flex text-2xl leading-none font-medium text-white">
-									30{" "}
+									{rewardStats?.reward?.available || "0"}{" "}
 									<p className="text ml-1 uppercase">
-										{chain === "icp" ? "icp" : "btc"}
+										{chain === "icp" ? "ICP" : "Sats"}
 									</p>
 								</p>
 								<p className="mt-[12px] text-sm leading-none font-normal text-white/60">

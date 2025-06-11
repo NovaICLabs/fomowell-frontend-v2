@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 
 import copy from "copy-to-clipboard";
 
-import { getBtcUserRewardStats, type RewardStats } from "@/apis/reward-btc";
+import { getIcUserRewardStats } from "@/apis/reward";
+import { getBtcUserRewardStats } from "@/apis/reward-btc";
 import {
 	Dialog,
 	DialogContent,
@@ -19,38 +20,17 @@ import { useIcIdentityStore } from "@/store/ic";
 type ReferralProps = {
 	referralLink: string;
 	referralText: Array<string>;
+	referrals: number;
+	earned: string;
 };
 
 export const ReferralContent: React.FC<ReferralProps> = ({
 	referralLink,
 	referralText,
+	referrals,
+	earned,
 }) => {
 	const { chain } = useChainStore();
-	const { jwt_token: btcJwtToken } = useBtcIdentityStore();
-	const { jwt_token: icJwtToken } = useIcIdentityStore();
-
-	const [referrals, setReferrals] = useState<number>(0);
-	const [earned, setEarned] = useState<string>("0");
-
-	const init = async () => {
-		if (chain === "icp" && icJwtToken) {
-			const result = await getBtcUserRewardStats(icJwtToken);
-			if (result) {
-				setReferrals(result?.level1Count + result?.level2Count);
-			}
-		}
-
-		if (chain === "bitcoin" && btcJwtToken) {
-			const result = await getBtcUserRewardStats(btcJwtToken);
-			if (result) {
-				setEarned(result?.reward.total);
-			}
-		}
-	};
-
-	useEffect(() => {
-		init().catch(console.error);
-	}, []);
 
 	return (
 		<div className="relative flex w-full">
@@ -59,7 +39,7 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 				className="flex w-full"
 				src="/images/referral-dialog-bg.png"
 			/>
-			<div className="absolute top-0 left-0 flex h-full w-full flex-col justify-between p-5">
+			<div className="absolute top-0 left-0 flex h-full min-h-[500px] w-full flex-col justify-between p-5">
 				<div className="flex flex-col">
 					<div className="flex w-full flex-col">
 						<img
@@ -112,7 +92,8 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 							Referrals: {referrals} users
 						</p>
 						<p className="text-sm font-medium text-[#101010]">
-							Sats earned: {earned} sats
+							{chain === "icp" ? "ICP" : "SATS"} Earned: {earned}{" "}
+							{chain === "icp" ? "ICP" : "SATS"}
 						</p>
 					</div>
 				</div>
@@ -124,6 +105,35 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 const ReferralDialog: React.FC<
 	ReferralProps & { open: boolean; setOpen: (open: boolean) => void }
 > = ({ open, setOpen, referralLink, referralText }) => {
+	const { chain } = useChainStore();
+	const { jwt_token: btcJwtToken } = useBtcIdentityStore();
+	const { jwt_token: icJwtToken } = useIcIdentityStore();
+
+	const [referrals, setReferrals] = useState<number>(0);
+	const [earned, setEarned] = useState<string>("0");
+
+	useEffect(() => {
+		if (chain === "icp" && icJwtToken) {
+			void getIcUserRewardStats(icJwtToken).then((result) => {
+				if (!result) {
+					return;
+				}
+				setReferrals(result?.level1Count + result?.level2Count);
+				setEarned(result?.reward.total);
+			});
+		}
+
+		if (chain === "bitcoin" && btcJwtToken) {
+			void getBtcUserRewardStats(btcJwtToken).then((result) => {
+				if (!result) {
+					return;
+				}
+				setReferrals(result?.level1Count + result?.level2Count);
+				setEarned(result?.reward.total);
+			});
+		}
+	}, [btcJwtToken, chain, icJwtToken]);
+
 	return (
 		<>
 			<Dialog
@@ -144,8 +154,10 @@ const ReferralDialog: React.FC<
 					</DialogHeader>
 
 					<ReferralContent
+						earned={earned}
 						referralLink={referralLink}
 						referralText={referralText}
+						referrals={referrals}
 					/>
 				</DialogContent>
 			</Dialog>
