@@ -449,4 +449,38 @@ export const getLaunchedTokenList = async () => {
 	return response.data.data.filter((token) => token.tokenAddress);
 };
 
-// export const get
+export type PendingDeposit = {
+	id: number;
+	pid: string;
+	address: string;
+	txid: string;
+	vout: number;
+	value: string;
+	confirmed: boolean;
+	blockHeight: number;
+	blockHash: string;
+	blockTime: string;
+	createdAt: number;
+	updatedAt: number;
+	executedAt: null;
+	mintedAt: null;
+	collectedAt: null;
+};
+// is have deposit loading
+export const getBtcPendingDeposits = async (user_token: string) => {
+	const response = await request<{
+		data: Array<PendingDeposit>;
+		statusCode: number;
+		message: string;
+	}>(`${getIndexerBtcBaseUrl()}/api/v1/users/btc/pending-deposits`, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+			authorization: `Bearer ${user_token}`,
+		},
+	});
+	if (response.statusCode !== 200) {
+		throw new Error(response.message);
+	}
+	return response.data;
+};

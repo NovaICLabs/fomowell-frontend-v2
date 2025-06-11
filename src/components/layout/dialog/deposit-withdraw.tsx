@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { showToast } from "@/components/utils/toast";
+import { useBtcPendingDeposits } from "@/hooks/apis/indexer_btc";
 import { useBtcCoreTokenBalance, useBtcFees } from "@/hooks/btc/core";
 import {
 	useBtcBalance,
@@ -597,15 +598,15 @@ const Withdraw = () => {
 						<>
 							<img
 								alt="to"
-								className="mx-auto mt-5"
+								className="mx-auto mt-3"
 								src="/svgs/common/to.svg"
 							/>
-							<span className="mx-auto mt-5 text-sm text-white/40">
+							<span className="mx-auto mt-4 text-sm text-white/40">
 								Linked Wallet
 							</span>
 						</>
 					) : (
-						<div className="mt-6 flex w-full flex-col items-start justify-between">
+						<div className="mt-5 flex w-full flex-col items-start justify-between">
 							<span className="pl-1.5 text-sm text-white/40">Address</span>
 							<Input
 								placeholder="Enter your BTC address"
@@ -627,7 +628,7 @@ const Withdraw = () => {
 					)}
 
 					<Button
-						className="mt-10 h-[42px] w-full rounded-full text-base font-bold text-black"
+						className="mt-4 h-[42px] w-full rounded-full text-base font-bold text-black"
 						disabled={buttonDisabled}
 						onClick={handleWithdraw}
 					>
@@ -684,15 +685,24 @@ export const DepositWithdrawHeader = () => {
 };
 export const DepositWithdrawContent = () => {
 	const { btcDepositWithdrawOpen } = useDialogStore();
+	const { data } = useBtcPendingDeposits();
+
 	return (
 		<div
 			className={cn(
-				"bg-gray-740 mt-5 flex flex-1 flex-col rounded-2xl p-5",
+				"bg-gray-740 mt-5 flex flex-1 flex-col justify-between rounded-2xl",
 				isMobile && "h-[561] flex-0"
 			)}
 		>
-			{btcDepositWithdrawOpen.type === "deposit" && <Deposit />}
-			{btcDepositWithdrawOpen.type === "withdraw" && <Withdraw />}
+			<div className="p-5">
+				{btcDepositWithdrawOpen.type === "deposit" && <Deposit />}
+				{btcDepositWithdrawOpen.type === "withdraw" && <Withdraw />}
+			</div>
+			{data && data.length > 0 && (
+				<div className="shrink-0 rounded-b-2xl bg-[#2F2F2F] px-4 py-3 text-sm">
+					It takes 20 to 30 minutes for the blockchain confirmation...
+				</div>
+			)}
 		</div>
 	);
 };
@@ -709,7 +719,7 @@ export default function BtcDepositWithdrawDialog() {
 				});
 			}}
 		>
-			<DialogContent className="bg-gray-760 h-[667px] w-[500px] rounded-3xl">
+			<DialogContent className="bg-gray-760 h-[680px] w-[500px] rounded-3xl">
 				<DialogHeader>
 					<DialogTitle>
 						<div className="flex items-center gap-[30px]">

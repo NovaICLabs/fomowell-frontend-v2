@@ -11,6 +11,7 @@ import {
 	type BtcTokenInfo,
 	type CandleParameters,
 	favoriteToken,
+	getBtcPendingDeposits,
 	getFavoriteTokenList,
 	getLaunchedTokenList,
 	getTokenList,
@@ -182,6 +183,20 @@ export const useBtcInfiniteUserActivity = (parameters: {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},
 		initialPageParam: 1,
+	});
+};
+
+export const useBtcPendingDeposits = () => {
+	const { jwt_token } = useBtcIdentityStore();
+	return useQuery({
+		queryKey: ["btc-core", "pending-deposits"],
+		queryFn: () => {
+			if (!jwt_token) {
+				throw new Error("No login jwt token");
+			}
+			return getBtcPendingDeposits(jwt_token);
+		},
+		refetchInterval: 2000,
 	});
 };
 
