@@ -1,15 +1,23 @@
+import { useCallback, useMemo } from "react";
+
 import { useLaserEyes } from "@omnisat/lasereyes";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import BigNumber from "bignumber.js";
 import { useSiwbIdentity } from "ic-siwb-lasereyes-connector";
 
-// import { btcWithdraw, type WithdrawArgs } from "@/canisters/rune";
 import {
 	getChainBTCCoreCanisterId,
+	getUserCreatedMemeTokens,
+	getUserTokens,
 	withdrawBtc,
 	type WithdrawBtcArgs,
 } from "@/canisters/btc_core";
 import { useBtcIdentityStore } from "@/store/btc";
+
+import {
+	useBtcMultipleCurrentPrice,
+	useBtcMultipleTokenHoldersCount,
+} from "../core";
 
 import type { Identity } from "@dfinity/agent";
 
@@ -72,7 +80,7 @@ export const useBtcWithdraw = () => {
 	const { identity } = useSiwbIdentity();
 
 	return useMutation({
-		mutationKey: ["ic-core", "withdraw"],
+		mutationKey: ["btc-core", "withdraw"],
 		mutationFn: async (args: WithdrawBtcArgs) => {
 			if (!identity) {
 				return new Error("No identity found");
@@ -85,4 +93,119 @@ export const useBtcWithdraw = () => {
 			);
 		},
 	});
+};
+
+export const useBtcUserHoldingTokens = (id: string) => {
+	return useQuery({
+		queryKey: ["btc_holdings", id],
+		queryFn: async () => {
+			if (!id) throw new Error("Principal is not set");
+			return getUserTokens(getChainBTCCoreCanisterId().toText(), {
+				owner: id,
+			});
+		},
+	});
+};
+
+export const useBtcUserCreatedTokens = (userid: string) => {
+	return useQuery({
+		queryKey: ["btc_created", userid],
+		queryFn: async () => {
+			if (!userid) throw new Error("Principal is not set");
+			return getUserCreatedMemeTokens(getChainBTCCoreCanisterId().toText(), {
+				owner: userid,
+			});
+		},
+	});
+};
+
+export const useBtcUserTokenHoldersList = (id: string) => {
+	const { data, isFetching, refetch } = useBtcUserHoldingTokens(id);
+	const {
+		data: allPrices,
+		isFetching: isPriceFetching,
+		refetch: priceRefetch,
+	} = useBtcMultipleCurrentPrice({
+		ids: data ? data?.map((row) => row.id) : [],
+	});
+	const {
+		data: allHolders,
+		isFetching: isHolderFetching,
+		refetch: holderRefetch,
+	} = useBtcMultipleTokenHoldersCount({
+		ids: data ? data?.map((row) => row.id) : [],
+	});
+
+	const items = useMemo(() => {
+		return (data ?? []).map((row) => {
+			const price = allPrices?.find((p) => p.id === row.id);
+			const holders = allHolders?.find((h) => h.id === row.id);
+			return {
+				...row,
+				balance: BigNumber(row.balance)
+					.dividedBy(BigNumber(10).pow(row.decimals))
+					.toString(),
+				price: price?.formattedPerPayToken,
+				holders: holders?.total,
+			};
+		});
+	}, [allHolders, allPrices, data]);
+
+	const reload = useCallback(async () => {
+		await Promise.all([refetch(), priceRefetch(), holderRefetch()]);
+	}, [refetch, priceRefetch, holderRefetch]);
+
+	const isLoading = useMemo(() => {
+		return isFetching && isPriceFetching && isHolderFetching;
+	}, [isFetching, isPriceFetching, isHolderFetching]);
+
+	return {
+		isFetching: isLoading,
+		refetch: reload,
+		data: items,
+	};
+};
+
+export const useBtcUserCreatedTokenList = (userid: string) => {
+	const { data, isFetching, refetch } = useBtcUserCreatedTokens(userid);
+	const {
+		data: allPrices,
+		isFetching: isPriceFetching,
+		refetch: priceRefetch,
+	} = useBtcMultipleCurrentPrice({
+		ids: data ? data?.map((row) => row.id) : [],
+	});
+	const {
+		data: allHolders,
+		isFetching: isHolderFetching,
+		refetch: holderRefetch,
+	} = useBtcMultipleTokenHoldersCount({
+		ids: data ? data?.map((row) => row.id) : [],
+	});
+
+	const items = useMemo(() => {
+		return (data ?? []).map((row) => {
+			const price = allPrices?.find((p) => p.id === row.id);
+			const holders = allHolders?.find((h) => h.id === row.id);
+			return {
+				...row,
+				price: price?.formattedPerPayToken,
+				holders: holders?.total,
+			};
+		});
+	}, [allHolders, allPrices, data]);
+
+	const reload = useCallback(async () => {
+		await Promise.all([refetch(), priceRefetch(), holderRefetch()]);
+	}, [refetch, priceRefetch, holderRefetch]);
+
+	const isLoading = useMemo(() => {
+		return isFetching && isPriceFetching && isHolderFetching;
+	}, [isFetching, isPriceFetching, isHolderFetching]);
+
+	return {
+		isFetching: isLoading,
+		refetch: reload,
+		data: items,
+	};
 };
