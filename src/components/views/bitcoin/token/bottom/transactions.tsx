@@ -173,10 +173,10 @@ export default function Transactions() {
 					<div className="flex h-full w-full items-center gap-1">
 						<span className="text-sm leading-4">
 							{formatNumberSmart(
-								// BigNumber(1)
-								// 	.times(10 ** getCkbtcCanisterToken().decimals)
-								// 	.div(BigNumber(info.getValue()))
-								BigNumber(info.getValue()).toString(),
+								BigNumber(1)
+									.times(10 ** getCkbtcCanisterToken().decimals)
+									.div(BigNumber(info.getValue()))
+									.toString(),
 								{
 									shortZero: true,
 								}

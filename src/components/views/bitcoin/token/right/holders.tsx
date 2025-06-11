@@ -5,7 +5,7 @@ import BigNumber from "bignumber.js";
 import { isMobile } from "react-device-detect";
 import ReactPaginate from "react-paginate";
 
-import { getChainICCoreCanisterId } from "@/canisters/core";
+import { getChainBTCCoreCanisterId } from "@/canisters/btc_core";
 import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { useBtcTokenHolders } from "@/hooks/btc/core";
 import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
@@ -82,7 +82,7 @@ export default function Holders() {
 										</div>
 										<span className="ml-1">
 											{holder.account.owner.toText() ===
-											getChainICCoreCanisterId().toText() ? (
+											getChainBTCCoreCanisterId().toText() ? (
 												<span className="text-white">(Pool)</span>
 											) : null}
 										</span>

@@ -5,14 +5,14 @@ import { isMobile } from "react-device-detect";
 import { useDebounce } from "use-debounce";
 
 import { getCkbtcCanisterId } from "@/canisters/btc_core";
-import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
+// import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import DepositPlus from "@/components/icons/common/deposit-plus";
 import SlippageSetting from "@/components/icons/common/slippage-setting";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { showToast } from "@/components/utils/toast";
-import { useCKBTCPrice } from "@/hooks/apis/coingecko";
+import { useCKBTCPrice, useSatsPrice } from "@/hooks/apis/coingecko";
 import {
 	useBtcBuy,
 	useBtcCalculateBuy,
@@ -55,6 +55,8 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 
 	// price
 	const { data: btcPrice } = useCKBTCPrice();
+	const { data: satsPrice } = useSatsPrice();
+
 	const { data: currentTokenPrice, refetch: refetchCurrentTokenPrice } =
 		useBtcMemeCurrentPrice({ id: Number(id) });
 
@@ -69,6 +71,7 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 			owner: principal,
 			token: { MemeToken: BigInt(Number(id)) },
 		});
+
 	const [buyAmount, setBuyAmount] = useState<string>("");
 	const [debouncedBuyAmount] = useDebounce(buyAmount, 500);
 
@@ -348,7 +351,7 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 		}
 
 		const currentTokenPriceInBTC = BigNumber(1)
-			.multipliedBy(10 ** getCkbtcCanisterToken().decimals)
+			// .multipliedBy(10 ** getCkbtcCanisterToken().decimals)
 			.div(BigNumber(currentTokenPrice.raw));
 
 		// Avoid division by zero or invalid calculations if price is non-positive
@@ -506,13 +509,13 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 								)
 							: currentTokenPrice &&
 								memeTokenBalance &&
-								btcPrice &&
+								satsPrice &&
 								getTokenUsdValueTotal(
 									{
 										amount: memeTokenBalance?.raw,
 									},
 									BigNumber(currentTokenPrice.formattedPerPayToken)
-										.multipliedBy(btcPrice)
+										.multipliedBy(satsPrice)
 										.toNumber()
 								)}
 						)
