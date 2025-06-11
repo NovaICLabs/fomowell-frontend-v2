@@ -4,13 +4,19 @@ import { Dialog } from "@radix-ui/react-dialog";
 
 import {
 	getIcUserRewardLeaderboard,
+	getIcUserRewardMyInvitees,
+	getIcUserRewardMyWithdraw,
 	getIcUserRewardStats,
 	getIcUserRewardWithdraw,
 } from "@/apis/reward";
 import {
 	getBtcUserRewardLeaderboard,
+	getBtcUserRewardMyInvitees,
+	getBtcUserRewardMyWithdraw,
 	getBtcUserRewardStats,
 	getBtcUserRewardWithdraw,
+	type MyInviteesItem,
+	type MyWithdrawalsItem,
 	type RewardLeaderboard,
 	type RewardStats,
 } from "@/apis/reward-btc";
@@ -24,12 +30,8 @@ import { useBtcIdentityStore } from "@/store/btc";
 import { useChainStore } from "@/store/chain";
 import { useIcIdentityStore } from "@/store/ic";
 
-import Invitation from "./components/Invitation";
+import InvitationTable from "./components/Invitation";
 import WithdrawalTable from "./components/Withdrawal";
-
-export type TypeReferralListItem = {
-	id: number;
-};
 
 const PriceRewardsIcp = ({ data }: { data: string }) => {
 	const { data: icpPrice } = useICPPrice();
@@ -104,6 +106,12 @@ export default function ReferralPage() {
 	const [rewardLeaderboard, setRewardLeaderboard] = useState<
 		Array<RewardLeaderboard>
 	>([]);
+	const [myInvitees, setMyInvitees] = useState<
+		Array<MyInviteesItem> | undefined
+	>(undefined);
+	const [myWithdraw, setMyWithdraw] = useState<
+		Array<MyWithdrawalsItem> | undefined
+	>(undefined);
 
 	useEffect(() => {
 		if (chain === "icp" && icJwtToken) {
@@ -116,6 +124,16 @@ export default function ReferralPage() {
 				if (!result) return;
 				setRewardLeaderboard(result);
 			});
+
+			void getIcUserRewardMyWithdraw(icJwtToken).then((result) => {
+				if (!result) return;
+				setMyWithdraw(result.withdrawals);
+			});
+
+			void getIcUserRewardMyInvitees(icJwtToken).then((result) => {
+				if (!result) return;
+				setMyInvitees(result);
+			});
 		}
 
 		if (chain === "bitcoin" && btcJwtToken) {
@@ -127,6 +145,17 @@ export default function ReferralPage() {
 			void getBtcUserRewardLeaderboard(btcJwtToken).then((result) => {
 				if (!result) return;
 				setRewardLeaderboard(result);
+			});
+
+			void getBtcUserRewardMyWithdraw(btcJwtToken).then((result) => {
+				if (!result) return;
+
+				setMyWithdraw(result.withdrawals);
+			});
+
+			void getBtcUserRewardMyInvitees(btcJwtToken).then((result) => {
+				if (!result) return;
+				setMyInvitees(result);
 			});
 		}
 	}, [btcJwtToken, icJwtToken, chain]);
@@ -223,7 +252,7 @@ export default function ReferralPage() {
 						</div>
 						<div className="mt-3 flex flex-col gap-y-[20px]">
 							{withdrawal.map((item, index) => (
-								<div className="flex w-full">
+								<div key={index} className="flex w-full">
 									<div className="mt-[8px] mr-[6px] h-1 w-1 flex-shrink-0 rounded-full bg-white/60" />
 									<p key={index} className="text-sm font-normal text-white/60">
 										{item}
@@ -280,12 +309,12 @@ export default function ReferralPage() {
 							<p className="text-sm leading-none font-normal text-white/50">
 								My total Rewards
 							</p>
-							<p className="mt-2 flex text-2xl leading-none font-medium text-white">
+							<div className="mt-2 flex text-2xl leading-none font-medium text-white">
 								{rewardStats?.reward?.total || "0"}{" "}
 								<p className="text ml-1 uppercase">
 									{chain === "icp" ? "ICP" : "Sats"}
 								</p>
-							</p>
+							</div>
 							<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
 								{chain === "icp" ? (
 									<PriceRewardsIcp data={rewardStats?.reward?.total || "0"} />
@@ -298,12 +327,12 @@ export default function ReferralPage() {
 							<p className="text-sm leading-none font-normal text-white/50">
 								Withdrawal completed
 							</p>
-							<p className="mt-2 flex text-2xl leading-none font-medium text-white">
+							<div className="mt-2 flex text-2xl leading-none font-medium text-white">
 								{rewardStats?.reward?.withdrawn || "0"}{" "}
 								<p className="text ml-1 uppercase">
 									{chain === "icp" ? "ICP" : "Sats"}
 								</p>
-							</p>
+							</div>
 							<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
 								{chain === "icp" ? (
 									<PriceRewardsIcp
@@ -321,12 +350,12 @@ export default function ReferralPage() {
 								<p className="text-sm leading-none font-normal text-white/50">
 									Can withdraw
 								</p>
-								<p className="mt-2 flex text-2xl leading-none font-medium text-white">
+								<div className="mt-2 flex text-2xl leading-none font-medium text-white">
 									{rewardStats?.reward?.available || "0"}{" "}
 									<p className="text ml-1 uppercase">
 										{chain === "icp" ? "ICP" : "Sats"}
 									</p>
-								</p>
+								</div>
 								<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
 									{chain === "icp" ? (
 										<PriceRewardsIcp
@@ -402,9 +431,9 @@ export default function ReferralPage() {
 							</div>
 						</div>
 
-						<div className="no-scrollbar mt-4 h-[331px] flex-shrink-0 overflow-x-scroll rounded-xl bg-[#191919]">
-							{tab === "invitation" && <Invitation />}
-							{tab === "withdrawal" && <WithdrawalTable />}
+						<div className="no-scrollbar relative mt-4 h-[331px] flex-shrink-0 overflow-x-scroll rounded-xl bg-[#191919]">
+							{tab === "invitation" && <InvitationTable data={myInvitees} />}
+							{tab === "withdrawal" && <WithdrawalTable data={myWithdraw} />}
 						</div>
 					</div>
 				</div>

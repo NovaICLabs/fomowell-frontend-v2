@@ -1,6 +1,11 @@
 import { request } from ".";
 
-import type { RewardLeaderboard, RewardStats } from "./reward-btc";
+import type {
+	MyInviteesItem,
+	MyWithdrawals,
+	RewardLeaderboard,
+	RewardStats,
+} from "./reward-btc";
 
 const getIndexerBaseUrl = () => {
 	const indexerBaseUrl = import.meta.env.VITE_INDEXER_BASE_URL;
@@ -92,11 +97,43 @@ export const getIcUserRewardMyWithdraw = async (user_token: string) => {
 	});
 
 	const response = await request<{
-		data: null;
+		data: MyWithdrawals;
 		statusCode: number;
 		message: string;
 	}>(
 		`${getIndexerBaseUrl()}/api/v1/users/reward-my-withdrawals?${queryParameters.toString()}`,
+		{
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				authorization: `Bearer ${user_token}`,
+			},
+		}
+	);
+
+	if (response.statusCode !== 200) {
+		throw new Error(
+			`Failed to fetch user: ${response.message} (Status: ${response.statusCode})`
+		);
+	}
+	return response.data;
+};
+
+export const getIcUserRewardMyInvitees = async (user_token: string) => {
+	if (!user_token) {
+		return undefined;
+	}
+	const queryParameters = new URLSearchParams({
+		page: "1",
+		pageSize: "9999",
+	});
+
+	const response = await request<{
+		data: Array<MyInviteesItem>;
+		statusCode: number;
+		message: string;
+	}>(
+		`${getIndexerBaseUrl()}/api/v1/users/reward-my-invitees?${queryParameters.toString()}`,
 		{
 			method: "GET",
 			headers: {

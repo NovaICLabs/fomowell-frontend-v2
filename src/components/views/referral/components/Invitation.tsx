@@ -1,12 +1,41 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 
 import { motion } from "framer-motion";
 
 import { Empty } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getAvatar } from "@/lib/common/avatar";
+import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 
-import type { TypeReferralListItem } from "..";
+import type { MyInviteesItem } from "@/apis/reward-btc";
+
+const headers = [
+	{
+		id: "time",
+		label: "Time",
+		sortable: false,
+		className: "min-w-[40%] pl-[20px]",
+	},
+	{
+		id: "invitee",
+		label: "Invitee",
+		sortable: false,
+		className: "min-w-[20%]",
+	},
+	{
+		id: "level",
+		label: "Level",
+		sortable: false,
+		className: "min-w-[20%]",
+	},
+	{
+		id: "fee",
+		label: "Fee",
+		sortable: false,
+		className: "min-w-[20%]",
+	},
+];
 
 const ReferralHeader = ({
 	sortBy,
@@ -15,47 +44,6 @@ const ReferralHeader = ({
 	sortBy: string;
 	setSortBy: (sortBy: string) => void;
 }) => {
-	const headers = [
-		{
-			id: "time",
-			label: "Time",
-			sortable: false,
-			className:
-				"min-w-[18%] w-[180px] pr-[10px] pl-[20px] md:w-[400px] sticky left-0 bg-[#191919] z-[1]",
-		},
-		{
-			id: "invitee",
-			label: "Invitee",
-			sortable: true,
-			className: "min-w-[15%] w-[120px] md:w-[220px]",
-		},
-		{
-			id: "level",
-			label: "Level",
-			sortable: true,
-			className: "min-w-[15%] w-[120px] md:w-[220px]",
-		},
-		{
-			id: "transaction-amount",
-			label: "Transaction amount ",
-			sortable: true,
-			className: "min-w-[15%] w-[120px] md:w-[220px]",
-		},
-		{
-			id: "fee",
-			label: "Fee",
-			sortable: true,
-			className: "min-w-[15%] w-[120px] md:w-[220px]",
-		},
-		{
-			id: "my-invitation-rebate",
-			label: "My invitation Rebate",
-			sortable: true,
-			className:
-				"min-w-[10%] w-[100px] pl-[10px] md:w-[220px] sticky right-0 bg-[#191919] z-[1]",
-		},
-	];
-
 	const handleSort = (field: string): void => {
 		if (sortBy === `${field}-up`) {
 			setSortBy(`${field}-down`);
@@ -113,7 +101,7 @@ const ReferralHeader = ({
 const ReferralListItemSkeleton = () => {
 	return (
 		<>
-			{Array.from({ length: 15 }).map((_, index) => (
+			{Array.from({ length: 3 }).map((_, index) => (
 				<div
 					key={index}
 					className="flex h-[70px] w-full flex-shrink-0 items-center justify-center border-b border-[#262626]"
@@ -125,7 +113,7 @@ const ReferralListItemSkeleton = () => {
 	);
 };
 
-const ReferralListItem = ({ itemData }: { itemData: TypeReferralListItem }) => {
+const ReferralListItem = ({ itemData }: { itemData: MyInviteesItem }) => {
 	const transparentBg = "rgba(0, 0, 0, 0)";
 	const yellowBg = "rgba(247, 180, 6)";
 	const rowVariants = {
@@ -152,80 +140,72 @@ const ReferralListItem = ({ itemData }: { itemData: TypeReferralListItem }) => {
 
 	return (
 		<motion.tr
-			key={itemData.id}
 			className="group relative flex h-[70px] items-center border-b border-[#262626] duration-300 hover:!bg-[#262626]"
 			initial="initial"
 			variants={rowVariants}
 			onClick={() => {}}
 		>
-			<div className="sticky left-0 z-[1] flex h-full w-[180px] min-w-[18%] items-center bg-[#191919] pr-[10px] pl-[20px] text-left text-xs leading-none font-medium text-white/60 duration-300 group-hover:!bg-[#262626] md:w-[400px]">
-				<p className="text-sm font-normal text-white/60">06/08/2025</p>
+			<div className="flex h-full min-w-[40%] items-center pl-[20px] text-left text-sm leading-4 font-medium text-white/60">
+				<p className="text-sm font-normal text-white/60">
+					{itemData.createdAt}
+				</p>
 			</div>
-			<div className="flex h-full w-[120px] min-w-[14%] items-center text-left text-sm leading-4 font-medium text-white/60 md:w-[220px]">
+			<div className="flex h-full min-w-[20%] items-center text-left text-sm leading-4 font-medium text-white/60">
 				<img
 					alt=""
 					className="mr-1 h-6 w-6 rounded-full"
-					src="https://image-uploader.sophiamoon231.workers.dev/1749260495081-f2s89pv8438.jpeg"
+					src={getAvatar(itemData.principal ?? "")}
 				/>
-				<p className="text-sm font-normal text-white/60">5an7p-...-6qe</p>
+				<p className="text-sm font-normal text-white/60">
+					{itemData.principal ? truncatePrincipal(itemData.principal) : ""}
+				</p>
 			</div>
-			<div className="flex h-full w-[120px] min-w-[14%] flex-col justify-center text-left md:w-[220px]">
-				<p className="text-sm font-normal text-white/60">First</p>
+			<div className="flex h-full min-w-[20%] items-center text-left text-sm leading-4 font-medium text-white/60">
+				<p className="text-sm font-normal text-white/60">{itemData.level}</p>
 			</div>
-			<div className="flex h-full w-[120px] min-w-[14%] items-center text-left text-sm leading-4 font-medium text-white md:w-[220px]">
-				<p className="text-sm font-normal text-white/60">$1100.36</p>
-			</div>
-			<div className="flex h-full w-[120px] min-w-[14%] flex-col justify-center text-left text-sm leading-4 font-medium text-white/60 md:w-[220px]">
-				<p className="text-sm font-normal text-white/60">3.14 ICP</p>
-			</div>
-			<div className="sticky right-0 z-[1] flex h-full w-[100px] min-w-[10%] items-center bg-[#191919] pl-[10px] text-left text-sm leading-4 font-medium text-white/60 duration-300 group-hover:!bg-[#262626] md:w-[220px]">
-				<p className="text-sm font-normal text-white/60">0.314 ICP</p>
+			<div className="flex h-full min-w-[20%] items-center text-left text-sm leading-4 font-medium text-white/60">
+				<p className="text-sm font-normal text-white/60">
+					{itemData.total_fee}
+				</p>
 			</div>
 		</motion.tr>
 	);
 };
 
-const InvitationTable = () => {
+const InvitationTable = ({
+	data,
+}: {
+	data: Array<MyInviteesItem> | undefined;
+}) => {
 	const [sortBy, setSortBy] = useState<string>("");
-	const [list, setList] = useState<Array<TypeReferralListItem> | undefined>(
-		undefined
-	);
 
-	const sortedList = useMemo(() => {
-		if (!list) {
-			return undefined;
-		}
-		return list;
-	}, [list]);
+	// const sortedList = useMemo(() => {
+	// 	if (!data) {
+	// 		return undefined;
+	// 	}
 
-	useEffect(() => {
-		const data: Array<TypeReferralListItem> = [
-			{
-				id: 1,
-			},
-		];
-
-		setTimeout(() => {
-			setList(data);
-		}, 1000);
-	}, [sortBy]);
+	// 	return data;
+	// }, [data]);
 
 	return (
-		<table className="h-full w-full min-w-max">
-			<thead className="sticky top-0 z-10">
-				<ReferralHeader setSortBy={setSortBy} sortBy={sortBy} />
-			</thead>
-			<tbody className="flex w-full flex-col">
-				{!sortedList && <ReferralListItemSkeleton />}
-				{sortedList && sortedList.length ? (
-					sortedList.map((item) => (
-						<ReferralListItem key={item.id} itemData={item} />
-					))
+		<>
+			<table className="h-full w-full min-w-max">
+				<thead className="sticky top-0 z-10">
+					<ReferralHeader setSortBy={setSortBy} sortBy={sortBy} />
+				</thead>
+				{!data && <ReferralListItemSkeleton />}
+				{data && !data.length && <Empty />}
+				{data && data.length ? (
+					<tbody className="flex w-full flex-col">
+						{data.map((item, index) => (
+							<ReferralListItem key={index} itemData={item} />
+						))}
+					</tbody>
 				) : (
-					<Empty />
+					<></>
 				)}
-			</tbody>
-		</table>
+			</table>
+		</>
 	);
 };
 

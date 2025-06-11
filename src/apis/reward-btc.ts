@@ -19,6 +19,27 @@ export type RewardStats = {
 	};
 };
 
+export type MyWithdrawalsItem = {
+	id: number;
+	userId: number;
+	amount: string;
+	status: "pending" | "completed" | "failed";
+	createdAt: string;
+};
+export type MyWithdrawals = {
+	total: number;
+	page: number;
+	pageSize: number;
+	withdrawals: Array<MyWithdrawalsItem>;
+};
+
+export type MyInviteesItem = {
+	principal: string;
+	createdAt: string;
+	level: number;
+	total_fee: string;
+};
+
 export type RewardLeaderboard = {
 	rank: number;
 	user: {
@@ -115,11 +136,43 @@ export const getBtcUserRewardMyWithdraw = async (user_token: string) => {
 	});
 
 	const response = await request<{
-		data: RewardStats;
+		data: MyWithdrawals;
 		statusCode: number;
 		message: string;
 	}>(
 		`${getIndexerBtcBaseUrl()}/api/v1/users/reward-my-withdrawals?${queryParameters.toString()}`,
+		{
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				authorization: `Bearer ${user_token}`,
+			},
+		}
+	);
+
+	if (response.statusCode !== 200) {
+		throw new Error(
+			`Failed to fetch user: ${response.message} (Status: ${response.statusCode})`
+		);
+	}
+	return response.data;
+};
+
+export const getBtcUserRewardMyInvitees = async (user_token: string) => {
+	if (!user_token) {
+		return undefined;
+	}
+	const queryParameters = new URLSearchParams({
+		page: "1",
+		pageSize: "9999",
+	});
+
+	const response = await request<{
+		data: Array<MyInviteesItem>;
+		statusCode: number;
+		message: string;
+	}>(
+		`${getIndexerBtcBaseUrl()}/api/v1/users/reward-my-invitees?${queryParameters.toString()}`,
 		{
 			method: "GET",
 			headers: {

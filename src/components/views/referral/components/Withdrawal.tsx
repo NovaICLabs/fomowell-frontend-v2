@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 
 import { motion } from "framer-motion";
 
@@ -6,38 +6,36 @@ import { Empty } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-import type { TypeReferralListItem } from "..";
+import type { MyWithdrawalsItem } from "@/apis/reward-btc";
 
-const ReferralHeader = ({
+const headers = [
+	{
+		id: "time",
+		label: "Time",
+		sortable: false,
+		className: "min-w-[40%] pl-[20px]",
+	},
+	{
+		id: "amount",
+		label: "Withdrawal amount (ICP)",
+		sortable: false,
+		className: "min-w-[40%]",
+	},
+	{
+		id: "state",
+		label: "State",
+		sortable: false,
+		className: "min-w-[20%]",
+	},
+];
+
+const WithdrawalHeader = ({
 	sortBy,
 	setSortBy,
 }: {
 	sortBy: string;
 	setSortBy: (sortBy: string) => void;
 }) => {
-	const headers = [
-		{
-			id: "time",
-			label: "Time",
-			sortable: false,
-			className:
-				"min-w-[18%] w-[180px] pr-[10px] pl-[20px] md:w-[400px] sticky left-0 bg-[#191919] z-[1]",
-		},
-		{
-			id: "amount",
-			label: "Withdrawal amount (ICP)",
-			sortable: true,
-			className: "min-w-[14%] flex-1 w-[120px] md:w-[220px]",
-		},
-		{
-			id: "state",
-			label: "State",
-			sortable: true,
-			className:
-				"min-w-[10%] w-[100px] pl-[10px] md:w-[220px] sticky right-0 bg-[#191919] z-[1]",
-		},
-	];
-
 	const handleSort = (field: string): void => {
 		if (sortBy === `${field}-up`) {
 			setSortBy(`${field}-down`);
@@ -92,10 +90,10 @@ const ReferralHeader = ({
 	);
 };
 
-const ReferralListItemSkeleton = () => {
+const WithdrawalListItemSkeleton = () => {
 	return (
 		<>
-			{Array.from({ length: 15 }).map((_, index) => (
+			{Array.from({ length: 3 }).map((_, index) => (
 				<div
 					key={index}
 					className="flex h-[70px] w-full flex-shrink-0 items-center justify-center border-b border-[#262626]"
@@ -107,7 +105,7 @@ const ReferralListItemSkeleton = () => {
 	);
 };
 
-const ReferralListItem = ({ itemData }: { itemData: TypeReferralListItem }) => {
+const WithdrawalListItem = ({ itemData }: { itemData: MyWithdrawalsItem }) => {
 	const transparentBg = "rgba(0, 0, 0, 0)";
 	const yellowBg = "rgba(247, 180, 6)";
 	const rowVariants = {
@@ -134,65 +132,57 @@ const ReferralListItem = ({ itemData }: { itemData: TypeReferralListItem }) => {
 
 	return (
 		<motion.tr
-			key={itemData.id}
 			className="group relative flex h-[70px] items-center border-b border-[#262626] duration-300 hover:!bg-[#262626]"
 			initial="initial"
 			variants={rowVariants}
 			onClick={() => {}}
 		>
-			<div className="sticky left-0 z-[1] flex h-full w-[180px] min-w-[18%] items-center bg-[#191919] pr-[10px] pl-[20px] text-left text-xs leading-none font-medium text-white/60 duration-300 group-hover:!bg-[#262626] md:w-[400px]">
-				<p className="text-sm font-normal text-white/60">06/08/2025</p>
+			<div className="flex h-full min-w-[40%] flex-1 flex-col justify-center pl-[20px] text-left text-sm leading-4 font-medium text-white/60">
+				<p className="text-sm font-normal text-white/60">
+					{itemData.createdAt}
+				</p>
 			</div>
-			<div className="flex h-full w-[120px] min-w-[14%] flex-1 flex-col justify-center text-left text-sm leading-4 font-medium text-white/60 md:w-[220px]">
-				<p className="text-sm font-normal text-white/60">3.14 ICP</p>
+			<div className="flex h-full min-w-[40%] flex-1 flex-col justify-center text-left text-sm leading-4 font-medium text-white/60">
+				<p className="text-sm font-normal text-white/60">{itemData.amount}</p>
 			</div>
-			<div className="sticky right-0 z-[1] flex h-full w-[100px] min-w-[10%] items-center bg-[#191919] pl-[10px] text-left text-sm leading-4 font-medium text-white/60 duration-300 group-hover:!bg-[#262626] md:w-[220px]">
-				<p className="text-sm font-normal text-white/60">Finished</p>
+			<div className="flex h-full min-w-[20%] flex-1 flex-col justify-center text-left text-sm leading-4 font-medium text-white/60">
+				<p className="text-sm font-normal text-white/60">{itemData.status}</p>
 			</div>
 		</motion.tr>
 	);
 };
 
-const WithdrawalTable = () => {
+const WithdrawalTable = ({
+	data,
+}: {
+	data: Array<MyWithdrawalsItem> | undefined;
+}) => {
 	const [sortBy, setSortBy] = useState<string>("");
-	const [list, setList] = useState<Array<TypeReferralListItem> | undefined>(
-		undefined
-	);
 
-	const sortedList = useMemo(() => {
-		if (!list) {
-			return undefined;
-		}
-		return list;
-	}, [list]);
+	// const sortedList = useMemo(() => {
+	// 	if (!data) {
+	// 		return undefined;
+	// 	}
 
-	useEffect(() => {
-		const data: Array<TypeReferralListItem> = [
-			{
-				id: 1,
-			},
-		];
-
-		setTimeout(() => {
-			setList(data);
-		}, 1000);
-	}, [sortBy]);
+	// 	return data;
+	// }, [data]);
 
 	return (
 		<table className="h-full w-full min-w-max">
 			<thead className="sticky top-0 z-10">
-				<ReferralHeader setSortBy={setSortBy} sortBy={sortBy} />
+				<WithdrawalHeader setSortBy={setSortBy} sortBy={sortBy} />
 			</thead>
-			<tbody className="flex w-full flex-col">
-				{!sortedList && <ReferralListItemSkeleton />}
-				{sortedList && sortedList.length ? (
-					sortedList.map((item) => (
-						<ReferralListItem key={item.id} itemData={item} />
-					))
-				) : (
-					<Empty />
-				)}
-			</tbody>
+			{!data && <WithdrawalListItemSkeleton />}
+			{data && !data.length && <Empty />}
+			{data && data.length ? (
+				<tbody className="flex w-full flex-col">
+					{data.map((item, index) => (
+						<WithdrawalListItem key={index} itemData={item} />
+					))}
+				</tbody>
+			) : (
+				<></>
+			)}
 		</table>
 	);
 };
