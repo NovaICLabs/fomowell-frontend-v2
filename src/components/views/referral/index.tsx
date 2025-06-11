@@ -2,10 +2,16 @@ import { useEffect, useState } from "react";
 
 import { Dialog } from "@radix-ui/react-dialog";
 
-import { getIcUserRewardStats, getIcUserRewardWithdraw } from "@/apis/reward";
 import {
+	getIcUserRewardLeaderboard,
+	getIcUserRewardStats,
+	getIcUserRewardWithdraw,
+} from "@/apis/reward";
+import {
+	getBtcUserRewardLeaderboard,
 	getBtcUserRewardStats,
 	getBtcUserRewardWithdraw,
+	type RewardLeaderboard,
 	type RewardStats,
 } from "@/apis/reward-btc";
 import { ReferralContent } from "@/components/layout/dialog/referral";
@@ -67,26 +73,35 @@ export default function ReferralPage() {
 	};
 
 	const [rewardStats, setRewardStats] = useState<RewardStats>();
+	const [rewardLeaderboard, setRewardLeaderboard] = useState<
+		Array<RewardLeaderboard>
+	>([]);
 
 	useEffect(() => {
 		if (chain === "icp" && icJwtToken) {
 			void getIcUserRewardStats(icJwtToken).then((result) => {
-				if (!result) {
-					return;
-				}
+				if (!result) return;
 				setRewardStats(result);
+			});
+
+			void getIcUserRewardLeaderboard(icJwtToken).then((result) => {
+				if (!result) return;
+				setRewardLeaderboard(result);
 			});
 		}
 
 		if (chain === "bitcoin" && btcJwtToken) {
 			void getBtcUserRewardStats(btcJwtToken).then((result) => {
-				if (!result) {
-					return;
-				}
+				if (!result) return;
 				setRewardStats(result);
 			});
+
+			void getBtcUserRewardLeaderboard(btcJwtToken).then((result) => {
+				if (!result) return;
+				setRewardLeaderboard(result);
+			});
 		}
-	}, []);
+	}, [btcJwtToken, icJwtToken, chain]);
 
 	const domain = window.location.origin;
 
@@ -192,66 +207,44 @@ export default function ReferralPage() {
 				</div>
 				<div className="ml-5 min-w-0 flex-1">
 					<div className="flex h-[212px] w-full gap-x-[13px] rounded-xl border border-[#f7b406]/30 bg-[#111111] p-3">
-						<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
-							<img alt="" className="w-[94px]" src="/images/gold.png" />
-							<div className="flex gap-x-[80px]">
-								<div className="flex flex-col gap-y-[13px]">
-									<p className="text-sm font-normal text-white/50">
-										Claimed Rewards:
-									</p>
-									<p className="flex text-base font-medium text-white">
-										250{" "}
-										<p className="text ml-1 uppercase">
-											{chain === "icp" ? "ICP" : "Sats"}
+						{rewardLeaderboard.map((item, index) => (
+							<div
+								key={index}
+								className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]"
+							>
+								{item.rank === 1 && (
+									<img alt="" className="w-[94px]" src="/images/gold.png" />
+								)}
+								{item.rank === 2 && (
+									<img alt="" className="w-[94px]" src="/images/silver.png" />
+								)}
+								{item.rank === 3 && (
+									<img alt="" className="w-[94px]" src="/images/copper.png" />
+								)}
+
+								<div className="flex gap-x-[80px]">
+									<div className="flex flex-col gap-y-[13px]">
+										<p className="text-sm font-normal text-white/50">
+											Claimed Rewards:
 										</p>
-									</p>
-								</div>
-								<div className="flex flex-col gap-y-[13px]">
-									<p className="text-sm font-normal text-white/50">Invitee:</p>
-									<p className="text-base font-medium text-white">255</p>
+										<p className="flex text-base font-medium text-white">
+											{item.totalRewards}{" "}
+											<p className="text ml-1 uppercase">
+												{chain === "icp" ? "ICP" : "SARS"}
+											</p>
+										</p>
+									</div>
+									<div className="flex flex-col gap-y-[13px]">
+										<p className="text-sm font-normal text-white/50">
+											Invitee:
+										</p>
+										<p className="text-base font-medium text-white">
+											{(item.level1Count || 0) + (item.level2Count || 0)}
+										</p>
+									</div>
 								</div>
 							</div>
-						</div>
-						<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
-							<img alt="" className="w-[94px]" src="/images/silver.png" />
-							<div className="flex gap-x-[80px]">
-								<div className="flex flex-col gap-y-[13px]">
-									<p className="text-sm font-normal text-white/50">
-										Claimed Rewards:
-									</p>
-									<p className="flex text-base font-medium text-white">
-										250{" "}
-										<p className="text ml-1 uppercase">
-											{chain === "icp" ? "ICP" : "Sats"}
-										</p>
-									</p>
-								</div>
-								<div className="flex flex-col gap-y-[13px]">
-									<p className="text-sm font-normal text-white/50">Invitee:</p>
-									<p className="text-base font-medium text-white">255</p>
-								</div>
-							</div>
-						</div>
-						<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
-							<img alt="" className="w-[94px]" src="/images/copper.png" />
-							<div className="flex gap-x-[80px]">
-								<div className="flex flex-col gap-y-[13px]">
-									<p className="text-sm font-normal text-white/50">
-										Claimed Rewards:
-									</p>
-									<p className="flex text-base font-medium text-white">
-										250{" "}
-										<p className="text ml-1 uppercase">
-											{chain === "icp" ? "ICP" : "Sats"}
-										</p>
-									</p>
-								</div>
-								<div className="flex flex-col gap-y-[13px]">
-									<p className="text-sm font-normal text-white/50">Invitee:</p>
-									<p className="text-base font-medium text-white">255</p>
-								</div>
-							</div>
-						</div>
+						))}
 					</div>
 
 					<div className="mt-5 flex h-[188px] w-full rounded-xl border border-neutral-800 bg-[#111111]">
@@ -266,7 +259,7 @@ export default function ReferralPage() {
 								</p>
 							</p>
 							<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
-								$241.63
+								--
 							</p>
 						</div>
 						<div className="flex flex-1 flex-col justify-center border-r border-neutral-800 px-5">
@@ -280,7 +273,7 @@ export default function ReferralPage() {
 								</p>
 							</p>
 							<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
-								$241.63
+								--
 							</p>
 						</div>
 						<div className="flex flex-1 items-center justify-center border-r border-neutral-800 px-5">
@@ -295,7 +288,7 @@ export default function ReferralPage() {
 									</p>
 								</p>
 								<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
-									$241.63
+									--
 								</p>
 							</div>
 							<div

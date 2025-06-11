@@ -19,6 +19,20 @@ export type RewardStats = {
 	};
 };
 
+export type RewardLeaderboard = {
+	rank: number;
+	user: {
+		id: number;
+		principal: string;
+		name: string;
+		avatar: string;
+	};
+	totalRewards: string;
+	availableRewards: string;
+	level1Count: number;
+	level2Count: number;
+};
+
 export const getBtcUserRewardStats = async (user_token: string) => {
 	if (!user_token) {
 		return undefined;
@@ -43,15 +57,12 @@ export const getBtcUserRewardStats = async (user_token: string) => {
 	return response.data;
 };
 
-export const getBtcUserRewardLeaderboard = async (
-	user_token: string,
-	limit: number
-) => {
+export const getBtcUserRewardLeaderboard = async (user_token: string) => {
 	if (!user_token) {
 		return undefined;
 	}
 	const response = await request<{
-		data: RewardStats;
+		data: Array<RewardLeaderboard>;
 		statusCode: number;
 		message: string;
 	}>(`${getIndexerBtcBaseUrl()}/api/v1/users/reward-leaderboard`, {
