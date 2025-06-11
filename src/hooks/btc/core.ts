@@ -94,10 +94,11 @@ export const useBtcMemeCurrentPrice = (args: { id: number }) => {
 
 			return {
 				raw: result,
-				formattedPerPayToken: BigNumber(1)
-					.times(10 ** getCkbtcCanisterToken().decimals)
-					.div(BigNumber(result))
-					.toString(),
+				formattedPerPayToken: result,
+				// BigNumber(1)
+				// 	.times(10 ** getCkbtcCanisterToken().decimals)
+				// 	.div(BigNumber(result))
+				// 	.toString(),
 			};
 		},
 		// refetchInterval: 2000,
