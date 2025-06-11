@@ -104,3 +104,35 @@ export const getBtcUserRewardWithdraw = async (user_token: string) => {
 	}
 	return response.data;
 };
+
+export const getBtcUserRewardMyWithdraw = async (user_token: string) => {
+	if (!user_token) {
+		return undefined;
+	}
+	const queryParameters = new URLSearchParams({
+		page: "1",
+		pageSize: "9999",
+	});
+
+	const response = await request<{
+		data: RewardStats;
+		statusCode: number;
+		message: string;
+	}>(
+		`${getIndexerBtcBaseUrl()}/api/v1/users/reward-my-withdrawals?${queryParameters.toString()}`,
+		{
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				authorization: `Bearer ${user_token}`,
+			},
+		}
+	);
+
+	if (response.statusCode !== 200) {
+		throw new Error(
+			`Failed to fetch user: ${response.message} (Status: ${response.statusCode})`
+		);
+	}
+	return response.data;
+};

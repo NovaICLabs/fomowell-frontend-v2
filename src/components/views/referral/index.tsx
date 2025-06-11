@@ -17,6 +17,8 @@ import {
 import { ReferralContent } from "@/components/layout/dialog/referral";
 import { DialogContent } from "@/components/ui/dialog";
 import { showToast } from "@/components/utils/toast";
+import { useICPPrice, useSatsPrice } from "@/hooks/apis/coingecko";
+import { formatNumberSmart } from "@/lib/common/number";
 import { cn } from "@/lib/utils";
 import { useBtcIdentityStore } from "@/store/btc";
 import { useChainStore } from "@/store/chain";
@@ -27,6 +29,32 @@ import WithdrawalTable from "./components/Withdrawal";
 
 export type TypeReferralListItem = {
 	id: number;
+};
+
+const PriceRewardsIcp = ({ data }: { data: string }) => {
+	const { data: icpPrice } = useICPPrice();
+	return (
+		<>
+			{!data || !icpPrice
+				? "--"
+				: formatNumberSmart(Number(data) * icpPrice, {
+						shortZero: true,
+					})}
+		</>
+	);
+};
+const PriceRewardsSats = ({ data }: { data: string }) => {
+	const { data: satsPrice } = useSatsPrice();
+	return (
+		<>
+			{!data || !satsPrice
+				? "--"
+				: "$" +
+					formatNumberSmart(Number(data) * satsPrice, {
+						shortZero: true,
+					})}
+		</>
+	);
 };
 
 export default function ReferralPage() {
@@ -259,7 +287,11 @@ export default function ReferralPage() {
 								</p>
 							</p>
 							<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
-								--
+								{chain === "icp" ? (
+									<PriceRewardsIcp data={rewardStats?.reward?.total || "0"} />
+								) : (
+									<PriceRewardsSats data={rewardStats?.reward?.total || "0"} />
+								)}
 							</p>
 						</div>
 						<div className="flex flex-1 flex-col justify-center border-r border-neutral-800 px-5">
@@ -273,7 +305,15 @@ export default function ReferralPage() {
 								</p>
 							</p>
 							<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
-								--
+								{chain === "icp" ? (
+									<PriceRewardsIcp
+										data={rewardStats?.reward?.withdrawn || "0"}
+									/>
+								) : (
+									<PriceRewardsSats
+										data={rewardStats?.reward?.withdrawn || "0"}
+									/>
+								)}
 							</p>
 						</div>
 						<div className="flex flex-1 items-center justify-center border-r border-neutral-800 px-5">
@@ -288,7 +328,15 @@ export default function ReferralPage() {
 									</p>
 								</p>
 								<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
-									--
+									{chain === "icp" ? (
+										<PriceRewardsIcp
+											data={rewardStats?.reward?.available || "0"}
+										/>
+									) : (
+										<PriceRewardsSats
+											data={rewardStats?.reward?.available || "0"}
+										/>
+									)}
 								</p>
 							</div>
 							<div
