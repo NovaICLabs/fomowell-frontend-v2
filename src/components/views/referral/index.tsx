@@ -8,6 +8,8 @@ import { useIcIdentityStore } from "@/store/ic";
 
 import Invitation from "./components/Invitation";
 import WithdrawalTable from "./components/Withdrawal";
+import { Dialog } from "@radix-ui/react-dialog";
+import { DialogContent } from "@/components/ui/dialog";
 
 export type TypeReferralListItem = {
 	id: number;
@@ -22,6 +24,8 @@ export default function ReferralPage() {
 	const { chain } = useChainStore();
 
 	const [tab, setTab] = useState<"invitation" | "withdrawal">("invitation");
+	const [open, setOpen] = useState(false);
+	const [loading, setLoading] = useState(false);
 
 	const withdrawal = [
 		"Each withdrawal requires a minimum of 1 ICP to be eligible for application (if not met, it will continue to accumulate).",
@@ -30,7 +34,14 @@ export default function ReferralPage() {
 	];
 
 	const onWithdraw = () => {
-		console.log("🚀 ~ onWithdraw ~ onWithdraw:", onWithdraw);
+		setLoading(true);
+		if (chain === "icp" && icJwtToken) {
+			// icJwtToken;
+		}
+
+		if (chain === "bitcoin" && btcJwtToken) {
+			// btcJwtToken;
+		}
 	};
 
 	const init = async () => {
@@ -50,144 +61,169 @@ export default function ReferralPage() {
 	const domain = window.location.origin;
 
 	return (
-		<div className="flex h-full w-full">
-			<div className="flex w-[350px] flex-shrink-0 flex-col">
-				<ReferralContent
-					referralLink={`${domain}?chain=${chain}&ref=${chain === "icp" ? identityProfileIc?.invite_code : identityProfileBTC?.invite_code}`}
-					referralText={
-						chain === "icp"
-							? [
-									"Inviting friends to log in will earn you 0.5 ICPS.",
-									"First-level commission rebate: 20%",
-									"Secondary commission rebate: 5%",
-									"Third-level anti-bribery: 3%",
-								]
-							: [
-									"First-level commission rebate: 20%",
-									"Secondary commission rebate: 5%",
-								]
-					}
-				/>
-				<div className="mt-5 w-full rounded-xl border border-[#f7b406]/40 bg-[#111111] px-4 py-7">
-					<div className="flex w-full items-center">
-						<img
-							alt="fomowell"
-							className="mr-1 h-[18px] w-[18px]"
-							src="/svgs/info.svg"
-						/>
-						<p className="justify-start font-['Albert_Sans'] text-base font-semibold text-white">
-							Withdrawal explanation
-						</p>
-					</div>
-					<div className="mt-3 flex flex-col gap-y-[20px]">
-						{withdrawal.map((item, index) => (
-							<div className="flex w-full">
-								<div className="mt-[8px] mr-[6px] h-1 w-1 flex-shrink-0 rounded-full bg-white/60" />
-								<p key={index} className="text-sm font-normal text-white/60">
-									{item}
-								</p>
+		<>
+			<Dialog
+				open={open}
+				onOpenChange={(show: boolean) => {
+					if (loading) return;
+					setOpen(show);
+				}}
+			>
+				<DialogContent
+					className={cn(
+						"border-gray-755 bg-gray-755 transition-height flex w-[398px] flex-col rounded-3xl px-5 py-6 text-white duration-300"
+					)}
+				>
+					<div className="mt-5 flex w-full flex-col items-center">
+						<img alt="svg" className="w-[40px]" src="/svgs/withdraw.svg" />
+						<div className="mt-[15px] w-full justify-center px-2 text-center font-['Albert_Sans'] text-lg leading-relaxed font-medium text-white">
+							Should the entire amount of the reward be made available?
+						</div>
+						<div className="mt-[40px] flex w-full gap-x-4">
+							<div className="flex h-[42px] flex-1 cursor-pointer items-center justify-center rounded-[21px] border border-[#f7b406]">
+								<div
+									className="text-base leading-none font-semibold text-white"
+									onClick={() => {
+										if (loading) return;
+										setOpen(false);
+									}}
+								>
+									Cancel
+								</div>
 							</div>
-						))}
-					</div>
-				</div>
-			</div>
-			<div className="ml-5 min-w-0 flex-1">
-				<div className="flex h-[212px] w-full gap-x-[13px] rounded-xl border border-[#f7b406]/30 bg-[#111111] p-3">
-					<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
-						<img alt="" className="w-[94px]" src="/images/gold.png" />
-						<div className="flex gap-x-[80px]">
-							<div className="flex flex-col gap-y-[13px]">
-								<p className="text-sm font-normal text-white/50">
-									Claimed Rewards:
-								</p>
-								<p className="flex text-base font-medium text-white">
-									250{" "}
-									<p className="text ml-1 uppercase">
-										{chain === "icp" ? "icp" : "btc"}
-									</p>
-								</p>
-							</div>
-							<div className="flex flex-col gap-y-[13px]">
-								<p className="text-sm font-normal text-white/50">Invitee:</p>
-								<p className="text-base font-medium text-white">255</p>
+							<div
+								className={cn(
+									"flex h-[42px] flex-1 cursor-pointer items-center justify-center rounded-[21px] border bg-[#f7b406]",
+									loading && "!cursor-not-allowed opacity-80"
+								)}
+								onClick={() => {
+									onWithdraw();
+								}}
+							>
+								{loading && (
+									<img
+										alt=""
+										className="mr-2 h-3.5 w-3.5 animate-spin"
+										src="/svgs/loading.svg"
+									/>
+								)}
+								<div className="text-base leading-none font-semibold text-black">
+									Confirm
+								</div>
 							</div>
 						</div>
 					</div>
-					<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
-						<img alt="" className="w-[94px]" src="/images/silver.png" />
-						<div className="flex gap-x-[80px]">
-							<div className="flex flex-col gap-y-[13px]">
-								<p className="text-sm font-normal text-white/50">
-									Claimed Rewards:
-								</p>
-								<p className="flex text-base font-medium text-white">
-									250{" "}
-									<p className="text ml-1 uppercase">
-										{chain === "icp" ? "icp" : "btc"}
-									</p>
-								</p>
-							</div>
-							<div className="flex flex-col gap-y-[13px]">
-								<p className="text-sm font-normal text-white/50">Invitee:</p>
-								<p className="text-base font-medium text-white">255</p>
-							</div>
+				</DialogContent>
+			</Dialog>
+			<div className="flex h-full w-full">
+				<div className="flex w-[350px] flex-shrink-0 flex-col">
+					<ReferralContent
+						referralLink={`${domain}?chain=${chain}&ref=${chain === "icp" ? identityProfileIc?.invite_code : identityProfileBTC?.invite_code}`}
+						referralText={
+							chain === "icp"
+								? [
+										"Inviting friends to log in will earn you 0.5 ICPS.",
+										"First-level commission rebate: 20%",
+										"Secondary commission rebate: 5%",
+										"Third-level anti-bribery: 3%",
+									]
+								: [
+										"First-level commission rebate: 20%",
+										"Secondary commission rebate: 5%",
+									]
+						}
+					/>
+					<div className="mt-5 w-full rounded-xl border border-[#f7b406]/40 bg-[#111111] px-4 py-7">
+						<div className="flex w-full items-center">
+							<img
+								alt="fomowell"
+								className="mr-1 h-[18px] w-[18px]"
+								src="/svgs/info.svg"
+							/>
+							<p className="justify-start font-['Albert_Sans'] text-base font-semibold text-white">
+								Withdrawal explanation
+							</p>
 						</div>
-					</div>
-					<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
-						<img alt="" className="w-[94px]" src="/images/copper.png" />
-						<div className="flex gap-x-[80px]">
-							<div className="flex flex-col gap-y-[13px]">
-								<p className="text-sm font-normal text-white/50">
-									Claimed Rewards:
-								</p>
-								<p className="flex text-base font-medium text-white">
-									250{" "}
-									<p className="text ml-1 uppercase">
-										{chain === "icp" ? "icp" : "btc"}
+						<div className="mt-3 flex flex-col gap-y-[20px]">
+							{withdrawal.map((item, index) => (
+								<div className="flex w-full">
+									<div className="mt-[8px] mr-[6px] h-1 w-1 flex-shrink-0 rounded-full bg-white/60" />
+									<p key={index} className="text-sm font-normal text-white/60">
+										{item}
 									</p>
-								</p>
-							</div>
-							<div className="flex flex-col gap-y-[13px]">
-								<p className="text-sm font-normal text-white/50">Invitee:</p>
-								<p className="text-base font-medium text-white">255</p>
-							</div>
+								</div>
+							))}
 						</div>
 					</div>
 				</div>
+				<div className="ml-5 min-w-0 flex-1">
+					<div className="flex h-[212px] w-full gap-x-[13px] rounded-xl border border-[#f7b406]/30 bg-[#111111] p-3">
+						<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
+							<img alt="" className="w-[94px]" src="/images/gold.png" />
+							<div className="flex gap-x-[80px]">
+								<div className="flex flex-col gap-y-[13px]">
+									<p className="text-sm font-normal text-white/50">
+										Claimed Rewards:
+									</p>
+									<p className="flex text-base font-medium text-white">
+										250{" "}
+										<p className="text ml-1 uppercase">
+											{chain === "icp" ? "icp" : "btc"}
+										</p>
+									</p>
+								</div>
+								<div className="flex flex-col gap-y-[13px]">
+									<p className="text-sm font-normal text-white/50">Invitee:</p>
+									<p className="text-base font-medium text-white">255</p>
+								</div>
+							</div>
+						</div>
+						<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
+							<img alt="" className="w-[94px]" src="/images/silver.png" />
+							<div className="flex gap-x-[80px]">
+								<div className="flex flex-col gap-y-[13px]">
+									<p className="text-sm font-normal text-white/50">
+										Claimed Rewards:
+									</p>
+									<p className="flex text-base font-medium text-white">
+										250{" "}
+										<p className="text ml-1 uppercase">
+											{chain === "icp" ? "icp" : "btc"}
+										</p>
+									</p>
+								</div>
+								<div className="flex flex-col gap-y-[13px]">
+									<p className="text-sm font-normal text-white/50">Invitee:</p>
+									<p className="text-base font-medium text-white">255</p>
+								</div>
+							</div>
+						</div>
+						<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
+							<img alt="" className="w-[94px]" src="/images/copper.png" />
+							<div className="flex gap-x-[80px]">
+								<div className="flex flex-col gap-y-[13px]">
+									<p className="text-sm font-normal text-white/50">
+										Claimed Rewards:
+									</p>
+									<p className="flex text-base font-medium text-white">
+										250{" "}
+										<p className="text ml-1 uppercase">
+											{chain === "icp" ? "icp" : "btc"}
+										</p>
+									</p>
+								</div>
+								<div className="flex flex-col gap-y-[13px]">
+									<p className="text-sm font-normal text-white/50">Invitee:</p>
+									<p className="text-base font-medium text-white">255</p>
+								</div>
+							</div>
+						</div>
+					</div>
 
-				<div className="mt-5 flex h-[188px] w-full rounded-xl border border-neutral-800 bg-[#111111]">
-					<div className="flex flex-1 flex-col justify-center border-r border-neutral-800 px-5">
-						<p className="text-sm leading-none font-normal text-white/50">
-							My total Rewards
-						</p>
-						<p className="mt-2 flex text-2xl leading-none font-medium text-white">
-							30{" "}
-							<p className="text ml-1 uppercase">
-								{chain === "icp" ? "icp" : "btc"}
-							</p>
-						</p>
-						<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
-							$241.63
-						</p>
-					</div>
-					<div className="flex flex-1 flex-col justify-center border-r border-neutral-800 px-5">
-						<p className="text-sm leading-none font-normal text-white/50">
-							Withdrawal completed
-						</p>
-						<p className="mt-2 flex text-2xl leading-none font-medium text-white">
-							30{" "}
-							<p className="text ml-1 uppercase">
-								{chain === "icp" ? "icp" : "btc"}
-							</p>
-						</p>
-						<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
-							$241.63
-						</p>
-					</div>
-					<div className="flex flex-1 items-center justify-center border-r border-neutral-800 px-5">
-						<div className="flex flex-1 flex-col">
+					<div className="mt-5 flex h-[188px] w-full rounded-xl border border-neutral-800 bg-[#111111]">
+						<div className="flex flex-1 flex-col justify-center border-r border-neutral-800 px-5">
 							<p className="text-sm leading-none font-normal text-white/50">
-								Can withdraw
+								My total Rewards
 							</p>
 							<p className="mt-2 flex text-2xl leading-none font-medium text-white">
 								30{" "}
@@ -199,75 +235,105 @@ export default function ReferralPage() {
 								$241.63
 							</p>
 						</div>
-						<div
-							className="flex h-[38px] w-[103px] cursor-pointer items-center justify-center rounded-[21px] bg-white text-sm font-semibold text-[#111111]"
-							onClick={() => {
-								onWithdraw();
-							}}
-						>
-							Withdraw
+						<div className="flex flex-1 flex-col justify-center border-r border-neutral-800 px-5">
+							<p className="text-sm leading-none font-normal text-white/50">
+								Withdrawal completed
+							</p>
+							<p className="mt-2 flex text-2xl leading-none font-medium text-white">
+								30{" "}
+								<p className="text ml-1 uppercase">
+									{chain === "icp" ? "icp" : "btc"}
+								</p>
+							</p>
+							<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
+								$241.63
+							</p>
 						</div>
-					</div>
-				</div>
-
-				<div className="mt-[30px] flex w-full flex-col">
-					<div className="flex w-full gap-x-[40px]">
-						<div className="relative flex">
-							<p
-								className={cn(
-									"cursor-pointer text-base font-semibold text-white/40 duration-300",
-									tab === "invitation" && "text-white"
-								)}
+						<div className="flex flex-1 items-center justify-center border-r border-neutral-800 px-5">
+							<div className="flex flex-1 flex-col">
+								<p className="text-sm leading-none font-normal text-white/50">
+									Can withdraw
+								</p>
+								<p className="mt-2 flex text-2xl leading-none font-medium text-white">
+									30{" "}
+									<p className="text ml-1 uppercase">
+										{chain === "icp" ? "icp" : "btc"}
+									</p>
+								</p>
+								<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
+									$241.63
+								</p>
+							</div>
+							<div
+								className="flex h-[38px] w-[103px] cursor-pointer items-center justify-center rounded-[21px] bg-white text-sm font-semibold text-[#111111]"
 								onClick={() => {
-									setTab("invitation");
+									setOpen(true);
 								}}
 							>
-								Invitation Rebate
-							</p>
-							<div
-								className={`absolute -bottom-1 left-0 h-[1px] rounded-[1px] transition-all duration-300 ease-in-out ${
-									tab === "invitation"
-										? "w-[66px] opacity-100"
-										: "w-0 opacity-0"
-								}`}
-								style={{
-									background:
-										"linear-gradient(90deg, #F7B406 0%, rgba(247, 180, 6, 0.00) 100%)",
-								}}
-							/>
-						</div>
-						<div className="relative flex">
-							<p
-								className={cn(
-									"cursor-pointer text-base font-semibold text-white/40 duration-300",
-									tab === "withdrawal" && "text-white"
-								)}
-								onClick={() => {
-									setTab("withdrawal");
-								}}
-							>
-								Withdrawal Record
-							</p>
-							<div
-								className={`absolute -bottom-1 left-0 h-[1px] rounded-[1px] transition-all duration-300 ease-in-out ${
-									tab === "withdrawal"
-										? "w-[66px] opacity-100"
-										: "w-0 opacity-0"
-								}`}
-								style={{
-									background:
-										"linear-gradient(90deg, #F7B406 0%, rgba(247, 180, 6, 0.00) 100%)",
-								}}
-							/>
+								Withdraw
+							</div>
 						</div>
 					</div>
 
-					<div className="no-scrollbar mt-4 h-[331px] flex-shrink-0 overflow-x-scroll rounded-xl bg-[#191919]">
-						{tab === "invitation" && <Invitation />}
-						{tab === "withdrawal" && <WithdrawalTable />}
+					<div className="mt-[30px] flex w-full flex-col">
+						<div className="flex w-full gap-x-[40px]">
+							<div className="relative flex">
+								<p
+									className={cn(
+										"cursor-pointer text-base font-semibold text-white/40 duration-300",
+										tab === "invitation" && "text-white"
+									)}
+									onClick={() => {
+										setTab("invitation");
+									}}
+								>
+									Invitation Rebate
+								</p>
+								<div
+									className={`absolute -bottom-1 left-0 h-[1px] rounded-[1px] transition-all duration-300 ease-in-out ${
+										tab === "invitation"
+											? "w-[66px] opacity-100"
+											: "w-0 opacity-0"
+									}`}
+									style={{
+										background:
+											"linear-gradient(90deg, #F7B406 0%, rgba(247, 180, 6, 0.00) 100%)",
+									}}
+								/>
+							</div>
+							<div className="relative flex">
+								<p
+									className={cn(
+										"cursor-pointer text-base font-semibold text-white/40 duration-300",
+										tab === "withdrawal" && "text-white"
+									)}
+									onClick={() => {
+										setTab("withdrawal");
+									}}
+								>
+									Withdrawal Record
+								</p>
+								<div
+									className={`absolute -bottom-1 left-0 h-[1px] rounded-[1px] transition-all duration-300 ease-in-out ${
+										tab === "withdrawal"
+											? "w-[66px] opacity-100"
+											: "w-0 opacity-0"
+									}`}
+									style={{
+										background:
+											"linear-gradient(90deg, #F7B406 0%, rgba(247, 180, 6, 0.00) 100%)",
+									}}
+								/>
+							</div>
+						</div>
+
+						<div className="no-scrollbar mt-4 h-[331px] flex-shrink-0 overflow-x-scroll rounded-xl bg-[#191919]">
+							{tab === "invitation" && <Invitation />}
+							{tab === "withdrawal" && <WithdrawalTable />}
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 }
