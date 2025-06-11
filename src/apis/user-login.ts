@@ -97,7 +97,7 @@ export type CreateUser = {
 	avatar?: string;
 	email?: string;
 	name?: string;
-	invate_by?: string;
+	invite_by?: string;
 };
 export const createNewUser = async () => {
 	const response = await request<{
@@ -116,7 +116,7 @@ export const createNewUser = async () => {
 			avatar: "string",
 			email: "user@example.com",
 			name: "John",
-			invate_by: "VW50",
+			invite_by: "VW50",
 		}),
 	});
 	if (response.statusCode === 409) {

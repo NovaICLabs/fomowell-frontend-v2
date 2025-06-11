@@ -114,49 +114,53 @@ export default function ReferralPage() {
 	>(undefined);
 
 	useEffect(() => {
-		if (chain === "icp" && icJwtToken) {
-			void getIcUserRewardStats(icJwtToken).then((result) => {
-				if (!result) return;
-				setRewardStats(result);
-			});
+		if (chain === "icp") {
+			if (icJwtToken) {
+				void getIcUserRewardStats(icJwtToken).then((result) => {
+					if (!result) return;
+					setRewardStats(result);
+				});
 
-			void getIcUserRewardLeaderboard(icJwtToken).then((result) => {
-				if (!result) return;
-				setRewardLeaderboard(result);
-			});
+				void getIcUserRewardLeaderboard(icJwtToken).then((result) => {
+					if (!result) return;
+					setRewardLeaderboard(result);
+				});
 
-			void getIcUserRewardMyWithdraw(icJwtToken).then((result) => {
-				if (!result) return;
-				setMyWithdraw(result.withdrawals);
-			});
+				void getIcUserRewardMyWithdraw(icJwtToken).then((result) => {
+					if (!result) return;
+					setMyWithdraw(result.withdrawals);
+				});
 
-			void getIcUserRewardMyInvitees(icJwtToken).then((result) => {
-				if (!result) return;
-				setMyInvitees(result);
-			});
+				void getIcUserRewardMyInvitees(icJwtToken).then((result) => {
+					if (!result) return;
+					setMyInvitees(result);
+				});
+			}
 		}
 
-		if (chain === "bitcoin" && btcJwtToken) {
-			void getBtcUserRewardStats(btcJwtToken).then((result) => {
-				if (!result) return;
-				setRewardStats(result);
-			});
+		if (chain === "bitcoin") {
+			if (btcJwtToken) {
+				void getBtcUserRewardStats(btcJwtToken).then((result) => {
+					if (!result) return;
+					setRewardStats(result);
+				});
 
-			void getBtcUserRewardLeaderboard(btcJwtToken).then((result) => {
-				if (!result) return;
-				setRewardLeaderboard(result);
-			});
+				void getBtcUserRewardLeaderboard(btcJwtToken).then((result) => {
+					if (!result) return;
+					setRewardLeaderboard(result);
+				});
 
-			void getBtcUserRewardMyWithdraw(btcJwtToken).then((result) => {
-				if (!result) return;
+				void getBtcUserRewardMyWithdraw(btcJwtToken).then((result) => {
+					if (!result) return;
 
-				setMyWithdraw(result.withdrawals);
-			});
+					setMyWithdraw(result.withdrawals);
+				});
 
-			void getBtcUserRewardMyInvitees(btcJwtToken).then((result) => {
-				if (!result) return;
-				setMyInvitees(result);
-			});
+				void getBtcUserRewardMyInvitees(btcJwtToken).then((result) => {
+					if (!result) return;
+					setMyInvitees(result);
+				});
+			}
 		}
 	}, [btcJwtToken, icJwtToken, chain]);
 
