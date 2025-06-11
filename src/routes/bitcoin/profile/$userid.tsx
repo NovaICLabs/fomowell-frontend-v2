@@ -322,7 +322,7 @@ function UserId() {
 				referralsTotal={1}
 				setOpen={setReferral2BTCOpen}
 				referralText={[
-					"First-level commission rebate: 10%",
+					"First-level commission rebate: 20%",
 					"Secondary commission rebate: 5%",
 				]}
 			/>

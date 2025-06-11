@@ -44,12 +44,12 @@ export default function ReferralPage() {
 						chain === "icp"
 							? [
 									"Inviting friends to log in will earn you 0.5 ICPS.",
-									"First-level commission rebate: 10%",
+									"First-level commission rebate: 20%",
 									"Secondary commission rebate: 5%",
 									"Third-level anti-bribery: 3%",
 								]
 							: [
-									"First-level commission rebate: 10%",
+									"First-level commission rebate: 20%",
 									"Secondary commission rebate: 5%",
 								]
 					}
@@ -78,7 +78,7 @@ export default function ReferralPage() {
 				</div>
 			</div>
 			<div className="ml-5 min-w-0 flex-1">
-				<div className="flex h-[212px] w-full gap-x-[13px] rounded-xl border border-[#f7b406] bg-[#111111] p-3">
+				<div className="flex h-[212px] w-full gap-x-[13px] rounded-xl border border-[#f7b406]/30 bg-[#111111] p-3">
 					<div className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]">
 						<img alt="" className="w-[94px]" src="/images/gold.png" />
 						<div className="flex gap-x-[80px]">

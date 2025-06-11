@@ -10,10 +10,10 @@ export const menuLinks = [
 		label: "Tokens",
 		to: "/",
 	},
-	{
-		label: "Referral",
-		to: "/referral",
-	},
+	// {
+	// 	label: "Referral",
+	// 	to: "/referral",
+	// },
 	// {
 	// 	label: "Liquidity",
 	// 	to: "/liquidity",

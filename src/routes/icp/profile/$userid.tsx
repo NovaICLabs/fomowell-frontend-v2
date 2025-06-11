@@ -335,7 +335,7 @@ function UserId() {
 				setOpen={setReferral2ICPOpen}
 				referralText={[
 					"Inviting friends to log in will earn you 0.5 ICPS.",
-					"First-level commission rebate: 10%",
+					"First-level commission rebate: 20%",
 					"Secondary commission rebate: 5%",
 					"Third-level anti-bribery: 3%",
 				]}

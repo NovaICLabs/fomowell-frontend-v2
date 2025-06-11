@@ -11,6 +11,7 @@ import { getCkbtcCanisterId } from "@/canisters/btc_core";
 import { CopyIcon } from "@/components/icons/common/copy";
 import { DisconnectIcon } from "@/components/icons/common/disconnect";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
+import InvitationIcon from "@/components/icons/links-popover/invitation";
 import WalletIcon from "@/components/icons/links-popover/linked-wallet";
 import ProfileIcon from "@/components/icons/links-popover/profile";
 import { Button } from "@/components/ui/button";
@@ -126,6 +127,13 @@ export const BtcAccountInfo = () => {
 				void router.navigate({ to: `/bitcoin/wallet/${principal}` });
 			}),
 			icon: <WalletIcon />,
+		},
+		{
+			label: "Invitation",
+			action: withStopPropagation(() => {
+				void router.navigate({ to: `/referral` });
+			}),
+			icon: <InvitationIcon />,
 		},
 	];
 
