@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import copy from "copy-to-clipboard";
 
+import { getBtcUserRewardStats, type RewardStats } from "@/apis/reward-btc";
 import {
 	Dialog,
 	DialogContent,
@@ -11,27 +12,45 @@ import {
 import { showToast } from "@/components/utils/toast";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { cn } from "@/lib/utils";
-import { useBtcRewardStats } from "@/hooks/apis/indexer_btc";
+import { useBtcIdentityStore } from "@/store/btc";
+import { useChainStore } from "@/store/chain";
+import { useIcIdentityStore } from "@/store/ic";
 
 type ReferralProps = {
 	referralLink: string;
 	referralText: Array<string>;
-	referralsTotal: number;
-	earnedTotal: number;
 };
 
 export const ReferralContent: React.FC<ReferralProps> = ({
 	referralLink,
 	referralText,
-	referralsTotal,
-	earnedTotal,
 }) => {
-	const a = useBtcRewardStats();
+	const { chain } = useChainStore();
+	const { jwt_token: btcJwtToken } = useBtcIdentityStore();
+	const { jwt_token: icJwtToken } = useIcIdentityStore();
+
+	const [referrals, setReferrals] = useState<number>(0);
+	const [earned, setEarned] = useState<string>("0");
+
+	const init = async () => {
+		if (chain === "icp" && icJwtToken) {
+			const result = await getBtcUserRewardStats(icJwtToken);
+			if (result) {
+				setReferrals(result?.level1Count + result?.level2Count);
+			}
+		}
+
+		if (chain === "bitcoin" && btcJwtToken) {
+			const result = await getBtcUserRewardStats(btcJwtToken);
+			if (result) {
+				setEarned(result?.reward.total);
+			}
+		}
+	};
 
 	useEffect(() => {
-		// console.log("referralLink", referralLink);
-		console.log("🚀 ~ jwt_token:", a);
-	}, [a]);
+		init().catch(console.error);
+	}, []);
 
 	return (
 		<div className="relative flex w-full">
@@ -72,7 +91,11 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 					</p>
 					<div className="mt-[18px] flex w-full items-center">
 						<div className="flex h-[38px] flex-1 items-center truncate rounded-[10px] border border-[#101010]/60 text-sm font-normal text-[#101010]">
-							<p className="mx-2 truncate text-left">{referralLink}</p>
+							<input
+								disabled
+								className="mx-2 h-full w-full text-left outline-none"
+								value={referralLink}
+							></input>
 						</div>
 						<img
 							alt="fomowell"
@@ -86,10 +109,10 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 					</div>
 					<div className="mt-[16px] flex w-full justify-between">
 						<p className="text-sm font-medium text-[#101010]">
-							Referrals: {referralsTotal} users
+							Referrals: {referrals} users
 						</p>
 						<p className="text-sm font-medium text-[#101010]">
-							Sats earned: {earnedTotal} sats
+							Sats earned: {earned} sats
 						</p>
 					</div>
 				</div>
@@ -100,14 +123,7 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 
 const ReferralDialog: React.FC<
 	ReferralProps & { open: boolean; setOpen: (open: boolean) => void }
-> = ({
-	open,
-	setOpen,
-	referralLink,
-	referralText,
-	referralsTotal,
-	earnedTotal,
-}) => {
+> = ({ open, setOpen, referralLink, referralText }) => {
 	return (
 		<>
 			<Dialog
@@ -128,10 +144,8 @@ const ReferralDialog: React.FC<
 					</DialogHeader>
 
 					<ReferralContent
-						earnedTotal={earnedTotal}
 						referralLink={referralLink}
 						referralText={referralText}
-						referralsTotal={referralsTotal}
 					/>
 				</DialogContent>
 			</Dialog>

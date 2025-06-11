@@ -20,6 +20,7 @@ import {
 	type TokenInfo,
 	type TokenListParameters,
 } from "@/apis/indexer";
+import { getUserRewardStats } from "@/apis/reward";
 import { updateUserInfo } from "@/apis/user-login";
 import { getICPCanisterId, getIcrcTokenBalance } from "@/canisters/icrc3";
 import { useDialogStore } from "@/store/dialog";

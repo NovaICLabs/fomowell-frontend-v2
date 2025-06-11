@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ReferralContent } from "@/components/layout/dialog/referral";
 import { cn } from "@/lib/utils";
@@ -14,8 +14,10 @@ export type TypeReferralListItem = {
 };
 
 export default function ReferralPage() {
-	const { identityProfile: identityProfileBTC } = useBtcIdentityStore();
-	const { identityProfile: identityProfileIc } = useIcIdentityStore();
+	const { identityProfile: identityProfileBTC, jwt_token: btcJwtToken } =
+		useBtcIdentityStore();
+	const { identityProfile: identityProfileIc, jwt_token: icJwtToken } =
+		useIcIdentityStore();
 
 	const { chain } = useChainStore();
 
@@ -31,15 +33,27 @@ export default function ReferralPage() {
 		console.log("🚀 ~ onWithdraw ~ onWithdraw:", onWithdraw);
 	};
 
+	const init = async () => {
+		if (chain === "icp" && icJwtToken) {
+			// icJwtToken;
+		}
+
+		if (chain === "bitcoin" && btcJwtToken) {
+			// btcJwtToken;
+		}
+	};
+
+	useEffect(() => {
+		init().catch(console.error);
+	}, []);
+
 	const domain = window.location.origin;
 
 	return (
 		<div className="flex h-full w-full">
 			<div className="flex w-[350px] flex-shrink-0 flex-col">
 				<ReferralContent
-					earnedTotal={0}
 					referralLink={`${domain}?chain=${chain}&ref=${chain === "icp" ? identityProfileIc?.invite_code : identityProfileBTC?.invite_code}`}
-					referralsTotal={2}
 					referralText={
 						chain === "icp"
 							? [

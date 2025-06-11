@@ -1,6 +1,6 @@
 import { request } from ".";
 
-import type { UserInfo } from "./indexer";
+import type { RewardStats } from "./reward-btc";
 
 const getIndexerBaseUrl = () => {
 	const indexerBaseUrl = import.meta.env.VITE_INDEXER_BASE_URL;
@@ -10,22 +10,12 @@ const getIndexerBaseUrl = () => {
 	return indexerBaseUrl;
 };
 
-export type CreateUser = {
-	principal: string;
-	eth_account?: string;
-	btc_account?: string;
-	avatar?: string;
-	email?: string;
-	name?: string;
-	invate_by?: string;
-};
-
-export const getUserRewardStats = async (user_token: string) => {
+export const getIcUserRewardStats = async (user_token: string) => {
 	if (!user_token) {
 		return undefined;
 	}
 	const response = await request<{
-		data: UserInfo;
+		data: RewardStats;
 		statusCode: number;
 		message: string;
 	}>(`${getIndexerBaseUrl()}/api/v1/users/reward-stats`, {

@@ -348,26 +348,3 @@ export const useBtcLinkedWalletTokensBalance = (principal?: string) => {
 		enabled: !!finalPrincipal,
 	});
 };
-
-export const useBtcRewardStats = () => {
-	const { jwt_token } = useBtcIdentityStore();
-	console.log("🚀 ~ useBtcRewardStats ~ jwt_token:", jwt_token);
-	if (!jwt_token) {
-		throw new Error("No login jwt token");
-	}
-
-	return useQuery({
-		queryKey: ["btc-core", "rewardStats"],
-		queryFn: () => getUserRewardStats(jwt_token),
-		// refetchInterval: 2000,
-	});
-	// return useMutation({
-	// 	qu: ["btc-core", "rewardStats"],
-	// 	mutationFn: async () => {
-	// 		if (!jwt_token) {
-	// 			throw new Error("No login jwt token");
-	// 		}
-	// 		return getUserRewardStats(jwt_token);
-	// 	},
-	// });
-};
