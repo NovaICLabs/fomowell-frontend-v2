@@ -35,7 +35,7 @@ export const loginOrRegisterByPrincipal = async (
 		body: JSON.stringify({
 			principal: principal,
 			random: random,
-			invate_by: invitationCode2btc,
+			invite_by: invitationCode2btc,
 		}),
 	});
 
