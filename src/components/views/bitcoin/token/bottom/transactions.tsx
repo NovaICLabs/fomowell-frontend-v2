@@ -13,7 +13,6 @@ import { BigNumber } from "bignumber.js";
 
 import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { Skeleton } from "@/components/ui/skeleton";
-// import { useCKBTCPrice } from "@/hooks/apis/coingecko";
 import { useBtcInfiniteTokenTransactionsHistory } from "@/hooks/apis/indexer_btc";
 import { getAvatar } from "@/lib/common/avatar";
 import {
@@ -52,7 +51,6 @@ export default function Transactions() {
 		token0: id,
 	});
 	const columnHelper = useMemo(() => createColumnHelper<Transaction>(), []);
-	// const { data: ckbtcPrice } = useCKBTCPrice();
 
 	const columns = useMemo(
 		() => [
@@ -175,16 +173,16 @@ export default function Transactions() {
 					<div className="flex h-full w-full items-center gap-1">
 						<span className="text-sm leading-4">
 							{formatNumberSmart(
-								BigNumber(1)
-									.times(10 ** getCkbtcCanisterToken().decimals)
-									.div(BigNumber(info.getValue()))
-									.toString(),
+								// BigNumber(1)
+								// 	.times(10 ** getCkbtcCanisterToken().decimals)
+								// 	.div(BigNumber(info.getValue()))
+								BigNumber(info.getValue()).toString(),
 								{
 									shortZero: true,
 								}
 							)}
 						</span>
-						<span className="text-sm leading-4 text-white/60">BTC</span>
+						<span className="text-sm leading-4 text-white/60">sats</span>
 					</div>
 				),
 				size: 150,

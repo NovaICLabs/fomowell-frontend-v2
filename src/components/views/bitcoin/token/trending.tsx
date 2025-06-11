@@ -156,7 +156,7 @@ export default function Trending() {
 											shortenLarge: true,
 										}
 									)}{" "}
-									BTC
+									sats
 								</span>
 							</div>
 						</div>

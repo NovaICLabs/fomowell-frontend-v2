@@ -126,7 +126,7 @@ export default function HeadInfo() {
 							{formatNumberSmart(currentPrice?.formattedPerPayToken ?? "0", {
 								shortZero: true,
 							})}
-							<span>BTC</span>
+							<span>sats</span>
 						</div>
 					)}
 					<span className="flex items-center gap-1 text-sm">
