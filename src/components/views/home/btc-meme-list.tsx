@@ -584,7 +584,6 @@ export default function BtcMemeList() {
 				),
 				cell: (info) => {
 					const value = info.getValue();
-					console.log("🚀 ~ columnHelper.accessor ~ value:", value);
 					const priceInUsd =
 						value === null
 							? BigNumber(0)
@@ -826,6 +825,7 @@ export default function BtcMemeList() {
 			}),
 		],
 		[
+			ckBtcPrice,
 			columnHelper,
 			direction,
 			favoriteToken,
@@ -851,7 +851,6 @@ export default function BtcMemeList() {
 			},
 		},
 	});
-	console.log("🚀 ~ BtcMemeList ~ items:", items);
 
 	const { chain } = useChainStore();
 	const parentRef = useRef<HTMLDivElement>(null);
