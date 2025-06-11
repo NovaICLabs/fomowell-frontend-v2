@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { showToast } from "@/components/utils/toast";
-import { useCKBTCPrice } from "@/hooks/apis/coingecko";
+import { useCKBTCPrice, useSatsPrice } from "@/hooks/apis/coingecko";
 import { useBtcSingleTokenInfo } from "@/hooks/apis/indexer_btc";
 import { useBtcMemeCurrentPrice, useBtcMemeTokenInfo } from "@/hooks/btc/core";
 import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
@@ -45,7 +45,9 @@ export const InfoDetail = () => {
 			: undefined;
 	}, [memeTokenInfo]);
 
+	const { data: satsPrice } = useSatsPrice();
 	const { data: ckBtcPrice } = useCKBTCPrice();
+
 	const liquidityUSD = useMemo(() => {
 		return liquidityBtc && ckBtcPrice
 			? BigNumber(liquidityBtc).times(ckBtcPrice).times(2).toString()
@@ -53,20 +55,20 @@ export const InfoDetail = () => {
 	}, [liquidityBtc, ckBtcPrice]);
 
 	const totalSupply = useMemo(() => {
-		return 2_100_000;
+		return 21_000_000;
 	}, []);
 
 	const marketCap = useMemo(() => {
-		return currentTokenPrice?.raw && totalSupply && ckBtcPrice
+		return currentTokenPrice?.raw && totalSupply && satsPrice
 			? BigNumber(1)
 					// .times(10 ** getCkbtcCanisterToken().decimals)
 					// .div(BigNumber(currentTokenPrice.raw))
 					.times(totalSupply)
-					.times(ckBtcPrice)
+					.times(satsPrice)
 					.times(BigNumber(currentTokenPrice.raw))
 					.toString()
 			: undefined;
-	}, [currentTokenPrice, totalSupply, ckBtcPrice]);
+	}, [currentTokenPrice, totalSupply, satsPrice]);
 
 	return (
 		<div className="bg-gray-860 flex flex-col gap-5.5 rounded-[12px] px-4.5 py-5">
@@ -79,7 +81,7 @@ export const InfoDetail = () => {
 							: formatNumberSmart(currentTokenPrice?.formattedPerPayToken, {
 									shortZero: true,
 								})}{" "}
-						BTC
+						sats
 					</span>
 				</span>
 			</div>

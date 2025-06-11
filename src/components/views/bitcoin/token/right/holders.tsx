@@ -6,12 +6,13 @@ import { isMobile } from "react-device-detect";
 import ReactPaginate from "react-paginate";
 
 import { getChainICCoreCanisterId } from "@/canisters/core";
+import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { useBtcTokenHolders } from "@/hooks/btc/core";
 import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
 import {
 	formatNumberSmart,
 	formatUnits,
-	parseUnits,
+	// parseUnits,
 } from "@/lib/common/number";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
@@ -94,8 +95,8 @@ export default function Holders() {
 									(
 									{formatNumberSmart(
 										BigNumber(holder.balance)
-											.times(100)
-											.div(parseUnits(1_000_000_000))
+											.div(10 ** getCkbtcCanisterToken().decimals)
+											.div(BigNumber(21_000_000))
 											.toString()
 									)}
 									% )

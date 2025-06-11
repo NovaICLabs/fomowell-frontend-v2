@@ -13,6 +13,9 @@ import WithdrawIcon from "@/components/icons/common/withdraw";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
 import ReferralDialog from "@/components/layout/dialog/referral";
 import { Button } from "@/components/ui/button";
+import ProfileActivity from "@/components/views/bitcoin/profile/activity";
+import ProfileCreatedTokens from "@/components/views/bitcoin/profile/create-list";
+import ProfileHoldings from "@/components/views/bitcoin/profile/holdings";
 import EditInfoModal from "@/components/views/icp/profile/edit-info-modal";
 import { useUserInfo } from "@/hooks/apis/user";
 import { useBtcCoreTokenBalance } from "@/hooks/btc/core";
@@ -25,9 +28,6 @@ import { useDialogStore } from "@/store/dialog";
 
 // import { Skeleton } from "@/components/ui/skeleton";
 // import { showToast } from "@/components/utils/toast";
-// import ProfileActivity from "@/components/views/icp/profile/activity";
-// import ProfileCreatedTokens from "@/components/views/icp/profile/create-list";
-// import ProfileHoldings from "@/components/views/icp/profile/holdings";
 
 export const Route = createFileRoute("/bitcoin/profile/$userid")({
 	component: UserId,
@@ -297,21 +297,21 @@ function UserId() {
 
 				<div className="no-scrollbar flex-1 flex-col overflow-auto rounded-2xl pb-5">
 					<div className="h-max">
-						{/* {activeTab === "Holdings" && (
-						<div className="bg-gray-760 h-full overflow-auto rounded-2xl p-5 text-white/60">
-							<ProfileHoldings />
-						</div>
-					)}
-					{activeTab === "Created" && (
-						<div className="bg-gray-760 h-full overflow-auto rounded-2xl p-5 text-white/60">
-							<ProfileCreatedTokens />
-						</div>
-					)}
-					{activeTab === "Activity" && (
-						<div className="bg-gray-760 h-full overflow-auto rounded-2xl p-5 text-white/60">
-							<ProfileActivity />
-						</div>
-					)} */}
+						{activeTab === "Holdings" && (
+							<div className="bg-gray-760 h-full overflow-auto rounded-2xl p-5 text-white/60">
+								<ProfileHoldings />
+							</div>
+						)}
+						{activeTab === "Created" && (
+							<div className="bg-gray-760 h-full overflow-auto rounded-2xl p-5 text-white/60">
+								<ProfileCreatedTokens />
+							</div>
+						)}
+						{activeTab === "Activity" && (
+							<div className="bg-gray-760 h-full overflow-auto rounded-2xl p-5 text-white/60">
+								<ProfileActivity />
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

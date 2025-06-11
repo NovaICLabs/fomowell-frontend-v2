@@ -20,7 +20,7 @@ import {
 	getMemeToken,
 	type SellArgs,
 } from "@/canisters/btc_core";
-import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
+// import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { showToast } from "@/components/utils/toast";
 import { formatNumberSmart, formatUnits } from "@/lib/common/number";
 
@@ -235,9 +235,10 @@ export const useBtcMultipleCurrentPrice = (args: {
 				id: args.ids[index],
 				raw: r,
 				formattedPerPayToken: formatNumberSmart(
-					BigNumber(1)
-						.multipliedBy(10 ** getCkbtcCanisterToken().decimals)
-						.div(BigNumber(r))
+					BigNumber(r)
+					// BigNumber(1)
+					// 	.multipliedBy(10 ** getCkbtcCanisterToken().decimals)
+					// 	.div(BigNumber(r))
 				),
 			}));
 		},

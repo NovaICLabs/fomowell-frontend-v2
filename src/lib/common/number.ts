@@ -154,6 +154,7 @@ export const getTokenUsdValueTotal = (
 			.times(price),
 		{
 			shortenLarge: true,
+			shortZero: true,
 		}
 	);
 };

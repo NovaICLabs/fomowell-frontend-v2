@@ -33,7 +33,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { showToast } from "@/components/utils/toast";
-import { useCKBTCPrice } from "@/hooks/apis/coingecko";
+import { useCKBTCPrice, useSatsPrice } from "@/hooks/apis/coingecko";
 import {
 	useBtcFavoriteToken,
 	useBtcInfiniteFavoriteTokenList,
@@ -294,7 +294,8 @@ export default function BtcMemeList() {
 		}
 		return BigInt(parseUnits(flashAmount, 8));
 	}, [flashAmount]);
-	const { data: ckbtcPrice } = useCKBTCPrice();
+	const { data: satsPrice } = useSatsPrice();
+	const { data: ckBtcPrice } = useCKBTCPrice();
 
 	const items = useMemo(
 		() => data?.pages.flatMap((page) => page.data) ?? [],
@@ -501,7 +502,7 @@ export default function BtcMemeList() {
 				cell: (info) => {
 					const raw = info.getValue();
 					const priceInBtc = raw === null ? BigNumber(0) : BigNumber(raw);
-					const priceInUsd = priceInBtc.times(ckbtcPrice ?? 0);
+					const priceInUsd = priceInBtc.times(satsPrice ?? 0);
 					return (
 						<div className="flex h-full w-full flex-col items-start justify-center">
 							<div className="flex items-center text-sm font-medium text-white">
@@ -516,7 +517,7 @@ export default function BtcMemeList() {
 								{formatNumberSmart(priceInBtc, {
 									shortZero: true,
 								})}
-								<span>BTC</span>
+								<span>sats</span>
 							</div>
 						</div>
 					);
@@ -553,7 +554,7 @@ export default function BtcMemeList() {
 									{
 										amount: isNull ? 0n : BigInt(value) * 2n,
 									},
-									ckbtcPrice ?? 0
+									ckBtcPrice ?? 0
 								)}
 							</span>
 						</div>
@@ -583,13 +584,14 @@ export default function BtcMemeList() {
 				),
 				cell: (info) => {
 					const value = info.getValue();
+					console.log("🚀 ~ columnHelper.accessor ~ value:", value);
 					const priceInUsd =
 						value === null
 							? BigNumber(0)
 							: // BigNumber(1)
 								// 		.div(BigNumber(value))
-								BigNumber(value).times(ckbtcPrice ?? 0);
-					const mc = BigNumber(2_100_000).times(priceInUsd);
+								BigNumber(value).times(satsPrice ?? 0);
+					const mc = BigNumber(21_000_000).times(priceInUsd);
 					return (
 						<div className="flex h-full w-full items-center gap-1">
 							<span className="text-sm leading-4 font-medium text-white">
@@ -768,12 +770,12 @@ export default function BtcMemeList() {
 							? "--"
 							: getTokenUsdValueTotal(
 									{ amount: BigInt(value) },
-									ckbtcPrice ?? 0
+									satsPrice ?? 0
 								);
 					return (
 						<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
 							<span className="text-sm leading-4 font-medium text-white">
-								{inBtc} BTC
+								{inBtc} sats
 							</span>
 							<span className="text-xs leading-4 font-light text-white/60">
 								${inUsd}
@@ -829,7 +831,7 @@ export default function BtcMemeList() {
 			favoriteToken,
 			handleQuickBuy,
 			handleSort,
-			ckbtcPrice,
+			satsPrice,
 			sort,
 		]
 	);
@@ -849,6 +851,7 @@ export default function BtcMemeList() {
 			},
 		},
 	});
+	console.log("🚀 ~ BtcMemeList ~ items:", items);
 
 	const { chain } = useChainStore();
 	const parentRef = useRef<HTMLDivElement>(null);

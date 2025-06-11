@@ -31,7 +31,7 @@ export const useQuickBuyStore = create(
 				set({ slippage });
 			},
 
-			btcAmount: "0.0002",
+			btcAmount: "0.00001",
 			setBtcAmount: (btcAmount) => {
 				set({ btcAmount });
 			},
