@@ -20,6 +20,7 @@ import {
 	type PaginatedDataWithData,
 	type TokenListParameters,
 } from "@/apis/indexer_btc";
+import { getUserRewardStats } from "@/apis/reward-btc";
 import { updateUserInfo } from "@/apis/user-login-btc";
 import { getCkbtcCanisterId } from "@/canisters/btc_core";
 import { getIcrcTokenBalance } from "@/canisters/icrc3";
@@ -331,4 +332,27 @@ export const useBtcLinkedWalletTokensBalance = (principal?: string) => {
 		},
 		enabled: !!finalPrincipal,
 	});
+};
+
+export const useBtcRewardStats = () => {
+	const { jwt_token } = useBtcIdentityStore();
+	console.log("🚀 ~ useBtcRewardStats ~ jwt_token:", jwt_token);
+	if (!jwt_token) {
+		throw new Error("No login jwt token");
+	}
+
+	return useQuery({
+		queryKey: ["btc-core", "rewardStats"],
+		queryFn: () => getUserRewardStats(jwt_token),
+		// refetchInterval: 2000,
+	});
+	// return useMutation({
+	// 	qu: ["btc-core", "rewardStats"],
+	// 	mutationFn: async () => {
+	// 		if (!jwt_token) {
+	// 			throw new Error("No login jwt token");
+	// 		}
+	// 		return getUserRewardStats(jwt_token);
+	// 	},
+	// });
 };

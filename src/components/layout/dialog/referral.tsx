@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import copy from "copy-to-clipboard";
 
 import {
@@ -9,6 +11,7 @@ import {
 import { showToast } from "@/components/utils/toast";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { cn } from "@/lib/utils";
+import { useBtcRewardStats } from "@/hooks/apis/indexer_btc";
 
 type ReferralProps = {
 	referralLink: string;
@@ -23,6 +26,13 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 	referralsTotal,
 	earnedTotal,
 }) => {
+	const a = useBtcRewardStats();
+
+	useEffect(() => {
+		// console.log("referralLink", referralLink);
+		console.log("🚀 ~ jwt_token:", a);
+	}, [a]);
+
 	return (
 		<div className="relative flex w-full">
 			<img

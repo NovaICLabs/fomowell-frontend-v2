@@ -1,3 +1,5 @@
+import { useAppStore } from "@/store/app";
+
 import { request } from ".";
 
 import type { UserInfo } from "./indexer";
@@ -19,6 +21,7 @@ export const loginOrRegisterByPrincipal = async (
 	parameters: LoginParameters
 ): Promise<string> => {
 	const { principal, random } = parameters;
+	const { invitationCode2btc } = useAppStore.getState();
 
 	const response = await request<{
 		data: { access_token: string };
@@ -32,6 +35,7 @@ export const loginOrRegisterByPrincipal = async (
 		body: JSON.stringify({
 			principal: principal,
 			random: random,
+			invate_by: invitationCode2btc,
 		}),
 	});
 
@@ -93,6 +97,7 @@ export type CreateUser = {
 	avatar?: string;
 	email?: string;
 	name?: string;
+	invate_by?: string;
 };
 export const createNewUser = async () => {
 	const response = await request<{
@@ -111,6 +116,7 @@ export const createNewUser = async () => {
 			avatar: "string",
 			email: "user@example.com",
 			name: "John",
+			invate_by: "VW50",
 		}),
 	});
 
