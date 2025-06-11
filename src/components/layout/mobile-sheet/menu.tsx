@@ -12,7 +12,6 @@ import { useMobileSheetStore } from "@/store/mobile/sheet";
 
 import { BtcAccountInfo } from "../header/connect-button/bitcoin";
 import { IcpAccountInfo } from "../header/connect-button/icp";
-import { menuLinks } from "../header/links";
 
 export default function MenuSheet() {
 	const location = useLocation();
@@ -22,18 +21,12 @@ export default function MenuSheet() {
 	const { setHowItWorksOpen } = useDialogStore();
 
 	const menus = useMemo(() => {
-		if (chain === "bitcoin") {
-			const newMenus = [
-				...menuLinks,
-				{
-					label: "Liquidity",
-					to: "/bitcoin/liquidity",
-				},
-			];
-			return newMenus;
-		}
-
-		return menuLinks;
+		return chain === "bitcoin"
+			? [
+					{ label: "Tokens", to: "/" },
+					{ label: "Liquidity", to: "/bitcoin/liquidity" },
+				]
+			: [{ label: "Tokens", to: "/" }];
 	}, [chain]);
 
 	return (

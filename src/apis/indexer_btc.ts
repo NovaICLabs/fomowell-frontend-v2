@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 
-import { getICPCanisterId } from "@/canisters/icrc3";
+import { getCkbtcCanisterId } from "@/canisters/btc_core";
 import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { validatePrincipalText } from "@/lib/ic/principal";
 
@@ -277,7 +277,7 @@ export const getTokenPriceCandle = async (parameters: CandleParameters) => {
 	const start = now - duration * 24 * 60 * 60 * 1000;
 	const queryParameters = new URLSearchParams({
 		token0: tokenId,
-		token1: getICPCanisterId().toText(),
+		token1: getCkbtcCanisterId().toText(),
 		market: market ?? "BTC",
 		start: start.toString(),
 		end: now.toString(),

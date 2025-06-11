@@ -21,7 +21,8 @@ import {
 	type TokenListParameters,
 } from "@/apis/indexer_btc";
 import { updateUserInfo } from "@/apis/user-login-btc";
-import { getICPCanisterId, getIcrcTokenBalance } from "@/canisters/icrc3";
+import { getCkbtcCanisterId } from "@/canisters/btc_core";
+import { getIcrcTokenBalance } from "@/canisters/icrc3";
 import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
 
@@ -114,7 +115,7 @@ export const useBtcSingleTokenInfo = (parameters: { id: string }) => {
 	});
 };
 
-export const useInfiniteTokenTransactionsHistory = (parameters: {
+export const useBtcInfiniteTokenTransactionsHistory = (parameters: {
 	token0: string;
 }) => {
 	return useInfiniteQuery({
@@ -123,7 +124,7 @@ export const useInfiniteTokenTransactionsHistory = (parameters: {
 			getTokenTransactionList({
 				...parameters,
 				page: pageParameter,
-				token1: getICPCanisterId().toText(),
+				token1: getCkbtcCanisterId().toText(),
 			}),
 		getNextPageParam: (lastPage, pages) => {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
@@ -146,7 +147,7 @@ export const useBtcTokenPriceCandle = (parameters: CandleParameters) => {
 	});
 };
 
-export const useTokenComments = (parameters: {
+export const useBtcTokenComments = (parameters: {
 	meme_token_id: string;
 	page?: number;
 	pageSize?: number;
