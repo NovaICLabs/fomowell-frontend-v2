@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 
-import { Link } from "@tanstack/react-router";
+import { Link, useParams } from "@tanstack/react-router";
 import {
 	createColumnHelper,
 	flexRender,
@@ -15,7 +15,6 @@ import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { Skeleton } from "@/components/ui/skeleton";
 // import { useCKBTCPrice } from "@/hooks/apis/coingecko";
 import { useBtcInfiniteTokenTransactionsHistory } from "@/hooks/apis/indexer_btc";
-import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
 import { getAvatar } from "@/lib/common/avatar";
 import {
 	formatNumberSmart,
@@ -37,7 +36,9 @@ const TableItemsSkeleton = () => {
 };
 
 export default function Transactions() {
-	const { id } = useTokenChainAndId();
+	const { id } = useParams({
+		from: `/bitcoin/token/$id`,
+	});
 
 	const {
 		data,

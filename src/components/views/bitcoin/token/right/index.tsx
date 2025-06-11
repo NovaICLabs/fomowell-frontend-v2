@@ -99,7 +99,7 @@ export const InfoDetail = () => {
 					</span>
 					<div className="text-gray-280 flex items-center">
 						(
-						<img alt={"btc-logo"} src={`/svgs/chains/bitcoin.svg`} />
+						<img alt={"btc-logo"} src={"/svgs/chains/bitcoin.svg"} />
 						<span className="text-gray-280">
 							{liquidityBtc ? formatNumberSmart(liquidityBtc) : "0"}
 						</span>
@@ -162,7 +162,7 @@ export default function Bottom() {
 							<div
 								key={tab}
 								className={cn(
-									`relative cursor-pointer text-base font-semibold`,
+									"relative cursor-pointer text-base font-semibold",
 									isActive ? "text-white" : "text-white/60 hover:text-white"
 									// tab === "Liquidity" && "cursor-not-allowed"
 								)}
