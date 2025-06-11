@@ -71,7 +71,7 @@ export const useBtcInfiniteTokenList = (parameters: TokenListParameters) => {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},
 		initialPageParam: 1,
-		// refetchInterval: 2000,
+		refetchInterval: 2000,
 	});
 };
 
@@ -91,13 +91,13 @@ export const useBtcInfiniteFavoriteTokenList = (parameters: {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},
 		initialPageParam: 1,
-		// refetchInterval: 2000,
+		refetchInterval: 2000,
 		enabled: !!principal && parameters.isEnabled,
 	});
 };
 
 export const getBtcSingleTokenInfoKey = (id: string, principal?: string) => {
-	return ["btc-core", "tokenInfo", id, principal];
+	return ["btc-core", "tokenInfo", id, principal ?? "principal"];
 };
 
 export const useBtcSingleTokenInfo = (parameters: { id: string }) => {
@@ -113,7 +113,7 @@ export const useBtcSingleTokenInfo = (parameters: { id: string }) => {
 			});
 			return data[0];
 		},
-		// refetchInterval: 5000,
+		refetchInterval: 5000,
 	});
 };
 
@@ -132,7 +132,7 @@ export const useBtcInfiniteTokenTransactionsHistory = (parameters: {
 			return lastPage.totalPages > pages.length ? pages.length + 1 : undefined;
 		},
 		initialPageParam: 1,
-		// refetchInterval: 2000,
+		refetchInterval: 2000,
 	});
 };
 
@@ -145,7 +145,7 @@ export const useBtcTokenPriceCandle = (parameters: CandleParameters) => {
 			parameters.interval,
 		],
 		queryFn: () => getTokenPriceCandle(parameters),
-		// refetchInterval: 2000,
+		refetchInterval: 2000,
 	});
 };
 

@@ -40,6 +40,7 @@ export type BtcTokenInfo = {
 	creator: string;
 	timestamp: string;
 	market: "BTC";
+	rune_name: string;
 	tokenAddress?: string;
 	decimals: number;
 	holders: string;

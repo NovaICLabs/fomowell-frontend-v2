@@ -33,7 +33,7 @@ export interface ArchiveLedgerInfo {
 	txn_count: bigint;
 	archive_txn_count: bigint;
 	is_cleaning: boolean;
-	archives: Array<[Principal, TransactionRange]>;
+	archives: Array<[Principal, GetBlocksRequest]>;
 }
 export interface ArchiveSetting {
 	max_records_in_archive_instance: bigint;
@@ -49,6 +49,15 @@ export interface ArchivedRange {
 	start: bigint;
 	length: bigint;
 }
+export interface BTCBuy {
+	fee: [] | [bigint];
+	token: Principal;
+	from: Account;
+	sats: bigint;
+	sold: bigint;
+	meme_token_id: bigint;
+	amount: bigint;
+}
 export type BTreeMap = Array<
 	[
 		string,
@@ -63,13 +72,6 @@ export type BTreeMap = Array<
 		),
 	]
 >;
-export interface BondingCurve {
-	token: StableToken;
-	token_reserve: bigint;
-	meme_token_reserve: bigint;
-	k_last: bigint;
-	total_supply: bigint;
-}
 export interface Burn {
 	from: Account;
 	memo: [] | [Uint8Array | number[]];
@@ -148,9 +150,7 @@ export interface ConsentMessageSpec {
 }
 export interface CreateMemeTokenArg {
 	creator: [] | [Principal];
-	token: StableToken;
 	ticker: string;
-	logo_base64: string;
 	twitter: [] | [string];
 	logo: string;
 	name: string;
@@ -158,6 +158,9 @@ export interface CreateMemeTokenArg {
 	website: [] | [string];
 	dev_buy: [] | [bigint];
 	telegram: [] | [string];
+}
+export interface Curve {
+	sold: bigint;
 }
 export interface DailyMetricsData {
 	updateCalls: bigint;
@@ -191,6 +194,10 @@ export type DisplayMessageType =
 	  };
 export interface ErrorInfo {
 	description: string;
+}
+export interface GetBlocksRequest {
+	start: bigint;
+	length: bigint;
 }
 export interface GetInformationRequest {
 	status: [] | [StatusRequest];
@@ -294,7 +301,6 @@ export interface LogMessageData {
 	message: string;
 }
 export interface MemeToken {
-	bc: BondingCurve;
 	id: bigint;
 	creator: string;
 	ticker: string;
@@ -303,13 +309,12 @@ export interface MemeToken {
 	logo: string;
 	name: string;
 	market_cap_token: bigint;
+	curve: Curve;
 	completed: boolean;
 	rune_name: string;
 	description: string;
-	lp_canister: [] | [Principal];
 	created_at: bigint;
 	website: [] | [string];
-	ledger_canister: [] | [Principal];
 	price: number;
 	telegram: [] | [string];
 	process: number;
@@ -395,7 +400,8 @@ export type Result_4 = { Ok: ConsentInfo } | { Err: Icrc21Error };
 export type Result_5 = { Ok: LiquidityAddArg } | { Err: string };
 export type Result_6 = { Ok: PreRunesSwapSatsResponse } | { Err: string };
 export type Result_7 = { Ok: PreSatsSwapRunesResponse } | { Err: string };
-export type Result_8 = { Ok: bigint } | { Err: string };
+export type Result_8 = { Ok: number } | { Err: string };
+export type Result_9 = { Ok: bigint } | { Err: string };
 export interface RunesSwapSats {
 	fee: bigint;
 	token: Principal;
@@ -480,8 +486,10 @@ export interface Transaction {
 	kind: string;
 	mint: [] | [Mint];
 	sell: [] | [Buy];
+	btc_sell: [] | [BTCBuy];
 	runes_swap_sats: [] | [RunesSwapSats];
 	deposit: [] | [Deposit];
+	btc_buy: [] | [BTCBuy];
 	withdraw_ckbtc: [] | [WithdrawCkbtc];
 	withdraw_liquidity: [] | [WithdrawLiquidity];
 	timestamp: bigint;
@@ -490,10 +498,6 @@ export interface Transaction {
 	sats_swap_runes: [] | [SatsSwapRunes];
 }
 export interface TransactionRange {
-	start: bigint;
-	length: bigint;
-}
-export interface TransactionRange_1 {
 	transactions: Array<Transaction_1>;
 }
 export interface Transaction_1 {
@@ -575,7 +579,7 @@ export interface _SERVICE {
 		[GetInformationRequest],
 		GetInformationResponse
 	>;
-	get_transactions: ActorMethod<[TransactionRange], GetTransactionsResponse>;
+	get_transactions: ActorMethod<[GetBlocksRequest], GetTransactionsResponse>;
 	icrc10_supported_standards: ActorMethod<[], Array<SupportedStandard>>;
 	icrc1_balance_of: ActorMethod<[LedgerType, Account], bigint>;
 	icrc21_canister_call_consent_message: ActorMethod<
@@ -588,7 +592,7 @@ export interface _SERVICE {
 	pre_sats_swap_runes: ActorMethod<[PreSatsSwapRunesArg], Result_7>;
 	pre_withdraw_liquidity: ActorMethod<[PreLiquidityRemoveArg], Result_5>;
 	query_meme_token: ActorMethod<[bigint], [] | [MemeToken]>;
-	query_meme_token_price: ActorMethod<[bigint], Result_2>;
+	query_meme_token_price: ActorMethod<[bigint], Result_8>;
 	query_meme_tokens: ActorMethod<[QueryMemeTokenArgs], QueryMemeTokenResponse>;
 	query_state: ActorMethod<[], State>;
 	query_token_holders: ActorMethod<
@@ -605,7 +609,7 @@ export interface _SERVICE {
 	sats_swap_runes: ActorMethod<[SatsSwapRunesArg], Result>;
 	sell: ActorMethod<[BuyArgs], Result_2>;
 	withdraw: ActorMethod<[WithdrawArgs], Result_2>;
-	withdraw_ckbtc: ActorMethod<[WithdrawByCkbtcArgs], Result_8>;
+	withdraw_ckbtc: ActorMethod<[WithdrawByCkbtcArgs], Result_9>;
 	withdraw_liquidity: ActorMethod<[LiquidityRemoveArg], Result>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;

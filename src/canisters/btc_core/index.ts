@@ -17,7 +17,7 @@ import { unwrapRustResult } from "@/lib/ic/rust/result";
 
 import { idlFactory } from "./index.did";
 // import { approve, getICPCanisterId } from "../icrc3";
-import { getCkbtcCanisterToken } from "../icrc3/specials";
+// import { getCkbtcCanisterToken } from "../icrc3/specials";
 
 import type { _SERVICE, LedgerType, StableToken } from "./index.did.d";
 import type { ActorCreator } from "@/lib/ic/connectors";
@@ -61,10 +61,11 @@ export const getMemeToken = async (canisterId: string, id: bigint) => {
 		creator: r.creator,
 		completed: r.completed,
 		available_token: r.available_token,
-		canister_id: unwrapOption(r.ledger_canister),
+		rune_name: r.rune_name,
+		// canister_id: unwrapOption(r.ledger_canister),
 		liquidity: r.market_cap_token,
 		created_at: r.created_at,
-		bc: r.bc, // no use
+		// bc: r.bc, // no use
 		decimals: 8,
 	}));
 	if (!memeToken) {
@@ -342,7 +343,7 @@ export const getUserTokens = async (
 			available_token: r.token.available_token,
 			liquidity: r.token.market_cap_token,
 			created_at: r.token.created_at,
-			bc: r.token.bc, // no use
+			// bc: r.token.bc, // no use
 			decimals: 8,
 		} as unknown as MemeTokenDetails;
 	});
@@ -386,12 +387,12 @@ export const createMemeToken = async (
 		twitter,
 		creator,
 		devBuy,
-		logoBase64,
+		// logoBase64,
 	} = args;
 	console.log("🚀 ~ args:", args);
 
 	const result = await actor.create_token({
-		token: getCkbtcCanisterToken(),
+		// token: getCkbtcCanisterToken(),
 		name,
 		ticker,
 		description,
@@ -401,7 +402,7 @@ export const createMemeToken = async (
 		creator: wrapOption(creator ? validatePrincipalText(creator) : undefined),
 		logo,
 		dev_buy: wrapOption(devBuy),
-		logo_base64: logoBase64,
+		// logo_base64: logoBase64,
 	});
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);

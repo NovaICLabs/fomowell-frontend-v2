@@ -150,7 +150,7 @@ const TokenInfoRow = ({
 						)}
 					</div>
 				</div>
-				{token.tokenAddress ? (
+				{!token.rune_name && token.tokenAddress ? (
 					<div className="flex items-center gap-0.5">
 						<span className="max-w-[100px] truncate text-xs text-white/60">
 							{truncatePrincipal(token.tokenAddress)}
@@ -172,8 +172,8 @@ const TokenInfoRow = ({
 						)}
 					</div>
 				) : (
-					<div className="w-20 truncate text-xs leading-4 font-light text-white/60">
-						{token.name}
+					<div className="w-20 text-xs leading-4 font-light text-white/60">
+						{token.rune_name}
 					</div>
 				)}
 			</div>
@@ -500,8 +500,7 @@ export default function BtcMemeList() {
 				),
 				cell: (info) => {
 					const raw = info.getValue();
-					const priceInBtc =
-						raw === null ? BigNumber(0) : BigNumber(1).div(BigNumber(raw));
+					const priceInBtc = raw === null ? BigNumber(0) : BigNumber(raw);
 					const priceInUsd = priceInBtc.times(ckbtcPrice ?? 0);
 					return (
 						<div className="flex h-full w-full flex-col items-start justify-center">
@@ -587,10 +586,10 @@ export default function BtcMemeList() {
 					const priceInUsd =
 						value === null
 							? BigNumber(0)
-							: BigNumber(1)
-									.div(BigNumber(value))
-									.times(ckbtcPrice ?? 0);
-					const mc = BigNumber(1_000_000_000).times(priceInUsd);
+							: // BigNumber(1)
+								// 		.div(BigNumber(value))
+								BigNumber(value).times(ckbtcPrice ?? 0);
+					const mc = BigNumber(2_100_000).times(priceInUsd);
 					return (
 						<div className="flex h-full w-full items-center gap-1">
 							<span className="text-sm leading-4 font-medium text-white">
