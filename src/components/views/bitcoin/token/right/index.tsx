@@ -61,11 +61,9 @@ export const InfoDetail = () => {
 	const marketCap = useMemo(() => {
 		return currentTokenPrice?.raw && totalSupply && satsPrice
 			? BigNumber(1)
-					// .times(10 ** getCkbtcCanisterToken().decimals)
-					// .div(BigNumber(currentTokenPrice.raw))
+					.div(BigNumber(currentTokenPrice.raw))
 					.times(totalSupply)
 					.times(satsPrice)
-					.times(BigNumber(currentTokenPrice.raw))
 					.toString()
 			: undefined;
 	}, [currentTokenPrice, totalSupply, satsPrice]);

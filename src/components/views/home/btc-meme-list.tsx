@@ -587,10 +587,11 @@ export default function BtcMemeList() {
 					const priceInUsd =
 						value === null
 							? BigNumber(0)
-							: // BigNumber(1)
-								// 		.div(BigNumber(value))
-								BigNumber(value).times(satsPrice ?? 0);
+							: BigNumber(1)
+									.div(BigNumber(value))
+									.times(satsPrice ?? 0);
 					const mc = BigNumber(21_000_000).times(priceInUsd);
+
 					return (
 						<div className="flex h-full w-full items-center gap-1">
 							<span className="text-sm leading-4 font-medium text-white">
@@ -835,6 +836,8 @@ export default function BtcMemeList() {
 			sort,
 		]
 	);
+
+	// console.debug("🚀 ~ BtcMemeList ~ items:", items);
 
 	const table = useReactTable({
 		data: items,

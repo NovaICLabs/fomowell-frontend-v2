@@ -5,7 +5,7 @@ import { isMobile } from "react-device-detect";
 import { useDebounce } from "use-debounce";
 
 import { getCkbtcCanisterId } from "@/canisters/btc_core";
-import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
+// import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import DepositPlus from "@/components/icons/common/deposit-plus";
 import SlippageSetting from "@/components/icons/common/slippage-setting";
 import { Button } from "@/components/ui/button";
@@ -351,7 +351,7 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 		}
 
 		const currentTokenPriceInBTC = BigNumber(1)
-			.multipliedBy(10 ** getCkbtcCanisterToken().decimals)
+			// .multipliedBy(10 ** getCkbtcCanisterToken().decimals)
 			.div(BigNumber(currentTokenPrice.raw));
 
 		// Avoid division by zero or invalid calculations if price is non-positive
