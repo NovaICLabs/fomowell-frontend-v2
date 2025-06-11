@@ -1,6 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { getBtcPrice, getCkBtcPrice, getICPPrice } from "@/apis/coingecko";
+import {
+	getBtcPrice,
+	getCkBtcPrice,
+	getICPPrice,
+	getSatsPrice,
+} from "@/apis/coingecko";
 
 export const useICPPrice = () => {
 	return useQuery({
@@ -15,6 +20,15 @@ export const useCKBTCPrice = () => {
 	return useQuery({
 		queryKey: ["ckbtc-price"],
 		queryFn: getCkBtcPrice,
+		refetchInterval: 10000 * 60 * 5,
+		staleTime: Infinity,
+	});
+};
+
+export const useSatsPrice = () => {
+	return useQuery({
+		queryKey: ["sats-price"],
+		queryFn: getSatsPrice,
 		refetchInterval: 10000 * 60 * 5,
 		staleTime: Infinity,
 	});

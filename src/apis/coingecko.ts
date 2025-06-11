@@ -26,3 +26,12 @@ export const getBtcPrice = async (): Promise<number> => {
 	);
 	return response["bitcoin"].usd;
 };
+
+export const getSatsPrice = async (): Promise<number> => {
+	const response = await request<{
+		"sats-ordinals": { usd: number };
+	}>(
+		`${import.meta.env.VITE_COINGECKO_API_BASE_URL}/simple/price?ids=sats-ordinals&vs_currencies=usd`
+	);
+	return response["sats-ordinals"].usd;
+};
