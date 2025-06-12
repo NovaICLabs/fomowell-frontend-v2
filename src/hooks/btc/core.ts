@@ -67,7 +67,7 @@ export const useBtcMemeTokenInfo = (id: number) => {
 		queryKey: ["btc-core", "meme-token", id],
 		queryFn: () =>
 			getMemeToken(getChainBTCCoreCanisterId().toText(), BigInt(id)),
-		// refetchInterval: 1000 * 10,
+		refetchInterval: 1000 * 10,
 	});
 };
 
@@ -114,7 +114,7 @@ export const useBtcMemeCurrentPrice = (args: { id: number }) => {
 				// 	.toString(),
 			};
 		},
-		// refetchInterval: 2000,
+		refetchInterval: 2000,
 	});
 };
 
@@ -202,6 +202,7 @@ export const useBtcTokenHolders = (args: {
 				pageSize,
 			}),
 		enabled: !!args.id && !!args.page,
+		refetchInterval: 1000 * 2,
 	});
 };
 
@@ -320,12 +321,15 @@ export const useBtcSell = () => {
 	});
 };
 
-export const useBtcPreAddLiquidity = (args: PreAddLiquidityArgs) => {
+export const useBtcPreAddLiquidity = (
+	args: PreAddLiquidityArgs & { enabled: boolean },
+	enabled?: boolean
+) => {
 	return useQuery({
 		queryKey: ["btc-core", "pre-add-liquidity"],
 		queryFn: async () =>
 			pre_add_liquidity(getChainBTCCoreCanisterId().toText(), args),
-		enabled: (!!args.sats || !!args.runes) && !!args.id,
+		enabled: !!args.id && enabled,
 	});
 };
 

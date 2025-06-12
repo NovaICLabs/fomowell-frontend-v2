@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useParams } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
@@ -138,8 +138,14 @@ export default function Bottom() {
 	const { id } = useParams({
 		from: `/bitcoin/token/$id`,
 	});
+
+	useEffect(() => {
+		return () => {
+			setActiveTab(tabs[0]);
+		};
+	}, [id]);
+
 	const { data: memeTokenInfo } = useBtcMemeTokenInfo(Number(id));
-	console.log("🚀 ~ Bottom ~ memeTokenInfo:", memeTokenInfo);
 
 	const { data: tokenInfo } = useBtcSingleTokenInfo({ id });
 
