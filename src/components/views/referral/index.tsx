@@ -68,7 +68,7 @@ const Explanation = () => {
 	const { chain } = useChainStore();
 
 	const withdrawal = [
-		`Each withdrawal requires a minimum of 1 ${chain === "icp" ? "ICP" : "SATS"} to be eligible for application (if not met, it will continue to accumulate).`,
+		`Each withdrawal requires a minimum of 10000 ${chain === "icp" ? "ICP" : "SATS"} to be eligible for application (if not met, it will continue to accumulate).`,
 		"Withdrawals usually arrive within 24 hours, and you can also query the blockchain transaction hash.",
 		"All commission rewards will be accumulated once credited, and withdrawals will be deducted based on the total amount.",
 	];

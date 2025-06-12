@@ -9,7 +9,7 @@ export const Route = createFileRoute("/about/")({
 export default function About() {
 	return (
 		<>
-			<div className="relative m-auto mt-[15px] mb-[25px] flex w-full px-[10px] md:px-0">
+			<div className="relative m-auto mt-[15px] mb-[25px] flex w-full max-w-[780px] px-[10px] md:px-0">
 				<AboutPage />
 			</div>
 		</>
