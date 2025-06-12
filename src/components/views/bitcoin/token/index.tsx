@@ -23,8 +23,8 @@ import { withStopPropagation } from "@/lib/common/react-event";
 // import { validatePrincipalText } from "@/lib/ic/principal";
 // import { getSwapUrlByCanisterId } from "@/lib/swap/icpex";
 import { cn } from "@/lib/utils";
+import { useBtcIdentityStore } from "@/store/btc";
 import { useDialogStore } from "@/store/dialog";
-import { useIcIdentityStore } from "@/store/ic";
 import { useMobileSheetStore } from "@/store/mobile/sheet";
 
 import Comments from "./bottom/comments";
@@ -49,7 +49,7 @@ const MobileToken = () => {
 	const router = useRouter();
 	const canGoBack = useCanGoBack();
 	const { setInfoOpen, setTradeOpen } = useMobileSheetStore();
-	const { connected } = useIcIdentityStore();
+	const { connected } = useBtcIdentityStore();
 	const { setBtcConnectOpen } = useDialogStore();
 	const [tradeType, setTradeType] = useState<TradeTab>("Buy");
 	const isCompleted = memeTokenInfo?.completed;
@@ -194,6 +194,7 @@ const MobileToken = () => {
 					</Button>
 				) : (
 					<>
+						{/* TODO mobile edit style */}
 						<Button
 							key={"buy"}
 							className={cn(

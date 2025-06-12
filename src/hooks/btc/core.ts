@@ -5,6 +5,7 @@ import BigNumber from "bignumber.js";
 import superjson from "superjson";
 
 import {
+	add_liquidity,
 	btc_buy,
 	btc_sell,
 	type BuyArgs,
@@ -18,6 +19,10 @@ import {
 	getCurrentPrice,
 	getHolders,
 	getMemeToken,
+	pre_add_liquidity,
+	pre_remove_liquidity,
+	type PreAddLiquidityArgs,
+	remove_liquidity,
 	type SellArgs,
 } from "@/canisters/btc_core";
 // import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
@@ -26,7 +31,12 @@ import { formatNumberSmart, formatUnits } from "@/lib/common/number";
 
 import { useBtcConnectedIdentity } from "../providers/wallet/bitcoin";
 
-import type { LedgerType } from "@/canisters/btc_core/index.did.d";
+import type {
+	LedgerType,
+	LiquidityAddArg,
+	LiquidityRemoveArg,
+	PreLiquidityRemoveArg,
+} from "@/canisters/btc_core/index.did.d";
 
 const NETWORK_FEE = 0.00002;
 const FEE = 0.0000001;
@@ -303,6 +313,58 @@ export const useBtcSell = () => {
 			} else {
 				showToast("error", "Failed to sell token");
 			}
+		},
+	});
+};
+
+export const useBtcPreAddLiquidity = (args: PreAddLiquidityArgs) => {
+	return useQuery({
+		queryKey: ["btc-core", "pre-add-liquidity"],
+		queryFn: async () =>
+			pre_add_liquidity(getChainBTCCoreCanisterId().toText(), args),
+		enabled: (!!args.sats || !!args.runes) && !!args.id,
+	});
+};
+
+export const useBtcAddLiquidity = () => {
+	const { actorCreator } = useBtcConnectedIdentity();
+	return useMutation({
+		mutationKey: ["btc-core", "add-liquidity"],
+		mutationFn: async (args: LiquidityAddArg) => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			return add_liquidity(
+				actorCreator,
+				getChainBTCCoreCanisterId().toText(),
+				args
+			);
+		},
+	});
+};
+
+export const useBtcPreRemoveLiquidity = (args: PreLiquidityRemoveArg) => {
+	return useQuery({
+		queryKey: ["btc-core", "pre-remove-liquidity"],
+		queryFn: async () =>
+			pre_remove_liquidity(getChainBTCCoreCanisterId().toText(), args),
+		enabled: !!args.liquidity && !!args.id,
+	});
+};
+
+export const useBtcRemoveLiquidity = () => {
+	const { actorCreator } = useBtcConnectedIdentity();
+	return useMutation({
+		mutationKey: ["btc-core", "remove-liquidity"],
+		mutationFn: async (args: LiquidityRemoveArg) => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			return remove_liquidity(
+				actorCreator,
+				getChainBTCCoreCanisterId().toText(),
+				args
+			);
 		},
 	});
 };

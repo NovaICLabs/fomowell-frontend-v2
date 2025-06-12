@@ -687,6 +687,15 @@ export const DepositWithdrawContent = () => {
 	const { btcDepositWithdrawOpen } = useDialogStore();
 	const { data } = useBtcPendingDeposits();
 
+	const hasLastData = useMemo(() => {
+		if (!data || (data && data.length === 0)) return false;
+
+		const last = data[data.length - 1];
+		return last;
+	}, [data]);
+
+	console.debug("🚀 ~ DepositWithdrawContent ~ data:", hasLastData);
+
 	return (
 		<div
 			className={cn(
@@ -698,9 +707,14 @@ export const DepositWithdrawContent = () => {
 				{btcDepositWithdrawOpen.type === "deposit" && <Deposit />}
 				{btcDepositWithdrawOpen.type === "withdraw" && <Withdraw />}
 			</div>
-			{data && data.length > 0 && (
+			{hasLastData && (
 				<div className="shrink-0 rounded-b-2xl bg-[#2F2F2F] px-4 py-3 text-sm">
-					It takes 20 to 30 minutes for the blockchain confirmation...
+					Your{" "}
+					{BigNumber(hasLastData?.value || 0)
+						.div(10 ** getCkbtcCanisterToken().decimals)
+						.toFixed()
+						.toString()}{" "}
+					BTC deposit is pending confirmation...
 				</div>
 			)}
 		</div>

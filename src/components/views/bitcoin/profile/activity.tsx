@@ -204,16 +204,16 @@ const ProfileActivity = () => {
 						<div className="flex h-full w-full items-center gap-1">
 							<span className="text-sm leading-4">
 								{formatNumberSmart(
-									BigNumber(1)
-										.times(10 ** getCkbtcCanisterToken().decimals)
-										.div(BigNumber(price))
-										.toString(),
+									// BigNumber(1)
+									// 	.times(10 ** getCkbtcCanisterToken().decimals)
+									// 	.div(BigNumber(price))
+									BigNumber(price).toFixed(5).toString(),
 									{
 										shortZero: true,
 									}
 								)}
 							</span>
-							<span className="text-sm leading-4 text-white/60">BTC</span>
+							<span className="text-sm leading-4 text-white/60">sats</span>
 						</div>
 					);
 				},

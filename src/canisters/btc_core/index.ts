@@ -19,7 +19,14 @@ import { idlFactory } from "./index.did";
 // import { approve, getICPCanisterId } from "../icrc3";
 // import { getCkbtcCanisterToken } from "../icrc3/specials";
 
-import type { _SERVICE, LedgerType, StableToken } from "./index.did.d";
+import type {
+	_SERVICE,
+	LedgerType,
+	LiquidityAddArg,
+	LiquidityRemoveArg,
+	PreLiquidityRemoveArg,
+	StableToken,
+} from "./index.did.d";
 import type { ActorCreator } from "@/lib/ic/connectors";
 import type { Identity } from "@dfinity/agent";
 import type { Principal } from "@dfinity/principal";
@@ -636,6 +643,118 @@ export const withdrawBtc = async (
 		subaccount: [],
 	});
 
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};
+
+// pre add liquidity
+export type PreAddLiquidityArgs = {
+	sats: bigint | undefined;
+	id: bigint;
+	runes: bigint | undefined;
+};
+
+export const pre_add_liquidity = async (
+	canisterId: string,
+	args: PreAddLiquidityArgs
+) => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { sats, id, runes } = args;
+
+	const result = await actor.pre_add_liquidity({
+		id,
+		sats: sats ? [sats] : [],
+		runes: runes ? [runes] : [],
+	});
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};
+
+// add liquidity
+export const add_liquidity = async (
+	createActor: ActorCreator,
+	canisterId: string,
+	args: LiquidityAddArg
+) => {
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		interfaceFactory: idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { sats, id, runes, nonce } = args;
+
+	const result = await actor.add_liquidity({
+		id,
+		sats: sats,
+		runes: runes,
+		nonce: nonce,
+	});
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};
+
+// pre add liquidity
+export const pre_remove_liquidity = async (
+	canisterId: string,
+	args: PreLiquidityRemoveArg
+) => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { id, liquidity } = args;
+
+	const result = await actor.pre_withdraw_liquidity({
+		id,
+		liquidity,
+	});
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};
+
+// remove liquidity
+export const remove_liquidity = async (
+	createActor: ActorCreator,
+	canisterId: string,
+	args: LiquidityRemoveArg
+) => {
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		interfaceFactory: idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { id, liquidity, nonce } = args;
+
+	const result = await actor.withdraw_liquidity({
+		id,
+		liquidity: liquidity,
+		nonce: nonce,
+	});
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
 	});
