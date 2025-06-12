@@ -26,7 +26,7 @@ export const Header = () => {
 			{isMobile ? (
 				<div
 					className={cn(
-						"flex h-11 items-center justify-between gap-2 px-2.5",
+						"relative z-50 flex h-11 items-center justify-between gap-2 px-2.5",
 						pathname.includes("/icp/token") && "hidden"
 					)}
 				>

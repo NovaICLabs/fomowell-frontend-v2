@@ -15,25 +15,25 @@ const headers = [
 		id: "time",
 		label: "Time",
 		sortable: false,
-		className: "min-w-[40%] pl-[20px]",
+		className: "min-w-[200px] w-[40%] pl-[20px]",
 	},
 	{
 		id: "invitee",
 		label: "Invitee",
 		sortable: false,
-		className: "min-w-[20%]",
+		className: "min-w-[150px] w-[20%]",
 	},
 	{
 		id: "level",
 		label: "Level",
 		sortable: false,
-		className: "min-w-[20%]",
+		className: "min-w-[150px] w-[20%]",
 	},
 	{
 		id: "fee",
 		label: "Fee",
 		sortable: false,
-		className: "min-w-[20%]",
+		className: "min-w-[150px] w-[20%]",
 	},
 ];
 

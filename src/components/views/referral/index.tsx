@@ -22,6 +22,11 @@ import {
 } from "@/apis/reward-btc";
 import { ReferralContent } from "@/components/layout/dialog/referral";
 import { DialogContent } from "@/components/ui/dialog";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import { showToast } from "@/components/utils/toast";
 import { useICPPrice, useSatsPrice } from "@/hooks/apis/coingecko";
 import { formatNumberSmart } from "@/lib/common/number";
@@ -59,6 +64,41 @@ const PriceRewardsSats = ({ data }: { data: string }) => {
 	);
 };
 
+const Explanation = () => {
+	const { chain } = useChainStore();
+
+	const withdrawal = [
+		`Each withdrawal requires a minimum of 1 ${chain === "icp" ? "ICP" : "SATS"} to be eligible for application (if not met, it will continue to accumulate).`,
+		"Withdrawals usually arrive within 24 hours, and you can also query the blockchain transaction hash.",
+		"All commission rewards will be accumulated once credited, and withdrawals will be deducted based on the total amount.",
+	];
+
+	return (
+		<div className="w-full rounded-xl border border-[#f7b406]/40 bg-[#111111] px-4 py-7 md:mt-5">
+			<div className="flex w-full items-center">
+				<img
+					alt="fomowell"
+					className="mr-1 h-[18px] w-[18px]"
+					src="/svgs/info.svg"
+				/>
+				<p className="justify-start font-['Albert_Sans'] text-base font-semibold text-white">
+					Withdrawal explanation
+				</p>
+			</div>
+			<div className="mt-3 flex flex-col gap-y-[20px]">
+				{withdrawal.map((item, index) => (
+					<div key={index} className="flex w-full">
+						<div className="mt-[8px] mr-[6px] h-1 w-1 flex-shrink-0 rounded-full bg-white/60" />
+						<p key={index} className="text-sm font-normal text-white/60">
+							{item}
+						</p>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+};
+
 export default function ReferralPage() {
 	const { identityProfile: identityProfileBTC, jwt_token: btcJwtToken } =
 		useBtcIdentityStore();
@@ -70,12 +110,6 @@ export default function ReferralPage() {
 	const [tab, setTab] = useState<"invitation" | "withdrawal">("invitation");
 	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
-
-	const withdrawal = [
-		"Each withdrawal requires a minimum of 1 ICP to be eligible for application (if not met, it will continue to accumulate).",
-		"Withdrawals usually arrive within 24 hours, and you can also query the blockchain transaction hash.",
-		"All commission rewards will be accumulated once credited, and withdrawals will be deducted based on the total amount.",
-	];
 
 	const onWithdraw = () => {
 		setLoading(true);
@@ -101,6 +135,8 @@ export default function ReferralPage() {
 				});
 		}
 	};
+
+	const [openPopover, setOpenPopover] = useState(false);
 
 	const [rewardStats, setRewardStats] = useState<RewardStats>();
 	const [rewardLeaderboard, setRewardLeaderboard] = useState<
@@ -146,6 +182,7 @@ export default function ReferralPage() {
 				});
 
 				void getBtcUserRewardLeaderboard(btcJwtToken).then((result) => {
+					console.log("🚀 ~ voidgetBtcUserRewardLeaderboard ~ result:", result);
 					if (!result) return;
 					setRewardLeaderboard(result);
 				});
@@ -165,6 +202,57 @@ export default function ReferralPage() {
 	}, [btcJwtToken, icJwtToken, chain]);
 
 	const domain = window.location.origin;
+
+	const RewardItem = ({ item }: { item: RewardLeaderboard }) => {
+		return (
+			<div className="flex flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[20px] md:h-[188px] md:pb-[30px]">
+				{item.rank === 1 && (
+					<img alt="" className="w-[94px]" src="/images/gold.png" />
+				)}
+				{item.rank === 2 && (
+					<img alt="" className="w-[94px]" src="/images/silver.png" />
+				)}
+				{item.rank === 3 && (
+					<img alt="" className="w-[94px]" src="/images/copper.png" />
+				)}
+
+				<div
+					className={cn(
+						"flex flex-row items-center gap-x-[80px]",
+						item.rank > 1 && "w-full flex-col md:w-auto md:flex-row"
+					)}
+				>
+					<div
+						className={cn(
+							"flex flex-shrink-0 flex-col px-3 md:gap-y-[13px]",
+							item.rank > 1 && "w-full md:w-auto"
+						)}
+					>
+						<p className="text-sm font-normal text-white/50">
+							Claimed Rewards:
+						</p>
+						<p className="flex text-base font-medium text-white">
+							{item.totalRewards}{" "}
+							<p className="text ml-1 uppercase">
+								{chain === "icp" ? "ICP" : "SARS"}
+							</p>
+						</p>
+					</div>
+					<div
+						className={cn(
+							"flex flex-shrink-0 flex-col px-3 md:gap-y-[13px]",
+							item.rank > 1 && "mt-3 w-full md:mt-0 md:w-auto"
+						)}
+					>
+						<p className="text-sm font-normal text-white/50">Invitee:</p>
+						<p className="text-base font-medium text-white">
+							{(item.level1Count || 0) + (item.level2Count || 0)}
+						</p>
+					</div>
+				</div>
+			</div>
+		);
+	};
 
 	return (
 		<>
@@ -221,8 +309,8 @@ export default function ReferralPage() {
 					</div>
 				</DialogContent>
 			</Dialog>
-			<div className="flex h-full w-full">
-				<div className="flex w-[350px] flex-shrink-0 flex-col">
+			<div className="flex h-full w-full flex-col md:flex-row">
+				<div className="flex w-full flex-shrink-0 flex-col md:w-[350px]">
 					<ReferralContent
 						earned={rewardStats?.reward.total || ""}
 						referralLink={`${domain}?chain=${chain}&ref=${chain === "icp" ? identityProfileIc?.invite_code : identityProfileBTC?.invite_code}`}
@@ -243,73 +331,54 @@ export default function ReferralPage() {
 							(rewardStats?.level1Count || 0) + (rewardStats?.level2Count || 0)
 						}
 					/>
-					<div className="mt-5 w-full rounded-xl border border-[#f7b406]/40 bg-[#111111] px-4 py-7">
-						<div className="flex w-full items-center">
-							<img
-								alt="fomowell"
-								className="mr-1 h-[18px] w-[18px]"
-								src="/svgs/info.svg"
-							/>
-							<p className="justify-start font-['Albert_Sans'] text-base font-semibold text-white">
-								Withdrawal explanation
-							</p>
-						</div>
-						<div className="mt-3 flex flex-col gap-y-[20px]">
-							{withdrawal.map((item, index) => (
-								<div key={index} className="flex w-full">
-									<div className="mt-[8px] mr-[6px] h-1 w-1 flex-shrink-0 rounded-full bg-white/60" />
-									<p key={index} className="text-sm font-normal text-white/60">
-										{item}
-									</p>
-								</div>
-							))}
-						</div>
+					<div className="hidden md:flex">
+						<Explanation />
 					</div>
 				</div>
-				<div className="ml-5 min-w-0 flex-1">
-					<div className="flex h-[212px] w-full gap-x-[13px] rounded-xl border border-[#f7b406]/30 bg-[#111111] p-3">
-						{rewardLeaderboard.map((item, index) => (
-							<div
-								key={index}
-								className="flex h-[188px] flex-1 flex-col items-center justify-center rounded-xl bg-[#191919] pb-[30px]"
-							>
-								{item.rank === 1 && (
-									<img alt="" className="w-[94px]" src="/images/gold.png" />
-								)}
-								{item.rank === 2 && (
-									<img alt="" className="w-[94px]" src="/images/silver.png" />
-								)}
-								{item.rank === 3 && (
-									<img alt="" className="w-[94px]" src="/images/copper.png" />
-								)}
 
-								<div className="flex gap-x-[80px]">
-									<div className="flex flex-col gap-y-[13px]">
-										<p className="text-sm font-normal text-white/50">
-											Claimed Rewards:
-										</p>
-										<p className="flex text-base font-medium text-white">
-											{item.totalRewards}{" "}
-											<p className="text ml-1 uppercase">
-												{chain === "icp" ? "ICP" : "SARS"}
-											</p>
-										</p>
-									</div>
-									<div className="flex flex-col gap-y-[13px]">
-										<p className="text-sm font-normal text-white/50">
-											Invitee:
-										</p>
-										<p className="text-base font-medium text-white">
-											{(item.level1Count || 0) + (item.level2Count || 0)}
-										</p>
-									</div>
-								</div>
+				<div className="mt-[30px] flex w-full justify-between md:hidden">
+					<p className="text-base font-semibold text-white">Rewards</p>
+
+					<Popover open={openPopover} onOpenChange={setOpenPopover}>
+						<PopoverTrigger asChild>
+							<img
+								alt=""
+								className="h-6 w-6 cursor-pointer"
+								src="/svgs/info.svg"
+							/>
+						</PopoverTrigger>
+						<PopoverContent
+							className="z-100 -mt-1 mr-[12px] w-[71vw] border-none border-gray-700 bg-transparent p-0 pt-1"
+							onMouseEnter={() => {
+								setOpenPopover(true);
+							}}
+							onMouseLeave={() => {
+								setOpenPopover(false);
+							}}
+						>
+							<div className="flex w-[100%]">
+								<Explanation></Explanation>
 							</div>
-						))}
+						</PopoverContent>
+					</Popover>
+				</div>
+
+				<div className="flex min-w-0 flex-1 flex-col gap-y-10 md:ml-5 md:gap-y-0">
+					<div className="order-3 flex w-full flex-col gap-x-[13px] gap-y-[13px] rounded-xl border border-[#f7b406]/30 bg-[#111111] p-3 md:order-2 md:h-[212px] md:flex-row">
+						{rewardLeaderboard && rewardLeaderboard[0] ? (
+							<RewardItem item={rewardLeaderboard[0]} />
+						) : (
+							<></>
+						)}
+						<div className="flex flex-2 gap-x-[13px]">
+							{rewardLeaderboard.slice(1, 3).map((item, index) => (
+								<RewardItem key={index} item={item} />
+							))}{" "}
+						</div>
 					</div>
 
-					<div className="mt-5 flex h-[188px] w-full rounded-xl border border-neutral-800 bg-[#111111]">
-						<div className="flex flex-1 flex-col justify-center border-r border-neutral-800 px-5">
+					<div className="order-1 mt-5 flex w-full flex-col rounded-xl border border-neutral-800 bg-[#111111] md:order-2 md:h-[188px] md:flex-row">
+						<div className="flex h-[148px] flex-col justify-center border-r border-b border-neutral-800 px-5 md:h-auto md:flex-1">
 							<p className="text-sm leading-none font-normal text-white/50">
 								My total Rewards
 							</p>
@@ -319,7 +388,7 @@ export default function ReferralPage() {
 									{chain === "icp" ? "ICP" : "Sats"}
 								</p>
 							</div>
-							<p className="mt-[12px] text-sm leading-none font-normal text-white/60">
+							<p className="mt-[6px] text-sm leading-none font-normal text-white/60 md:mt-[12px]">
 								{chain === "icp" ? (
 									<PriceRewardsIcp data={rewardStats?.reward?.total || "0"} />
 								) : (
@@ -327,7 +396,7 @@ export default function ReferralPage() {
 								)}
 							</p>
 						</div>
-						<div className="flex flex-1 flex-col justify-center border-r border-neutral-800 px-5">
+						<div className="flex h-[148px] flex-col justify-center border-r border-b border-neutral-800 px-5 md:h-auto md:flex-1">
 							<p className="text-sm leading-none font-normal text-white/50">
 								Withdrawal completed
 							</p>
@@ -349,7 +418,7 @@ export default function ReferralPage() {
 								)}
 							</p>
 						</div>
-						<div className="flex flex-1 items-center justify-center border-r border-neutral-800 px-5">
+						<div className="flex h-[148px] items-center justify-center border-r border-neutral-800 px-5 md:h-auto md:flex-1">
 							<div className="flex flex-1 flex-col">
 								<p className="text-sm leading-none font-normal text-white/50">
 									Can withdraw
@@ -383,7 +452,7 @@ export default function ReferralPage() {
 						</div>
 					</div>
 
-					<div className="mt-[30px] flex w-full flex-col">
+					<div className="order-2 flex w-full flex-col md:order-3 md:mt-[30px]">
 						<div className="flex w-full gap-x-[40px]">
 							<div className="relative flex">
 								<p

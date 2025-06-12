@@ -33,13 +33,13 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 	const { chain } = useChainStore();
 
 	return (
-		<div className="relative flex w-full">
+		<div className="relative flex min-h-[500px] w-full">
 			<img
 				alt="fomowell"
 				className="flex w-full"
 				src="/images/referral-dialog-bg.png"
 			/>
-			<div className="absolute top-0 left-0 flex h-full min-h-[500px] w-full flex-col justify-between p-5">
+			<div className="absolute top-0 left-0 flex h-full w-full flex-col justify-between p-5">
 				<div className="flex flex-col">
 					<div className="flex w-full flex-col">
 						<img
