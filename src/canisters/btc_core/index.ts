@@ -650,9 +650,9 @@ export const withdrawBtc = async (
 
 // pre add liquidity
 export type PreAddLiquidityArgs = {
-	sats: bigint | undefined;
+	sats: string | undefined;
 	id: bigint;
-	runes: bigint | undefined;
+	runes: string | undefined;
 };
 
 export const pre_add_liquidity = async (
@@ -674,8 +674,8 @@ export const pre_add_liquidity = async (
 
 	const result = await actor.pre_add_liquidity({
 		id,
-		sats: sats ? [sats] : [],
-		runes: runes ? [runes] : [],
+		sats: sats ? [BigInt(sats)] : [],
+		runes: runes ? [BigInt(runes)] : [],
 	});
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
