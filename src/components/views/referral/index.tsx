@@ -234,7 +234,7 @@ export default function ReferralPage() {
 						<p className="flex text-base font-medium text-white">
 							{formatNumberSmart(item.totalRewards, { shortenLarge: true })}
 							<p className="text ml-1 uppercase">
-								{chain === "icp" ? "ICP" : "SARS"}
+								{chain === "icp" ? "ICP" : "SATS"}
 							</p>
 						</p>
 					</div>
