@@ -1,0 +1,56 @@
+.mdCon {
+  width: 100%;
+  font-size: 16px;
+}
+
+.mdCon a {
+  color: #1d5cfd;
+}
+
+.mdCon h1,
+.mdCon h2,
+.mdCon h3,
+.mdCon h4 {
+  font-weight: 700;
+  padding: 10px 0;
+}
+
+.mdCon h1 {
+  font-size: 24px;
+}
+
+.mdCon h2 {
+  font-size: 22px;
+}
+
+.mdCon h3 {
+  font-size: 20px;
+}
+
+.mdCon h4 {
+  font-size: 16px;
+}
+
+.mdCon p {
+  padding: 8px 0;
+}
+
+.mdCon code {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  width: 100%;
+}
+
+.mdCon ul,
+.mdCon li {
+  padding: 5px 0;
+}
+
+.mdCon li p {
+  padding: 0;
+}
+
+.mdCon hr {
+  margin: 10px auto;
+}

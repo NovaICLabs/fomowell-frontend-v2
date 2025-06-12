@@ -6,7 +6,7 @@ import { ChevronLeft } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useChainStore } from "@/store/chain";
-import { useDialogStore } from "@/store/dialog";
+// import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore } from "@/store/ic";
 import { useMobileSheetStore } from "@/store/mobile/sheet";
 
@@ -18,13 +18,14 @@ export default function MenuSheet() {
 	const { menuOpen, setMenuOpen } = useMobileSheetStore();
 	const { chain } = useChainStore();
 	const { connected } = useIcIdentityStore();
-	const { setHowItWorksOpen } = useDialogStore();
+	// const { setHowItWorksOpen } = useDialogStore();
 
 	const menus = useMemo(() => {
 		return chain === "bitcoin"
 			? [
 					{ label: "Tokens", to: "/" },
 					{ label: "Liquidity", to: "/bitcoin/liquidity" },
+					{ label: "How it works", to: "/about" },
 				]
 			: [{ label: "Tokens", to: "/" }];
 	}, [chain]);
@@ -73,7 +74,7 @@ export default function MenuSheet() {
 							</Link>
 						);
 					})}
-					<div
+					{/* <div
 						className="border-gray-710 flex h-12 items-center border-t border-b text-sm font-medium text-white/60"
 						onClick={() => {
 							setHowItWorksOpen(true);
@@ -81,7 +82,7 @@ export default function MenuSheet() {
 						}}
 					>
 						<div className="px-2.5">How it works</div>
-					</div>
+					</div> */}
 				</div>
 			</SheetContent>
 		</Sheet>

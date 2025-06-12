@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as HowImport } from './routes/how'
 import { Route as IndexImport } from './routes/index'
 import { Route as ReferralIndexImport } from './routes/referral/index'
+import { Route as AboutIndexImport } from './routes/about/index'
 import { Route as IcpCreateImport } from './routes/icp/create'
 import { Route as BitcoinCreateImport } from './routes/bitcoin/create'
 import { Route as BitcoinLiquidityIndexImport } from './routes/bitcoin/liquidity/index'
@@ -43,6 +44,12 @@ const IndexRoute = IndexImport.update({
 const ReferralIndexRoute = ReferralIndexImport.update({
   id: '/referral/',
   path: '/referral/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AboutIndexRoute = AboutIndexImport.update({
+  id: '/about/',
+  path: '/about/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -145,6 +152,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IcpCreateImport
       parentRoute: typeof rootRoute
     }
+    '/about/': {
+      id: '/about/'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/referral/': {
       id: '/referral/'
       path: '/referral'
@@ -225,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/how': typeof HowRoute
   '/bitcoin/create': typeof BitcoinCreateRoute
   '/icp/create': typeof IcpCreateRoute
+  '/about': typeof AboutIndexRoute
   '/referral': typeof ReferralIndexRoute
   '/bitcoin/profile/$userid': typeof BitcoinProfileUseridRoute
   '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
@@ -242,6 +257,7 @@ export interface FileRoutesByTo {
   '/how': typeof HowRoute
   '/bitcoin/create': typeof BitcoinCreateRoute
   '/icp/create': typeof IcpCreateRoute
+  '/about': typeof AboutIndexRoute
   '/referral': typeof ReferralIndexRoute
   '/bitcoin/profile/$userid': typeof BitcoinProfileUseridRoute
   '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
@@ -260,6 +276,7 @@ export interface FileRoutesById {
   '/how': typeof HowRoute
   '/bitcoin/create': typeof BitcoinCreateRoute
   '/icp/create': typeof IcpCreateRoute
+  '/about/': typeof AboutIndexRoute
   '/referral/': typeof ReferralIndexRoute
   '/bitcoin/profile/$userid': typeof BitcoinProfileUseridRoute
   '/bitcoin/token/$id': typeof BitcoinTokenIdRoute
@@ -279,6 +296,7 @@ export interface FileRouteTypes {
     | '/how'
     | '/bitcoin/create'
     | '/icp/create'
+    | '/about'
     | '/referral'
     | '/bitcoin/profile/$userid'
     | '/bitcoin/token/$id'
@@ -295,6 +313,7 @@ export interface FileRouteTypes {
     | '/how'
     | '/bitcoin/create'
     | '/icp/create'
+    | '/about'
     | '/referral'
     | '/bitcoin/profile/$userid'
     | '/bitcoin/token/$id'
@@ -311,6 +330,7 @@ export interface FileRouteTypes {
     | '/how'
     | '/bitcoin/create'
     | '/icp/create'
+    | '/about/'
     | '/referral/'
     | '/bitcoin/profile/$userid'
     | '/bitcoin/token/$id'
@@ -329,6 +349,7 @@ export interface RootRouteChildren {
   HowRoute: typeof HowRoute
   BitcoinCreateRoute: typeof BitcoinCreateRoute
   IcpCreateRoute: typeof IcpCreateRoute
+  AboutIndexRoute: typeof AboutIndexRoute
   ReferralIndexRoute: typeof ReferralIndexRoute
   BitcoinProfileUseridRoute: typeof BitcoinProfileUseridRoute
   BitcoinTokenIdRoute: typeof BitcoinTokenIdRoute
@@ -346,6 +367,7 @@ const rootRouteChildren: RootRouteChildren = {
   HowRoute: HowRoute,
   BitcoinCreateRoute: BitcoinCreateRoute,
   IcpCreateRoute: IcpCreateRoute,
+  AboutIndexRoute: AboutIndexRoute,
   ReferralIndexRoute: ReferralIndexRoute,
   BitcoinProfileUseridRoute: BitcoinProfileUseridRoute,
   BitcoinTokenIdRoute: BitcoinTokenIdRoute,
@@ -372,6 +394,7 @@ export const routeTree = rootRoute
         "/how",
         "/bitcoin/create",
         "/icp/create",
+        "/about/",
         "/referral/",
         "/bitcoin/profile/$userid",
         "/bitcoin/token/$id",
@@ -395,6 +418,9 @@ export const routeTree = rootRoute
     },
     "/icp/create": {
       "filePath": "icp/create.tsx"
+    },
+    "/about/": {
+      "filePath": "about/index.tsx"
     },
     "/referral/": {
       "filePath": "referral/index.tsx"
