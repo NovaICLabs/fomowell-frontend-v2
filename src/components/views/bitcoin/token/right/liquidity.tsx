@@ -12,7 +12,9 @@ import {
 	useBtcAddLiquidity,
 	useBtcCoreTokenBalance,
 	useBtcMemeCurrentPrice,
+	useBtcMemeTokenAllLiquidity,
 	useBtcMemeTokenInfo,
+	useBtcMemeTokenUserLiquidity,
 	useBtcPreAddLiquidity,
 	useBtcPreRemoveLiquidity,
 	useBtcRemoveLiquidity,
@@ -411,7 +413,21 @@ const RemoveLiquidity = () => {
 	const { id } = useTokenChainAndId();
 
 	// const { data: cnBtcPrice } = useCKBTCPrice();
-	// const { data: satsPrice } = useSatsPrice();
+	const { data: satsPrice } = useSatsPrice();
+
+	const { data: currentTokenPrice, refetch: refetchCurrentTokenPrice } =
+		useBtcMemeCurrentPrice({ id: Number(id) });
+
+	const { data: userLiquidity, refetch: refetchUserLiquidity } =
+		useBtcMemeTokenUserLiquidity({
+			id: Number(id),
+		});
+
+	console.debug("🚀 ~ RemoveLiquidity ~ userLiquidity:", userLiquidity);
+
+	const { data: allLiquidity, refetch: refetchAllLiquidity } =
+		useBtcMemeTokenAllLiquidity({ id: Number(id) });
+	console.debug("🚀 ~ RemoveLiquidity ~ allLiquidity:", allLiquidity);
 
 	const { data: memeTokenInfo, refetch: refetchMemeTokenInfo } =
 		useBtcMemeTokenInfo(Number(id));
@@ -426,8 +442,16 @@ const RemoveLiquidity = () => {
 		useBtcRemoveLiquidity();
 
 	const reloadBalanceAndInfo = useCallback(() => {
+		void refetchUserLiquidity();
+		void refetchAllLiquidity();
+		void refetchCurrentTokenPrice();
 		void refetchMemeTokenInfo();
-	}, [refetchMemeTokenInfo]);
+	}, [
+		refetchAllLiquidity,
+		refetchCurrentTokenPrice,
+		refetchMemeTokenInfo,
+		refetchUserLiquidity,
+	]);
 
 	const handleRemoveLiquidity = async () => {
 		if (isRemovePending) {
@@ -473,10 +497,31 @@ const RemoveLiquidity = () => {
 						src={"/svgs/liquidity/wallet.svg"}
 					/>
 					<div className="justify-start font-['Albert_Sans'] text-sm leading-none font-medium text-white">
-						303.66
+						{userLiquidity
+							? formatNumberSmart(userLiquidity, {
+									shortenLarge: true,
+									shortZero: true,
+								}) || "--"
+							: "--"}
 					</div>
 					<div className="justify-start font-['Albert_Sans'] text-xs leading-none font-normal text-white/60">
-						($360.26)
+						(${" "}
+						{userLiquidity &&
+							currentTokenPrice &&
+							satsPrice &&
+							allLiquidity &&
+							formatNumberSmart(
+								BigNumber(userLiquidity)
+									.times(currentTokenPrice?.raw)
+									.div(allLiquidity?.k)
+									.times(satsPrice)
+									.toString(),
+								{
+									shortenLarge: true,
+									shortZero: true,
+								}
+							)}
+						)
 					</div>
 				</div>
 			</div>

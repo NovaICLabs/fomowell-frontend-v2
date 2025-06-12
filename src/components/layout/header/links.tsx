@@ -3,11 +3,11 @@ import { useMemo } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 
 import { useChainStore } from "@/store/chain";
-import { useDialogStore } from "@/store/dialog";
+// import { useDialogStore } from "@/store/dialog";
 
 export default function Links() {
 	const location = useLocation();
-	const { setHowItWorksOpen } = useDialogStore();
+	// const { setHowItWorksOpen } = useDialogStore();
 
 	const { chain } = useChainStore();
 

@@ -3,6 +3,7 @@ import {
 	getAnonymousActorCreator,
 } from "@/hooks/providers/wallet/ic";
 import { string2array } from "@/lib/common/data/arrays";
+import { bigint2string } from "@/lib/common/data/bigint";
 import { formatNumberSmart, formatUnits } from "@/lib/common/number";
 import {
 	validateCanisterIdText,
@@ -758,4 +759,54 @@ export const remove_liquidity = async (
 	return unwrapRustResult(result, (error) => {
 		throw new Error(error);
 	});
+};
+
+export const token_all_liquidity = async (
+	canisterId: string,
+	args: {
+		id: bigint;
+	}
+) => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { id } = args;
+
+	const result = await actor.query_meme_token_pool(id);
+
+	return unwrapOption(result);
+};
+
+export const token_user_liquidity = async (
+	principal: Principal,
+	canisterId: string,
+	args: {
+		id: bigint;
+	}
+) => {
+	const createActor = getAnonymousActorCreator();
+	if (!createActor) {
+		throw new Error("Failed to create actor");
+	}
+
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { id } = args;
+
+	const result = await actor.query_user_meme_token_lp([principal], id);
+
+	return bigint2string(result);
 };

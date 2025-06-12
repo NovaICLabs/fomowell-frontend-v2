@@ -33,7 +33,7 @@ export interface ArchiveLedgerInfo {
 	txn_count: bigint;
 	archive_txn_count: bigint;
 	is_cleaning: boolean;
-	archives: Array<[Principal, GetBlocksRequest]>;
+	archives: Array<[Principal, TransactionRange]>;
 }
 export interface ArchiveSetting {
 	max_records_in_archive_instance: bigint;
@@ -48,15 +48,6 @@ export interface ArchivedRange {
 	callback: [Principal, string];
 	start: bigint;
 	length: bigint;
-}
-export interface BTCBuy {
-	fee: [] | [bigint];
-	token: Principal;
-	from: Account;
-	sats: bigint;
-	sold: bigint;
-	meme_token_id: bigint;
-	amount: bigint;
 }
 export type BTreeMap = Array<
 	[
@@ -126,6 +117,10 @@ export interface CanisterMetrics {
 export type CanisterMetricsData =
 	| { hourly: Array<HourlyMetricsData> }
 	| { daily: Array<DailyMetricsData> };
+export interface ClaimArg {
+	token: StableToken;
+	claimer: [] | [Principal];
+}
 export interface ConsentInfo {
 	metadata: ConsentMessageMetadata;
 	consent_message: ConsentMessage;
@@ -194,10 +189,6 @@ export type DisplayMessageType =
 	  };
 export interface ErrorInfo {
 	description: string;
-}
-export interface GetBlocksRequest {
-	start: bigint;
-	length: bigint;
 }
 export interface GetInformationRequest {
 	status: [] | [StatusRequest];
@@ -281,6 +272,16 @@ export interface InitArg {
 	swap_burn: bigint;
 	btc_custody_canister: Principal;
 }
+export interface InnerSwap {
+	fee: [] | [bigint];
+	token: Principal;
+	from: Account;
+	sats: bigint;
+	sold: bigint;
+	meme_token_id: bigint;
+	amount: bigint;
+	swap_type: SwapType;
+}
 export type LedgerType = { MemeToken: bigint } | { ICRCToken: Principal };
 export interface LineDisplayPage {
 	lines: Array<string>;
@@ -318,6 +319,7 @@ export interface MemeToken {
 	price: number;
 	telegram: [] | [string];
 	process: number;
+	is_etch: boolean;
 }
 export interface MemeTokenBalance {
 	token: MemeToken;
@@ -350,6 +352,19 @@ export interface NumericEntity {
 	min: bigint;
 	first: bigint;
 	last: bigint;
+}
+export interface OuterSwap {
+	fee: bigint;
+	token: Principal;
+	burn: bigint;
+	from: Account;
+	sats: bigint;
+	reserve_runes: bigint;
+	nonce: bigint;
+	reserve_sats: bigint;
+	meme_token_id: bigint;
+	swap_type: SwapType;
+	runes: bigint;
 }
 export interface PoolView {
 	k: bigint;
@@ -402,35 +417,11 @@ export type Result_6 = { Ok: PreRunesSwapSatsResponse } | { Err: string };
 export type Result_7 = { Ok: PreSatsSwapRunesResponse } | { Err: string };
 export type Result_8 = { Ok: number } | { Err: string };
 export type Result_9 = { Ok: bigint } | { Err: string };
-export interface RunesSwapSats {
-	fee: bigint;
-	token: Principal;
-	burn: bigint;
-	from: Account;
-	reserve_runes: bigint;
-	nonce: bigint;
-	input_runes: bigint;
-	reserve_sats: bigint;
-	output_sats: bigint;
-	meme_token_id: bigint;
-}
 export interface RunesSwapSatsArg {
 	id: bigint;
 	sats_min: [] | [bigint];
 	nonce: bigint;
 	runes: bigint;
-}
-export interface SatsSwapRunes {
-	fee: bigint;
-	token: Principal;
-	burn: bigint;
-	from: Account;
-	reserve_runes: bigint;
-	nonce: bigint;
-	output_runes: bigint;
-	reserve_sats: bigint;
-	meme_token_id: bigint;
-	input_sats: bigint;
 }
 export interface SatsSwapRunesArg {
 	id: bigint;
@@ -475,29 +466,32 @@ export interface SupportedStandard {
 	url: string;
 	name: string;
 }
+export type SwapType = { rune_to_btc: null } | { btc_to_rune: null };
 export interface TokenAmount {
 	token: Principal;
 	amount: bigint;
 }
 export interface Transaction {
 	buy: [] | [Buy];
+	inner_swap: [] | [InnerSwap];
 	add_liquidity: [] | [AddLiquidity];
 	withdraw: [] | [Deposit];
 	kind: string;
 	mint: [] | [Mint];
 	sell: [] | [Buy];
-	btc_sell: [] | [BTCBuy];
-	runes_swap_sats: [] | [RunesSwapSats];
 	deposit: [] | [Deposit];
-	btc_buy: [] | [BTCBuy];
 	withdraw_ckbtc: [] | [WithdrawCkbtc];
 	withdraw_liquidity: [] | [WithdrawLiquidity];
 	timestamp: bigint;
+	outer_swap: [] | [OuterSwap];
 	index: bigint;
 	transfer: [] | [Transfer];
-	sats_swap_runes: [] | [SatsSwapRunes];
 }
 export interface TransactionRange {
+	start: bigint;
+	length: bigint;
+}
+export interface TransactionRange_1 {
 	transactions: Array<Transaction_1>;
 }
 export interface Transaction_1 {
@@ -572,6 +566,7 @@ export interface _SERVICE {
 	buy: ActorMethod<[BuyArgs], Result_1>;
 	calculate_buy: ActorMethod<[bigint, bigint], Result_2>;
 	calculate_sell: ActorMethod<[bigint, bigint], Result_2>;
+	claim: ActorMethod<[ClaimArg], Result_2>;
 	create_token: ActorMethod<[CreateMemeTokenArg], Result_3>;
 	deposit: ActorMethod<[DepositArgs], Result_2>;
 	generate_random: ActorMethod<[], bigint>;
@@ -579,7 +574,7 @@ export interface _SERVICE {
 		[GetInformationRequest],
 		GetInformationResponse
 	>;
-	get_transactions: ActorMethod<[GetBlocksRequest], GetTransactionsResponse>;
+	get_transactions: ActorMethod<[TransactionRange], GetTransactionsResponse>;
 	icrc10_supported_standards: ActorMethod<[], Array<SupportedStandard>>;
 	icrc1_balance_of: ActorMethod<[LedgerType, Account], bigint>;
 	icrc21_canister_call_consent_message: ActorMethod<
@@ -592,6 +587,7 @@ export interface _SERVICE {
 	pre_sats_swap_runes: ActorMethod<[PreSatsSwapRunesArg], Result_7>;
 	pre_withdraw_liquidity: ActorMethod<[PreLiquidityRemoveArg], Result_5>;
 	query_meme_token: ActorMethod<[bigint], [] | [MemeToken]>;
+	query_meme_token_pool: ActorMethod<[bigint], [] | [PoolView]>;
 	query_meme_token_price: ActorMethod<[bigint], Result_8>;
 	query_meme_tokens: ActorMethod<[QueryMemeTokenArgs], QueryMemeTokenResponse>;
 	query_state: ActorMethod<[], State>;
@@ -604,10 +600,12 @@ export interface _SERVICE {
 		[[] | [Principal]],
 		Array<MemeToken>
 	>;
+	query_user_meme_token_lp: ActorMethod<[[] | [Principal], bigint], bigint>;
 	query_user_tokens: ActorMethod<[[] | [Account]], Array<MemeTokenBalance>>;
 	runes_swap_sats: ActorMethod<[RunesSwapSatsArg], Result>;
 	sats_swap_runes: ActorMethod<[SatsSwapRunesArg], Result>;
 	sell: ActorMethod<[BuyArgs], Result_2>;
+	test: ActorMethod<[bigint], undefined>;
 	withdraw: ActorMethod<[WithdrawArgs], Result_2>;
 	withdraw_ckbtc: ActorMethod<[WithdrawByCkbtcArgs], Result_9>;
 	withdraw_liquidity: ActorMethod<[LiquidityRemoveArg], Result>;

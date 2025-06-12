@@ -97,6 +97,7 @@ export default function Holders() {
 										BigNumber(holder.balance)
 											.div(10 ** getCkbtcCanisterToken().decimals)
 											.div(BigNumber(21_000_000))
+											.times(100)
 											.toString()
 									)}
 									% )

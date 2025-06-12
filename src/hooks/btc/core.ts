@@ -24,10 +24,13 @@ import {
 	type PreAddLiquidityArgs,
 	remove_liquidity,
 	type SellArgs,
+	token_all_liquidity,
+	token_user_liquidity,
 } from "@/canisters/btc_core";
 // import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { showToast } from "@/components/utils/toast";
 import { formatNumberSmart, formatUnits } from "@/lib/common/number";
+import { validatePrincipalText } from "@/lib/ic/principal";
 
 import { useBtcConnectedIdentity } from "../providers/wallet/bitcoin";
 
@@ -366,5 +369,34 @@ export const useBtcRemoveLiquidity = () => {
 				args
 			);
 		},
+	});
+};
+
+export const useBtcMemeTokenAllLiquidity = (args: { id: number }) => {
+	return useQuery({
+		queryKey: ["btc-core", "meme-token-all-liquidity", args.id],
+		queryFn: async () =>
+			token_all_liquidity(getChainBTCCoreCanisterId().toText(), {
+				id: BigInt(args.id),
+			}),
+		enabled: !!args.id,
+	});
+};
+
+export const useBtcMemeTokenUserLiquidity = (args: { id: number }) => {
+	const { principal } = useBtcConnectedIdentity();
+	return useQuery({
+		queryKey: ["btc-core", "meme-token-user-liquidity", principal, args.id],
+		queryFn: async () => {
+			if (!principal) {
+				throw new Error("No principal found");
+			}
+			return token_user_liquidity(
+				validatePrincipalText(principal),
+				getChainBTCCoreCanisterId().toText(),
+				{ id: BigInt(args.id) }
+			);
+		},
+		enabled: !!args.id,
 	});
 };

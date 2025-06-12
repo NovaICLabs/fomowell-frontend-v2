@@ -3,10 +3,10 @@ import { useMemo, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
 
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { showToast } from "@/components/utils/toast";
+// import { showToast } from "@/components/utils/toast";
 import { useCKBTCPrice, useSatsPrice } from "@/hooks/apis/coingecko";
 import { useBtcSingleTokenInfo } from "@/hooks/apis/indexer_btc";
 import { useBtcMemeCurrentPrice, useBtcMemeTokenInfo } from "@/hooks/btc/core";
@@ -139,6 +139,7 @@ export default function Bottom() {
 		from: `/bitcoin/token/$id`,
 	});
 	const { data: memeTokenInfo } = useBtcMemeTokenInfo(Number(id));
+	console.log("🚀 ~ Bottom ~ memeTokenInfo:", memeTokenInfo);
 
 	const { data: tokenInfo } = useBtcSingleTokenInfo({ id });
 
@@ -150,8 +151,10 @@ export default function Bottom() {
 	} = tokenInfo ?? {};
 
 	const currentTabs = useMemo(() => {
-		return memeTokenInfo && memeTokenInfo.completed ? tabs : tabs;
-		// : tabs.filter((tab) => tab !== "Liquidity");
+		return memeTokenInfo && memeTokenInfo.completed
+			? tabs
+			: //  : tabs;
+				tabs.filter((tab) => tab !== "Liquidity");
 	}, [memeTokenInfo]);
 
 	return (
@@ -195,39 +198,40 @@ export default function Bottom() {
 					<div className="flex h-[426px] w-[390px] flex-1 flex-col items-center justify-center gap-2">
 						<Skeleton className="h-[426px] w-[390px]" />
 					</div>
-				) : memeTokenInfo.completed ? (
-					<div className="flex flex-shrink-0 flex-col items-center justify-center gap-2">
-						<img
-							alt="completed"
-							className="w-50"
-							src="/svgs/common/launched.svg"
-						/>
-						<Button
-							className="-mt-9.5 h-9 w-88 rounded-full text-base font-bold"
-							onClick={() => {
-								const rune_name = memeTokenInfo.rune_name;
-								if (!rune_name) {
-									showToast("error", "rune_name not found");
-									return;
-								}
-								// todo add swap url
-								// window.open(
-								// 	getSwapUrlByCanisterId({
-								// 		input: canister_id.toText(),
-								// 		output: getCkbtcCanisterId().toText(),
-								// 	}),
-								// 	"_blank"
-								// );
-							}}
-						>
-							Go to Dex
-						</Button>
-					</div>
 				) : (
+					//  : memeTokenInfo.completed ? (
+					// 	<div className="flex flex-shrink-0 flex-col items-center justify-center gap-2">
+					// 		<img
+					// 			alt="completed"
+					// 			className="w-50"
+					// 			src="/svgs/common/launched.svg"
+					// 		/>
+					// 		<Button
+					// 			className="-mt-9.5 h-9 w-88 rounded-full text-base font-bold"
+					// 			onClick={() => {
+					// 				const rune_name = memeTokenInfo.rune_name;
+					// 				if (!rune_name) {
+					// 					showToast("error", "rune_name not found");
+					// 					return;
+					// 				}
+					// 				// todo add swap url
+					// 				// window.open(
+					// 				// 	getSwapUrlByCanisterId({
+					// 				// 		input: canister_id.toText(),
+					// 				// 		output: getCkbtcCanisterId().toText(),
+					// 				// 	}),
+					// 				// 	"_blank"
+					// 				// );
+					// 			}}
+					// 		>
+					// 			Go to Dex
+					// 		</Button>
+					// 	</div>
+					// )
 					<Trade />
 				))}
 
-			{/* TODO: add remove liquidity */}
+			{/* add remove liquidity */}
 			{activeTab === "Liquidity" && <Liquidity />}
 
 			<div className="bg-gray-860 grid h-21 flex-shrink-0 grid-cols-4 overflow-hidden rounded-[12px]">
