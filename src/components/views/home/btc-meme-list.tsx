@@ -770,12 +770,12 @@ export default function BtcMemeList() {
 							? "--"
 							: getTokenUsdValueTotal(
 									{ amount: BigInt(value) },
-									satsPrice ?? 0
+									ckBtcPrice ?? 0
 								);
 					return (
 						<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
 							<span className="text-sm leading-4 font-medium text-white">
-								{inBtc} sats
+								{inBtc} BTC
 							</span>
 							<span className="text-xs leading-4 font-light text-white/60">
 								${inUsd}
