@@ -16,6 +16,7 @@ export default function Links() {
 			? [
 					{ label: "Tokens", to: "/" },
 					{ label: "Liquidity", to: "/bitcoin/liquidity" },
+					{ label: "How it works", to: "/about" },
 				]
 			: [{ label: "Tokens", to: "/" }];
 	}, [chain]);
@@ -50,14 +51,14 @@ export default function Links() {
 					</Link>
 				);
 			})}
-			<div
+			{/* <div
 				className={`relative cursor-pointer text-sm font-medium text-white/60 hover:text-white`}
 				onClick={() => {
 					setHowItWorksOpen(true);
 				}}
 			>
 				How it works
-			</div>
+			</div> */}
 			{menus.map((link, index) => {
 				if (index <= menuLeftCount) return;
 

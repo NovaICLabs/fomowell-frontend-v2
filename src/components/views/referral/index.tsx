@@ -182,7 +182,6 @@ export default function ReferralPage() {
 				});
 
 				void getBtcUserRewardLeaderboard(btcJwtToken).then((result) => {
-					console.log("🚀 ~ voidgetBtcUserRewardLeaderboard ~ result:", result);
 					if (!result) return;
 					setRewardLeaderboard(result);
 				});
@@ -194,6 +193,7 @@ export default function ReferralPage() {
 				});
 
 				void getBtcUserRewardMyInvitees(btcJwtToken).then((result) => {
+					console.log("🚀 ~ voidgetBtcUserRewardMyInvitees ~ result:", result);
 					if (!result) return;
 					setMyInvitees(result);
 				});
@@ -232,7 +232,7 @@ export default function ReferralPage() {
 							Claimed Rewards:
 						</p>
 						<p className="flex text-base font-medium text-white">
-							{item.totalRewards}{" "}
+							{formatNumberSmart(item.totalRewards, { shortenLarge: true })}
 							<p className="text ml-1 uppercase">
 								{chain === "icp" ? "ICP" : "SARS"}
 							</p>
@@ -370,7 +370,7 @@ export default function ReferralPage() {
 						) : (
 							<></>
 						)}
-						<div className="flex flex-2 gap-x-[13px]">
+						<div className="grid flex-2 grid-cols-2 gap-x-[13px]">
 							{rewardLeaderboard.slice(1, 3).map((item, index) => (
 								<RewardItem key={index} item={item} />
 							))}{" "}
@@ -383,7 +383,11 @@ export default function ReferralPage() {
 								My total Rewards
 							</p>
 							<div className="mt-2 flex text-2xl leading-none font-medium text-white">
-								{rewardStats?.reward?.total || "0"}{" "}
+								{rewardStats?.reward?.total
+									? formatNumberSmart(rewardStats?.reward?.total, {
+											shortenLarge: true,
+										})
+									: "0"}{" "}
 								<p className="text ml-1 uppercase">
 									{chain === "icp" ? "ICP" : "Sats"}
 								</p>
@@ -401,7 +405,11 @@ export default function ReferralPage() {
 								Withdrawal completed
 							</p>
 							<div className="mt-2 flex text-2xl leading-none font-medium text-white">
-								{rewardStats?.reward?.withdrawn || "0"}{" "}
+								{rewardStats?.reward?.withdrawn
+									? formatNumberSmart(rewardStats?.reward?.withdrawn, {
+											shortenLarge: true,
+										})
+									: "0"}{" "}
 								<p className="text ml-1 uppercase">
 									{chain === "icp" ? "ICP" : "Sats"}
 								</p>
@@ -424,7 +432,11 @@ export default function ReferralPage() {
 									Can withdraw
 								</p>
 								<div className="mt-2 flex text-2xl leading-none font-medium text-white">
-									{rewardStats?.reward?.available || "0"}{" "}
+									{rewardStats?.reward?.available
+										? formatNumberSmart(rewardStats?.reward?.available, {
+												shortenLarge: true,
+											})
+										: "0"}{" "}
 									<p className="text ml-1 uppercase">
 										{chain === "icp" ? "ICP" : "Sats"}
 									</p>
