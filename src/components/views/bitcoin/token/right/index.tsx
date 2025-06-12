@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { useParams } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
 
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,6 @@ import { showToast } from "@/components/utils/toast";
 import { useCKBTCPrice, useSatsPrice } from "@/hooks/apis/coingecko";
 import { useBtcSingleTokenInfo } from "@/hooks/apis/indexer_btc";
 import { useBtcMemeCurrentPrice, useBtcMemeTokenInfo } from "@/hooks/btc/core";
-import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
 import {
 	formatNumberSmart,
 	formatUnits,
@@ -32,7 +32,9 @@ const isNegative = (value: number) => {
 	return value < 0;
 };
 export const InfoDetail = () => {
-	const { id } = useTokenChainAndId();
+	const { id } = useParams({
+		from: `/bitcoin/token/$id`,
+	});
 
 	const { data: currentTokenPrice } = useBtcMemeCurrentPrice({
 		id: Number(id),
@@ -133,9 +135,9 @@ export const InfoDetail = () => {
 };
 export default function Bottom() {
 	const [activeTab, setActiveTab] = useState(tabs[0]);
-
-	const { chain, id } = useTokenChainAndId();
-
+	const { id } = useParams({
+		from: `/bitcoin/token/$id`,
+	});
 	const { data: memeTokenInfo } = useBtcMemeTokenInfo(Number(id));
 
 	const { data: tokenInfo } = useBtcSingleTokenInfo({ id });
@@ -148,8 +150,9 @@ export default function Bottom() {
 	} = tokenInfo ?? {};
 
 	const currentTabs = useMemo(() => {
-		return chain !== "icp" ? tabs : tabs.filter((tab) => tab !== "Liquidity");
-	}, [chain]);
+		return memeTokenInfo && memeTokenInfo.completed ? tabs : tabs;
+		// : tabs.filter((tab) => tab !== "Liquidity");
+	}, [memeTokenInfo]);
 
 	return (
 		<div className="no-scrollbar flex w-[390px] flex-shrink-0 flex-col gap-y-[14px] overflow-auto">
