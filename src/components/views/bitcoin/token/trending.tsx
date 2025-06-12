@@ -187,9 +187,8 @@ export default function Trending() {
 				),
 				cell: (info) => {
 					const value = info.getValue();
-					const price = isNullOrUndefined(value)
-						? undefined
-						: BigNumber(1).div(BigNumber(value));
+					const price = isNullOrUndefined(value) ? undefined : BigNumber(value);
+					// : BigNumber(1).div(BigNumber(value));
 					const priceChangeRate = getPriceChangeRate(
 						{ label: "", value: sort },
 						info.row.original

@@ -163,7 +163,7 @@ export default function Transactions() {
 				size: 130,
 			}),
 			// Price column
-			columnHelper.accessor("token1Price", {
+			columnHelper.accessor("token0Price", {
 				header: () => (
 					<div className="group flex cursor-pointer items-center gap-1">
 						<span className="duration-300 group-hover:text-white">Price</span>
@@ -173,10 +173,10 @@ export default function Transactions() {
 					<div className="flex h-full w-full items-center gap-1">
 						<span className="text-sm leading-4">
 							{formatNumberSmart(
-								BigNumber(1)
-									.times(10 ** getCkbtcCanisterToken().decimals)
-									.div(BigNumber(info.getValue()))
-									.toString(),
+								// BigNumber(1)
+								// 	.times(10 ** getCkbtcCanisterToken().decimals)
+								// 	.div(BigNumber(info.getValue()))
+								BigNumber(info.getValue()).toString(),
 								{
 									shortZero: true,
 								}
