@@ -355,7 +355,7 @@ export const useBtcPreRemoveLiquidity = (args: PreLiquidityRemoveArg) => {
 		queryKey: ["btc-core", "pre-remove-liquidity"],
 		queryFn: async () =>
 			pre_remove_liquidity(getChainBTCCoreCanisterId().toText(), args),
-		enabled: !!args.liquidity && !!args.id,
+		enabled: !!args.id,
 	});
 };
 
