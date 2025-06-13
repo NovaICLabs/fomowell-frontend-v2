@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { getICPCanisterId } from "@/canisters/icrc3";
+import Upload from "@/components/icons/common/upload";
 import Telegram from "@/components/icons/media/telegram";
 import Website from "@/components/icons/media/website";
 import X from "@/components/icons/media/x";
@@ -30,7 +31,6 @@ import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
 import { fileToBase64 } from "@/lib/common/file";
 import { parseUnits } from "@/lib/common/number";
 import { useDialogStore } from "@/store/dialog";
-import Upload from "@/components/icons/common/upload";
 // Create form validation schema with Zod
 const formSchema = z.object({
 	name: z
