@@ -207,6 +207,7 @@ const LiquidityListItem = ({
 			: formatNumberSmart(itemData.price, {
 					shortenLarge: true,
 					shortZero: true,
+					formatCount: 3,
 				});
 	}, [itemData.price]);
 

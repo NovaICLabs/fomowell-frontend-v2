@@ -110,10 +110,14 @@ export const getCoreTokenBalance = async (
 	const decimals = 8;
 	const formatted = formatNumberSmart(
 		BigNumber(result)
-			.div(10 ** decimals)
-			.toFixed(2, 1)
-			.toString()
+			.dividedBy(10 ** decimals)
+			.toFixed(6, 1)
+			.toString(),
+		{
+			formatCount: 6,
+		}
 	);
+
 	return {
 		raw: result,
 		formatted,
@@ -718,16 +722,13 @@ export const add_liquidity = async (
 
 // pre add liquidity
 export const pre_remove_liquidity = async (
+	createActor: ActorCreator,
 	canisterId: string,
 	args: PreLiquidityRemoveArg
 ) => {
-	const createActor = getAnonymousActorCreator();
-	if (!createActor) {
-		throw new Error("Failed to create actor");
-	}
 	const actor = await createActor<_SERVICE>({
 		canisterId,
-		idlFactory,
+		interfaceFactory: idlFactory,
 	});
 	if (!actor) {
 		throw new Error("Failed to create actor");

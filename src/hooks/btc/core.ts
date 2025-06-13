@@ -351,10 +351,19 @@ export const useBtcAddLiquidity = () => {
 };
 
 export const useBtcPreRemoveLiquidity = (args: PreLiquidityRemoveArg) => {
+	const { actorCreator } = useBtcConnectedIdentity();
 	return useQuery({
 		queryKey: ["btc-core", "pre-remove-liquidity"],
-		queryFn: async () =>
-			pre_remove_liquidity(getChainBTCCoreCanisterId().toText(), args),
+		queryFn: async () => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			return pre_remove_liquidity(
+				actorCreator,
+				getChainBTCCoreCanisterId().toText(),
+				args
+			);
+		},
 		enabled: !!args.id,
 	});
 };

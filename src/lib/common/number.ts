@@ -69,9 +69,11 @@ export function countLeadingDecimalZeros(numberString: string): number {
 export const formatNumberSmart = (
 	value: BigNumber | string | number,
 	options: {
+		formatCount?: number;
 		shortenLarge?: boolean;
 		shortZero?: boolean;
 	} = {
+		formatCount: 3,
 		shortenLarge: false,
 		shortZero: false,
 	}
@@ -141,7 +143,9 @@ export const formatNumberSmart = (
 			return formattedDecimal.replace(/(\.\d*?[1-9])0+$|\.0*$/, "$1");
 		}
 	}
-	return bn.toFormat(2).replace(/(\.\d*?[1-9])0+$|\.0*$/, "$1");
+	return bn
+		.toFormat(options.formatCount ?? 3)
+		.replace(/(\.\d*?[1-9])0+$|\.0*$/, "$1");
 };
 
 export const getTokenUsdValueTotal = (
@@ -155,6 +159,7 @@ export const getTokenUsdValueTotal = (
 		{
 			shortenLarge: true,
 			shortZero: true,
+			formatCount: 3,
 		}
 	);
 };

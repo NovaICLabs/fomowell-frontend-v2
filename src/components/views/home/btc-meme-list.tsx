@@ -516,7 +516,7 @@ export default function BtcMemeList() {
 										})}
 							</div>
 							<div className="flex items-center gap-x-0.5 text-xs font-light text-white/60">
-								{formatNumberSmart(priceInBtc, {
+								{formatNumberSmart(priceInBtc.toFixed(3), {
 									shortZero: true,
 								})}
 								<span>sats</span>
