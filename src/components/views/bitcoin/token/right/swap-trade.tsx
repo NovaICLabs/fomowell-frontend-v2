@@ -261,7 +261,7 @@ export default function SwapTrade({ initialTab }: { initialTab?: TradeTab }) {
 						console.debug("🚀 ~ handleConfirm ~ result:", result);
 						showToast(
 							"success",
-							`${formatNumberSmart(formatUnits(formatUnits(result.sats)))} ${"BTC"} received`
+							`${formatNumberSmart(formatUnits(result.sats))} ${"BTC"} received`
 						);
 					}
 			}
