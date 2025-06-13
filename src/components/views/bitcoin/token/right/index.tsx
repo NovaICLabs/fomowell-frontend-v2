@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { useParams } from "@tanstack/react-router";
+import { useParams, useSearch } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
 
 // import { Button } from "@/components/ui/button";
+import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 // import { showToast } from "@/components/utils/toast";
-import { useCKBTCPrice, useSatsPrice } from "@/hooks/apis/coingecko";
+import { useCKBTCPrice } from "@/hooks/apis/coingecko";
 import { useBtcSingleTokenInfo } from "@/hooks/apis/indexer_btc";
 import { useBtcMemeCurrentPrice, useBtcMemeTokenInfo } from "@/hooks/btc/core";
 import {
@@ -47,7 +48,6 @@ export const InfoDetail = () => {
 			: undefined;
 	}, [memeTokenInfo]);
 
-	const { data: satsPrice } = useSatsPrice();
 	const { data: ckBtcPrice } = useCKBTCPrice();
 
 	const liquidityUSD = useMemo(() => {
@@ -61,14 +61,14 @@ export const InfoDetail = () => {
 	}, []);
 
 	const marketCap = useMemo(() => {
-		return currentTokenPrice?.raw && totalSupply && satsPrice
-			? BigNumber(1)
-					.div(BigNumber(currentTokenPrice.raw))
+		return currentTokenPrice?.raw && totalSupply && ckBtcPrice
+			? BigNumber(currentTokenPrice.raw)
+					.div(10 ** getCkbtcCanisterToken().decimals)
 					.times(totalSupply)
-					.times(satsPrice)
+					.times(ckBtcPrice)
 					.toString()
 			: undefined;
-	}, [currentTokenPrice, totalSupply, satsPrice]);
+	}, [currentTokenPrice, totalSupply, ckBtcPrice]);
 
 	return (
 		<div className="bg-gray-860 flex flex-col gap-5.5 rounded-[12px] px-4.5 py-5">
@@ -138,6 +138,15 @@ export default function Bottom() {
 	const { id } = useParams({
 		from: `/bitcoin/token/$id`,
 	});
+	const { type } = useSearch({
+		from: "/bitcoin/token/$id",
+	});
+
+	useEffect(() => {
+		if (id && type === "add_liquidity") {
+			setActiveTab("Liquidity");
+		}
+	}, [id, type]);
 
 	useEffect(() => {
 		return () => {
