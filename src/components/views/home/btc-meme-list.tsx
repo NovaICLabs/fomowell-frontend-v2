@@ -409,10 +409,9 @@ export default function BtcMemeList() {
 					})
 						.then((receivedAmount) => {
 							console.debug("🚀 ~ .then ~ receivedAmount:", receivedAmount);
-							const { runes } = receivedAmount;
 							showToast(
 								"success",
-								`${runes} $${ticker.toLocaleUpperCase()} received!`
+								`${formatNumberSmart(formatUnits(receivedAmount))} $${ticker.toLocaleUpperCase()} received!`
 							);
 						})
 						.catch((error: Error) => {

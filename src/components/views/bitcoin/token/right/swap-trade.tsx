@@ -240,10 +240,10 @@ export default function SwapTrade({ initialTab }: { initialTab?: TradeTab }) {
 						console.debug("🚀 ~ handleConfirm ~ result:", result);
 						showToast(
 							"success",
-							`${formatNumberSmart(formatUnits(result.runes, memeTokenInfo?.decimals))} ${memeTokenInfo?.ticker.toUpperCase()} received`
+							`${formatNumberSmart(formatUnits(result, memeTokenInfo?.decimals))} ${memeTokenInfo?.ticker.toUpperCase()} received`
 						);
 						// refetch meme token info
-						if (result.id) {
+						if (result) {
 							void refetchMemeTokenInfo();
 						}
 					} else {
@@ -261,7 +261,7 @@ export default function SwapTrade({ initialTab }: { initialTab?: TradeTab }) {
 						console.debug("🚀 ~ handleConfirm ~ result:", result);
 						showToast(
 							"success",
-							`${formatNumberSmart(formatUnits(result.sats))} ${"BTC"} received`
+							`${formatNumberSmart(formatUnits(result))} ${"BTC"} received`
 						);
 					}
 			}
