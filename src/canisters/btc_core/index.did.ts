@@ -659,8 +659,8 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			[IDL.Vec(MemeTokenBalance)],
 			["query"]
 		),
-		runes_swap_sats: IDL.Func([RunesSwapSatsArg], [Result], []),
-		sats_swap_runes: IDL.Func([SatsSwapRunesArg], [Result], []),
+		runes_swap_sats: IDL.Func([RunesSwapSatsArg], [Result_2], []),
+		sats_swap_runes: IDL.Func([SatsSwapRunesArg], [Result_2], []),
 		sell: IDL.Func([BuyArgs], [Result_2], []),
 		test: IDL.Func([IDL.Nat64], [], []),
 		withdraw: IDL.Func([WithdrawArgs], [Result_2], []),

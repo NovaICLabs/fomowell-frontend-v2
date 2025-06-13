@@ -615,8 +615,8 @@ export interface _SERVICE {
 	>;
 	query_user_meme_token_lp: ActorMethod<[[] | [Principal], bigint], bigint>;
 	query_user_tokens: ActorMethod<[[] | [Account]], Array<MemeTokenBalance>>;
-	runes_swap_sats: ActorMethod<[RunesSwapSatsArg], Result>;
-	sats_swap_runes: ActorMethod<[SatsSwapRunesArg], Result>;
+	runes_swap_sats: ActorMethod<[RunesSwapSatsArg], Result_2>;
+	sats_swap_runes: ActorMethod<[SatsSwapRunesArg], Result_2>;
 	sell: ActorMethod<[BuyArgs], Result_2>;
 	test: ActorMethod<[bigint], undefined>;
 	withdraw: ActorMethod<[WithdrawArgs], Result_2>;
