@@ -397,7 +397,7 @@ export type UserInfo = {
 	updatedAt: string;
 };
 
-export const getUserInfo = async (userid: string) => {
+export const getBtcUserInfo = async (userid: string) => {
 	// validate principal
 	validatePrincipalText(userid);
 
