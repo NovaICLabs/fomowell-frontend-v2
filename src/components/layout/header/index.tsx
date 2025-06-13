@@ -12,6 +12,7 @@ import { useChainStore } from "@/store/chain";
 import { useMobileSheetStore } from "@/store/mobile/sheet";
 
 import IcpWalletConnect from "./connect-button/icp";
+import BitcoinSearch from "./btc-search";
 
 export const Header = () => {
 	const router = useRouter();
@@ -58,7 +59,8 @@ export const Header = () => {
 						<CreateToken />
 					</div>
 					<div className="absolute top-1/2 left-4/7 -translate-x-1/2 -translate-y-1/2">
-						<Search />
+						{chain === "bitcoin" && <BitcoinSearch />}
+						{chain === "icp" && <Search />}
 					</div>
 					<div className="flex items-center gap-7.5">
 						<ChainSelector />

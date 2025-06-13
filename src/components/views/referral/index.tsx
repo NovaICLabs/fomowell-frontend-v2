@@ -37,6 +37,7 @@ import { useIcIdentityStore } from "@/store/ic";
 
 import InvitationTable from "./components/Invitation";
 import WithdrawalTable from "./components/Withdrawal";
+import { useRouter } from "@tanstack/react-router";
 
 const PriceRewardsIcp = ({ data }: { data: string }) => {
 	const { data: icpPrice } = useICPPrice();
@@ -100,6 +101,8 @@ const Explanation = () => {
 };
 
 export default function ReferralPage() {
+	const router = useRouter();
+
 	const { jwt_token: btcJwtToken } = useBtcIdentityStore();
 	const { jwt_token: icJwtToken } = useIcIdentityStore();
 
@@ -169,6 +172,8 @@ export default function ReferralPage() {
 					if (!result) return;
 					setMyInvitees(result);
 				});
+			} else {
+				void router.navigate({ to: "/" });
 			}
 		}
 
@@ -195,9 +200,11 @@ export default function ReferralPage() {
 					if (!result) return;
 					setMyInvitees(result);
 				});
+			} else {
+				void router.navigate({ to: "/" });
 			}
 		}
-	}, [btcJwtToken, icJwtToken, chain]);
+	}, [btcJwtToken, icJwtToken, chain, router]);
 
 	const RewardItem = ({ item }: { item: RewardLeaderboard }) => {
 		return (
