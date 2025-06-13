@@ -4,7 +4,7 @@ import {
 } from "@/hooks/providers/wallet/ic";
 import { string2array } from "@/lib/common/data/arrays";
 import { bigint2string } from "@/lib/common/data/bigint";
-import { formatNumberSmart, formatUnits } from "@/lib/common/number";
+import { formatNumberSmart } from "@/lib/common/number";
 import {
 	validateCanisterIdText,
 	validatePrincipalText,
@@ -106,7 +106,12 @@ export const getCoreTokenBalance = async (
 		subaccount: [],
 	});
 	const decimals = 8;
-	const formatted = formatNumberSmart(formatUnits(result, decimals));
+	const formatted = formatNumberSmart(
+		BigNumber(result)
+			.div(10 ** decimals)
+			.toFixed(2, 1)
+			.toString()
+	);
 	return {
 		raw: result,
 		formatted,
