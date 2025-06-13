@@ -346,16 +346,24 @@ export default function ReferralPage() {
 				</div>
 
 				<div className="flex min-w-0 flex-1 flex-col gap-y-10 md:ml-5 md:gap-y-0">
-					<div className="order-3 flex w-full flex-col gap-x-[13px] gap-y-[13px] rounded-xl border border-[#f7b406]/30 bg-[#111111] p-3 md:order-2 md:h-[212px] md:flex-row">
-						{rewardLeaderboard && rewardLeaderboard[0] ? (
-							<RewardItem item={rewardLeaderboard[0]} />
-						) : (
-							<></>
-						)}
-						<div className="grid flex-2 grid-cols-2 gap-x-[13px]">
-							{rewardLeaderboard.slice(1, 3).map((item, index) => (
-								<RewardItem key={index} item={item} />
-							))}{" "}
+					<div
+						className="order-3 flex w-full rounded-xl p-[1px] md:order-2 md:h-[212px]"
+						style={{
+							background:
+								"linear-gradient(90deg, rgba(247, 180, 6, 0.4) 40%, rgba(247, 114, 6, 0.4) 100%)",
+						}}
+					>
+						<div className="flex w-full flex-col gap-x-[13px] gap-y-[13px] rounded-xl bg-[#111111] p-3 md:flex-row">
+							{rewardLeaderboard && rewardLeaderboard[0] ? (
+								<RewardItem item={rewardLeaderboard[0]} />
+							) : (
+								<></>
+							)}
+							<div className="grid flex-2 grid-cols-2 gap-x-[13px]">
+								{rewardLeaderboard.slice(1, 3).map((item, index) => (
+									<RewardItem key={index} item={item} />
+								))}{" "}
+							</div>
 						</div>
 					</div>
 

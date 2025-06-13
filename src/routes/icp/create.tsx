@@ -3,7 +3,6 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
-import { Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -31,6 +30,7 @@ import { useConnectedIdentity } from "@/hooks/providers/wallet/ic";
 import { fileToBase64 } from "@/lib/common/file";
 import { parseUnits } from "@/lib/common/number";
 import { useDialogStore } from "@/store/dialog";
+import Upload from "@/components/icons/common/upload";
 // Create form validation schema with Zod
 const formSchema = z.object({
 	name: z
@@ -221,13 +221,14 @@ function TokenCreationPage() {
 		parseUnits(totalPayment)
 	);
 	return (
-		<div className="container m-auto pb-10">
+		<div className="relative container m-auto pb-10">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)}>
-					<div className="grid grid-cols-1 gap-y-3 md:grid-cols-2 md:gap-8">
-						{/* Left Column - Basic Token Information */}
-						<Card className="rounded-2xl border-gray-800 bg-gray-800">
-							<CardContent className="px-3 md:px-12.5">
+					<div className="relative grid grid-cols-1 gap-y-3 overflow-hidden md:grid-cols-2 md:gap-8">
+						<Card className="relative overflow-hidden rounded-2xl border border-[#F7A30666]">
+							<div className="absolute top-[-155px] left-[-155px] h-[310px] w-[310px] rounded-full bg-[#ffb61a]/80 blur-[120px]" />
+
+							<CardContent className="relative z-[1] px-3 md:px-12.5">
 								<div className="mb-6 flex flex-col items-center">
 									{/* Logo Upload Field */}
 									<FormField
@@ -237,9 +238,9 @@ function TokenCreationPage() {
 											<FormItem className="flex w-full flex-col items-center">
 												<FormControl>
 													<FileUploader
-														wrapperClassName="bg-gray-710 mb-2 flex h-25 w-25 items-center justify-center rounded-full"
+														wrapperClassName="bg-[#111111] mb-2 flex h-25 w-25 items-center justify-center rounded-full"
 														imageIcon={
-															<Upload className="h-8 w-8 text-gray-400" />
+															<Upload className="h-[54px] w-[54px] text-gray-400" />
 														}
 														onChange={async (url, file) => {
 															if (url && file) {
@@ -252,10 +253,10 @@ function TokenCreationPage() {
 													/>
 												</FormControl>
 												<FormDescription>
-													<p className="text-sm text-gray-400">
+													<p className="text-sm text-[#A1A1A1]">
 														JPEG / PNG / WEBP / GIF / SVG
 													</p>
-													<p className="text-center text-xs text-gray-500">
+													<p className="text-center text-xs text-[#A1A1A1]">
 														(max size 1MB)
 													</p>
 												</FormDescription>
@@ -272,12 +273,12 @@ function TokenCreationPage() {
 										name="name"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel className="flex items-center text-gray-400">
+												<FormLabel className="flex items-center font-normal text-[#fff]">
 													Name <img alt="required" src="/svgs/required.svg" />
 												</FormLabel>
 												<FormControl>
 													<Input
-														className="border-gray-710 mt-1 h-10.5 rounded-xl bg-gray-800 focus-visible:ring-0"
+														className="mt-1 h-10.5 rounded-xl border-white/10 !bg-[#111] focus-visible:ring-0"
 														{...field}
 													/>
 												</FormControl>
@@ -292,13 +293,13 @@ function TokenCreationPage() {
 										name="symbol"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel className="flex items-center text-gray-400">
+												<FormLabel className="flex items-center font-normal text-[#fff]">
 													Token Symbol{" "}
 													<img alt="required" src="/svgs/required.svg" />
 												</FormLabel>
 												<FormControl>
 													<Input
-														className="border-gray-710 mt-1 h-10.5 rounded-xl bg-gray-800 focus-visible:ring-0"
+														className="mt-1 h-10.5 rounded-xl border-white/10 !bg-[#111] focus-visible:ring-0"
 														{...field}
 													/>
 												</FormControl>
@@ -314,17 +315,17 @@ function TokenCreationPage() {
 										render={({ field }) => (
 											<FormItem>
 												<div className="flex justify-between">
-													<FormLabel className="flex items-center text-gray-400">
+													<FormLabel className="flex items-center font-normal text-[#fff]">
 														Token Description{" "}
 														<img alt="required" src="/svgs/required.svg" />
 													</FormLabel>
-													<span className="text-sm text-gray-400">
+													<span className="text-sm text-[#A1A1A1]">
 														{field.value.length}/100
 													</span>
 												</div>
 												<FormControl>
 													<Textarea
-														className="border-gray-710 bg-gray-710 mt-1 h-28 rounded-xl focus-visible:ring-0"
+														className="!borderborder-white/10 mt-1 h-28 resize-none rounded-xl !bg-[#111] focus-visible:ring-0"
 														{...field}
 														onChange={(event) => {
 															// Limit description to 100 characters
@@ -347,19 +348,24 @@ function TokenCreationPage() {
 								<CardContent className="space-y-6 px-3 md:px-12.5">
 									{/* Social Media - Twitter Field */}
 									<div>
-										<h3 className="mb-3 text-gray-400">Twitter (Optional)</h3>
+										<span className="flex items-center font-normal text-[#fff]">
+											Twitter{" "}
+											<em className="ml-1 text-sm text-white/60 not-italic">
+												(Optional)
+											</em>
+										</span>
 										<FormField
 											control={form.control}
 											name="twitter"
 											render={({ field }) => (
 												<FormItem>
 													<FormControl>
-														<div className="relative">
+														<div className="relative mt-2">
 															<Input
-																className="bg-gray-710 h-10.5 rounded-xl border-gray-700 pl-6 focus-visible:ring-0"
+																className="h-10.5 rounded-xl border-white/10 !bg-[#111] pl-10 focus-visible:ring-0"
 																{...field}
 															/>
-															<X className="absolute top-1/2 left-2 h-3 w-3 -translate-y-1/2 text-white/20" />
+															<X className="absolute top-1/2 left-4 h-3.5 w-3.5 -translate-y-1/2 text-white/60" />
 														</div>
 													</FormControl>
 													<FormMessage />
@@ -370,19 +376,24 @@ function TokenCreationPage() {
 
 									{/* Social Media - Telegram Field */}
 									<div>
-										<h3 className="mb-3 text-gray-400">Telegram (Optional)</h3>
+										<span className="flex items-center font-normal text-[#fff]">
+											Telegram{" "}
+											<em className="ml-1 text-sm text-white/60 not-italic">
+												(Optional)
+											</em>
+										</span>
 										<FormField
 											control={form.control}
 											name="telegram"
 											render={({ field }) => (
 												<FormItem>
 													<FormControl>
-														<div className="relative">
+														<div className="relative mt-2">
 															<Input
-																className="bg-gray-710 h-10.5 rounded-xl border-gray-700 pl-6 focus-visible:ring-0"
+																className="h-10.5 rounded-xl border-white/10 !bg-[#111] pl-10 focus-visible:ring-0"
 																{...field}
 															/>
-															<Telegram className="absolute top-1/2 left-2 h-3 w-3 -translate-y-1/2 text-white/20" />
+															<Telegram className="absolute top-1/2 left-4 h-3.5 w-3.5 -translate-y-1/2 text-white/60" />
 														</div>
 													</FormControl>
 													<FormMessage />
@@ -393,19 +404,24 @@ function TokenCreationPage() {
 
 									{/* Social Media - Website Field */}
 									<div>
-										<h3 className="mb-3 text-gray-400">Website (Optional)</h3>
+										<span className="flex items-center font-normal text-[#fff]">
+											Website{" "}
+											<em className="ml-1 text-sm text-white/60 not-italic">
+												(Optional)
+											</em>
+										</span>
 										<FormField
 											control={form.control}
 											name="website"
 											render={({ field }) => (
 												<FormItem>
 													<FormControl>
-														<div className="relative">
+														<div className="relative mt-2">
 															<Input
-																className="bg-gray-710 h-10.5 rounded-xl border-gray-700 pl-6 focus-visible:ring-0"
+																className="h-10.5 rounded-xl border-white/10 !bg-[#111] pl-10 focus-visible:ring-0"
 																{...field}
 															/>
-															<Website className="absolute top-1/2 left-2 h-3 w-3 -translate-y-1/2 text-white/20" />
+															<Website className="absolute top-1/2 left-4 h-3.5 w-3.5 -translate-y-1/2 text-white/60" />
 														</div>
 													</FormControl>
 													<FormMessage />
@@ -418,8 +434,11 @@ function TokenCreationPage() {
 							<Card className="rounded-2xl border-gray-800 bg-gray-800">
 								<CardContent className="space-y-6 px-3 md:px-12.5">
 									<div className="flex flex-col gap-y-2">
-										<span className="text-sm text-white/60">
-											Dev buy (Optional)
+										<span className="flex items-center font-normal text-[#fff]">
+											Dev buy{" "}
+											<em className="ml-1 text-sm text-white/60 not-italic">
+												(Optional)
+											</em>
 										</span>
 										<div className="relative">
 											<FormField
@@ -430,7 +449,7 @@ function TokenCreationPage() {
 														<FormControl>
 															<div className="relative h-10.5">
 																<Input
-																	className="border-gray-710 h-10.5 rounded-xl bg-gray-800 pl-2.5 focus-visible:ring-0"
+																	className="h-10.5 rounded-xl border-white/10 !bg-[#111] focus-visible:ring-0"
 																	placeholder="0.00"
 																	{...field}
 																	onBlur={() => {
@@ -445,7 +464,7 @@ function TokenCreationPage() {
 																/>
 																<img
 																	alt="ICP"
-																	className="absolute top-1/2 right-2 h-6 w-6 -translate-y-1/2"
+																	className="absolute top-1/2 right-4 h-6 w-6 -translate-y-1/2"
 																	src="/svgs/chains/icp.svg"
 																/>
 															</div>
@@ -455,18 +474,18 @@ function TokenCreationPage() {
 												)}
 											/>
 										</div>
-										<div className="border-gray-710 mt-2 flex flex-col gap-y-2.5 rounded-xl border p-2.5">
+										<div className="flex flex-col gap-y-2.5 rounded-xl border border-white/10 p-2.5">
 											<div className="flex items-center justify-between">
-												<span className="text-sm text-white/40">
+												<span className="text-xs text-white/40">
 													Launch Fee
 												</span>
-												<span className="text-sm text-white">0.5 ICP</span>
+												<span className="text-xs text-white">0.5 ICP</span>
 											</div>
 											<div className="flex items-center justify-between">
-												<span className="text-sm text-white/40">
+												<span className="text-xs text-white/40">
 													Percentage
 												</span>
-												<span className="text-sm text-white">
+												<span className="text-xs text-white">
 													{BigNumber(parseFloat(form.watch("devBuy") || "0"))
 														.div(500)
 														.times(100)
@@ -475,10 +494,10 @@ function TokenCreationPage() {
 												</span>
 											</div>
 											<div className="flex items-center justify-between">
-												<span className="text-sm text-white/40">
+												<span className="text-xs text-white/40">
 													Total Payment
 												</span>
-												<span className="text-sm text-white">
+												<span className="text-xs text-white">
 													{totalPayment} ICP
 												</span>
 											</div>
@@ -491,14 +510,6 @@ function TokenCreationPage() {
 
 					{/* Submit Button and Fee Information */}
 					<div className="mt-12.5 flex flex-col items-center gap-2">
-						{
-							<div className="flex flex-col items-center">
-								<span className="text-sm text-white/60">
-									Balance:{" "}
-									{coreTokenBalance ? coreTokenBalance?.formatted : "0"} ICP
-								</span>
-							</div>
-						}
 						{connected ? (
 							<Button
 								className="w-full max-w-md rounded-full py-6 text-base font-bold text-black"
@@ -522,6 +533,14 @@ function TokenCreationPage() {
 								Connect Wallet
 							</Button>
 						)}
+						{
+							<div className="flex flex-col items-center">
+								<span className="text-sm text-white">
+									Balance:{" "}
+									{coreTokenBalance ? coreTokenBalance?.formatted : "0"} ICP
+								</span>
+							</div>
+						}
 					</div>
 				</form>
 			</Form>
