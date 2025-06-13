@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import copy from "copy-to-clipboard";
 
@@ -18,19 +18,33 @@ import { useChainStore } from "@/store/chain";
 import { useIcIdentityStore } from "@/store/ic";
 
 type ReferralProps = {
-	referralLink: string;
-	referralText: Array<string>;
 	referrals: number;
 	earned: string;
 };
 
 export const ReferralContent: React.FC<ReferralProps> = ({
-	referralLink,
-	referralText,
 	referrals,
 	earned,
 }) => {
 	const { chain } = useChainStore();
+	const domain = window.location.origin;
+
+	const { identityProfile: identityProfileBTC } = useBtcIdentityStore();
+	const { identityProfile: identityProfileIc } = useIcIdentityStore();
+
+	const referralText = [
+		"First-level commission rebate: 20%",
+		"Secondary commission rebate: 5%",
+	];
+
+	const code = useMemo(() => {
+		if (chain === "icp") {
+			return identityProfileIc?.invite_code || "";
+		} else {
+			return identityProfileBTC?.invite_code || "";
+		}
+		return "";
+	}, [chain, identityProfileBTC, identityProfileIc]);
 
 	return (
 		<div className="relative flex min-h-[500px] w-full">
@@ -54,7 +68,28 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 							Share your unique referral link with them.
 						</p>
 					</div>
-					<div className="mt-[64px] flex flex-col gap-y-5">
+					<div className="mt-7 flex w-full flex-col">
+						<p className="text-lg leading-none font-semibold text-white">
+							Your referral code
+						</p>
+						<div className="mt-[14px] flex h-[43px] w-[180px] items-center justify-center gap-x-[10px] rounded-lg border border-[#f7b406] bg-[#feb800]">
+							<p className="text-2xl font-semibold text-[#101010]">
+								{chain === "icp"
+									? identityProfileIc?.invite_code
+									: identityProfileBTC?.invite_code}
+							</p>
+							<img
+								alt="icon"
+								className="w-[14px] cursor-pointer"
+								src="/svgs/copy-dark.svg"
+								onClick={withStopPropagation(() => {
+									copy(code);
+									showToast("success", "Copy Successfully");
+								})}
+							/>
+						</div>
+					</div>
+					<div className="mt-[40px] flex flex-col gap-y-5">
 						{referralText.map((item, index) => (
 							<div key={index} className="flex w-full items-center">
 								<div className="h-1 w-1 flex-shrink-0 rounded-full bg-[#ebcf85]" />
@@ -74,7 +109,7 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 							<input
 								disabled
 								className="mx-2 h-full w-full text-left outline-none"
-								value={referralLink}
+								value={`${domain}?chain=${chain}&ref=${chain === "icp" ? identityProfileIc?.invite_code : identityProfileBTC?.invite_code}`}
 							></input>
 						</div>
 						<img
@@ -82,7 +117,7 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 							className="ml-3 h-3.5 w-3.5 flex-shrink-0 cursor-pointer"
 							src="/svgs/copy-dark.svg"
 							onClick={withStopPropagation(() => {
-								copy(referralLink ?? "");
+								copy(code);
 								showToast("success", "Copy Successfully");
 							})}
 						/>
@@ -102,9 +137,10 @@ export const ReferralContent: React.FC<ReferralProps> = ({
 	);
 };
 
-const ReferralDialog: React.FC<
-	ReferralProps & { open: boolean; setOpen: (open: boolean) => void }
-> = ({ open, setOpen, referralLink, referralText }) => {
+const ReferralDialog: React.FC<{
+	open: boolean;
+	setOpen: (open: boolean) => void;
+}> = ({ open, setOpen }) => {
 	const { chain } = useChainStore();
 	const { jwt_token: btcJwtToken } = useBtcIdentityStore();
 	const { jwt_token: icJwtToken } = useIcIdentityStore();
@@ -153,12 +189,7 @@ const ReferralDialog: React.FC<
 						</DialogTitle>
 					</DialogHeader>
 
-					<ReferralContent
-						earned={earned}
-						referralLink={referralLink}
-						referralText={referralText}
-						referrals={referrals}
-					/>
+					<ReferralContent earned={earned} referrals={referrals} />
 				</DialogContent>
 			</Dialog>
 		</>

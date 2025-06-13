@@ -327,17 +327,7 @@ function UserId() {
 					</div>
 				</div>
 			</div>
-			<ReferralDialog
-				open={referral2ICPOpen}
-				referralLink={`${domain}?chain=${chain}&ref=${identityProfile?.invite_code}`}
-				setOpen={setReferral2ICPOpen}
-				referralText={[
-					"Inviting friends to log in will earn you 0.5 ICPS.",
-					"First-level commission rebate: 20%",
-					"Secondary commission rebate: 5%",
-					"Third-level anti-bribery: 3%",
-				]}
-			/>
+			<ReferralDialog open={referral2ICPOpen} setOpen={setReferral2ICPOpen} />
 		</>
 	);
 }

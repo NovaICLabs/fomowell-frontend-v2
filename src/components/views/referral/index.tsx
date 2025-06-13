@@ -100,10 +100,8 @@ const Explanation = () => {
 };
 
 export default function ReferralPage() {
-	const { identityProfile: identityProfileBTC, jwt_token: btcJwtToken } =
-		useBtcIdentityStore();
-	const { identityProfile: identityProfileIc, jwt_token: icJwtToken } =
-		useIcIdentityStore();
+	const { jwt_token: btcJwtToken } = useBtcIdentityStore();
+	const { jwt_token: icJwtToken } = useIcIdentityStore();
 
 	const { chain } = useChainStore();
 
@@ -200,8 +198,6 @@ export default function ReferralPage() {
 			}
 		}
 	}, [btcJwtToken, icJwtToken, chain]);
-
-	const domain = window.location.origin;
 
 	const RewardItem = ({ item }: { item: RewardLeaderboard }) => {
 		return (
@@ -313,20 +309,6 @@ export default function ReferralPage() {
 				<div className="flex w-full flex-shrink-0 flex-col md:w-[350px]">
 					<ReferralContent
 						earned={rewardStats?.reward.total || ""}
-						referralLink={`${domain}?chain=${chain}&ref=${chain === "icp" ? identityProfileIc?.invite_code : identityProfileBTC?.invite_code}`}
-						referralText={
-							chain === "icp"
-								? [
-										"Inviting friends to log in will earn you 0.5 ICPS.",
-										"First-level commission rebate: 20%",
-										"Secondary commission rebate: 5%",
-										"Third-level anti-bribery: 3%",
-									]
-								: [
-										"First-level commission rebate: 20%",
-										"Secondary commission rebate: 5%",
-									]
-						}
 						referrals={
 							(rewardStats?.level1Count || 0) + (rewardStats?.level2Count || 0)
 						}

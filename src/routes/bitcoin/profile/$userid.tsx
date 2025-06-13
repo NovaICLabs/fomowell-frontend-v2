@@ -315,15 +315,7 @@ function UserId() {
 					</div>
 				</div>
 			</div>
-			<ReferralDialog
-				open={referral2BTCOpen}
-				referralLink={`${domain}?chain=${chain}&ref=${identityProfile?.invite_code || ""}`}
-				setOpen={setReferral2BTCOpen}
-				referralText={[
-					"First-level commission rebate: 20%",
-					"Secondary commission rebate: 5%",
-				]}
-			/>
+			<ReferralDialog open={referral2BTCOpen} setOpen={setReferral2BTCOpen} />
 		</>
 	);
 }
