@@ -210,7 +210,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		logs: IDL.Opt(CanisterLogResponse),
 		version: IDL.Opt(IDL.Nat),
 	});
-	const TransactionRange = IDL.Record({
+	const GetBlocksRequest = IDL.Record({
 		start: IDL.Nat,
 		length: IDL.Nat,
 	});
@@ -246,6 +246,13 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		reserve_sats: IDL.Nat,
 		meme_token_id: IDL.Nat64,
 		input_sats: IDL.Nat,
+	});
+	const WithdrawRewards = IDL.Record({
+		to: Account,
+		token: IDL.Principal,
+		from: Account,
+		memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
+		amount: IDL.Nat,
 	});
 	const Deposit = IDL.Record({
 		to: Account,
@@ -336,6 +343,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		buy: IDL.Opt(Buy),
 		inner_swap: IDL.Opt(InnerSwap),
 		add_liquidity: IDL.Opt(AddLiquidity),
+		withdraw_rewards: IDL.Opt(WithdrawRewards),
 		withdraw: IDL.Opt(Deposit),
 		kind: IDL.Text,
 		mint: IDL.Opt(Mint),
@@ -388,11 +396,11 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		timestamp: IDL.Nat64,
 		transfer: IDL.Opt(Transfer_1),
 	});
-	const TransactionRange_1 = IDL.Record({
+	const TransactionRange = IDL.Record({
 		transactions: IDL.Vec(Transaction_1),
 	});
 	const ArchivedRange = IDL.Record({
-		callback: IDL.Func([TransactionRange], [TransactionRange_1], ["query"]),
+		callback: IDL.Func([GetBlocksRequest], [TransactionRange], ["query"]),
 		start: IDL.Nat,
 		length: IDL.Nat,
 	});
@@ -467,7 +475,6 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 	const PreSatsSwapRunesArg = IDL.Record({
 		id: IDL.Nat64,
 		sats: IDL.Nat,
-		nonce: IDL.Nat64,
 	});
 	const PreSatsSwapRunesResponse = IDL.Record({
 		nonce: IDL.Nat64,
@@ -512,7 +519,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		txn_count: IDL.Nat,
 		archive_txn_count: IDL.Nat,
 		is_cleaning: IDL.Bool,
-		archives: IDL.Vec(IDL.Tuple(IDL.Principal, TransactionRange)),
+		archives: IDL.Vec(IDL.Tuple(IDL.Principal, GetBlocksRequest)),
 	});
 	const State = IDL.Record({
 		archive_ledger_info: ArchiveLedgerInfo,
@@ -568,6 +575,12 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		liquidity: IDL.Nat,
 		nonce: IDL.Nat64,
 	});
+	const WithdrawRewardsArgs = IDL.Record({
+		to: Account,
+		token: IDL.Principal,
+		memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
+		amount: IDL.Nat,
+	});
 	return IDL.Service({
 		__get_candid_interface_tmp_hack: IDL.Func([], [IDL.Text], ["query"]),
 		add_liquidity: IDL.Func([LiquidityAddArg], [Result], []),
@@ -584,7 +597,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 			["query"]
 		),
 		get_transactions: IDL.Func(
-			[TransactionRange],
+			[GetBlocksRequest],
 			[GetTransactionsResponse],
 			["query"]
 		),
@@ -653,6 +666,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
 		withdraw: IDL.Func([WithdrawArgs], [Result_2], []),
 		withdraw_ckbtc: IDL.Func([WithdrawByCkbtcArgs], [Result_9], []),
 		withdraw_liquidity: IDL.Func([LiquidityRemoveArg], [Result], []),
+		withdraw_rewards: IDL.Func([WithdrawRewardsArgs], [Result_2], []),
 	});
 };
 export const init = ({ IDL }: { IDL: any }) => {

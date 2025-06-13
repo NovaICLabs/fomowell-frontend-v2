@@ -28,6 +28,8 @@ import type {
 	LiquidityAddArg,
 	LiquidityRemoveArg,
 	PreLiquidityRemoveArg,
+	PreRunesSwapSatsArg,
+	PreSatsSwapRunesArg,
 	StableToken,
 } from "./index.did.d";
 import type { ActorCreator } from "@/lib/ic/connectors";
@@ -817,4 +819,116 @@ export const token_user_liquidity = async (
 	const result = await actor.query_user_meme_token_lp([principal], id);
 
 	return bigint2string(result);
+};
+
+// swap ==============================
+// pre sats swap to runes
+export const pre_sats_swap_runes = async (
+	createActor: ActorCreator,
+	canisterId: string,
+	args: PreSatsSwapRunesArg
+) => {
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		interfaceFactory: idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { id, sats } = args;
+
+	const result = await actor.pre_sats_swap_runes({
+		id,
+		sats,
+	});
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};
+
+// sats swap to runes
+export type SatsSwapRunesArgType = {
+	id: bigint;
+	sats: bigint;
+	nonce: bigint;
+	runes_min: bigint | undefined;
+};
+
+export const sats_swap_runes = async (
+	createActor: ActorCreator,
+	canisterId: string,
+	args: SatsSwapRunesArgType
+) => {
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		interfaceFactory: idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { id, sats, nonce, runes_min } = args;
+	const result = await actor.sats_swap_runes({
+		id,
+		sats: BigInt(sats),
+		nonce,
+		runes_min: wrapOption(runes_min ? BigInt(runes_min) : undefined),
+	});
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};
+
+// pre runes swap to sats
+export const pre_runes_swap_sats = async (
+	createActor: ActorCreator,
+	canisterId: string,
+	args: PreRunesSwapSatsArg
+) => {
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		interfaceFactory: idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { id, runes } = args;
+
+	const result = await actor.pre_runes_swap_sats({
+		id,
+		runes,
+	});
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
+};
+
+// runes swap to sats
+export type RunesSwapSatsArgType = {
+	id: bigint;
+	runes: bigint;
+	nonce: bigint;
+	sats_min: bigint | undefined;
+};
+export const runes_swap_sats = async (
+	createActor: ActorCreator,
+	canisterId: string,
+	args: RunesSwapSatsArgType
+) => {
+	const actor = await createActor<_SERVICE>({
+		canisterId,
+		interfaceFactory: idlFactory,
+	});
+	if (!actor) {
+		throw new Error("Failed to create actor");
+	}
+	const { id, runes, nonce, sats_min } = args;
+	const result = await actor.runes_swap_sats({
+		id,
+		runes: BigInt(runes),
+		nonce,
+		sats_min: wrapOption(sats_min ? BigInt(sats_min) : undefined),
+	});
+	return unwrapRustResult(result, (error) => {
+		throw new Error(error);
+	});
 };

@@ -21,8 +21,14 @@ import {
 	getMemeToken,
 	pre_add_liquidity,
 	pre_remove_liquidity,
+	pre_runes_swap_sats,
+	pre_sats_swap_runes,
 	type PreAddLiquidityArgs,
 	remove_liquidity,
+	runes_swap_sats,
+	type RunesSwapSatsArgType,
+	sats_swap_runes,
+	type SatsSwapRunesArgType,
 	type SellArgs,
 	token_all_liquidity,
 	token_user_liquidity,
@@ -39,6 +45,8 @@ import type {
 	LiquidityAddArg,
 	LiquidityRemoveArg,
 	PreLiquidityRemoveArg,
+	PreRunesSwapSatsArg,
+	PreSatsSwapRunesArg,
 } from "@/canisters/btc_core/index.did.d";
 
 const NETWORK_FEE = 0.00002;
@@ -411,5 +419,163 @@ export const useBtcMemeTokenUserLiquidity = (args: { id: number }) => {
 			);
 		},
 		enabled: !!args.id,
+	});
+};
+
+export const useBtcPreSwapRunes = () => {
+	const { actorCreator } = useBtcConnectedIdentity();
+	return useMutation({
+		mutationKey: ["btc-core", "pre_runes_swap_runes"],
+		mutationFn: async (args: PreSatsSwapRunesArg) => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			return pre_sats_swap_runes(
+				actorCreator,
+				getChainBTCCoreCanisterId().toText(),
+				args
+			);
+		},
+	});
+};
+
+export const useBtcSwapRunes = () => {
+	const { actorCreator } = useBtcConnectedIdentity();
+	return useMutation({
+		mutationKey: ["btc-core", "runes_swap_runes"],
+		mutationFn: async (args: SatsSwapRunesArgType) => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			return sats_swap_runes(
+				actorCreator,
+				getChainBTCCoreCanisterId().toText(),
+				args
+			);
+		},
+	});
+};
+
+export const useBtcPreSwapSats = () => {
+	const { actorCreator } = useBtcConnectedIdentity();
+	return useMutation({
+		mutationKey: ["btc-core", "pre_sats_swap_sats"],
+		mutationFn: async (args: PreRunesSwapSatsArg) => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			return pre_runes_swap_sats(
+				actorCreator,
+				getChainBTCCoreCanisterId().toText(),
+				args
+			);
+		},
+	});
+};
+
+export const useBtcSwapSats = () => {
+	const { actorCreator } = useBtcConnectedIdentity();
+	return useMutation({
+		mutationKey: ["btc-core", "runes_swap_sats"],
+		mutationFn: async (args: RunesSwapSatsArgType) => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			return runes_swap_sats(
+				actorCreator,
+				getChainBTCCoreCanisterId().toText(),
+				args
+			);
+		},
+		onError: (error) => {
+			if (error.message.indexOf("is out of cycles") !== -1) {
+				showToast("error", `Cycles insufficient`);
+			} else {
+				showToast("error", "Failed to sell token");
+			}
+		},
+	});
+};
+
+export const useBtcCalculateSwapRunes = (args: {
+	amount?: bigint;
+	id: number;
+	enabled?: boolean;
+}) => {
+	const { actorCreator } = useBtcConnectedIdentity();
+	return useQuery({
+		queryKey: [
+			"btc-core",
+			"calculate-swap-runes",
+			args.id.toString(),
+			args.amount?.toString(),
+		],
+		queryFn: async () => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			if (args.amount === undefined) {
+				throw new Error("No amount provided");
+			}
+			const result = await pre_sats_swap_runes(
+				actorCreator,
+				getChainBTCCoreCanisterId().toText(),
+				{
+					sats: args.amount,
+					id: BigInt(args.id),
+				}
+			);
+			const decimals = 8;
+			return {
+				nonce: result.nonce,
+				raw: result.runes,
+				formatted: formatNumberSmart(formatUnits(result.runes, decimals)),
+				decimals,
+			};
+		},
+		refetchInterval: 1000 * 2,
+		enabled: args.amount !== undefined && args.enabled,
+	});
+};
+
+export const useBtcCalculateSwapSats = (args: {
+	amount?: bigint;
+	id: number;
+	enabled?: boolean;
+}) => {
+	const { actorCreator } = useBtcConnectedIdentity();
+
+	return useQuery({
+		queryKey: [
+			"btc-core",
+			"calculate-swap-sats",
+			args.id.toString(),
+			args.amount?.toString(),
+		],
+		queryFn: async () => {
+			if (!actorCreator) {
+				throw new Error("No actor creator found");
+			}
+			if (args.amount === undefined) {
+				throw new Error("No amount provided");
+			}
+			const result = await pre_runes_swap_sats(
+				actorCreator,
+				getChainBTCCoreCanisterId().toText(),
+				{
+					runes: args.amount,
+					id: BigInt(args.id),
+				}
+			);
+			const decimals = 8;
+			return {
+				nonce: result.nonce,
+				raw: result.sats,
+				formatted: formatNumberSmart(formatUnits(result.sats, decimals)),
+				decimals,
+			};
+		},
+		refetchInterval: 1000 * 2,
+		enabled: args.amount !== undefined && args.enabled,
 	});
 };
