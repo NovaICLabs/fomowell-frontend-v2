@@ -13,7 +13,7 @@ import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { showToast } from "@/components/utils/toast";
-import { useCKBTCPrice, useSatsPrice } from "@/hooks/apis/coingecko";
+import { useCKBTCPrice } from "@/hooks/apis/coingecko";
 import {
 	useBtcAddLiquidity,
 	useBtcCoreTokenBalance,
@@ -70,7 +70,6 @@ const AddLiquidity = () => {
 
 	//  price
 	const { data: ckBtcPrice } = useCKBTCPrice();
-	const { data: satsPrice } = useSatsPrice();
 	// balance
 	const { data: coreTokenBalance, refetch: refetchCoreTokenBalance } =
 		useBtcCoreTokenBalance({
@@ -294,13 +293,14 @@ const AddLiquidity = () => {
 								($
 								{currentTokenPrice &&
 									memeTokenBalance &&
-									satsPrice &&
+									ckBtcPrice &&
 									getTokenUsdValueTotal(
 										{
 											amount: memeTokenBalance?.raw,
 										},
 										BigNumber(currentTokenPrice.formattedPerPayToken)
-											.multipliedBy(satsPrice)
+											.multipliedBy(ckBtcPrice)
+											.div(10 ** getCkbtcCanisterToken().decimals)
 											.toNumber()
 									)}
 								)

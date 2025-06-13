@@ -4,10 +4,11 @@ import { Link, useRouter } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
 import { motion } from "framer-motion";
 
+import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { Star } from "@/components/icons/star";
 import { Empty } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCKBTCPrice, useSatsPrice } from "@/hooks/apis/coingecko";
+import { useCKBTCPrice } from "@/hooks/apis/coingecko";
 import { useBtcInfiniteTokenList } from "@/hooks/apis/indexer_btc";
 import { useBtcConnectedIdentity } from "@/hooks/providers/wallet/bitcoin";
 import { string2bigint } from "@/lib/common/data/bigint";
@@ -160,11 +161,9 @@ const LiquidityListItemSkeleton = () => {
 
 const LiquidityListItem = ({
 	itemData,
-	// satsPrice,
 	ckBtcPrice,
 }: {
 	itemData: BtcTokenInfo;
-	satsPrice: number | undefined;
 	ckBtcPrice: number | undefined;
 }) => {
 	const router = useRouter();
@@ -216,7 +215,7 @@ const LiquidityListItem = ({
 			itemData.price === null
 				? BigNumber(0)
 				: BigNumber(itemData.price)
-						.div(10 ** 8)
+						.div(10 ** getCkbtcCanisterToken().decimals)
 						.times(ckBtcPrice ?? 0);
 
 		const mcUsd = BigNumber(21_000_000).times(priceInUsd).toString();
@@ -393,7 +392,6 @@ const LiquidityListItem = ({
 
 export default function LiquidityPage() {
 	const [sortBy, setSortBy] = useState<string>("");
-	const { data: satsPrice } = useSatsPrice();
 	const { data: ckBtcPrice } = useCKBTCPrice();
 
 	const { principal } = useBtcConnectedIdentity();
@@ -526,7 +524,6 @@ export default function LiquidityPage() {
 								key={item.id}
 								ckBtcPrice={ckBtcPrice}
 								itemData={item}
-								satsPrice={satsPrice}
 							/>
 						))
 					) : (

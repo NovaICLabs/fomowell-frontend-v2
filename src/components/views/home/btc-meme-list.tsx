@@ -18,6 +18,7 @@ import { isMobile } from "react-device-detect";
 import { toast } from "sonner";
 
 import { getCkbtcCanisterId } from "@/canisters/btc_core";
+import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { CopyIcon } from "@/components/icons/common/copy";
 import SortsIcon from "@/components/icons/common/sorts";
 import Telegram from "@/components/icons/media/telegram";
@@ -501,7 +502,9 @@ export default function BtcMemeList() {
 				cell: (info) => {
 					const raw = info.getValue();
 					const priceInBtc = raw === null ? BigNumber(0) : BigNumber(raw);
-					const priceInUsd = priceInBtc.div(10 ** 8).times(ckBtcPrice ?? 0);
+					const priceInUsd = priceInBtc
+						.div(10 ** getCkbtcCanisterToken().decimals)
+						.times(ckBtcPrice ?? 0);
 					return (
 						<div className="flex h-full w-full flex-col items-start justify-center">
 							<div className="flex items-center text-sm font-medium text-white">
@@ -587,7 +590,7 @@ export default function BtcMemeList() {
 						value === null
 							? BigNumber(0)
 							: BigNumber(value)
-									.div(10 ** 8)
+									.div(10 ** getCkbtcCanisterToken().decimals)
 									.times(ckBtcPrice ?? 0);
 
 					const mc = BigNumber(21_000_000).times(priceInUsd);

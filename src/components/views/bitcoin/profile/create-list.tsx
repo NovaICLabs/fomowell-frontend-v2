@@ -10,8 +10,9 @@ import {
 import BigNumber from "bignumber.js";
 
 // import SortsIcon from "@/components/icons/common/sorts";
+import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { Empty } from "@/components/ui/empty";
-import { useCKBTCPrice, useSatsPrice } from "@/hooks/apis/coingecko";
+import { useCKBTCPrice } from "@/hooks/apis/coingecko";
 import { useBtcUserCreatedTokens } from "@/hooks/btc/tokens/btc";
 import {
 	formatNumberSmart,
@@ -27,7 +28,6 @@ import type { CreatedToken } from "@/canisters/btc_core";
 const ProfileCreatedTokens = () => {
 	const router = useRouter();
 	const { chain } = useChainStore();
-	const { data: satsPrice } = useSatsPrice();
 	const { data: ckBtcPrice } = useCKBTCPrice();
 
 	const { userid } = useParams({ from: "/bitcoin/profile/$userid" });
@@ -109,7 +109,9 @@ const ProfileCreatedTokens = () => {
 					const priceInBTC =
 						raw === undefined || raw === 0 ? BigNumber(0) : BigNumber(raw);
 
-					const priceInUsd = priceInBTC.times(satsPrice ?? 0);
+					const priceInUsd = priceInBTC
+						.div(10 ** getCkbtcCanisterToken().decimals)
+						.times(ckBtcPrice ?? 0);
 
 					return (
 						<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
@@ -221,7 +223,7 @@ const ProfileCreatedTokens = () => {
 				size: 120,
 			}),
 		],
-		[columnHelper, satsPrice, ckBtcPrice]
+		[columnHelper, ckBtcPrice]
 	);
 
 	const allItemsLoaded = useMemo(() => {

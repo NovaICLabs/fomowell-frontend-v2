@@ -11,8 +11,9 @@ import {
 import BigNumber from "bignumber.js";
 
 // import SortsIcon from "@/components/icons/common/sorts";
+import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { Empty } from "@/components/ui/empty";
-import { useSatsPrice } from "@/hooks/apis/coingecko";
+import { useCKBTCPrice } from "@/hooks/apis/coingecko";
 import { useBtcUserTokenHoldersList } from "@/hooks/btc/tokens/btc";
 import { formatNumberSmart, isNullOrUndefined } from "@/lib/common/number";
 import { cn } from "@/lib/utils";
@@ -23,7 +24,7 @@ import type { MemeTokenDetails } from "@/canisters/core";
 const ProfileHoldings = () => {
 	const router = useRouter();
 	const { chain } = useChainStore();
-	const { data: satsPrice } = useSatsPrice();
+	const { data: ckBtcPrice } = useCKBTCPrice();
 	const { userid } = useParams({ from: "/bitcoin/profile/$userid" });
 	const {
 		data: items,
@@ -118,7 +119,9 @@ const ProfileHoldings = () => {
 					const priceInBTC =
 						raw === undefined || raw === 0 ? BigNumber(0) : BigNumber(raw);
 
-					const priceInUsd = priceInBTC.times(satsPrice ?? 0);
+					const priceInUsd = priceInBTC
+						.div(10 ** getCkbtcCanisterToken().decimals)
+						.times(ckBtcPrice ?? 0);
 					const totalUsd = priceInUsd.times(balance);
 
 					return (
@@ -148,7 +151,9 @@ const ProfileHoldings = () => {
 					const priceInBTC =
 						raw === undefined || raw === 0 ? BigNumber(0) : BigNumber(raw);
 
-					const priceInUsd = priceInBTC.times(satsPrice ?? 0);
+					const priceInUsd = priceInBTC
+						.div(10 ** getCkbtcCanisterToken().decimals)
+						.times(ckBtcPrice ?? 0);
 
 					return (
 						<div className="flex h-full w-full flex-col items-start justify-center gap-1.5">
@@ -203,7 +208,7 @@ const ProfileHoldings = () => {
 				size: 140,
 			}),
 		],
-		[columnHelper, satsPrice]
+		[columnHelper, ckBtcPrice]
 	);
 
 	const allItemsLoaded = useMemo(() => {
