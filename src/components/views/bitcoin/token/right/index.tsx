@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { useParams } from "@tanstack/react-router";
+import { useParams, useSearch } from "@tanstack/react-router";
 import BigNumber from "bignumber.js";
 
 // import { Button } from "@/components/ui/button";
@@ -138,6 +138,15 @@ export default function Bottom() {
 	const { id } = useParams({
 		from: `/bitcoin/token/$id`,
 	});
+	const { type } = useSearch({
+		from: "/bitcoin/token/$id",
+	});
+
+	useEffect(() => {
+		if (id && type === "add_liquidity") {
+			setActiveTab("Liquidity");
+		}
+	}, [id, type]);
 
 	useEffect(() => {
 		return () => {

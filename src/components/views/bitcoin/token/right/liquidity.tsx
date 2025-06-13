@@ -1,8 +1,14 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import BigNumber from "bignumber.js";
+import { useDebounce } from "use-debounce";
 
-import { getCkbtcCanisterId } from "@/canisters/btc_core";
+import {
+	getChainBTCCoreCanisterId,
+	getCkbtcCanisterId,
+	pre_add_liquidity,
+	type PreAddLiquidityArgs,
+} from "@/canisters/btc_core";
 import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,17 +21,24 @@ import {
 	useBtcMemeTokenAllLiquidity,
 	useBtcMemeTokenInfo,
 	useBtcMemeTokenUserLiquidity,
-	useBtcPreAddLiquidity,
+	// useBtcPreAddLiquidity,
 	useBtcPreRemoveLiquidity,
 	useBtcRemoveLiquidity,
 } from "@/hooks/btc/core";
 import { useTokenChainAndId } from "@/hooks/common/useTokenRouter";
 import { useBtcConnectedIdentity } from "@/hooks/providers/wallet/bitcoin";
-import { formatNumberSmart, getTokenUsdValueTotal } from "@/lib/common/number";
+import { string2bigint } from "@/lib/common/data/bigint";
+import {
+	formatNumberSmart,
+	formatUnits,
+	getTokenUsdValueTotal,
+} from "@/lib/common/number";
 import { withStopPropagation } from "@/lib/common/react-event";
 import { validateInputNumber } from "@/lib/common/validate";
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
+
+import type { LiquidityAddArg } from "@/canisters/btc_core/index.did.d";
 
 const AddLiquidity = () => {
 	const { setBtcDepositWithdrawOpen } = useDialogStore();
@@ -33,31 +46,143 @@ const AddLiquidity = () => {
 	const { principal } = useBtcConnectedIdentity();
 
 	const [tokenALiquidityValue, setTokenALiquidityValue] = useState<string>("");
+	const [debouncedTokenALiquidityValue] = useDebounce(
+		tokenALiquidityValue,
+		500
+	);
+	console.log(
+		"🚀 ~ AddLiquidity ~ debouncedTokenALiquidityValue:",
+		debouncedTokenALiquidityValue
+	);
+
 	const [tokenBLiquidityValue, setTokenBLiquidityValue] = useState<string>("");
+	const [debouncedTokenBLiquidityValue] = useDebounce(
+		tokenBLiquidityValue,
+		500
+	);
+	console.log(
+		"🚀 ~ AddLiquidity ~ debouncedTokenBLiquidityValue:",
+		debouncedTokenBLiquidityValue
+	);
+
+	const [isUpdatingTokenA, setIsUpdatingTokenA] = useState(false);
+	const [isUpdatingTokenB, setIsUpdatingTokenB] = useState(false);
+
 	//  price
 	const { data: ckBtcPrice } = useCKBTCPrice();
 	const { data: satsPrice } = useSatsPrice();
-
-	const { data: currentTokenPrice, refetch: refetchCurrentTokenPrice } =
-		useBtcMemeCurrentPrice({ id: Number(id) });
-
+	// balance
 	const { data: coreTokenBalance, refetch: refetchCoreTokenBalance } =
 		useBtcCoreTokenBalance({
 			owner: principal,
 			token: { ICRCToken: getCkbtcCanisterId() },
 		});
-
-	const { data: memeTokenInfo, refetch: refetchMemeTokenInfo } =
-		useBtcMemeTokenInfo(Number(id));
 	const { data: memeTokenBalance, refetch: refetchMemeTokenBalance } =
 		useBtcCoreTokenBalance({
 			owner: principal,
 			token: { MemeToken: BigInt(Number(id)) },
 		});
 
+	const [preResult, setPreResult] = useState<LiquidityAddArg>();
+	// const { data: preResult } = useBtcPreAddLiquidity({
+	// 	id: BigInt(id),
+	// 	runes: debouncedTokenALiquidityValue
+	// 		? debouncedTokenALiquidityValue
+	// 		: undefined,
+	// 	sats: debouncedTokenBLiquidityValue
+	// 		? BigNumber(debouncedTokenBLiquidityValue)
+	// 				.times(10 ** getCkbtcCanisterToken().decimals)
+	// 				.toString()
+	// 		: undefined,
+	// 	enabled: !!(debouncedTokenALiquidityValue || debouncedTokenBLiquidityValue),
+	// });
+
+	const getPreResult = useCallback(
+		async (type: "runes" | "sats", value: string) => {
+			try {
+				const args: PreAddLiquidityArgs = {
+					id: BigInt(id),
+					runes: undefined,
+					sats: undefined,
+				};
+
+				if (type === "sats" && value) {
+					args.sats = BigNumber(value)
+						.times(10 ** getCkbtcCanisterToken().decimals)
+						.toString();
+				}
+				if (type === "runes" && value) {
+					args.runes = BigNumber(value).toFixed(0).toString();
+				}
+
+				if (!args.runes && !args.sats) {
+					return;
+				}
+				console.log("🚀 ~ args:", args);
+
+				const result = await pre_add_liquidity(
+					getChainBTCCoreCanisterId().toText(),
+					args
+				);
+				console.log("🚀 ~ getPreResult ~ result:", result);
+
+				if (result && type === "runes") {
+					setPreResult(result);
+					setTokenBLiquidityValue(
+						BigNumber(result.sats)
+							.div(10 ** getCkbtcCanisterToken().decimals)
+							.toString()
+					);
+					setIsUpdatingTokenB(false);
+				}
+				if (result && type === "sats") {
+					setPreResult(result);
+					setTokenALiquidityValue(formatUnits(result.runes));
+					setIsUpdatingTokenA(false);
+				}
+			} catch (error) {
+				console.error("🚀 ~ getPreResult ~ error:", error);
+			}
+		},
+		[id]
+	);
+
+	useEffect(() => {
+		if ((debouncedTokenALiquidityValue && !isUpdatingTokenB) || !preResult) {
+			setIsUpdatingTokenB(true);
+			void getPreResult("runes", debouncedTokenALiquidityValue);
+		}
+	}, [
+		debouncedTokenALiquidityValue,
+		getPreResult,
+		isUpdatingTokenB,
+		preResult,
+		tokenALiquidityValue,
+	]);
+
+	useEffect(() => {
+		if ((debouncedTokenBLiquidityValue && !isUpdatingTokenA) || !preResult) {
+			setIsUpdatingTokenA(true);
+			void getPreResult("sats", debouncedTokenBLiquidityValue);
+		}
+	}, [
+		debouncedTokenBLiquidityValue,
+		getPreResult,
+		isUpdatingTokenA,
+		preResult,
+		tokenBLiquidityValue,
+	]);
+
+	const { data: currentTokenPrice, refetch: refetchCurrentTokenPrice } =
+		useBtcMemeCurrentPrice({ id: Number(id) });
+
+	const { data: memeTokenInfo, refetch: refetchMemeTokenInfo } =
+		useBtcMemeTokenInfo(Number(id));
+
 	const changeToken1 = (percent: number) => {
 		if (!memeTokenBalance || !memeTokenBalance.formatted) return;
 
+		setIsUpdatingTokenA(true);
 		setTokenALiquidityValue(
 			BigNumber(memeTokenBalance.raw)
 				.div(10 ** memeTokenBalance.decimals)
@@ -70,6 +195,7 @@ const AddLiquidity = () => {
 	const changeToken2 = (percent: number) => {
 		if (!coreTokenBalance || !coreTokenBalance.formatted) return;
 
+		setIsUpdatingTokenB(true);
 		setTokenBLiquidityValue(
 			BigNumber(coreTokenBalance.raw)
 				.div(10 ** coreTokenBalance.decimals)
@@ -85,22 +211,14 @@ const AddLiquidity = () => {
 
 		void refetchMemeTokenInfo();
 		void refetchCurrentTokenPrice();
+		setTokenALiquidityValue("");
+		setTokenBLiquidityValue("");
 	}, [
 		refetchCoreTokenBalance,
 		refetchMemeTokenBalance,
 		refetchMemeTokenInfo,
 		refetchCurrentTokenPrice,
 	]);
-
-	const { data: preResult } = useBtcPreAddLiquidity({
-		id: BigInt(id),
-		sats: tokenALiquidityValue
-			? BigNumber(tokenALiquidityValue)
-					.times(10 ** getCkbtcCanisterToken().decimals)
-					.toString()
-			: undefined,
-		runes: tokenBLiquidityValue ? tokenBLiquidityValue : undefined,
-	});
 
 	const { mutateAsync: addMutate, isPending } = useBtcAddLiquidity();
 
@@ -130,23 +248,26 @@ const AddLiquidity = () => {
 		}
 	};
 
-	const finalTokenAValue = useMemo(() => {
-		if (!preResult) {
-			return tokenALiquidityValue;
-		}
+	const tokenANotEnough =
+		!memeTokenBalance ||
+		BigNumber(memeTokenBalance.raw)
+			.div(10 ** memeTokenBalance.decimals)
+			.lt(tokenALiquidityValue);
 
-		return preResult.runes.toString();
-	}, [preResult, tokenALiquidityValue]);
+	console.log(
+		"tokenALiquidityValue",
+		tokenALiquidityValue,
+		memeTokenBalance &&
+			BigNumber(memeTokenBalance.raw)
+				.div(10 ** memeTokenBalance.decimals)
+				.toString()
+	);
 
-	const finalTokenBValue = useMemo(() => {
-		if (!preResult) {
-			return tokenBLiquidityValue;
-		}
-
-		return BigNumber(preResult.sats)
-			.div(10 ** getCkbtcCanisterToken().decimals)
-			.toString();
-	}, [preResult, tokenBLiquidityValue]);
+	const tokenBNotEnough =
+		!coreTokenBalance ||
+		BigNumber(coreTokenBalance.raw)
+			.div(10 ** coreTokenBalance.decimals)
+			.lt(tokenBLiquidityValue);
 
 	return (
 		<div className="mt-[24px] flex flex-col">
@@ -197,8 +318,9 @@ const AddLiquidity = () => {
 				</div>
 				<div className="mt-3 flex h-[54px] w-full items-center rounded-2xl border border-white/10 bg-[#111111] pr-[14px]">
 					<Input
+						aria-invalid={tokenANotEnough}
 						placeholder="0.00"
-						value={finalTokenAValue}
+						value={tokenALiquidityValue}
 						className={cn(
 							"dark:bg-background h-full w-full rounded-2xl border border-transparent text-lg font-semibold placeholder:text-lg placeholder:leading-[14px] placeholder:font-bold placeholder:text-white/40 focus-visible:border-transparent focus-visible:ring-0"
 						)}
@@ -215,6 +337,7 @@ const AddLiquidity = () => {
 								value,
 								callback: setTokenALiquidityValue,
 							});
+							setIsUpdatingTokenA(true);
 						}}
 					/>
 					<p className="text-lg leading-[14px] font-bold text-white/40">
@@ -300,8 +423,9 @@ const AddLiquidity = () => {
 				</div>
 				<div className="mt-3 flex h-[54px] w-full items-center rounded-2xl border border-white/10 bg-[#111111] pr-[14px]">
 					<Input
+						aria-invalid={tokenBNotEnough}
 						placeholder="0.00"
-						value={finalTokenBValue}
+						value={tokenBLiquidityValue}
 						className={cn(
 							"dark:bg-background h-full w-full rounded-2xl border border-transparent text-lg font-semibold placeholder:text-lg placeholder:leading-[14px] placeholder:font-bold placeholder:text-white/40 focus-visible:border-transparent focus-visible:ring-0"
 						)}
@@ -318,6 +442,7 @@ const AddLiquidity = () => {
 								value,
 								callback: setTokenBLiquidityValue,
 							});
+							setIsUpdatingTokenB(true);
 						}}
 					/>
 					<p className="text-lg leading-[14px] font-bold text-white/40">BTC</p>
@@ -361,9 +486,10 @@ const AddLiquidity = () => {
 			<div className="mt-5 flex w-full justify-between">
 				<p className="text-sm font-normal text-white/40">Total Deposit</p>
 				<p className="text-sm font-normal text-white">
+					$
 					{preResult && ckBtcPrice
 						? formatNumberSmart(
-								BigNumber(finalTokenBValue)
+								BigNumber(tokenBLiquidityValue)
 									.times(ckBtcPrice)
 									.times(2)
 									.toString(),
@@ -391,7 +517,9 @@ const AddLiquidity = () => {
 					!tokenALiquidityValue ||
 					!tokenBLiquidityValue ||
 					!preResult ||
-					isPending
+					isPending ||
+					tokenANotEnough ||
+					tokenBNotEnough
 				}
 				onClick={handleAddLiquidity}
 			>
@@ -413,10 +541,10 @@ const RemoveLiquidity = () => {
 	const { id } = useTokenChainAndId();
 
 	// const { data: cnBtcPrice } = useCKBTCPrice();
-	const { data: satsPrice } = useSatsPrice();
+	// const { data: satsPrice } = useSatsPrice();
 
-	const { data: currentTokenPrice, refetch: refetchCurrentTokenPrice } =
-		useBtcMemeCurrentPrice({ id: Number(id) });
+	// const { data: currentTokenPrice, refetch: refetchCurrentTokenPrice } =
+	// 	useBtcMemeCurrentPrice({ id: Number(id) });
 
 	const { data: userLiquidity, refetch: refetchUserLiquidity } =
 		useBtcMemeTokenUserLiquidity({
@@ -434,9 +562,9 @@ const RemoveLiquidity = () => {
 
 	const { data: preRemoveResult } = useBtcPreRemoveLiquidity({
 		id: BigInt(id),
-		liquidity: BigInt(removeLiquidityValue || 0),
+		liquidity: string2bigint(removeLiquidityValue || ""),
 	});
-	console.debug("🚀 ~ RemoveLiquidity ~ preResult:", preRemoveResult);
+	// console.debug("🚀 ~ RemoveLiquidity ~ preResult:", preRemoveResult);
 
 	const { mutateAsync: removeLiquidity, isPending: isRemovePending } =
 		useBtcRemoveLiquidity();
@@ -444,11 +572,11 @@ const RemoveLiquidity = () => {
 	const reloadBalanceAndInfo = useCallback(() => {
 		void refetchUserLiquidity();
 		void refetchAllLiquidity();
-		void refetchCurrentTokenPrice();
+		// void refetchCurrentTokenPrice();
 		void refetchMemeTokenInfo();
 	}, [
 		refetchAllLiquidity,
-		refetchCurrentTokenPrice,
+		// refetchCurrentTokenPrice,
 		refetchMemeTokenInfo,
 		refetchUserLiquidity,
 	]);
@@ -476,8 +604,11 @@ const RemoveLiquidity = () => {
 	};
 
 	const onChangeInputValue = (percent: number) => {
-		console.log("🚀 ~ onChangeInputValue ~ percent:", percent);
-		// setRemoveLiquidityValue();
+		if (!userLiquidity) return;
+
+		setRemoveLiquidityValue(
+			BigNumber(userLiquidity).times(percent).toFixed(0, 1).toString()
+		);
 	};
 
 	return (
@@ -504,7 +635,7 @@ const RemoveLiquidity = () => {
 								}) || "--"
 							: "--"}
 					</div>
-					<div className="justify-start font-['Albert_Sans'] text-xs leading-none font-normal text-white/60">
+					{/* <div className="justify-start font-['Albert_Sans'] text-xs leading-none font-normal text-white/60">
 						(${" "}
 						{userLiquidity &&
 							currentTokenPrice &&
@@ -522,7 +653,7 @@ const RemoveLiquidity = () => {
 								}
 							)}
 						)
-					</div>
+					</div> */}
 				</div>
 			</div>
 
@@ -587,10 +718,13 @@ const RemoveLiquidity = () => {
 				</div>
 			</div>
 			<div className="mt-5 flex w-full justify-between">
-				<p className="text-sm font-normal text-white/40">BTC Received</p>
+				<p className="text-sm font-normal text-white/40">sats Received</p>
 				<p className="text-sm font-normal text-white">
 					{preRemoveResult
 						? formatNumberSmart(
+								// formatUnits(
+
+								// ),
 								BigNumber(preRemoveResult?.sats || 0)
 									.div(10 ** getCkbtcCanisterToken().decimals)
 									.toString(),
@@ -599,7 +733,8 @@ const RemoveLiquidity = () => {
 									shortZero: true,
 								}
 							)
-						: "--"}
+						: "--"}{" "}
+					sats
 				</p>
 			</div>
 			<div className="mt-5 flex w-full justify-between">
@@ -610,7 +745,7 @@ const RemoveLiquidity = () => {
 					{preRemoveResult
 						? formatNumberSmart(
 								BigNumber(preRemoveResult?.runes || 0)
-									.div(10 ** 8)
+									// .div(10 ** 8)
 									.toString(),
 								{
 									shortenLarge: true,
@@ -625,7 +760,8 @@ const RemoveLiquidity = () => {
 				className={cn(
 					"mt-5 h-9.5 w-full rounded-full text-lg font-semibold text-white",
 					"bg-[#1e1e1e] hover:bg-[#1e1e1e]/80",
-					removeLiquidityValue && "bg-[#f7b406] text-[#111111]"
+					removeLiquidityValue &&
+						"bg-[#f7b406] text-[#111111] hover:bg-[#f7b406]/80"
 				)}
 				onClick={handleRemoveLiquidity}
 			>

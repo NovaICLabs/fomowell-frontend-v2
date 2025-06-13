@@ -33,7 +33,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { showToast } from "@/components/utils/toast";
-import { useCKBTCPrice, useSatsPrice } from "@/hooks/apis/coingecko";
+import { useCKBTCPrice } from "@/hooks/apis/coingecko";
 import {
 	useBtcFavoriteToken,
 	useBtcInfiniteFavoriteTokenList,
@@ -294,7 +294,6 @@ export default function BtcMemeList() {
 		}
 		return BigInt(parseUnits(flashAmount, 8));
 	}, [flashAmount]);
-	const { data: satsPrice } = useSatsPrice();
 	const { data: ckBtcPrice } = useCKBTCPrice();
 
 	const items = useMemo(
@@ -502,7 +501,7 @@ export default function BtcMemeList() {
 				cell: (info) => {
 					const raw = info.getValue();
 					const priceInBtc = raw === null ? BigNumber(0) : BigNumber(raw);
-					const priceInUsd = priceInBtc.times(satsPrice ?? 0);
+					const priceInUsd = priceInBtc.div(10 ** 8).times(ckBtcPrice ?? 0);
 					return (
 						<div className="flex h-full w-full flex-col items-start justify-center">
 							<div className="flex items-center text-sm font-medium text-white">
@@ -587,9 +586,10 @@ export default function BtcMemeList() {
 					const priceInUsd =
 						value === null
 							? BigNumber(0)
-							: BigNumber(1)
-									.div(BigNumber(value))
-									.times(satsPrice ?? 0);
+							: BigNumber(value)
+									.div(10 ** 8)
+									.times(ckBtcPrice ?? 0);
+
 					const mc = BigNumber(21_000_000).times(priceInUsd);
 
 					return (
@@ -832,7 +832,6 @@ export default function BtcMemeList() {
 			favoriteToken,
 			handleQuickBuy,
 			handleSort,
-			satsPrice,
 			sort,
 		]
 	);
