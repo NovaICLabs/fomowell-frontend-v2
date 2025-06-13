@@ -40,7 +40,12 @@ import {
 	useBtcInfiniteFavoriteTokenList,
 	useBtcInfiniteTokenList,
 } from "@/hooks/apis/indexer_btc";
-import { useBtcBuy, useBtcCoreTokenBalance } from "@/hooks/btc/core";
+import {
+	useBtcBuy,
+	useBtcCoreTokenBalance,
+	useBtcPreSwapRunes,
+	useBtcSwapRunes,
+} from "@/hooks/btc/core";
 import { useBtcConnectedIdentity } from "@/hooks/providers/wallet/bitcoin";
 import {
 	formatNumberSmart,
@@ -363,6 +368,72 @@ export default function BtcMemeList() {
 
 	// favorite token
 	const { mutateAsync: favoriteToken } = useBtcFavoriteToken(queryParameters);
+
+	const { mutateAsync: preSwapRunes } = useBtcPreSwapRunes();
+	const { mutateAsync: swapRunes } = useBtcSwapRunes();
+
+	// sats to runes
+	const onSwapSats2Runes = useCallback(
+		async ({
+			tokenId,
+			loadingToastId,
+			ticker,
+		}: {
+			tokenId: string;
+			loadingToastId: string | number;
+			ticker: string;
+		}) => {
+			// if not login
+			if (!principal) {
+				setBtcConnectOpen(true);
+				return;
+			}
+
+			try {
+				const result = await preSwapRunes({
+					id: BigInt(tokenId),
+					sats: flashAmountBigInt,
+				});
+				console.debug(
+					"🚀 ~ onSwapSats2Runes ~ result:",
+					flashAmountBigInt,
+					result
+				);
+
+				if (result) {
+					void swapRunes({
+						sats: flashAmountBigInt,
+						id: BigInt(tokenId),
+						runes_min: BigInt(0),
+						nonce: result.nonce,
+					})
+						.then((receivedAmount) => {
+							console.debug("🚀 ~ .then ~ receivedAmount:", receivedAmount);
+							const { runes } = receivedAmount;
+							showToast(
+								"success",
+								`${runes} $${ticker.toLocaleUpperCase()} received!`
+							);
+						})
+						.catch((error: Error) => {
+							if (error.message.indexOf("is out of cycles") !== -1) {
+								showToast("error", `Cycles insufficient`);
+							} else {
+								showToast("error", "Failed to purchase token");
+							}
+						})
+						.finally(() => {
+							toast.dismiss(loadingToastId);
+						});
+				}
+			} catch (error) {
+				console.log("🚀 ~ onSwapSats2Runes ~ error:", error);
+				showToast("error", "Failed to purchase token");
+			}
+		},
+		[flashAmountBigInt, preSwapRunes, principal, setBtcConnectOpen, swapRunes]
+	);
+
 	// handle quick buy
 	const handleQuickBuy = useCallback(
 		(info: CellContext<BtcTokenInfo, unknown>) => {
@@ -381,14 +452,24 @@ export default function BtcMemeList() {
 				return;
 			}
 
+			const completed = info.row.original.completed;
 			const tokenId = info.row.original.memeTokenId.toString();
+			const ticker = info.row.original.ticker;
 			const loadingToastId = showToast(
 				"loading",
-				`Buying token($${info.row.original.ticker.toLocaleUpperCase()})...`,
+				`Buying token($${ticker.toLocaleUpperCase()})...`,
 				{
 					duration: Infinity,
 				}
 			);
+
+			// if completed
+			if (completed) {
+				void onSwapSats2Runes({ loadingToastId, tokenId, ticker });
+				return;
+			}
+
+			// not completed
 			void buyToken({
 				amount: flashAmountBigInt,
 				id: BigInt(tokenId),
@@ -412,7 +493,14 @@ export default function BtcMemeList() {
 					toast.dismiss(loadingToastId);
 				});
 		},
-		[balance, buyToken, flashAmountBigInt, principal, setBtcConnectOpen]
+		[
+			balance,
+			buyToken,
+			flashAmountBigInt,
+			onSwapSats2Runes,
+			principal,
+			setBtcConnectOpen,
+		]
 	);
 
 	const columns = useMemo(

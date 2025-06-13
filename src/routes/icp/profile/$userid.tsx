@@ -27,7 +27,7 @@ import {
 import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
-import { useChainStore } from "@/store/chain";
+// import { useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
 import { useIcIdentityStore } from "@/store/ic";
 
@@ -133,8 +133,8 @@ function UserId() {
 	// is self
 	const isSelf = userid === identityProfile?.principal;
 
-	const domain = window.location.origin;
-	const { chain } = useChainStore();
+	// const domain = window.location.origin;
+	// const { chain } = useChainStore();
 
 	return (
 		<>

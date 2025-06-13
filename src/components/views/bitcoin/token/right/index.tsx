@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 
 import Holders from "./holders";
 import Liquidity from "./liquidity";
+import SwapTrade from "./swap-trade";
 import Trade from "./trade";
 
 // import { getCkbtcCanisterId } from "@/canisters/btc_core";
@@ -213,36 +214,9 @@ export default function Bottom() {
 					<div className="flex h-[426px] w-[390px] flex-1 flex-col items-center justify-center gap-2">
 						<Skeleton className="h-[426px] w-[390px]" />
 					</div>
+				) : memeTokenInfo.completed ? (
+					<SwapTrade />
 				) : (
-					//  : memeTokenInfo.completed ? (
-					// 	<div className="flex flex-shrink-0 flex-col items-center justify-center gap-2">
-					// 		<img
-					// 			alt="completed"
-					// 			className="w-50"
-					// 			src="/svgs/common/launched.svg"
-					// 		/>
-					// 		<Button
-					// 			className="-mt-9.5 h-9 w-88 rounded-full text-base font-bold"
-					// 			onClick={() => {
-					// 				const rune_name = memeTokenInfo.rune_name;
-					// 				if (!rune_name) {
-					// 					showToast("error", "rune_name not found");
-					// 					return;
-					// 				}
-					// 				// todo add swap url
-					// 				// window.open(
-					// 				// 	getSwapUrlByCanisterId({
-					// 				// 		input: canister_id.toText(),
-					// 				// 		output: getCkbtcCanisterId().toText(),
-					// 				// 	}),
-					// 				// 	"_blank"
-					// 				// );
-					// 			}}
-					// 		>
-					// 			Go to Dex
-					// 		</Button>
-					// 	</div>
-					// )
 					<Trade />
 				))}
 

@@ -23,7 +23,7 @@ import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useBtcIdentityStore } from "@/store/btc";
-import { useChainStore } from "@/store/chain";
+// import { useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
 
 // import { Skeleton } from "@/components/ui/skeleton";
@@ -117,7 +117,7 @@ const UserInfo = () => {
 function UserId() {
 	const { userid } = Route.useParams();
 	const [activeTab, setActiveTab] = useState("Created");
-	const { principal, identityProfile } = useBtcIdentityStore();
+	const { principal } = useBtcIdentityStore();
 	const { referral2BTCOpen, setReferral2BTCOpen } = useDialogStore();
 
 	const { data: coreTokenBalance } = useBtcCoreTokenBalance({
@@ -139,8 +139,8 @@ function UserId() {
 	// is self
 	const isSelf = userid === principal;
 
-	const domain = window.location.origin;
-	const { chain } = useChainStore();
+	// const domain = window.location.origin;
+	// const { chain } = useChainStore();
 
 	return (
 		<>
