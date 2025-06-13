@@ -21,6 +21,7 @@ import copy from "copy-to-clipboard";
 import { Check, Loader2 } from "lucide-react";
 import { useDebounce } from "use-debounce";
 
+import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { CopyIcon } from "@/components/icons/common/copy";
 import { Star } from "@/components/icons/star";
 import { CommandInput, CommandList } from "@/components/ui/command";
@@ -115,7 +116,7 @@ export default function BitcoinSearch() {
 	const [debouncedSearchTerm] = useDebounce(searchTerm, 500); // 500ms debounce
 	const router = useRouter();
 	const { chain } = useChainStore();
-	const { data: icpPrice } = useCKBTCPrice();
+	const { data: ckBtcPrice } = useCKBTCPrice();
 
 	// useRecent
 	const { recentSearch, addRecentSearch, clearRecentSearch } = useSearchStore();
@@ -174,7 +175,7 @@ export default function BitcoinSearch() {
 						? "--"
 						: formatNumberSmart(
 								formatUnits(
-									BigNumber(info.row.original.volume24H).times(icpPrice ?? 0)
+									BigNumber(info.row.original.volume24H).times(ckBtcPrice ?? 0)
 								),
 								{
 									shortenLarge: true,
@@ -188,7 +189,7 @@ export default function BitcoinSearch() {
 										? 0n
 										: BigInt(info.row.original.market_cap_token),
 								},
-								icpPrice ?? 0
+								ckBtcPrice ?? 0
 							);
 					return (
 						<div className="flex h-full w-full flex-col items-end justify-center">
@@ -209,9 +210,11 @@ export default function BitcoinSearch() {
 				id: "price",
 				cell: (info) => {
 					const raw = info.getValue();
-					const priceInIcp =
-						raw === null ? BigNumber(0) : BigNumber(1).div(BigNumber(raw));
-					const priceInUsd = priceInIcp.times(icpPrice ?? 0);
+					const priceInBtc = raw === null ? BigNumber(0) : BigNumber(raw);
+					const priceInUsd = priceInBtc
+						.div(10 ** getCkbtcCanisterToken().decimals)
+						.times(ckBtcPrice ?? 0);
+
 					return (
 						<div className="flex h-full flex-col items-end justify-center">
 							<div className="flex items-center gap-1">
@@ -243,7 +246,7 @@ export default function BitcoinSearch() {
 				size: 100,
 			}),
 		],
-		[columnHelper, favoriteToken, icpPrice]
+		[columnHelper, favoriteToken, ckBtcPrice]
 	);
 
 	const table = useReactTable({
