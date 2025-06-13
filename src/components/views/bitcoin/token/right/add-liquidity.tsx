@@ -173,11 +173,12 @@ const AddLiquidity = () => {
 	const changeToken1 = (percent: number) => {
 		if (!memeTokenBalance || !memeTokenBalance.formatted) return;
 
+		activeInputRef.current = "tokenA";
 		setTokenALiquidityValue(
 			BigNumber(memeTokenBalance.raw)
 				.div(10 ** memeTokenBalance.decimals)
 				.times(percent)
-				.toFixed(2)
+				.toFixed(2, 1)
 				.toString()
 		);
 	};
@@ -185,11 +186,12 @@ const AddLiquidity = () => {
 	const changeToken2 = (percent: number) => {
 		if (!coreTokenBalance || !coreTokenBalance.formatted) return;
 
+		activeInputRef.current = "tokenB";
 		setTokenBLiquidityValue(
 			BigNumber(coreTokenBalance.raw)
 				.div(10 ** coreTokenBalance.decimals)
 				.times(percent)
-				.toFixed(2)
+				.toFixed(2, 1)
 				.toString()
 		);
 	};
