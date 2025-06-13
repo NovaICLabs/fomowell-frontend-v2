@@ -110,10 +110,14 @@ export const getCoreTokenBalance = async (
 	const decimals = 8;
 	const formatted = formatNumberSmart(
 		BigNumber(result)
-			.div(10 ** decimals)
-			.toFixed(2, 1)
-			.toString()
+			.dividedBy(10 ** decimals)
+			.toFixed(6, 1)
+			.toString(),
+		{
+			formatCount: 6,
+		}
 	);
+
 	return {
 		raw: result,
 		formatted,
