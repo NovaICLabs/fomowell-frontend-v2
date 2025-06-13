@@ -38,7 +38,7 @@ const RemoveLiquidity = () => {
 			id: Number(id),
 		});
 
-	// console.debug("🚀 ~ RemoveLiquidity ~ userLiquidity:", userLiquidity);
+	console.debug("🚀 ~ RemoveLiquidity ~ userLiquidity:", userLiquidity);
 
 	const { data: allLiquidity, refetch: refetchAllLiquidity } =
 		useBtcMemeTokenAllLiquidity({ id: Number(id) });
@@ -62,6 +62,8 @@ const RemoveLiquidity = () => {
 		void refetchAllLiquidity();
 		void refetchCurrentTokenPrice();
 		void refetchMemeTokenInfo();
+
+		setRemoveLiquidityValue("");
 	}, [
 		refetchAllLiquidity,
 		refetchCurrentTokenPrice,
@@ -79,6 +81,7 @@ const RemoveLiquidity = () => {
 			return;
 		}
 		if (!preRemoveResult) {
+			showToast("error", "Pre remove liquidity failed");
 			return;
 		}
 
@@ -246,7 +249,7 @@ const RemoveLiquidity = () => {
 					{preRemoveResult
 						? formatNumberSmart(
 								BigNumber(preRemoveResult?.runes || 0)
-									// .div(10 ** 8)
+									.div(10 ** getCkbtcCanisterToken().decimals)
 									.toString(),
 								{
 									shortenLarge: true,
@@ -257,14 +260,20 @@ const RemoveLiquidity = () => {
 				</p>
 			</div>
 			<Button
-				disabled={!connected || !removeLiquidityValue || isRemovePending}
 				className={cn(
 					"mt-5 h-9.5 w-full rounded-full text-lg font-semibold text-white",
 					"bg-[#1e1e1e] hover:bg-[#1e1e1e]/80",
 					connected &&
 						removeLiquidityValue &&
+						preRemoveResult &&
 						"bg-[#f7b406] text-[#111111] hover:bg-[#f7b406]/80"
 				)}
+				disabled={
+					!connected ||
+					!removeLiquidityValue ||
+					isRemovePending ||
+					!preRemoveResult
+				}
 				onClick={handleRemoveLiquidity}
 			>
 				Remove

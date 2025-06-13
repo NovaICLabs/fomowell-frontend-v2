@@ -718,16 +718,13 @@ export const add_liquidity = async (
 
 // pre add liquidity
 export const pre_remove_liquidity = async (
+	createActor: ActorCreator,
 	canisterId: string,
 	args: PreLiquidityRemoveArg
 ) => {
-	const createActor = getAnonymousActorCreator();
-	if (!createActor) {
-		throw new Error("Failed to create actor");
-	}
 	const actor = await createActor<_SERVICE>({
 		canisterId,
-		idlFactory,
+		interfaceFactory: idlFactory,
 	});
 	if (!actor) {
 		throw new Error("Failed to create actor");
