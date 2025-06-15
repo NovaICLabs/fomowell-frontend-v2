@@ -54,13 +54,13 @@ function getPriceChangeRate(option: TrendingTimeOption, token: BtcTokenInfo) {
 function getVolume(option: TrendingTimeOption, token: BtcTokenInfo) {
 	switch (option.value) {
 		case "popularity_5m":
-			return token.volume5M;
+			return token.volume5M ?? 0;
 		case "popularity_1h":
-			return token.volume1H;
+			return token.volume1H ?? 0;
 		case "popularity_6h":
-			return token.volume6H;
+			return token.volume6H ?? 0;
 		case "popularity_24h":
-			return token.volume24H;
+			return token.volume24H ?? 0;
 		default:
 			return 0;
 	}

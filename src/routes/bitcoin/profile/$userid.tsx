@@ -7,26 +7,26 @@ import { isMobile } from "react-device-detect";
 
 import { getCkbtcCanisterId } from "@/canisters/btc_core";
 import { CopyIcon } from "@/components/icons/common/copy";
-// import { EditIcon } from "@/components/icons/common/edit";
+import { EditIcon } from "@/components/icons/common/edit";
 import ReferIcon from "@/components/icons/common/refer";
 import WithdrawIcon from "@/components/icons/common/withdraw";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
 import ReferralDialog from "@/components/layout/dialog/referral";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import ProfileActivity from "@/components/views/bitcoin/profile/activity";
 import ProfileCreatedTokens from "@/components/views/bitcoin/profile/create-list";
+import EditInfoModal from "@/components/views/bitcoin/profile/edit-info-modal";
 import ProfileHoldings from "@/components/views/bitcoin/profile/holdings";
-import EditInfoModal from "@/components/views/icp/profile/edit-info-modal";
-import { useUserInfo } from "@/hooks/apis/user";
+import { useBtcUserInfo } from "@/hooks/apis/user";
 import { useBtcCoreTokenBalance } from "@/hooks/btc/core";
 import { getAvatar } from "@/lib/common/avatar";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 import { useBtcIdentityStore } from "@/store/btc";
-import { useChainStore } from "@/store/chain";
+// import { useChainStore } from "@/store/chain";
 import { useDialogStore } from "@/store/dialog";
 
-// import { Skeleton } from "@/components/ui/skeleton";
 // import { showToast } from "@/components/utils/toast";
 
 export const Route = createFileRoute("/bitcoin/profile/$userid")({
@@ -38,7 +38,7 @@ const UserInfo = () => {
 	const [principalCopied, setPrincipalCopied] = useState(false);
 	const { principal } = useBtcIdentityStore();
 
-	const { data: userInfo, refetch: refetchUserInfo } = useUserInfo(userid);
+	const { data: userInfo, refetch: refetchUserInfo } = useBtcUserInfo(userid);
 
 	const [isShow, setIsShow] = useState<boolean>(false);
 
@@ -74,13 +74,14 @@ const UserInfo = () => {
 
 			<div className="flex flex-col gap-1">
 				<div className="flex items-center gap-1">
-					{/* {userInfo ? ( userInfo.name */}
-					<span className="text-lg font-semibold">
-						{truncatePrincipal(principal ?? "")}
-					</span>
-					{/* ) : (
+					{userInfo ? (
+						<span className="text-lg font-semibold">
+							{/* {truncatePrincipal(principal ?? "")} */}
+							{userInfo.name}
+						</span>
+					) : (
 						<Skeleton className="h-7 w-20"></Skeleton>
-					)} */}
+					)}
 
 					{isSelf && (
 						<span
@@ -88,7 +89,7 @@ const UserInfo = () => {
 								setIsShow(true);
 							}}
 						>
-							{/* <EditIcon /> */}
+							<EditIcon />
 						</span>
 					)}
 				</div>
@@ -117,7 +118,7 @@ const UserInfo = () => {
 function UserId() {
 	const { userid } = Route.useParams();
 	const [activeTab, setActiveTab] = useState("Created");
-	const { principal, identityProfile } = useBtcIdentityStore();
+	const { principal } = useBtcIdentityStore();
 	const { referral2BTCOpen, setReferral2BTCOpen } = useDialogStore();
 
 	const { data: coreTokenBalance } = useBtcCoreTokenBalance({
@@ -139,8 +140,8 @@ function UserId() {
 	// is self
 	const isSelf = userid === principal;
 
-	const domain = window.location.origin;
-	const { chain } = useChainStore();
+	// const domain = window.location.origin;
+	// const { chain } = useChainStore();
 
 	return (
 		<>

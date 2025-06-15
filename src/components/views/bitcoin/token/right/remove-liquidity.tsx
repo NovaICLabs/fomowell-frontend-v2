@@ -222,13 +222,10 @@ const RemoveLiquidity = () => {
 				</div>
 			</div>
 			<div className="mt-5 flex w-full justify-between">
-				<p className="text-sm font-normal text-white/40">sats Received</p>
+				<p className="text-sm font-normal text-white/40">BTC Received</p>
 				<p className="text-sm font-normal text-white">
 					{preRemoveResult
 						? formatNumberSmart(
-								// formatUnits(
-
-								// ),
 								BigNumber(preRemoveResult?.sats || 0)
 									.div(10 ** getCkbtcCanisterToken().decimals)
 									.toString(),
@@ -238,7 +235,7 @@ const RemoveLiquidity = () => {
 								}
 							)
 						: "--"}{" "}
-					sats
+					BTC
 				</p>
 			</div>
 			<div className="mt-5 flex w-full justify-between">

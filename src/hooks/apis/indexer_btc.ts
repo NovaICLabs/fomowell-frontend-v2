@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { produce } from "immer";
 
-import { createComment, getCommentList } from "@/apis/comment";
+import { createComment, getCommentList } from "@/apis/comment_btc";
 import {
 	type BtcTokenInfo,
 	type CandleParameters,
@@ -21,7 +21,7 @@ import {
 	type PaginatedDataWithData,
 	type TokenListParameters,
 } from "@/apis/indexer_btc";
-import { getUserRewardStats } from "@/apis/reward-btc";
+// import { getUserRewardStats } from "@/apis/reward-btc";
 import { updateUserInfo } from "@/apis/user-login-btc";
 import { getCkbtcCanisterId } from "@/canisters/btc_core";
 import { getIcrcTokenBalance } from "@/canisters/icrc3";

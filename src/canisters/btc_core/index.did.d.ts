@@ -33,7 +33,7 @@ export interface ArchiveLedgerInfo {
 	txn_count: bigint;
 	archive_txn_count: bigint;
 	is_cleaning: boolean;
-	archives: Array<[Principal, TransactionRange]>;
+	archives: Array<[Principal, GetBlocksRequest]>;
 }
 export interface ArchiveSetting {
 	max_records_in_archive_instance: bigint;
@@ -189,6 +189,10 @@ export type DisplayMessageType =
 	  };
 export interface ErrorInfo {
 	description: string;
+}
+export interface GetBlocksRequest {
+	start: bigint;
+	length: bigint;
 }
 export interface GetInformationRequest {
 	status: [] | [StatusRequest];
@@ -392,7 +396,6 @@ export interface PreRunesSwapSatsResponse {
 export interface PreSatsSwapRunesArg {
 	id: bigint;
 	sats: bigint;
-	nonce: bigint;
 }
 export interface PreSatsSwapRunesResponse {
 	nonce: bigint;
@@ -475,6 +478,7 @@ export interface Transaction {
 	buy: [] | [Buy];
 	inner_swap: [] | [InnerSwap];
 	add_liquidity: [] | [AddLiquidity];
+	withdraw_rewards: [] | [WithdrawRewards];
 	withdraw: [] | [Deposit];
 	kind: string;
 	mint: [] | [Mint];
@@ -488,10 +492,6 @@ export interface Transaction {
 	transfer: [] | [Transfer];
 }
 export interface TransactionRange {
-	start: bigint;
-	length: bigint;
-}
-export interface TransactionRange_1 {
 	transactions: Array<Transaction_1>;
 }
 export interface Transaction_1 {
@@ -560,6 +560,19 @@ export interface WithdrawLiquidity {
 	output_sats: bigint;
 	meme_token_id: bigint;
 }
+export interface WithdrawRewards {
+	to: Account;
+	token: Principal;
+	from: Account;
+	memo: [] | [Uint8Array | number[]];
+	amount: bigint;
+}
+export interface WithdrawRewardsArgs {
+	to: Account;
+	token: Principal;
+	memo: [] | [Uint8Array | number[]];
+	amount: bigint;
+}
 export interface _SERVICE {
 	__get_candid_interface_tmp_hack: ActorMethod<[], string>;
 	add_liquidity: ActorMethod<[LiquidityAddArg], Result>;
@@ -574,7 +587,7 @@ export interface _SERVICE {
 		[GetInformationRequest],
 		GetInformationResponse
 	>;
-	get_transactions: ActorMethod<[TransactionRange], GetTransactionsResponse>;
+	get_transactions: ActorMethod<[GetBlocksRequest], GetTransactionsResponse>;
 	icrc10_supported_standards: ActorMethod<[], Array<SupportedStandard>>;
 	icrc1_balance_of: ActorMethod<[LedgerType, Account], bigint>;
 	icrc21_canister_call_consent_message: ActorMethod<
@@ -602,13 +615,14 @@ export interface _SERVICE {
 	>;
 	query_user_meme_token_lp: ActorMethod<[[] | [Principal], bigint], bigint>;
 	query_user_tokens: ActorMethod<[[] | [Account]], Array<MemeTokenBalance>>;
-	runes_swap_sats: ActorMethod<[RunesSwapSatsArg], Result>;
-	sats_swap_runes: ActorMethod<[SatsSwapRunesArg], Result>;
+	runes_swap_sats: ActorMethod<[RunesSwapSatsArg], Result_2>;
+	sats_swap_runes: ActorMethod<[SatsSwapRunesArg], Result_2>;
 	sell: ActorMethod<[BuyArgs], Result_2>;
 	test: ActorMethod<[bigint], undefined>;
 	withdraw: ActorMethod<[WithdrawArgs], Result_2>;
 	withdraw_ckbtc: ActorMethod<[WithdrawByCkbtcArgs], Result_9>;
 	withdraw_liquidity: ActorMethod<[LiquidityRemoveArg], Result>;
+	withdraw_rewards: ActorMethod<[WithdrawRewardsArgs], Result_2>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];

@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { showToast } from "@/components/utils/toast";
-import { useUpdateUserInfo } from "@/hooks/apis/indexer";
+import { useBtcUpdateUserInfo } from "@/hooks/apis/indexer_btc";
 import { truncatePrincipal } from "@/lib/ic/principal";
-import { useIcIdentityStore } from "@/store/ic";
+import { useBtcIdentityStore } from "@/store/btc";
 
 import { FileUploader } from "../../token/bottom/file-uploader";
 
@@ -31,14 +31,14 @@ const EditInfoModal = ({
 	onSuccess,
 }: EditModalProps) => {
 	const { principal, identityProfile, reloadIdentityProfile } =
-		useIcIdentityStore();
+		useBtcIdentityStore();
 
 	const [avatar, setAvatar] = useState<string | undefined>();
 	const [nickname, setNickname] = useState<string | undefined>(
 		principal ? truncatePrincipal(principal) : undefined
 	);
 
-	const { mutateAsync: updateProfile, isPending } = useUpdateUserInfo();
+	const { mutateAsync: updateProfile, isPending } = useBtcUpdateUserInfo();
 
 	// const [isPending, setIsPending] = useState(false);
 
