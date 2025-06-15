@@ -458,7 +458,7 @@ function TokenCreationPage() {
 									</div>
 								</CardContent>
 							</Card>
-							<Card className="flex-1 rounded-2xl border-gray-800 bg-gray-800">
+							<Card className="flex flex-1 flex-col justify-center rounded-2xl border-gray-800 bg-gray-800">
 								<CardContent className="space-y-6 px-3 md:px-12.5">
 									{/* Social Media - Twitter Field */}
 									<div>
