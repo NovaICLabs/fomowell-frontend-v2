@@ -478,7 +478,7 @@ export default function BtcMemeList() {
 					const { amount_out } = receivedAmount;
 					showToast(
 						"success",
-						`${amount_out} $${info.row.original.ticker.toLocaleUpperCase()} received!`
+						`${formatNumberSmart(formatUnits(amount_out))} $${info.row.original.ticker.toLocaleUpperCase()} received!`
 					);
 				})
 				.catch((error: Error) => {
