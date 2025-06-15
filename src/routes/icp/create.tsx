@@ -273,7 +273,7 @@ function TokenCreationPage() {
 										name="name"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel className="flex items-center font-normal text-[#fff]">
+												<FormLabel className="flex items-center text-sm font-normal text-[#fff]">
 													Name <img alt="required" src="/svgs/required.svg" />
 												</FormLabel>
 												<FormControl>
@@ -293,7 +293,7 @@ function TokenCreationPage() {
 										name="symbol"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel className="flex items-center font-normal text-[#fff]">
+												<FormLabel className="flex items-center text-sm font-normal text-[#fff]">
 													Token Symbol{" "}
 													<img alt="required" src="/svgs/required.svg" />
 												</FormLabel>
@@ -315,7 +315,7 @@ function TokenCreationPage() {
 										render={({ field }) => (
 											<FormItem>
 												<div className="flex justify-between">
-													<FormLabel className="flex items-center font-normal text-[#fff]">
+													<FormLabel className="flex items-center text-sm font-normal text-[#fff]">
 														Token Description{" "}
 														<img alt="required" src="/svgs/required.svg" />
 													</FormLabel>
@@ -348,7 +348,7 @@ function TokenCreationPage() {
 								<CardContent className="space-y-6 px-3 md:px-12.5">
 									{/* Social Media - Twitter Field */}
 									<div>
-										<span className="flex items-center font-normal text-[#fff]">
+										<span className="flex items-center text-sm font-normal text-[#fff]">
 											Twitter{" "}
 											<em className="ml-1 text-sm text-white/60 not-italic">
 												(Optional)
@@ -376,7 +376,7 @@ function TokenCreationPage() {
 
 									{/* Social Media - Telegram Field */}
 									<div>
-										<span className="flex items-center font-normal text-[#fff]">
+										<span className="flex items-center text-sm font-normal text-[#fff]">
 											Telegram{" "}
 											<em className="ml-1 text-sm text-white/60 not-italic">
 												(Optional)
@@ -404,7 +404,7 @@ function TokenCreationPage() {
 
 									{/* Social Media - Website Field */}
 									<div>
-										<span className="flex items-center font-normal text-[#fff]">
+										<span className="flex items-center text-sm font-normal text-[#fff]">
 											Website{" "}
 											<em className="ml-1 text-sm text-white/60 not-italic">
 												(Optional)
@@ -434,7 +434,7 @@ function TokenCreationPage() {
 							<Card className="flex flex-1 flex-col justify-center rounded-2xl border-gray-800 bg-gray-800">
 								<CardContent className="space-y-6 px-3 md:px-12.5">
 									<div className="flex flex-col gap-y-2">
-										<span className="flex items-center font-normal text-[#fff]">
+										<span className="flex items-center text-sm font-normal text-[#fff]">
 											Dev buy{" "}
 											<em className="ml-1 text-sm text-white/60 not-italic">
 												(Optional)
