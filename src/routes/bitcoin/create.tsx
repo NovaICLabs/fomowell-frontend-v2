@@ -235,7 +235,7 @@ function TokenCreationPage() {
 		parseUnits(totalPayment)
 	);
 	return (
-		<div className="relative container m-auto pb-10">
+		<div className="relative container m-auto px-[15px] pb-10 md:px-0">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)}>
 					<div className="relative grid grid-cols-1 gap-y-3 overflow-hidden md:grid-cols-2 md:gap-8">
@@ -458,7 +458,7 @@ function TokenCreationPage() {
 									</div>
 								</CardContent>
 							</Card>
-							<Card className="rounded-2xl border-gray-800 bg-gray-800">
+							<Card className="flex-1 rounded-2xl border-gray-800 bg-gray-800">
 								<CardContent className="space-y-6 px-3 md:px-12.5">
 									{/* Social Media - Twitter Field */}
 									<div>
