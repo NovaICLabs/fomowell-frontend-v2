@@ -24,7 +24,7 @@ import { fromNow } from "@/lib/common/time";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
 
-import type { Transaction } from "@/apis/indexer";
+import type { Transaction } from "@/apis/indexer_btc";
 
 const TableItemsSkeleton = () => {
 	return (
@@ -99,15 +99,22 @@ export default function Transactions() {
 						<span className="duration-300 group-hover:text-white">Amount</span>
 					</div>
 				),
-				cell: (info) => (
-					<div className="flex h-full w-full items-center">
-						<span className="text-sm leading-4 text-white/60">
-							{formatNumberSmart(formatUnits(info.getValue()), {
-								shortenLarge: true,
-							})}
-						</span>
-					</div>
-				),
+				cell: (info) => {
+					const isSwap = info.row.original.pool_type === "outer_swap";
+					const value = isSwap
+						? info.row.original.token0Volume
+						: info.getValue();
+
+					return (
+						<div className="flex h-full w-full items-center">
+							<span className="text-sm leading-4 text-white/60">
+								{formatNumberSmart(formatUnits(value), {
+									shortenLarge: true,
+								})}
+							</span>
+						</div>
+					);
+				},
 				size: 100,
 			}),
 			// Total USD column
@@ -119,26 +126,33 @@ export default function Transactions() {
 						</span>
 					</div>
 				),
-				cell: (info) => (
-					<div className="flex h-full w-full items-center">
-						<span
-							className={cn(
-								"text-sm leading-4",
-								info.row.original.tradeType === "sell"
-									? "text-price-negative"
-									: "text-price-positive"
-							)}
-						>
-							$
-							{getTokenUsdValueTotal(
-								{
-									amount: BigInt(info.row.original.token1Amount),
-								},
-								info.row.original.token1Usd ?? 0
-							)}
-						</span>
-					</div>
-				),
+				cell: (info) => {
+					const isSwap = info.row.original.pool_type === "outer_swap";
+					const value = isSwap
+						? info.row.original.token1Volume
+						: info.row.original.token1Amount;
+
+					return (
+						<div className="flex h-full w-full items-center">
+							<span
+								className={cn(
+									"text-sm leading-4",
+									info.row.original.tradeType === "sell"
+										? "text-price-negative"
+										: "text-price-positive"
+								)}
+							>
+								$
+								{getTokenUsdValueTotal(
+									{
+										amount: BigInt(value),
+									},
+									info.row.original.token1Usd ?? 0
+								)}
+							</span>
+						</div>
+					);
+				},
 				size: 120,
 			}),
 			// Fee column
@@ -150,16 +164,23 @@ export default function Transactions() {
 						</span>
 					</div>
 				),
-				cell: (info) => (
-					<div className="flex h-full w-full items-center">
-						<span className="text-sm leading-4 text-white/60">
-							{formatNumberSmart(
-								formatUnits(info.getValue(), getCkbtcCanisterToken().decimals)
-							)}{" "}
-							BTC
-						</span>
-					</div>
-				),
+				cell: (info) => {
+					const isSwap = info.row.original.pool_type === "outer_swap";
+					const value = isSwap
+						? info.row.original.token1Volume
+						: info.getValue();
+
+					return (
+						<div className="flex h-full w-full items-center">
+							<span className="text-sm leading-4 text-white/60">
+								{formatNumberSmart(
+									formatUnits(value, getCkbtcCanisterToken().decimals)
+								)}{" "}
+								BTC
+							</span>
+						</div>
+					);
+				},
 				size: 130,
 			}),
 			// Price column
@@ -222,6 +243,7 @@ export default function Transactions() {
 		() => data?.pages.flatMap((page) => page.data) ?? [],
 		[data]
 	);
+	// console.log("🚀 ~ Transactions ~ items:", items);
 
 	const table = useReactTable({
 		data: items,

@@ -494,6 +494,8 @@ export default function Trade({ initialTab }: { initialTab?: TradeTab }) {
 						{activeTab === "Buy"
 							? coreTokenBalance?.formatted
 							: memeTokenBalance?.formatted}
+
+						{activeTab === "Buy" ? "BTC" : (memeTokenInfo?.ticker ?? "")}
 					</span>
 					<span className="text-xs text-white/60">
 						{" "}

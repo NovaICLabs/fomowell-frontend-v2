@@ -39,12 +39,16 @@ import { useDialogStore } from "@/store/dialog";
 
 const percentages = [25, 50, 75, 100];
 const tabs = ["Buy", "Sell"] as const;
-export type TradeTab = (typeof tabs)[number];
+export type SwapTradeTab = (typeof tabs)[number];
 
 const buyRange = [0.0001, Infinity] as const;
 const sellRange = [0.1, Infinity] as const;
 
-export default function SwapTrade({ initialTab }: { initialTab?: TradeTab }) {
+export default function SwapTrade({
+	initialTab,
+}: {
+	initialTab?: SwapTradeTab;
+}) {
 	const { id } = useTokenChainAndId();
 
 	const { principal } = useBtcConnectedIdentity();
@@ -61,7 +65,7 @@ export default function SwapTrade({ initialTab }: { initialTab?: TradeTab }) {
 		useBtcMemeCurrentPrice({ id: Number(id) });
 
 	// tab
-	const [activeTab, setActiveTab] = useState<TradeTab>(initialTab ?? "Buy");
+	const [activeTab, setActiveTab] = useState<SwapTradeTab>(initialTab ?? "Buy");
 
 	// meme token
 	const { data: memeTokenInfo, refetch: refetchMemeTokenInfo } =
@@ -502,7 +506,8 @@ export default function SwapTrade({ initialTab }: { initialTab?: TradeTab }) {
 					<span className="font-medium">
 						{activeTab === "Buy"
 							? coreTokenBalance?.formatted
-							: memeTokenBalance?.formatted}
+							: memeTokenBalance?.formatted}{" "}
+						{activeTab === "Buy" ? "BTC" : (memeTokenInfo?.ticker ?? "")}
 					</span>
 					<span className="text-xs text-white/60">
 						{" "}
