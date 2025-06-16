@@ -1,3 +1,4 @@
+import { showToast } from "@/components/utils/toast";
 import { useAppStore } from "@/store/app";
 
 import { request } from ".";
@@ -184,5 +185,41 @@ export const updateUserInfo = async (
 			`Failed to update user info: ${response.message} (Status: ${response.statusCode})`
 		);
 	}
+	return response.data;
+};
+
+// update user info
+export const bindReferCode = async (
+	user_token: string,
+	arg: { code: string }
+) => {
+	if (!user_token) {
+		return undefined;
+	}
+	const parameters = { invite_by: arg.code };
+
+	const response = await request<{
+		data: string;
+		statusCode: number;
+		message: string;
+	}>(`${getIndexerBtcBaseUrl()}/api/v1/users/bind`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			authorization: `Bearer ${user_token}`,
+		},
+		body: JSON.stringify(parameters),
+	});
+	if (response.statusCode === 409) {
+		showToast("error", response?.message);
+		return false;
+	}
+
+	if (response.statusCode !== 201) {
+		throw new Error(
+			`Failed to update user info: ${response.message} (Status: ${response.statusCode})`
+		);
+	}
+
 	return response.data;
 };

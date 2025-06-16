@@ -416,6 +416,7 @@ export type UserInfo = {
 	name: string;
 	role: string;
 	invite_code: string;
+	invite_by: string;
 	createdAt: string;
 	updatedAt: string;
 };
@@ -449,15 +450,3 @@ export const getLaunchedTokenList = async () => {
 	}
 	return response.data.data.filter((token) => token.tokenAddress);
 };
-
-// export const useICPRewardStats = () => {
-// 	const { jwt_token } = useIcIdentityStore();
-// 	if (!jwt_token) {
-// 		throw new Error("No login jwt token");
-// 	}
-
-// 	return useQuery({
-// 		queryKey: ["btc-core", "rewardStats"],
-// 		queryFn: () => getUserRewardStats(jwt_token),
-// 	});
-// };

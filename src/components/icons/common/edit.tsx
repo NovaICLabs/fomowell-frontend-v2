@@ -1,12 +1,23 @@
-export const EditIcon = () => {
+import { cn } from "@/lib/utils";
+
+export const EditIcon = ({
+	className,
+	onClick,
+	size = 12,
+}: {
+	className?: string;
+	onClick?: () => void;
+	size?: number;
+}) => {
 	return (
 		<svg
-			className="h-4 w-4 cursor-pointer text-white/40 hover:text-white"
+			className={cn(className, "cursor-pointer")}
 			fill="none"
-			height="16"
+			height={size}
 			viewBox="0 0 16 16"
-			width="16"
+			width={size}
 			xmlns="http://www.w3.org/2000/svg"
+			onClick={onClick}
 		>
 			<g clip-path="url(#clip0_411_9590)">
 				<path

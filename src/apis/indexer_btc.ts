@@ -393,6 +393,7 @@ export type UserInfo = {
 	name: string;
 	role: string;
 	invite_code: string;
+	invite_by: string;
 	createdAt: string;
 	updatedAt: string;
 };

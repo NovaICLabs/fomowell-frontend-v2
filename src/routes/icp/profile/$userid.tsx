@@ -5,10 +5,12 @@ import copy from "copy-to-clipboard";
 import { Check } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
+import { bindReferCode } from "@/apis/user-login";
 import { getICPCanisterId } from "@/canisters/icrc3";
 import { CopyIcon } from "@/components/icons/common/copy";
 import { EditIcon } from "@/components/icons/common/edit";
 import ReferIcon from "@/components/icons/common/refer";
+import { SubmitIcon } from "@/components/icons/common/submit";
 import WithdrawIcon from "@/components/icons/common/withdraw";
 import DepositWithdrawIcon from "@/components/icons/links-popover/deposit-withdraw";
 import ReferralDialog from "@/components/layout/dialog/referral";
@@ -113,8 +115,10 @@ const UserInfo = () => {
 };
 function UserId() {
 	const { userid } = Route.useParams();
+	const { data: userInfo } = useUserInfo(userid);
+
 	const [activeTab, setActiveTab] = useState("Created");
-	const { identityProfile } = useIcIdentityStore();
+	const { identityProfile, jwt_token } = useIcIdentityStore();
 	const { data: coreTokenBalance } = useCoreTokenBalance({
 		owner: userid,
 		token: { ICRCToken: getICPCanisterId() },
@@ -136,6 +140,31 @@ function UserId() {
 	// const domain = window.location.origin;
 	// const { chain } = useChainStore();
 
+	const [isEdit, setIsEdit] = useState(false);
+	const [code, setCode] = useState("");
+	const [loading, setLoading] = useState(false);
+	const [codeResource, setCodeResource] = useState("");
+	const onSubmitIcon = () => {
+		if (!jwt_token) {
+			return;
+		}
+		setLoading(true);
+		void bindReferCode(jwt_token, { code: code })
+			.then((response) => {
+				if (!response) {
+					setCode("");
+				} else {
+					setCodeResource(code);
+				}
+			})
+			.catch(() => {
+				setCode("");
+			})
+			.finally(() => {
+				setLoading(false);
+			});
+	};
+
 	return (
 		<>
 			<div className="flex h-full w-full flex-1 flex-col overflow-auto pt-5">
@@ -154,12 +183,9 @@ function UserId() {
 						<UserInfo />
 						<div
 							className={cn(
-								"absolute top-1/2 right-5 flex -translate-y-1/2 gap-x-6",
+								"absolute top-1/2 right-5 flex -translate-y-1/2 flex-col items-end gap-x-6",
 								isSelf ? "flex" : "hidden"
 							)}
-							onClick={() => {
-								setReferral2ICPOpen(true);
-							}}
 						>
 							{/* <div className="relative flex h-9 w-[102px] items-center justify-center rounded-full p-[2px]">
 							<Button
@@ -179,10 +205,71 @@ function UserId() {
 							</Button>
 							<div className="absolute inset-0 top-px right-px bottom-px left-px z-0 rounded-full bg-gradient-to-r from-yellow-500 to-blue-500"></div>
 						</div> */}
-							<Button className={cn("rounded-full", isMobile && "hidden")}>
+							<Button
+								className={cn("flex rounded-full", isMobile && "hidden")}
+								onClick={() => {
+									setReferral2ICPOpen(true);
+								}}
+							>
 								<ReferIcon className="text-black" />
 								Refer to Earn
 							</Button>
+							<div className="mt-2 flex items-center">
+								<p className="mr-2 text-base leading-none font-medium text-white/40">
+									Inviter:
+								</p>
+								{(userInfo && userInfo.invite_by) || codeResource ? (
+									<p className="text-base font-medium text-white">
+										{codeResource ? codeResource : userInfo!.invite_by}
+									</p>
+								) : (
+									<>
+										{isEdit ? (
+											<div className="flex h-9 w-[130px] items-center rounded-md border border-[#fff]/10 bg-[#111111]">
+												<input
+													className="ml-[6px] flex h-full w-full flex-1 outline-none"
+													disabled={loading}
+													value={code}
+													onChange={(event) => {
+														setCode(event.target.value);
+													}}
+													onKeyDown={(event) => {
+														if (event.key === "Enter") {
+															onSubmitIcon();
+														}
+													}}
+												/>
+												{loading ? (
+													<img
+														alt=""
+														className="mr-[6px] ml-1 h-4 w-4 animate-spin"
+														src="/svgs/loading.svg"
+													/>
+												) : (
+													<SubmitIcon
+														className="mr-[6px] ml-1 h-4 w-4"
+														onClick={() => {
+															onSubmitIcon();
+														}}
+													/>
+												)}
+											</div>
+										) : (
+											<div className="flex h-9 items-center">
+												<p className="text-base font-medium text-white">
+													Referral code
+												</p>
+												<EditIcon
+													className="ml-1 h-4 w-4"
+													onClick={() => {
+														setIsEdit(true);
+													}}
+												/>
+											</div>
+										)}
+									</>
+								)}
+							</div>
 						</div>
 					</div>
 

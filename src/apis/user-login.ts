@@ -185,3 +185,34 @@ export const updateUserInfo = async (
 	}
 	return response.data;
 };
+
+// update user info
+export const bindReferCode = async (
+	user_token: string,
+	arg: { code: string }
+) => {
+	if (!user_token) {
+		return undefined;
+	}
+	const parameters = { code: arg.code };
+
+	const response = await request<{
+		data: string;
+		statusCode: number;
+		message: string;
+	}>(`${getIndexerBaseUrl()}/api/v1/users/bind`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			authorization: `Bearer ${user_token}`,
+		},
+		body: JSON.stringify(parameters),
+	});
+
+	if (response.statusCode !== 201) {
+		throw new Error(
+			`Failed to update user info: ${response.message} (Status: ${response.statusCode})`
+		);
+	}
+	return response.data;
+};
