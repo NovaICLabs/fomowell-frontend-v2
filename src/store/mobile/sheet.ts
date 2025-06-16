@@ -4,6 +4,10 @@ type MobileSheetStore = {
 	setInfoOpen: (infoOpen: boolean) => void;
 	tradeOpen: boolean;
 	setTradeOpen: (tradeOpen: boolean) => void;
+	swapTradeOpen: boolean;
+	setSwapTradeOpen: (swapTradeOpen: boolean) => void;
+	liquidityOpen: boolean;
+	setLiquidityOpen: (swapTradeOpen: boolean) => void;
 	menuOpen: boolean;
 	setMenuOpen: (menuOpen: boolean) => void;
 };
@@ -19,5 +23,14 @@ export const useMobileSheetStore = create<MobileSheetStore>((set) => ({
 	tradeOpen: false,
 	setTradeOpen: (tradeOpen) => {
 		set({ tradeOpen });
+	},
+	// only btc
+	swapTradeOpen: false,
+	setSwapTradeOpen: (swapTradeOpen) => {
+		set({ swapTradeOpen });
+	},
+	liquidityOpen: false,
+	setLiquidityOpen: (liquidityOpen) => {
+		set({ liquidityOpen });
 	},
 }));

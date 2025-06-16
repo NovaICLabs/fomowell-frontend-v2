@@ -191,6 +191,7 @@ export const getFavoriteTokenList = async (parameters: {
 export type Transaction = {
 	id: string;
 	tradeType: "buy" | "sell";
+	pool_type: "inner_swap" | "outer_swap";
 	token0: string;
 	token1: string;
 	maker: string | null;

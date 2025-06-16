@@ -6,9 +6,9 @@ import { Check } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
 import { CopyIcon } from "@/components/icons/common/copy";
-import Assets from "@/components/views/icp/wallet/assets";
-import { useICPPrice } from "@/hooks/apis/coingecko";
-import { useICPBalance } from "@/hooks/ic/tokens/icp";
+import Assets from "@/components/views/bitcoin/wallet/assets";
+import { useCKBTCPrice } from "@/hooks/apis/coingecko";
+import { useBtcBalance } from "@/hooks/btc/tokens/btc";
 import { getTokenUsdValueTotal } from "@/lib/common/number";
 import { truncatePrincipal } from "@/lib/ic/principal";
 import { cn } from "@/lib/utils";
@@ -19,12 +19,13 @@ export const Route = createFileRoute("/bitcoin/wallet/$pid")({
 
 function RouteComponent() {
 	const { pid } = Route.useParams();
-	const { data: balance } = useICPBalance(pid);
-	const { data: price } = useICPPrice();
+
+	const { data: balance } = useBtcBalance();
+	const { data: price } = useCKBTCPrice();
 
 	const usdValue =
 		balance && price
-			? getTokenUsdValueTotal({ amount: balance.raw }, price)
+			? getTokenUsdValueTotal({ amount: BigInt(balance.raw) }, price)
 			: "--";
 
 	const [copied, setCopied] = useState(false);
@@ -66,7 +67,7 @@ function RouteComponent() {
 					<div className="text-sm font-medium text-gray-400">Total Value</div>
 					<div className="mt-1">
 						<span className="text-2xl font-semibold">
-							{balance?.formatted ?? "--"} ICP
+							{balance?.formatted ?? "--"} BTC
 						</span>
 					</div>
 					<div className="mt-0.5 text-sm text-white/60">≈ ${usdValue}</div>
@@ -91,7 +92,7 @@ function RouteComponent() {
 				>
 					Assets
 				</h2>
-				<Assets pid={pid} />
+				<Assets />
 			</div>
 		</div>
 	);

@@ -7,7 +7,7 @@ import { isMobile } from "react-device-detect";
 import { Star } from "@/components/icons/star";
 import BitcoinWalletConnect from "@/components/layout/header/connect-button/bitcoin";
 import { Button } from "@/components/ui/button";
-import { showToast } from "@/components/utils/toast";
+// import { showToast } from "@/components/utils/toast";
 import Bottom from "@/components/views/bitcoin/token/bottom";
 import HeadInfo from "@/components/views/bitcoin/token/head-info";
 import Right from "@/components/views/bitcoin/token/right";
@@ -30,6 +30,8 @@ import { useMobileSheetStore } from "@/store/mobile/sheet";
 import Comments from "./bottom/comments";
 import Transactions from "./bottom/transactions";
 import InfoSheet from "./mobile-sheet/info";
+import LiquiditySheet from "./mobile-sheet/liquidity";
+import SwapTradeSheet from "./mobile-sheet/swap-trade";
 import TradeSheet from "./mobile-sheet/trade";
 import Holders from "./right/holders";
 
@@ -48,7 +50,8 @@ const MobileToken = () => {
 	const [activeBottomTab, setActiveBottomTab] = useState(MobileTabsBottom[0]);
 	const router = useRouter();
 	const canGoBack = useCanGoBack();
-	const { setInfoOpen, setTradeOpen } = useMobileSheetStore();
+	const { setInfoOpen, setTradeOpen, setSwapTradeOpen, setLiquidityOpen } =
+		useMobileSheetStore();
 	const { connected } = useBtcIdentityStore();
 	const { setBtcConnectOpen } = useDialogStore();
 	const [tradeType, setTradeType] = useState<TradeTab>("Buy");
@@ -57,6 +60,8 @@ const MobileToken = () => {
 		<div className="flex h-dvh flex-col gap-4 pt-2">
 			<InfoSheet />
 			<TradeSheet initialTab={tradeType} />
+			<SwapTradeSheet />
+			<LiquiditySheet />
 			<div className="flex h-11 items-center justify-between gap-2 px-2.5">
 				<div className="flex items-center gap-0.5">
 					{canGoBack ? (
@@ -171,30 +176,41 @@ const MobileToken = () => {
 					<span className="text-xs text-white/60">Info</span>
 				</div>
 				{isCompleted ? (
-					<Button
-						className="h-9.5 w-37 flex-1 rounded-[19px] px-2.5 py-1.5 text-sm font-semibold text-black"
-						onClick={() => {
-							const rune_name = memeTokenInfo.rune_name;
-							if (!rune_name) {
-								showToast("error", "rune name not found!");
-								return;
-							}
-							// todo go to dex
-							// const input = validatePrincipalText(canister_id.toText());
-							// window.open(
-							// 	`${getSwapUrlByCanisterId({
-							// 		input: input.toText(),
-							// 		output: getCkbtcCanisterId().toText(),
-							// 	})}`,
-							// 	"_blank"
-							// );
-						}}
-					>
-						Go to Dex
-					</Button>
-				) : (
 					<>
 						{/* TODO mobile edit style */}
+						<Button
+							key={"buy"}
+							className={cn(
+								"h-9.5 w-37 rounded-[19px] bg-white px-2.5 py-1.5 text-sm font-medium text-[#111] hover:bg-[#111]/80"
+							)}
+							onClick={() => {
+								if (!connected) {
+									setBtcConnectOpen(true);
+									return;
+								}
+								setSwapTradeOpen(true);
+							}}
+						>
+							Trade
+						</Button>
+						<Button
+							key={"sell"}
+							className={cn(
+								"h-9.5 w-37 rounded-[19px] bg-[#333333] px-2.5 py-1.5 text-sm font-medium text-white hover:bg-[#333333]/80"
+							)}
+							onClick={() => {
+								if (!connected) {
+									setBtcConnectOpen(true);
+									return;
+								}
+								setLiquidityOpen(true);
+							}}
+						>
+							Liquidity
+						</Button>
+					</>
+				) : (
+					<>
 						<Button
 							key={"buy"}
 							className={cn(
