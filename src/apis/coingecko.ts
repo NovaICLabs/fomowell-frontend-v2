@@ -35,3 +35,15 @@ export const getSatsPrice = async (): Promise<number> => {
 	);
 	return response["sats-ordinals"].usd;
 };
+
+export const getBtcBalanceByAddress = async (
+	address: string
+): Promise<number> => {
+	const response = await request<{
+		chain_stats: { funded_txo_sum: number; spent_txo_sum: number };
+	}>(`https://blockstream.info/api/address/${address}`);
+
+	const sats =
+		response.chain_stats.funded_txo_sum - response.chain_stats.spent_txo_sum;
+	return sats;
+};

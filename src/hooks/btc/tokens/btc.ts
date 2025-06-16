@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import BigNumber from "bignumber.js";
 import { useSiwbIdentity } from "ic-siwb-lasereyes-connector";
 
+import { getBtcBalanceByAddress } from "@/apis/coingecko";
 import {
 	getChainBTCCoreCanisterId,
 	getUserCreatedMemeTokens,
@@ -12,6 +13,7 @@ import {
 	withdrawBtc,
 	type WithdrawBtcArgs,
 } from "@/canisters/btc_core";
+import { getCkbtcCanisterToken } from "@/canisters/icrc3/specials";
 import { useBtcIdentityStore } from "@/store/btc";
 
 import {
@@ -32,18 +34,20 @@ export const useBtcBalance = () => {
 		queryFn: async () => {
 			if (!btcAddress || !laserEyes)
 				throw new Error("No BTC address connected");
-
 			try {
+				const balance = await getBtcBalanceByAddress(btcAddress);
+				// console.log("🚀 ~ queryFn: ~ result:", balanceInSatoshis);
+
 				// Use LaserEyes to get the balance if it provides such functionality
-				const balanceInSatoshis = await laserEyes.getBalance();
-				const balanceInBtc = BigNumber(balanceInSatoshis)
-					.dividedBy(100000000)
+				// const balanceInSatoshis = await laserEyes.getBalance();
+				const balanceInBtc = BigNumber(balance)
+					.dividedBy(10 ** getCkbtcCanisterToken().decimals)
 					.toString();
 
-				console.debug("🚀 ~ queryFn: ~ balanceInBtc:", balanceInBtc);
+				// console.debug("🚀 ~ queryFn: ~ balanceInBtc:", balanceInBtc);
 
 				return {
-					raw: balanceInSatoshis,
+					raw: balance,
 					formatted: balanceInBtc,
 					decimals: 8,
 				};
