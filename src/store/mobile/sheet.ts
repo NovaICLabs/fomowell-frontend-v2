@@ -6,6 +6,8 @@ type MobileSheetStore = {
 	setTradeOpen: (tradeOpen: boolean) => void;
 	swapTradeOpen: boolean;
 	setSwapTradeOpen: (swapTradeOpen: boolean) => void;
+	liquidityOpen: boolean;
+	setLiquidityOpen: (swapTradeOpen: boolean) => void;
 	menuOpen: boolean;
 	setMenuOpen: (menuOpen: boolean) => void;
 };
@@ -26,5 +28,9 @@ export const useMobileSheetStore = create<MobileSheetStore>((set) => ({
 	swapTradeOpen: false,
 	setSwapTradeOpen: (swapTradeOpen) => {
 		set({ swapTradeOpen });
+	},
+	liquidityOpen: false,
+	setLiquidityOpen: (liquidityOpen) => {
+		set({ liquidityOpen });
 	},
 }));
