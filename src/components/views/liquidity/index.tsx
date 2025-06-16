@@ -22,6 +22,7 @@ import { fromNow } from "@/lib/common/time";
 import { cn } from "@/lib/utils";
 
 import type { BtcTokenInfo } from "@/apis/indexer_btc";
+import { withStopPropagation } from "@/lib/common/react-event";
 
 const LiquidityHeader = ({
 	sortBy,
@@ -36,7 +37,7 @@ const LiquidityHeader = ({
 			label: "Token",
 			sortable: false,
 			className:
-				"min-w-[18%] w-[180px] pr-[10px] pl-[50px] md:w-[400px] sticky left-0 bg-[#1E1E1E] z-[1]",
+				"min-w-[18%] w-[180px] pr-[10px] pl-[20px] md:w-[400px] sticky left-0 bg-[#1E1E1E] z-[1]",
 		},
 		{
 			id: "create",
@@ -191,7 +192,7 @@ const LiquidityListItem = ({
 		normal: { backgroundColor: transparentBg },
 	};
 
-	const onFavoriteLiquidity = () => {};
+	// const onFavoriteLiquidity = () => {};
 
 	const onAddLiquidity = () => {
 		void router.navigate({
@@ -226,27 +227,25 @@ const LiquidityListItem = ({
 	return (
 		<motion.tr
 			key={itemData.id}
-			className="group relative flex h-[70px] items-center border-b border-[#262626] duration-300 hover:!bg-[#262626]"
+			className="group relative flex h-[70px] cursor-pointer items-center border-b border-[#262626] duration-300 hover:!bg-[#262626]"
 			initial="initial"
 			variants={rowVariants}
+			onClick={() => {
+				void router.navigate({
+					to: `/bitcoin/token/$id`,
+					params: { id: `${itemData.id}` },
+				});
+			}}
 		>
 			<div className="sticky left-0 z-[1] flex h-full w-[180px] min-w-[18%] items-center bg-[#1E1E1E] pr-[10px] text-left text-xs leading-none font-medium text-white/60 duration-300 group-hover:!bg-[#262626] md:w-[400px]">
-				<Star
+				{/* <Star
 					className="ml-[20px] h-4 w-4 shrink-0 cursor-pointer text-white/40"
 					isActive={itemData.isFollow}
 					onClick={() => {
 						onFavoriteLiquidity();
 					}}
-				/>
-				<div
-					className="relative ml-[10px] flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full"
-					onClick={() => {
-						void router.navigate({
-							to: `/bitcoin/token/$id`,
-							params: { id: `${itemData.id}` },
-						});
-					}}
-				>
+				/> */}
+				<div className="relative ml-[20px] flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full">
 					<div className="absolute inset-0 rounded-full border-[2px] border-gray-500"></div>
 					<div className="bg-gray-710 absolute h-9 w-9 rounded-full p-[2px]"></div>
 					<div
@@ -273,7 +272,15 @@ const LiquidityListItem = ({
 					)} */}
 				</div>
 				<div className="ml-[10px] flex flex-col justify-center">
-					<div className="flex items-center gap-x-[10px]">
+					<div
+						className="flex items-center gap-x-[10px]"
+						onClick={() => {
+							void router.navigate({
+								to: `/bitcoin/token/$id`,
+								params: { id: `${itemData.id}` },
+							});
+						}}
+					>
 						<p
 							className="cursor-pointer text-sm leading-none font-medium text-white"
 							onClick={() => {
@@ -375,9 +382,9 @@ const LiquidityListItem = ({
 						backgroundSize: "cover",
 						backgroundPosition: "center",
 					}}
-					onClick={() => {
+					onClick={withStopPropagation(() => {
 						onAddLiquidity();
-					}}
+					})}
 				>
 					<img
 						alt=""
